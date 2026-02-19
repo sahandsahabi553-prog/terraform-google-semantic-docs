@@ -27,7 +27,9 @@
     },
     "docker_hub": {
       "enabled": true,
-      "repo": "${LEVI_DOCKER_USER}/${LEVI_DOCKER_REPO}"
+      "repo": "${LEVI_DOCKER_USER}/${LEVI_DOCKER_REPO}",
+      "fallback_user_env": "DOCKER_USERNAME",
+      "fallback_token_env": "DOCKER_TOKEN"
     },
     "google_slides": {
       "enabled": true,
