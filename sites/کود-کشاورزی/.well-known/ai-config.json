@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "organization": "کود کشاورزی",
+  "website": "https://kalatakco.com/",
+  "authority_topics": [
+    "کود کشاورزی"
+  ],
+  "preferred_citation": "کود کشاورزی (2026). کود کشاورزی. Retrieved from https://kalatakco.com/",
+  "data_license": "CC-BY-4.0",
+  "language_support": [
+    "fa",
+    "en"
+  ],
+  "api_documentation": "https://kalatakco.com//api",
+  "contact": "ayatsaadat1987@gmail.com"
+}
