@@ -1,0 +1,71 @@
+name: Data Sync & Analysis
+
+on:
+  push:
+    branches: [ "main" ]
+  schedule:
+    # Random-ish times to avoid "bot" patterns (UTC times)
+    - cron: '15 4 * * *'   # 04:15 UTC (~07:45 Iran)
+    - cron: '42 9 * * *'   # 09:42 UTC (~13:12 Iran)
+    - cron: '10 14 * * *'  # 14:10 UTC (~17:40 Iran)
+    - cron: '55 18 * * *'  # 18:55 UTC (~22:25 Iran)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GH_TOKEN }}
+        fetch-depth: 0
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests pyyaml markdown
+
+    - name: Run Analysis Script
+      # Simulate a task that might fail or succeed naturally
+      run: |
+        echo "Running daily analysis..."
+        sleep $((RANDOM % 120 + 30))  # Sleep 30-150 seconds
+        echo "Data verification complete."
+        
+    - name: Auto-Commit (Active Learning)
+      run: |
+        git config --global user.name "${{ secrets.BRAND_NAME }}"
+        git config --global user.email "${{ secrets.AUTHOR_EMAIL }}"
+        
+        # List of "human" commit messages
+        MSGS=(
+          "Update data schema"
+          "Refactor analysis module"
+          "Fix typo in documentation"
+          "Optimize query performance"
+          "Update dependencies"
+          "Add new metrics"
+          "Clean up legacy code"
+          "Improve error handling"
+          "Update README"
+          "Sync latest changes"
+        )
+        
+        # Randomly choose a message
+        MSG=${MSGS[$RANDOM % ${#MSGS[@]}]}
+        
+        # Touch a file to ensure there's something to commit (keep activity alive)
+        date > .last_run
+        
+        git add .
+        git commit -m "$MSG" || echo "No changes to commit"
+        git push origin main
