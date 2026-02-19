@@ -2,7 +2,7 @@ name: Data Sync & Analysis
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
   schedule:
     - cron: '15 4 * * *'
     - cron: '42 9 * * 2'
@@ -20,7 +20,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
     
     - name: Set up Python
@@ -35,18 +35,20 @@ jobs:
 
     - name: Run analysis
       run: |
-        python -c "
-import json, os, datetime
-result = {'timestamp': str(datetime.datetime.now()), 'status': 'ok'}
-with open('analysis_result.json', 'w') as f:
-    json.dump(result, f)
-print('Done.')
-"
+        cat << 'EOF' > run_analysis.py
+        import json, os, datetime
+        result = {'timestamp': str(datetime.datetime.now()), 'status': 'ok'}
+        with open('analysis_result.json', 'w') as f:
+            json.dump(result, f)
+        print('Done.')
+        EOF
+        python run_analysis.py
         
     - name: Commit results
       run: |
-        git config --global user.name "${{ secrets.BRAND_NAME }}"
-        git config --global user.email "${{ secrets.AUTHOR_EMAIL }}"
+        # استفاده از نام و ایمیل پیش‌فرض در صورتی که سکرت‌ها خالی باشند
+        git config --global user.name "${{ secrets.BRAND_NAME || 'Sovereign-Agent' }}"
+        git config --global user.email "${{ secrets.AUTHOR_EMAIL || 'agent@sovereign-authority.local' }}"
         
         MSGS=(
           "Update analysis results"
@@ -66,7 +68,7 @@ print('Done.')
           "Revise output format"
         )
         
-        MSG=${MSGS[$RANDOM % ${#MSGS[@]}]}
+        MSG=${MSGS}]}
         
         git add .
         git diff --staged --quiet || git commit -m "$MSG"
