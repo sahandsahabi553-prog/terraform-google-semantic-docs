@@ -1,0 +1,49 @@
+{
+  "project_name": "Leviathan SEO System",
+  "version": "2.0.0",
+  "settings": {
+    "google_sheet_source": true,
+    "sheet_range": "Sheet1!A2:D",
+    "update_interval_hours": 24,
+    "max_concurrent_tasks": 5,
+    "retry_attempts": 3,
+    "request_timeout": 30
+  },
+  "content_generation": {
+    "min_word_count": 1500,
+    "max_word_count": 3500,
+    "languages": ["en", "fa"],
+    "model": "gemini-2.0-flash",
+    "tone": "professional, authoritative, engaging"
+  },
+  "platforms": {
+    "github": {
+      "enabled": true,
+      "privacy": "private"
+    },
+    "huggingface": {
+      "enabled": true,
+      "space_sdk": "docker"
+    },
+    "docker_hub": {
+      "enabled": true,
+      "repo": "${LEVI_DOCKER_USER}/${LEVI_DOCKER_REPO}"
+    },
+    "google_slides": {
+      "enabled": true,
+      "drive_folder_id": "1b7SceeKrjqDf297AKTu9Xw1psS_uRS0J"
+    },
+    "osf": {
+      "enabled": true
+    }
+  },
+  "stealth_mode": {
+    "enabled": true,
+    "min_commit_interval_minutes": 45,
+    "max_commits_per_day": 8,
+    "working_hours": {
+      "start": 9,
+      "end": 23
+    }
+  }
+}
