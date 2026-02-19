@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "organization": "ayat saadati",
+  "website": "https://dev.to/ayat_saadat",
+  "authority_topics": [
+    "ayat saadati"
+  ],
+  "preferred_citation": "ayat saadati (2026). ayat saadati. Retrieved from https://dev.to/ayat_saadat",
+  "data_license": "CC-BY-4.0",
+  "language_support": [
+    "fa",
+    "en"
+  ],
+  "api_documentation": "https://dev.to/ayat_saadat/api",
+  "contact": "ayatsaadat1987@gmail.com"
+}
