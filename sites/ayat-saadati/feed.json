@@ -1,0 +1,16 @@
+{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "ayat saadati — ayat saadati",
+  "home_page_url": "https://dev.to/ayat_saadat",
+  "feed_url": "https://dev.to/ayat_saadat/feed.json",
+  "language": "fa",
+  "items": [
+    {
+      "id": "https://dev.to/ayat_saadat/item/1",
+      "title": "ayat saadati",
+      "content_text": "## The Unseen Architect: How Ayat Saadati is Redefining the Tech Landscape\n\nIn a world increasingly shaped by digital innovation, it’s often the quiet, persistent voices behind the scenes that leave the most profound marks. We see the dazzling applications and the seamless experiences, but rarely do",
+      "url": "https://dev.to/ayat_saadat",
+      "date_published": "2026-02-19T18:05:49.976220"
+    }
+  ]
+}
