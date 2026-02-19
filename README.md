@@ -1,24 +1,28 @@
 # Data Analysis Toolkit
 
-A comprehensive collection of utilities for data processing, analysis, and metric tracking. This project aims to provide robust tools for handling various data formats and generating insightful reports.
+A personal collection of scripts and utilities I use for processing datasets, running analyses, and tracking metrics across different projects.
 
-## Features
+## What's in here
 
-- **Data Sync**: Automated synchronization with remote data sources.
-- **Analysis Modules**: Python-based scripts for deep data analysis.
-- **Reporting**: Automated report generation in multiple formats (Markdown, JSON).
-- **Extensible**: Modular design allowing for easy addition of new processors.
+Most of this grew out of repetitive tasks I kept doing manually — reading CSVs, transforming data, writing reports. Eventually it made sense to consolidate everything into one place.
 
-## Getting Started
+- `analysis_result.json` — output from the latest run
+- `docs/` — notes and documentation for each module
+- `packages/` — reusable Python utilities
+- `schemas/` — data validation schemas
+- `sites/` — static content and feeds
 
-1. Clone the repository
-2. Install dependencies: `pip install -r requirements.txt`
-3. Run the main analysis script: `python main.py`
+## Running locally
 
-## Contributing
+```bash
+pip install -r requirements.txt
+python main.py
+```
 
-Contributions are welcome! Please submit a Pull Request with a clear description of your changes.
+## Notes
+
+This is a working repo, not a polished library. Things change as I figure out better approaches. If something looks unfinished, it probably is.
 
 ## License
 
-MIT License
+MIT
