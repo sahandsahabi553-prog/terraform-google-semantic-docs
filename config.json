@@ -13,7 +13,7 @@
     "min_word_count": 1500,
     "max_word_count": 3500,
     "languages": ["en", "fa"],
-    "model": "gemini-2.0-flash",
+    "model": "gemini-2.5-flash",
     "tone": "professional, authoritative, engaging"
   },
   "platforms": {
@@ -49,3 +49,4 @@
     }
   }
 }
+
