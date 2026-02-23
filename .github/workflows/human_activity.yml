@@ -68,7 +68,7 @@ jobs:
           "Revise output format"
         )
         
-        MSG=${MSGS}]}
+        MSG=${MSGS[$RANDOM % ${#MSGS[@]}]}
         
         git add .
         git diff --staged --quiet || git commit -m "$MSG"
