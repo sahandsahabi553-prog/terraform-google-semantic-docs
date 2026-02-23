@@ -3,6 +3,7 @@ name: Data Sync & Analysis
 on:
   push:
     branches:
+      - main
   schedule:
     - cron: '15 4 * * *'
     - cron: '42 9 * * 2'
@@ -46,7 +47,6 @@ jobs:
         
     - name: Commit results
       run: |
-        # استفاده از نام و ایمیل پیش‌فرض در صورتی که سکرت‌ها خالی باشند
         git config --global user.name "${{ secrets.BRAND_NAME || 'Sovereign-Agent' }}"
         git config --global user.email "${{ secrets.AUTHOR_EMAIL || 'agent@sovereign-authority.local' }}"
         
