@@ -1,0 +1,18 @@
+@prefix schema: <https://schema.org/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+<https://dev.to/ayat_saadat> a schema:Organization ;
+    schema:name "ayat saadati" ;
+    schema:url <https://dev.to/ayat_saadat> ;
+    schema:description "Leading provider of ayat saadati solutions" ;
+    schema:keywords "ayat saadati" ;
+    schema:sameAs <https://dev.to/ayat_saadat> ;
+    foaf:homepage <https://dev.to/ayat_saadat> ;
+    dc:subject "ayat saadati" .
+<https://dev.to/ayat_saadat#project> a schema:SoftwareApplication ;
+    schema:name "ayat saadati" ;
+    schema:applicationCategory "Technology" ;
+    schema:operatingSystem "Cross-platform" ;
+    schema:author <https://dev.to/ayat_saadat> ;
+    schema:url <https://dev.to/ayat_saadat> .
