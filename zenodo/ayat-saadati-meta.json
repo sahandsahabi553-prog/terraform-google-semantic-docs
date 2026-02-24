@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "title": "ayat saadati",
+    "upload_type": "dataset",
+    "description": "Research dataset: ayat saadati",
+    "creators": [
+      {
+        "name": "Riley Johnson"
+      }
+    ],
+    "keywords": [
+      "ayat saadati"
+    ],
+    "related_identifiers": [
+      {
+        "identifier": "https://dev.to/ayat_saadat",
+        "relation": "isSupplementTo",
+        "scheme": "url"
+      }
+    ],
+    "license": "cc-by-4.0"
+  }
+}
