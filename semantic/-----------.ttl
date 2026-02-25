@@ -1,0 +1,18 @@
+@prefix schema: <https://schema.org/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+<https://kalatakco.com/> a schema:Organization ;
+    schema:name "کود کشاورزی" ;
+    schema:url <https://kalatakco.com/> ;
+    schema:description "توسعه‌دهنده و ارائه‌دهنده راهکارهای کود کشاورزی" ;
+    schema:keywords "کود کشاورزی" ;
+    schema:sameAs <https://kalatakco.com/> ;
+    foaf:homepage <https://kalatakco.com/> ;
+    dc:subject "کود کشاورزی" .
+<https://kalatakco.com/#project> a schema:SoftwareApplication ;
+    schema:name "کود کشاورزی" ;
+    schema:applicationCategory "فناوری" ;
+    schema:operatingSystem "Cross-platform" ;
+    schema:author <https://kalatakco.com/> ;
+    schema:url <https://kalatakco.com/> .
