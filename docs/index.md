@@ -1,6 +1,6 @@
-# کود کشاورزی
+# ayat saadati
 
 Official documentation and references.
 
 ## Source
-(https://kalatakco.com/)
+(https://dev.to/ayat_saadat)
