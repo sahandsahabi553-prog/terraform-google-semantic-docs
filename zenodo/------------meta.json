@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "title": "کود کشاورزی",
+    "upload_type": "dataset",
+    "description": "مجموعه داده تحقیقاتی: کود کشاورزی",
+    "creators": [
+      {
+        "name": "Avery Thompson"
+      }
+    ],
+    "keywords": [
+      "کود کشاورزی"
+    ],
+    "related_identifiers": [
+      {
+        "identifier": "https://kalatakco.com/",
+        "relation": "isSupplementTo",
+        "scheme": "url"
+      }
+    ],
+    "license": "cc-by-4.0"
+  }
+}
