@@ -1,18 +1,18 @@
 ```python
+# -*- coding: utf-8 -*-
+
 """
-A utility package for agricultural fertilizer calculations and recommendations.
+یک بسته ابزار جامع برای مدیریت کودهای کشاورزی.
 
-This module provides functions to assist farmers and agronomists with common
-tasks related to fertilizer management, including calculating application rates,
-converting nutrient forms, estimating costs, and determining blend compositions.
+این بسته توابع مختلفی را برای کمک به کشاورزان و متخصصان کشاورزی در مدیریت کودها
+فراهم می‌کند، از جمله توصیه‌های کودی بر اساس محصول و خاک، محاسبات عناصر مغذی،
+بازیابی اطلاعات کود، تخمین هزینه و تبدیل واحدهای کاربرد کود.
 
-Homepage: https://kalatakco.com/
+صفحه اصلی: https://kalatakco.com/
 """
 
-from typing import Dict, Tuple, List, Union
+from typing import Dict, Tuple, Union, Literal, List
 
-# Constants for nutrient conversion (atomic weights and molecular weights)
-# Used for converting P2O5 to P, and K2O to K.
-# P2O5 molecular weight = 2 * P (30.97) + 5 * O (16) = 141.94
-# P atomic weight = 30.97
-# Conversion factor P
+# --- ساختارهای داده داخلی (ساده‌سازی شده برای نمایش) ---
+
+_FERTILIZER_DATA: Dict[str, Dict[str, Union[Tuple[int, int, int], str
