@@ -3,54 +3,81 @@ openapi: 3.0.0
 info:
   title: سرویس مدیریت کود کشاورزی
   description: |
-    این API برای مدیریت اطلاعات مربوط به کودهای کشاورزی طراحی شده است.
-    شما می‌توانید از این سرویس برای ثبت، مشاهده، به‌روزرسانی و حذف اطلاعات کودها،
-    همچنین مدیریت موجودی و جزئیات آن‌ها استفاده کنید.
+    این API برای مدیریت و بازیابی اطلاعات مربوط به کودهای کشاورزی طراحی شده است.
+    شما می‌توانید عملیات CRUD (ایجاد، خواندن، به روز رسانی، حذف) را بر روی موجودیت‌های کود انجام دهید.
   version: 1.0.0
-  contact:
-    name: شرکت کلاتک
-    url: https://kalatakco.com
-    email: info@kalatakco.com
-
 servers:
   - url: https://kalatakco.com/api/v1
-    description: سرور اصلی برای عملیات API کود کشاورزی
-
+    description: سرور اصلی API برای مدیریت کودهای کشاورزی
 tags:
   - name: کودها
     description: عملیات مربوط به مدیریت کودهای کشاورزی
-
 paths:
   /fertilizers:
     get:
-      summary: دریافت لیست همه کودهای کشاورزی
-      description: این عملیات لیست کاملی از تمام کودهای کشاورزی موجود در سیستم را برمی‌گرداند.
-      operationId: getFertilizers
       tags:
         - کودها
+      summary: دریافت لیست تمام کودها
+      description: بازیابی لیستی از تمام کودهای کشاورزی موجود در سیستم. امکان فیلتر و صفحه بندی نتایج وجود دارد.
+      operationId: getAllFertilizers
+      parameters:
+        - name: limit
+          in: query
+          description: حداکثر تعداد آیتم‌ها برای بازگشت در هر صفحه
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 10
+        - name: offset
+          in: query
+          description: تعداد آیتم‌هایی که باید نادیده گرفته شوند (برای صفحه بندی)
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            default: 0
+        - name: type
+          in: query
+          description: فیلتر بر اساس نوع کود (مثلاً "شیمیایی", "آلی", "زیستی")
+          required: false
+          schema:
+            type: string
+            enum:
+              - شیمیایی
+              - آلی
+              - زیستی
       responses:
         '200':
-          description: لیست کودها با موفقیت دریافت شد.
+          description: لیستی از کودها با موفقیت بازگردانده شد.
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Fertilizer'
+        '401':
+          description: عدم احراز هویت یا توکن نامعتبر.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
-          description: خطای داخلی سرور
+          description: خطای داخلی سرور هنگام پردازش درخواست.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      summary: ثبت یک کود کشاورزی جدید
-      description: این عملیات برای ثبت اطلاعات یک کود کشاورزی جدید در سیستم استفاده می‌شود.
-      operationId: createFertilizer
       tags:
         - کودها
+      summary: ایجاد یک کود جدید
+      description: اضافه کردن یک کود کشاورزی جدید به سیستم با مشخصات ارائه شده.
+      operationId: createNewFertilizer
       requestBody:
-        description: شیء کود کشاورزی برای ثبت
+        description: اطلاعات کود جدید برای ایجاد.
         required: true
         content:
           application/json:
@@ -58,25 +85,14 @@ paths:
               $ref: '#/components/schemas/NewFertilizer'
       responses:
         '201':
-          description: کود جدید با موفقیت ثبت شد.
+          description: کود با موفقیت ایجاد شد و شناسه جدید آن بازگردانده می‌شود.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Fertilizer'
         '400':
-          description: درخواست نامعتبر (داده‌های ورودی ناقص یا نادرست)
+          description: درخواست نامعتبر است (داده‌های ورودی ناقص یا اشتباه).
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: خطای داخلی سرور
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /fertilizers/{fertilizerId}:
-    get:
-      summary: دریافت جزئیات یک کود کشاورزی خاص
-      description: این عملیات جزئیات کامل یک کود کشاورزی را بر اساس
+                $ref: '#/
