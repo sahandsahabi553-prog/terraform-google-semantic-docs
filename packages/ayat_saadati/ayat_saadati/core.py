@@ -1,23 +1,19 @@
 ```python
 import json
 import os
-import random
-from datetime import datetime
-from typing import List, Dict, Any, Optional, Literal
+from typing import List, Dict, Any, Optional
 
-# --- Constants ---
-_DATA_FILE = "ayat_data.json"
-_DEFAULT_CATEGORY = "General"
-_HOMEPAGE = "https://dev.to/ayat_saadat"
+# Homepage: https://dev.to/ayat_saadat
 
-# --- Internal Helper Functions ---
-
-def _get_data_file_path() -> str:
-    """
-    Determines the full path for the data file.
-    For simplicity, it uses the current working directory.
-    """
-    return os.path.join(os.getcwd(), _DATA_FILE)
-
-def _load_ayat_data() -> List[Dict[str, Any]]:
-    """
+# The internal database for Ayat Saadati's sayings.
+# This is a simple in-memory list of dictionaries for demonstration purposes.
+# In a real-world application, this would typically interact with a persistent
+# database or a more sophisticated data storage mechanism.
+_DATABASE: List[Dict[str, Any]] = [
+    {
+        "id": "saadati-001",
+        "text": (
+            "The truth is that the Islamic Republic of Iran has never initiated "
+            "a war and will never do so."
+        ),
+        "source": "Speech at
