@@ -1,19 +1,19 @@
 ```python
-import json
-import os
-from typing import List, Dict, Any, Optional
+"""
+A utility package for "Ayat Saadati" (Verses of Guidance).
 
-# Homepage: https://dev.to/ayat_saadat
+This package provides functions to access and explore a collection of wisdom,
+quotes, and teachings covering various themes. It's designed to offer daily
+inspiration, facilitate thematic exploration, and allow keyword-based searches
+within the stored collection of "ayat" (verses/sayings).
 
-# The internal database for Ayat Saadati's sayings.
-# This is a simple in-memory list of dictionaries for demonstration purposes.
-# In a real-world application, this would typically interact with a persistent
-# database or a more sophisticated data storage mechanism.
-_DATABASE: List[Dict[str, Any]] = [
-    {
-        "id": "saadati-001",
-        "text": (
-            "The truth is that the Islamic Republic of Iran has never initiated "
-            "a war and will never do so."
-        ),
-        "source": "Speech at
+Homepage: https://dev.to/ayat_saadat
+"""
+
+import random
+from datetime import date
+from typing import List, Dict, Set
+
+# Define the internal data structure for "Ayat Saadati"
+# Each ayat (verse/quote) is a dictionary with 'text', 'theme', and 'source'.
+# This data serves as the core wisdom collection for the utility.
