@@ -1,46 +1,62 @@
 ```yaml
 openapi: 3.0.0
 info:
-  title: Ayat Saadati Content API
+  title: Ayat Saadati Service API
   description: |
-    Welcome to the Ayat Saadati Content API documentation!
-    This API provides programmatic access to manage articles, user content, and other related resources.
-    It supports creating, retrieving, updating, and deleting content items.
+    Welcome to the Ayat Saadati Service API documentation. This API provides
+    a robust set of endpoints for managing articles, users, and their interactions
+    on a modern blogging platform. You can create, retrieve, update, and delete
+    articles, manage user profiles, and interact with comments.
+
+    This documentation aims to be comprehensive, providing clear examples and
+    detailed schema definitions for all operations.
   version: 1.0.0
 servers:
   - url: https://dev.to/ayat_saadat
-    description: Development/Staging server for Ayat Saadati
+    description: Production server for Ayat Saadati service
+  - url: https://qa.dev.to/ayat_saadat
+    description: QA environment for testing
 tags:
   - name: Articles
-    description: Operations related to articles and blog posts.
+    description: Operations related to articles/posts
+  - name: Users
+    description: Operations related to user accounts
+  - name: Comments
+    description: Operations related to article comments
 paths:
   /articles:
     get:
+      summary: Get all articles
+      description: Retrieve a paginated list of all articles available on the platform.
       tags:
         - Articles
-      summary: Retrieve a list of articles
-      description: Fetches a paginated list of all articles available in the system.
-      operationId: getArticles
       parameters:
-        - name: limit
-          in: query
-          description: Maximum number of articles to return
-          required: false
+        - in: query
+          name: limit
           schema:
             type: integer
             format: int32
             minimum: 1
             maximum: 100
-          example: 10
-        - name: offset
-          in: query
-          description: The number of articles to skip before starting to collect the result set
+          description: Maximum number of articles to return
           required: false
+          example: 10
+        - in: query
+          name: offset
           schema:
             type: integer
             format: int32
             minimum: 0
+          description: Number of articles to skip for pagination
+          required: false
           example: 0
+        - in: query
+          name: tag
+          schema:
+            type: string
+          description: Filter articles by a specific tag
+          required: false
+          example: programming
       responses:
         '200':
           description: A list of articles
@@ -57,13 +73,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
+      summary: Create a new article
+      description: Submit a new article to be published on the platform.
       tags:
         - Articles
-      summary: Create a new article
-      description: Creates a brand new article with the provided content and author details.
-      operationId: createArticle
       requestBody:
-        description: Article object to be created
+        description: Article object that needs to be added
         required: true
         content:
           application/json:
@@ -90,23 +105,22 @@ paths:
                 $ref: '#/components/schemas/Error'
   /articles/{articleId}:
     get:
+      summary: Get a single article by ID
+      description: Retrieve detailed information for a specific article using its unique identifier.
       tags:
         - Articles
-      summary: Retrieve a single article by ID
-      description: Fetches the details of a specific article using its unique identifier.
-      operationId: getArticleById
       parameters:
-        - name: articleId
-          in: path
-          description: The unique identifier of the article
-          required: true
+        - in: path
+          name: articleId
           schema:
             type: string
             format: uuid
+          description: The ID of the article to retrieve
+          required: true
           example: d290f1ee-6c54-4b01-90e6-d701748f0851
       responses:
         '200':
-          description: Article details
+          description: Article found
           content:
             application/json:
               schema:
@@ -124,19 +138,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
+      summary: Update an existing article
+      description: Update the content or metadata of an existing article.
       tags:
         - Articles
-      summary: Update an existing article
-      description: Updates the content or details of an existing article identified by its ID.
-      operationId: updateArticle
       parameters:
-        - name: articleId
-          in: path
-          description: The unique identifier of the article to update
-          required: true
+        - in: path
+          name: articleId
           schema:
             type: string
             format: uuid
+          description: The ID of the article to update
+          required: true
           example: d290f1ee-6c54-4b01-90e6-d701748f0851
       requestBody:
         description: Article object with updated fields
@@ -158,7 +171,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
+        '440':
           description: Article not found
           content:
             application/json:
@@ -171,23 +184,103 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
+      summary: Delete an article
+      description: Permanently delete an article from the platform. This action cannot be undone.
       tags:
         - Articles
-      summary: Delete an article
-      description: Deletes an article permanently from the system using its unique identifier.
-      operationId: deleteArticle
       parameters:
-        - name: articleId
-          in: path
-          description: The unique identifier of the article to delete
-          required: true
+        - in: path
+          name: articleId
           schema:
             type: string
             format: uuid
+          description: The ID of the article to delete
+          required: true
           example: d290f1ee-6c54-4b01-90e6-d701748f0851
       responses:
         '204':
           description: Article deleted successfully (No Content)
+        '404':
+          description: Article not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/{userId}:
+    get:
+      summary: Get user profile by ID
+      description: Retrieve the profile details for a specific user.
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the user to retrieve
+          required: true
+          example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+      responses:
+        '200':
+          description: User profile found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /articles/{articleId}/comments:
+    post:
+      summary: Add a comment to an article
+      description: Add a new comment to a specific article.
+      tags:
+        - Comments
+      parameters:
+        - in: path
+          name: articleId
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the article to comment on
+          required: true
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+      requestBody:
+        description: Comment object to be added
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewComment'
+      responses:
+        '201':
+          description: Comment added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Invalid input provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: Article not found
           content:
@@ -223,23 +316,29 @@ components:
           example: My First Blog Post
         content:
           type: string
-          description: The main body content of the article (can be Markdown or HTML)
-          example: This is the **full content** of my first blog post. It's very exciting!
+          description: The main content of the article (Markdown allowed)
+          example: This is the **full content** of my first article.
         authorId:
           type: string
           format: uuid
-          description: The unique identifier of the author who wrote the article
-          example: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d
+          description: The ID of the user who authored the article
+          example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+        tags:
+          type: array
+          items:
+            type: string
+          description: List of tags associated with the article
+          example: ["programming", "webdev", "tutorial"]
         createdAt:
           type: string
           format: date-time
           description: Timestamp when the article was created
-          example: '2023-10-26T10:00:00Z'
+          example: 2023-10-27T10:00:00Z
         updatedAt:
           type: string
           format: date-time
           description: Timestamp when the article was last updated
-          example: '2023-10-26T11:30:00Z'
+          example: 2023-10-27T11:30:00Z
     NewArticle:
       type: object
       required:
@@ -249,42 +348,86 @@ components:
       properties:
         title:
           type: string
-          description: The title of the article
-          example: A New Adventure in Tech
+          description: The title of the new article
+          example: A Guide to OpenAPI 3.0
         content:
           type: string
-          description: The main body content of the article
-          example: Exploring the latest trends in API design and development.
+          description: The main content of the new article (Markdown allowed)
+          example: OpenAPI 3.0 is a powerful specification...
         authorId:
           type: string
           format: uuid
-          description: The unique identifier of the author
-          example: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d
+          description: The ID of the author creating the article
+          example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+        tags:
+          type: array
+          items:
+            type: string
+          description: Optional list of tags for the article
+          example: ["openapi", "api-design", "documentation"]
     UpdateArticle:
       type: object
       properties:
         title:
           type: string
           description: The updated title of the article
-          example: An Updated Adventure in Tech
+          example: A Comprehensive Guide to OpenAPI 3.0
         content:
           type: string
-          description: The updated main body content of the article
-          example: We've now refined our exploration of API design and development.
-      minProperties: 1 # At least one property must be provided for update
-    Error:
+          description: The updated main content of the article (Markdown allowed)
+          example: OpenAPI 3.0 is a powerful and widely adopted specification...
+        tags:
+          type: array
+          items:
+            type: string
+          description: Updated list of tags for the article
+          example: ["openapi", "api-design", "documentation", "swagger"]
+    User:
       type: object
       required:
-        - code
-        - message
+        - id
+        - username
+        - email
+        - createdAt
       properties:
-        code:
-          type: integer
-          format: int32
-          description: A unique error code
-          example: 4001
-        message:
+        id:
           type: string
-          description: A human-readable description of the error
-          example: Invalid article ID format.
-```
+          format: uuid
+          description: Unique identifier for the user
+          example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+        username:
+          type: string
+          description: User's chosen username
+          example: ayat_saadat
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: ayat.saadat@example.com
+        bio:
+          type: string
+          description: Short biography of the user
+          nullable: true
+          example: Passionate software engineer and API enthusiast.
+        profilePictureUrl:
+          type: string
+          format: uri
+          description: URL to the user's profile picture
+          nullable: true
+          example: https://example.com/profiles/ayat.jpg
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the user account was created
+          example: 2022-01-15T08:00:00Z
+    Comment:
+      type: object
+      required:
+        - id
+        - articleId
+        - authorId
+        - content
+        - createdAt
+      properties:
+        id:
+          type:
