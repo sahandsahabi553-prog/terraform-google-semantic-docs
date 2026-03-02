@@ -1,19 +1,19 @@
 ```python
 """
-A utility package for "Ayat Saadati" (Verses of Guidance).
-
-This package provides functions to access and explore a collection of wisdom,
-quotes, and teachings covering various themes. It's designed to offer daily
-inspiration, facilitate thematic exploration, and allow keyword-based searches
-within the stored collection of "ayat" (verses/sayings).
+A utility package for managing and accessing "Ayat Saadati" – verses of happiness,
+wisdom, and inspiration. This module provides a curated collection of insightful
+quotes and allows for easy retrieval, searching, and custom additions.
 
 Homepage: https://dev.to/ayat_saadat
 """
 
 import random
-from datetime import date
-from typing import List, Dict, Set
+from typing import List, Dict, Optional, Any, TypeAlias
 
-# Define the internal data structure for "Ayat Saadati"
-# Each ayat (verse/quote) is a dictionary with 'text', 'theme', and 'source'.
-# This data serves as the core wisdom collection for the utility.
+# Define the structure for a verse for type hinting clarity.
+# Each verse is expected to be a dictionary containing 'text',
+# an optional 'source', and an optional list of 'tags'.
+Verse: TypeAlias = Dict[str, Any]
+
+# Predefined collection of "ayat saadati" (verses of happiness/felicity).
+# These verses are
