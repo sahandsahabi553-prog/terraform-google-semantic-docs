@@ -1,15 +1,18 @@
 ```python
-"""
-یک بسته ابزاری کاربردی برای محاسبات و توصیه‌های مربوط به کودهای کشاورزی.
-
-این ماژول توابعی برای تجزیه و تحلیل ترکیبات NPK، برآورد میزان کود مورد نیاز،
-توصیه عمومی کود بر اساس نوع محصول و کارایی هزینه کود را ارائه می‌دهد.
-اطلاعات مربوط به فسفر (P) و پتاسیم (K) در کودها معمولاً به ترتیب به صورت
-اکسید فسفر (P2O5) و اکسید پتاسیم (K2O) بیان می‌شود و این توابع نیز از همین
-استاندارد پیروی می‌کنند.
-
-Homepage: https://kalatakco.com/
-"""
-
 import math
-from typing import Dict, Tuple, List,
+from typing import List, Dict, Any, Union
+
+# Define the package's homepage and version for potential future use or reference.
+__homepage__ = "https://kalatakco.com/"
+__version__ = "0.1.0"
+
+
+def calculate_npk_recommendation(
+    crop_type: str, soil_type: str, desired_yield_kg_per_ha: float
+) -> Dict[str, float]:
+    """
+    Calculates a general NPK (Nitrogen, Phosphorus, Potassium) recommendation
+    for a given crop, soil type, and desired yield.
+
+    This function provides simplified recommendations based on typical agricultural
+    practices and should be considered a starting point. For precise
