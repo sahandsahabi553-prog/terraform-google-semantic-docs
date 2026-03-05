@@ -1,66 +1,87 @@
 ```yaml
 openapi: 3.0.0
 info:
-  title: Ayat Saadati Service API
-  description: API documentation for the Ayat Saadati content management service. This API allows managing posts and related content, providing a robust interface for creating, retrieving, updating, and deleting posts.
+  title: Ayat Saadati Content Service API
+  description: |
+    Welcome to the Ayat Saadati Content Service API! This API allows you to manage
+    blog posts, articles, or other forms of content, which we refer to as "Ayat".
+    You can create, retrieve, update, and delete content entries, as well as fetch
+    lists of available content.
+    
+    This documentation provides details on all available endpoints, request/response
+    formats, and authentication methods.
   version: 1.0.0
 servers:
   - url: https://dev.to/ayat_saadat
-    description: Development server for Ayat Saadati service
+    description: Production server for Ayat Saadati service
+  - url: http://localhost:8080/api/v1
+    description: Local development server
 tags:
   - name: Posts
-    description: Operations related to blog posts and articles.
+    description: Operations related to managing individual content posts (Ayat).
+  - name: Authors
+    description: Operations related to authors of content.
 paths:
   /posts:
     get:
+      summary: Retrieve a list of content posts
+      operationId: getAllPosts
       tags:
         - Posts
-      summary: Retrieve a list of all posts
-      description: Fetches an array of all available posts, allowing for pagination to manage large datasets efficiently.
-      operationId: getAllPosts
       parameters:
         - name: limit
           in: query
-          description: How many items to return at one time (max 100)
+          description: Maximum number of posts to return
           required: false
           schema:
             type: integer
             format: int32
-            minimum: 1
-            maximum: 100
             default: 10
+            minimum: 1
         - name: offset
           in: query
-          description: Offset for pagination, indicating the starting point of the results.
+          description: Number of posts to skip before starting to return results
           required: false
           schema:
             type: integer
             format: int32
-            minimum: 0
             default: 0
+            minimum: 0
+        - name: authorId
+          in: query
+          description: Filter posts by author ID
+          required: false
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
-          description: A paginated list of posts.
+          description: A list of content posts
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Post'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
-          description: Internal server error. An unexpected error occurred on the server.
+          description: Internal server error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
+      summary: Create a new content post
+      operationId: createPost
       tags:
         - Posts
-      summary: Create a new post
-      description: Creates a new post with the provided data, assigning it a unique identifier and timestamps.
-      operationId: createPost
       requestBody:
-        description: Post object to be created.
+        description: Post object to be created
         required: true
         content:
           application/json:
@@ -68,120 +89,168 @@ paths:
               $ref: '#/components/schemas/NewPost'
       responses:
         '201':
-          description: Post created successfully. Returns the newly created post object.
+          description: Post created successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Post'
         '400':
-          description: Invalid input. The request body contains invalid or missing data.
+          description: Invalid post data provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized to create a post
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Internal server error. An unexpected error occurred on the server.
+          description: Internal server error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
   /posts/{postId}:
-    parameters:
-      - name: postId
-        in: path
-        description: Unique identifier of the post to retrieve, update, or delete.
-        required: true
-        schema:
-          type: integer
-          format: int64
-          minimum: 1
-        example: 123
     get:
+      summary: Retrieve a single content post by ID
+      operationId: getPostById
       tags:
         - Posts
-      summary: Retrieve a single post by ID
-      description: Fetches a specific post using its unique identifier.
-      operationId: getPostById
+      parameters:
+        - name: postId
+          in: path
+          description: ID of the post to retrieve
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
-          description: A single post object.
+          description: The requested post
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Post'
         '404':
-          description: Post not found. The specified postId does not exist.
+          description: Post not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Internal server error. An unexpected error occurred on the server.
+          description: Internal server error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
+      summary: Update an existing content post
+      operationId: updatePost
       tags:
         - Posts
-      summary: Update an existing post
-      description: Updates the details of an existing post identified by its ID. Only provided fields will be updated.
-      operationId: updatePost
+      parameters:
+        - name: postId
+          in: path
+          description: ID of the post to update
+          required: true
+          schema:
+            type: integer
+            format: int64
       requestBody:
-        description: Post object with fields to be updated.
+        description: Post object with updated fields
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdatePost'
+              $ref: '#/components/schemas/NewPost' # Reusing NewPost schema for update body
       responses:
         '200':
-          description: Post updated successfully. Returns the updated post object.
+          description: Post updated successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Post'
         '400':
-          description: Invalid input. The request body contains invalid data.
+          description: Invalid post data provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized to update this post
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '404':
-          description: Post not found. The specified postId does not exist.
+          description: Post not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Internal server error. An unexpected error occurred on the server.
+          description: Internal server error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
+      summary: Delete a content post
+      operationId: deletePost
       tags:
         - Posts
-      summary: Delete a post
-      description: Deletes a post identified by its ID. This action is irreversible.
-      operationId: deletePost
+      parameters:
+        - name: postId
+          in: path
+          description: ID of the post to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '204':
-          description: Post deleted successfully. No content is returned.
+          description: Post deleted successfully (No Content)
+        '401':
+          description: Unauthorized to delete this post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
-          description: Post not found. The specified postId does not exist.
+          description: Post not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Internal server error. An unexpected error occurred on the server.
+          description: Internal server error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
+  /authors:
+    get:
+      summary: Retrieve a list of content authors
+      operationId: getAllAuthors
+      tags:
+        - Authors
+      responses:
+        '200':
+          description: A list of authors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Author'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     Post:
@@ -196,20 +265,102 @@ components:
         id:
           type: integer
           format: int64
-          description: Unique identifier for the post.
+          description: Unique identifier for the post
           readOnly: true
-          example: 1
+          example: 101
         title:
           type: string
-          description: Title of the post.
-          minLength: 3
-          maxLength: 255
-          example: My First Post
+          description: Title of the post
+          example: "The Beauty of Saadati"
         content:
           type: string
-          description: Full content of the post.
-          minLength: 10
-          example: This is the detailed content of my very first post, discussing various topics.
+          description: Full content of the post
+          example: "Lorem ipsum dolor sit amet, consectetur adipiscing elit..."
         authorId:
           type: integer
-          format
+          format: int64
+          description: ID of the author who wrote the post
+          example: 5
+        categoryId:
+          type: integer
+          format: int64
+          description: Optional category ID for the post
+          nullable: true
+          example: 2
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the post was created
+          readOnly: true
+          example: "2023-10-27T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the post was last updated
+          nullable: true
+          readOnly: true
+          example: "2023-10-27T11:30:00Z"
+    NewPost:
+      type: object
+      required:
+        - title
+        - content
+        - authorId
+      properties:
+        title:
+          type: string
+          description: Title of the new post
+          example: "My First Ayat Saadati Entry"
+        content:
+          type: string
+          description: Full content of the new post
+          example: "This is the amazing content of my first post..."
+        authorId:
+          type: integer
+          format: int64
+          description: ID of the author creating the post
+          example: 5
+        categoryId:
+          type: integer
+          format: int64
+          description: Optional category ID for the new post
+          nullable: true
+          example: 2
+    Author:
+      type: object
+      required:
+        - id
+        - name
+        - email
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the author
+          readOnly: true
+          example: 5
+        name:
+          type: string
+          description: Full name of the author
+          example: "Ayat Saadati"
+        email:
+          type: string
+          format: email
+          description: Email address of the author
+          example: "ayat.saadati@example.com"
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: Error code
+          example: 404
+        message:
+          type: string
+          description: Detailed error message
+          example: "Post with ID 123 not found."
+```
