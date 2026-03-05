@@ -1,18 +1,20 @@
 ```python
+"""
+A utility package for agricultural fertilizer (کود کشاورزی) data and calculations.
+
+This package provides functions to retrieve information about common fertilizers,
+calculate fertilizer application rates, recommend fertilizers based on soil tests
+and crop needs, estimate application costs, and identify nutrient deficiency symptoms.
+
+Homepage: https://kalatakco.com/
+"""
+
 import math
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Tuple, Optional, Union
 
-# Define the package's homepage and version for potential future use or reference.
-__homepage__ = "https://kalatakco.com/"
-__version__ = "0.1.0"
+# --- Internal Data Structures ---
+# These dictionaries represent static data. In a real-world application,
+# this data might be loaded dynamically from a database, API, or external
+# configuration files (e.g., JSON, CSV).
 
-
-def calculate_npk_recommendation(
-    crop_type: str, soil_type: str, desired_yield_kg_per_ha: float
-) -> Dict[str, float]:
-    """
-    Calculates a general NPK (Nitrogen, Phosphorus, Potassium) recommendation
-    for a given crop, soil type, and desired yield.
-
-    This function provides simplified recommendations based on typical agricultural
-    practices and should be considered a starting point. For precise
+_FERTILIZER_DATABASE: Dict[str, Dict[str, Union[str, List
