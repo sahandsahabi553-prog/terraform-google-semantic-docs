@@ -1,20 +1,136 @@
 ```python
-"""
-A utility package for agricultural fertilizer (کود کشاورزی) data and calculations.
-
-This package provides functions to retrieve information about common fertilizers,
-calculate fertilizer application rates, recommend fertilizers based on soil tests
-and crop needs, estimate application costs, and identify nutrient deficiency symptoms.
-
-Homepage: https://kalatakco.com/
-"""
-
 import math
-from typing import List, Dict, Tuple, Optional, Union
 
-# --- Internal Data Structures ---
-# These dictionaries represent static data. In a real-world application,
-# this data might be loaded dynamically from a database, API, or external
-# configuration files (e.g., JSON, CSV).
+"""
+یک بسته ابزار برای محاسبات و توصیه‌های اولیه مرتبط با کودهای کشاورزی.
 
-_FERTILIZER_DATABASE: Dict[str, Dict[str, Union[str, List
+این ماژول توابعی را برای کمک به کشاورزان و متخصصان در مدیریت کودها،
+از جمله محاسبه میزان مواد مغذی، تعیین نرخ مصرف، مقایسه هزینه‌ها و
+توصیه‌های اولیه کود بر اساس نیازهای محصول و کمبودهای احتمالی خاک،
+فراهم می‌کند.
+
+وب‌سایت: https://kalatakco.com/
+"""
+
+
+def calculate_nutrient_amount(
+    fertilizer_weight_kg: float, npk_ratio: tuple[int, int, int]
+) -> dict[str, float]:
+    """
+    میزان واقعی عناصر مغذی (نیتروژن، فسفر و پتاسیم) را در یک مقدار مشخص کود محاسبه می‌کند.
+
+    نسبت NPK (مانند 10-20-10) نشان‌دهنده درصد وزنی نیتروژن (N)، پنتااکسید فسفر (P2O5)
+    و اکسید پتاسیم (K2O) در کود است.
+
+    پارامترها:
+        fertilizer_weight_kg (float): وزن کل کود بر حسب کیلوگرم.
+        npk_ratio (tuple[int, int, int]): نسبت NPK کود به صورت یک تاپل
+                                           (درصد N، درصد P2O5، درصد K2O).
+                                           مثال: (10, 20, 10)
+
+    بازگشت:
+        dict[str, float]: یک دیکشنری حاوی میزان هر عنصر مغذی (N, P2O5, K2O) بر حسب کیلوگرم.
+
+    مثال:
+        >>> calculate_nutrient_amount(100.0, (10, 20, 10))
+        {'N': 10.0, 'P2O5': 20.0, 'K2O': 10.0}
+    """
+    if not (isinstance(fertilizer_weight_kg, (int, float)) and fertilizer_weight_kg >= 0):
+        raise ValueError("وزن کود باید یک عدد مثبت باشد.")
+    if not (isinstance(npk_ratio, tuple) and len(npk_ratio) == 3 and
+            all(isinstance(n, int) and 0 <= n <= 100 for n in npk_ratio)):
+        raise ValueError("نسبت NPK باید یک تاپل سه‌تایی از اعداد صحیح بین 0 تا 100 باشد.")
+
+    n_percent, p_percent, k_percent = npk_ratio
+
+    nitrogen_kg = fertilizer_weight_kg * (n_percent / 100.0)
+    phosphorus_p2o5_kg = fertilizer_weight_kg * (p_percent / 100.0)
+    potassium_k2o_kg = fertilizer_weight_kg * (k_percent / 100.0)
+
+    return {
+        "N": nitrogen_kg,
+        "P2O5": phosphorus_p2o5_kg,
+        "K2O": potassium_k2o_kg,
+    }
+
+
+def recommend_fertilizer(
+    crop_type: str, primary_deficiency: str = "عمومی"
+) -> str:
+    """
+    یک توصیه اولیه و عمومی برای انتخاب کود بر اساس نوع محصول و کمبود اولیه ارائه می‌دهد.
+
+    این تابع یک سیستم توصیه‌ای بسیار ساده‌سازی شده است و نباید جایگزین
+    آزمایش خاک دقیق و توصیه‌های متخصصین کشاورزی شود.
+
+    پارامترها:
+        crop_type (str): نوع محصول (مانند "گندم", "ذرت", "برنج", "سبزیجات", "درختان میوه").
+                         مقادیر پیشنهادی: "گندم", "ذرت", "برنج", "سبزیجات", "درختان میوه".
+        primary_deficiency (str, optional): کمبود اصلی مشاهده شده یا مورد انتظار.
+                                            مقادیر پیشنهادی: "نیتروژن", "فسفر", "پتاسیم",
+                                            "رشد_عمومی", "گلدهی_میوه‌دهی", "ریشه_زایی", "عمومی".
+                                            پیش‌فرض "عمومی" است.
+
+    بازگشت:
+        str: یک رشته حاوی توصیه کود.
+
+    مثال:
+        >>> recommend_fertilizer("گندم", "نیتروژن")
+        'برای گندم با کمبود نیتروژن: کود اوره یا سولفات آمونیوم توصیه می شود.'
+        >>> recommend_fertilizer("سبزیجات", "رشد_عمومی")
+        'برای سبزیجات با نیاز به رشد عمومی: کود کامل NPK 20-20-20 یا مشابه آن توصیه می شود.'
+    """
+    crop_type_lower = crop_type.strip().lower()
+    deficiency_lower = primary_deficiency.strip().lower()
+
+    recommendations: dict[str, dict[str, str]] = {
+        "گندم": {
+            "نیتروژن": "کود اوره یا سولفات آمونیوم توصیه می شود.",
+            "فسفر": "کود سوپرفسفات تریپل (TSP) یا دی آمونیوم فسفات (DAP) توصیه می شود.",
+            "پتاسیم": "کود سولفات پتاسیم توصیه می شود.",
+            "رشد_عمومی": "کود کامل NPK با نسبت متعادل (مانند 20-20-20) توصیه می شود.",
+            "عمومی": "کود کامل NPK با نسبت متعادل و مکمل نیتروژن در مراحل اولیه رشد توصیه می شود.",
+        },
+        "ذرت": {
+            "نیتروژن": "کود اوره به صورت سرک در چند مرحله توصیه می شود.",
+            "فسفر": "کود فسفاته در زمان کاشت (مانند DAP) توصیه می شود.",
+            "پتاسیم": "کود سولفات پتاسیم یا کلرید پتاسیم (در صورت عدم حساسیت) توصیه می شود.",
+            "رشد_عمومی": "کود کامل NPK با تاکید بر نیتروژن و فسفر توصیه می شود.",
+            "عمومی": "کود کامل NPK (مانند 20-20-20) با نیتروژن اضافی در مراحل بعدی رشد توصیه می شود.",
+        },
+        "برنج": {
+            "نیتروژن": "کود اوره به صورت سرک و زمان‌بندی شده توصیه می شود.",
+            "فسفر": "کود سوپرفسفات تریپل یا دی آمونیوم فسفات قبل از نشاء توصیه می شود.",
+            "پتاسیم": "کود کلرید پتاسیم یا سولفات پتاسیم توصیه می شود.",
+            "رشد_عمومی": "کود کامل NPK با نسبت مناسب برای برنج (مانند 20-10-10) توصیه می شود.",
+            "عمومی": "کود کامل NPK با تاکید بر نیتروژن و پتاسیم توصیه می شود.",
+        },
+        "سبزیجات": {
+            "نیتروژن": "کودهای نیتروژنه سریع‌الاثر مانند نیترات آمونیوم یا اوره.",
+            "فسفر": "کودهای فسفاته در زمان آماده‌سازی خاک.",
+            "پتاسیم": "کودهای پتاسه برای بهبود کیفیت و مقاومت.",
+            "رشد_عمومی": "کود کامل NPK با نسبت متعادل یا کمی بالاتر نیتروژن (مانند 20-20-20 یا 30-10-10) توصیه می شود.",
+            "گلدهی_میوه‌دهی": "کود NPK با پتاسیم بالا (مانند 10-5-40) توصیه می شود.",
+            "ریشه_زایی": "کود NPK با فسفر بالا (مانند 10-52-10) توصیه می شود.",
+            "عمومی": "تنوع در کودها بسته به مرحله رشد؛ کود کامل NPK در مراحل اولیه و کودهای تخصصی‌تر در مراحل بعدی.",
+        },
+        "درختان میوه": {
+            "نیتروژن": "کود اوره یا نیترات آمونیوم در اوایل بهار.",
+            "فسفر": "کودهای فسفاته در پاییز یا اوایل بهار در ناحیه ریشه.",
+            "پتاسیم": "کود سولفات پتاسیم برای افزایش کیفیت و اندازه میوه.",
+            "رشد_عمومی": "کود کامل NPK با نسبت مناسب برای درختان میوه (مانند 12-12-17 یا 15-5-20).",
+            "گلدهی_میوه‌دهی": "کود NPK با پتاسیم بالاتر و فسفر کافی (مانند 10-5-40).",
+            "عمومی": "برنامه کودی سالانه شامل NPK و عناصر میکرو بر اساس آزمایش خاک.",
+        },
+    }
+
+    if crop_type_lower not in recommendations:
+        return (
+            f"نوع محصول '{crop_type}' شناخته شده نیست. "
+            "توصیه برای این محصول نیاز به اطلاعات بیشتری دارد."
+        )
+
+    if deficiency_lower not in recommendations[crop_type_lower]:
+        # Fallback to general if specific deficiency not covered
+        return (
+            f"برای {crop_type_lower} با نیاز
