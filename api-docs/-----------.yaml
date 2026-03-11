@@ -1,112 +1,14 @@
 ```yaml
 openapi: 3.0.0
 info:
-  title: سرویس مدیریت کودهای کشاورزی
+  title: سرویس کود کشاورزی
   description: |
-    API حرفه‌ای برای مدیریت اطلاعات کودهای کشاورزی شرکت کلاتک.
-    این سرویس امکانات کاملی برای افزودن، مشاهده، به‌روزرسانی و حذف کودهای کشاورزی را فراهم می‌کند تا مدیریت موجودی و جزئیات محصولات به سادگی انجام شود.
+    API برای مدیریت اطلاعات کودهای کشاورزی. این سرویس به کاربران امکان می‌دهد تا اطلاعات کودها را مشاهده، ایجاد، به‌روزرسانی و حذف کنند.
+    هدف این API ارائه یک رابط استاندارد و قابل اعتماد برای تعامل با داده‌های مربوط به انواع کودهای مورد استفاده در کشاورزی است.
   version: 1.0.0
 servers:
   - url: https://kalatakco.com/
-    description: سرور اصلی API شرکت کلاتک
+    description: سرور اصلی سرویس کود کشاورزی
 tags:
   - name: کودها
-    description: عملیات مربوط به مدیریت کودهای کشاورزی، شامل ثبت، مشاهده، ویرایش و حذف اطلاعات کودها.
-paths:
-  /کودها:
-    get:
-      summary: دریافت لیست همه کودهای کشاورزی
-      description: |
-        این عملیات لیست کاملی از تمام کودهای کشاورزی موجود در سیستم را برمی‌گرداند.
-        امکان فیلتر کردن نتایج بر اساس نوع کود نیز وجود دارد.
-      tags:
-        - کودها
-      parameters:
-        - in: query
-          name: نوع
-          schema:
-            type: string
-          description: فیلتر بر اساس نوع کود (مثال: شیمیایی، آلی، زیستی)
-          example: شیمیایی
-        - in: query
-          name: موجود_است
-          schema:
-            type: boolean
-          description: فیلتر بر اساس وضعیت موجودی کود (True برای موجود، False برای ناموجود)
-          example: true
-      responses:
-        '200':
-          description: لیست کودها با موفقیت دریافت شد.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/کود'
-        '500':
-          description: خطای داخلی سرور هنگام پردازش درخواست.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  پیام:
-                    type: string
-                    example: "خطای داخلی سرور"
-    post:
-      summary: افزودن یک کود کشاورزی جدید
-      description: |
-        این عملیات برای ثبت اطلاعات یک کود کشاورزی جدید در سیستم استفاده می‌شود.
-        اطلاعات کود (مانند نام، نوع، ترکیبات و قیمت) در بدنه درخواست ارسال می‌شود.
-      tags:
-        - کودها
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/کود_ورودی'
-      responses:
-        '201':
-          description: کود جدید با موفقیت ایجاد شد و شناسه آن برگردانده می‌شود.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/کود'
-        '400':
-          description: اطلاعات ارسالی نامعتبر است یا فیلدهای اجباری پر نشده‌اند.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  پیام:
-                    type: string
-                    example: "اطلاعات ارسالی نامعتبر است."
-  /کودها/{کود_شناسه}:
-    get:
-      summary: دریافت اطلاعات یک کود کشاورزی خاص
-      description: |
-        با استفاده از شناسه (ID) منحصر به فرد کود، می‌توان اطلاعات جزئی یک کود خاص را مشاهده کرد.
-        اگر کودی با شناسه مورد نظر یافت نشود، خطای 404 برگردانده می‌شود.
-      tags:
-        - کودها
-      parameters:
-        - in: path
-          name: کود_شناسه
-          schema:
-            type: integer
-            format: int64
-          required: true
-          description: شناسه منحصر به فرد کود کشاورزی
-          example: 123
-      responses:
-        '200':
-          description: اطلاعات کود با موفقیت دریافت شد.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/کود'
-        '404':
-          description: کود با شناسه مشخص شده یافت نشد.
-          content:
+    description: عملیات مربوط به مدیریت کودهای کشاورزی (مشاهده، ایجاد،
