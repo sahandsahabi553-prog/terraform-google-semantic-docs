@@ -1,21 +1,17 @@
 ```python
 """
-A utility package for agricultural fertilizer (کود کشاورزی) management.
+یک بسته ابزار کاربردی برای محاسبات مربوط به کودهای کشاورزی.
 
-This package provides functions for calculating NPK requirements, recommending
-fertilizers based on those requirements, estimating costs, and interpreting
-soil nutrient levels.
+این بسته شامل توابعی برای محاسبه دوز کود، تخمین نسبت NPK کودهای رایج،
+محاسبه نسبت NPK مخلوط کودها، تبدیل واحدهای مصرف و تخمین هزینه واحد غذایی است.
+این ابزارها برای کشاورزان، متخصصین کشاورزی و فروشندگان کود مفید هستند تا
+تصمیمات آگاهانه‌تری در مورد مدیریت تغذیه گیاهان اتخاذ کنند.
 
 Homepage: https://kalatakco.com/
 """
 
 import math
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Tuple, Union
 
-# --- Constants ---
-
-# NPK composition of common fertilizers (N, P2O5, K2O) in percentage
-# Source: General knowledge, agricultural extension materials.
-# P and K are typically expressed as their oxide forms (P2O5 and K2O) in
-# agricultural contexts.
-FERTILIZER_COMPOSITIONS: Dict[str, Tuple[float, float, float]] =
+# تعریف NPK استاندارد برای کودهای رایج.
+# مقادیر NPK معمولاً به صورت درصد وزنی N -
