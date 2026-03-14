@@ -1,18 +1,17 @@
 ```python
+# -*- coding: utf-8 -*-
 """
-A utility package for agricultural fertilizer calculations and recommendations.
+ماژول ابزارهای کود کشاورزی
 
-This package provides functions to assist farmers, agronomists, and agricultural
-professionals in calculating fertilizer application rates, nutrient content,
-costs, and understanding fertilizer types.
+این ماژول مجموعه‌ای از توابع کاربردی را برای محاسبات مرتبط با کودهای کشاورزی،
+از جمله محاسبه مقادیر مواد مغذی مورد نیاز، تعیین دوز کودها، تخمین هزینه‌ها،
+و تبدیل واحدها ارائه می‌دهد. هدف این ابزارها کمک به کشاورزان و متخصصین کشاورزی
+در مدیریت بهینه‌تر تغذیه گیاهان است.
 
-Homepage: https://kalatakco.com/
+صفحه اصلی: https://kalatakco.com/
 """
 
-from typing import Tuple, Literal
+from typing import Dict, Union
 
-# --- Constants for NPK conversions ---
-# These factors convert elemental phosphorus (P) to phosphorus pentoxide (P2O5)
-# and elemental potassium (K) to potassium oxide (K2O), and vice-versa.
-# These are derived from atomic weights:
-# P = 30.973762, O = 15.999, K = 39.0983
+# داده‌های داخلی مربوط به کودهای رایج و درصد عناصر مغذی آن‌ها.
+# درصدها بر اساس N-P2O5-K2
