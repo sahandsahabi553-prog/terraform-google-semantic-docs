@@ -1,17 +1,18 @@
 ```python
-# -*- coding: utf-8 -*-
 """
-ماژول ابزارهای کود کشاورزی
+A utility package for agricultural fertilizer calculations and recommendations.
 
-این ماژول مجموعه‌ای از توابع کاربردی را برای محاسبات مرتبط با کودهای کشاورزی،
-از جمله محاسبه مقادیر مواد مغذی مورد نیاز، تعیین دوز کودها، تخمین هزینه‌ها،
-و تبدیل واحدها ارائه می‌دهد. هدف این ابزارها کمک به کشاورزان و متخصصین کشاورزی
-در مدیریت بهینه‌تر تغذیه گیاهان است.
+This package provides functions to assist farmers and agronomists with common
+tasks related to fertilizer management, including calculating product amounts,
+converting nutrient forms, estimating costs, and providing basic recommendations.
 
-صفحه اصلی: https://kalatakco.com/
+Homepage: https://kalatakco.com/
 """
 
-from typing import Dict, Union
+from typing import Dict, List, Tuple, Union
 
-# داده‌های داخلی مربوط به کودهای رایج و درصد عناصر مغذی آن‌ها.
-# درصدها بر اساس N-P2O5-K2
+# --- Constants for Nutrient Conversion Factors ---
+# These factors are derived from the atomic weights of elements:
+# N=14.01, P=30.97, K=39.10, O=16.00
+#
+# For P2O5: Molecular weight = (2 * 30.97) + (5 * 16
