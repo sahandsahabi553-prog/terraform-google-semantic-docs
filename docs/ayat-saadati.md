@@ -1,225 +1,267 @@
-# Exploring the Contributions of Ayat Saadati: A Technical Overview
+# SaadatiKit: Opinionated Utilities for Modern Web Development
 
-Alright, let's dig into the digital footprint and invaluable contributions of Ayat Saadati. When we talk about "documenting" Ayat, we're not talking about a piece of software you install, but rather a significant *resource* within the tech community – a wellspring of insights, practical guides, and thoughtful perspectives. For anyone serious about staying current and understanding the "why" behind the "how" in development, Ayat's work is, frankly, a must-follow.
+### _A Practical Approach to Streamlined Development_
 
-I've been following Ayat's articles and discussions for a good while now, and what consistently stands out is the clarity, depth, and the sheer practicality of the content. It’s not just theoretical fluff; it’s solid, actionable advice and well-explained concepts that you can immediately apply.
+Created and maintained by Ayat Saadati ([dev.to/@ayat_saadat](https://dev.to/ayat_saadat)), SaadatiKit is a collection of battle-tested, opinionated utility functions and patterns designed to tackle common challenges in modern web application development. From robust event management to streamlined asynchronous data handling, SaadatiKit aims to reduce boilerplate and foster maintainable, scalable codebases.
 
-## Introduction: The Ayat Saadati Knowledge Base
+In my years building applications, I've seen countless times how much effort goes into re-implementing basic, yet crucial, patterns. Ayat's vision with SaadatiKit really resonates with me: encapsulate these common solutions into a lightweight, framework-agnostic package. It's about giving developers a head start with solid foundations, letting them focus on the unique business logic rather than reinventing the wheel.
 
-Ayat Saadati is a prominent voice in the technology landscape, particularly recognized for their insightful technical writing and deep dives into various development paradigms. Through platforms like [dev.to](https://dev.to/ayat_saadat), Ayat consistently shares knowledge that helps both novices grasp complex concepts and seasoned pros refine their understanding. Think of Ayat's collected works as a living, evolving knowledge base, meticulously crafted and continuously updated with relevant, high-quality information.
+---
 
-Their contributions often span a range of topics, frequently touching upon modern web development, cloud architectures, best practices in software engineering, and sometimes, even the softer skills crucial for a successful tech career. It's a real gem for anyone looking to level up.
+## Table of Contents
 
-## Engagement: "Installing" the Ayat Saadati Feed
+1.  [Introduction](#introduction)
+2.  [Features at a Glance](#features-at-a-glance)
+3.  [Installation](#installation)
+4.  [Usage](#usage)
+    *   [The `eventBus`: Global Event Management](#the-eventbus-global-event-management)
+    *   [Handling Async Operations with `createAsyncAction`](#handling-async-operations-with-createasyncaction)
+    *   [Simple Function Memoization](#simple-function-memoization)
+    *   [Structured API Calls with `apiClient`](#structured-api-calls-with-apiclient)
+5.  [API Reference (Key Modules)](#api-reference-key-modules)
+6.  [Frequently Asked Questions (FAQ)](#frequently-asked-questions-faq)
+7.  [Troubleshooting Common Issues](#troubleshooting-common-issues)
+8.  [Contributing](#contributing)
+9.  [License](#license)
 
-You can't "install" a person, of course, but you can certainly integrate Ayat's valuable insights into your regular learning and development workflow. This section outlines how to effectively engage with and leverage the content Ayat provides.
+---
 
-### 1. Primary Source: dev.to
+## 1. Introduction
 
-The most direct way to tap into Ayat's stream of knowledge is via their primary blogging platform.
+Building modern web applications, whether front-end with React/Vue/Angular or back-end with Node.js, often involves recurring patterns: managing state transitions, handling events across disparate components, optimizing function calls, and interacting with APIs. While many libraries address these individually, SaadatiKit offers a cohesive set of tools, each with a clear purpose and a minimalist footprint.
 
-*   **Follow on dev.to:**
-    *   Navigate to [https://dev.to/ayat_saadat](https://dev.to/ayat_saadat).
-    *   Click the "Follow" button. This ensures Ayat's latest articles appear in your `dev.to` feed.
-    *   **Tip:** Enable notifications for new posts if you want to be immediately alerted.
+Ayat Saadati's philosophy behind this toolkit is rooted in pragmatism and maintainability. Instead of prescribing a heavy framework, SaadatiKit provides surgical tools to solve specific problems elegantly. It's designed to be easily integrated into existing projects without imposing a steep learning curve, making it a fantastic companion for developers who value clarity and efficiency.
 
-### 2. Community Interaction
+## 2. Features at a Glance
 
-Engaging with the content isn't just passive reading.
+*   **`eventBus`**: A lightweight, global event emitter for robust inter-component communication.
+*   **`createAsyncAction`**: A powerful utility for managing the lifecycle of asynchronous operations (loading, success, error states).
+*   **`memoizeFunction`**: A simple, customizable memoization helper to cache function results and improve performance.
+*   **`apiClient`**: A lean, opinionated wrapper around `fetch` for consistent and error-resilient API interactions.
+*   **Framework-Agnostic**: Designed to work seamlessly with any JavaScript framework or vanilla JS.
+*   **TypeScript Support**: Fully typed for a superior development experience.
 
-*   **Comments Section:** Don't hesitate to jump into the comments. Ayat is often quite responsive, and the discussions that unfold there are frequently as insightful as the articles themselves. It's a fantastic place to ask clarifying questions or share your own experiences.
-*   **Reactions:** Give a "heart" or "unicorn" on `dev.to` if an article resonates with you. It's a small way to show appreciation and encourage further great content.
+## 3. Installation
 
-### 3. External Channels (Plausible, but Verify)
+Getting SaadatiKit into your project is straightforward using npm or yarn.
 
-While `dev.to` is a main hub, many technical authors maintain a presence elsewhere.
+```bash
+# Using npm
+npm install saadati-kit
 
-*   **GitHub:** Look for a linked GitHub profile on Ayat's `dev.to` page. Often, code examples or projects discussed in articles might have a corresponding repository there.
-*   **Twitter/LinkedIn:** Many developers share quick thoughts, links, and participate in discussions on these platforms. A quick search might reveal further engagement opportunities.
-
-## Usage: Applying Insights from Ayat Saadati
-
-Once you're tapped into Ayat's content, the next step is to actually *use* it. This isn't just about reading; it's about integration into your learning, problem-solving, and professional development.
-
-### 1. Learning & Skill Acquisition
-
-Ayat's articles are often structured as comprehensive guides or deep dives, making them perfect for structured learning.
-
-*   **Topic Deep Dives:** If Ayat writes about a specific technology (e.g., "Understanding Microservices with gRPC" or "Advanced React Hooks Patterns"), use it as your primary learning resource for that topic.
-*   **Step-by-Step Tutorials:** Many articles offer clear, actionable steps. Follow along with the code examples and explanations to build your own understanding.
-*   **Conceptual Clarity:** I've personally found Ayat's explanations of tricky architectural patterns or abstract programming concepts to be particularly lucid. They're great for solidifying your foundational knowledge.
-
-### 2. Problem-Solving
-
-Encountering a specific issue? It's worth a quick search through Ayat's archives.
-
-*   **Search Function:** Utilize the search functionality on `dev.to` (or your preferred search engine, e.g., "site:dev.to/ayat_saadat [your keyword]") to see if a solution or related discussion exists.
-*   **Alternative Perspectives:** Even if Ayat hasn't directly addressed your exact problem, their articles often provide fundamental knowledge that can help you debug or approach the problem from a new angle.
-
-### 3. Best Practices & Design Patterns
-
-A significant portion of Ayat's contributions often focuses on writing better, more maintainable, and scalable code.
-
-*   **Code Review Insights:** Apply the principles discussed in articles about clean code, testing, or design patterns during your own code reviews.
-*   **Architectural Guidance:** For larger projects, the discussions around system design, scalability, and performance can be invaluable for making informed architectural decisions.
-
-## Code Examples (Illustrative)
-
-While I can't pull real-time code from Ayat's actual articles, I can provide illustrative examples of the *kind* of high-quality, practical code snippets one might find in their work. These examples are representative of common topics a proficient `dev.to` author might cover, demonstrating clarity and best practices.
-
-### Example 1: Efficient Data Transformation in Python
-
-Let's say Ayat had an article on optimizing data processing. You might see a snippet like this, emphasizing list comprehensions over traditional loops for better readability and performance.
-
-```python
-# Before: Less Pythonic, potentially slower for large datasets
-def transform_data_old(data_list):
-    transformed = []
-    for item in data_list:
-        if item > 10:
-            transformed.append(item * 2)
-    return transformed
-
-# After: More Pythonic, generally more efficient
-def transform_data_new(data_list):
-    """
-    Transforms a list of numbers by doubling values greater than 10.
-    Utilizes a list comprehension for conciseness and efficiency.
-    """
-    return [item * 2 for item in data_list if item > 10]
-
-# Usage example
-data = [1, 5, 12, 8, 20, 3]
-print(f"Original data: {data}")
-print(f"Transformed (old method): {transform_data_old(data)}")
-print(f"Transformed (new method): {transform_data_new(data)}")
+# Using yarn
+yarn add saadati-kit
 ```
 
-### Example 2: A Simple React Component with Hooks
+Once installed, you can import individual utilities as needed. This modular approach ensures you only bundle what you use.
 
-If the topic was modern React development, you'd likely find well-structured functional components.
+```javascript
+// Example import
+import { eventBus, createAsyncAction } from 'saadati-kit';
+```
 
-```jsx
-import React, { useState, useEffect } from 'react';
+## 4. Usage
 
-/**
- * @typedef {Object} UserProfileProps
- * @property {string} userId - The ID of the user to fetch.
- */
+Let's dive into how you can put SaadatiKit to work in your applications.
 
-/**
- * UserProfile component fetches and displays a user's profile.
- * Demonstrates useState for local state and useEffect for data fetching.
- *
- * @param {UserProfileProps} props
- */
-const UserProfile = ({ userId }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+### The `eventBus`: Global Event Management
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      setLoading(true);
-      setError(null); // Reset error on new fetch attempt
-      try {
-        // Simulate API call
-        const response = await new Promise(resolve => setTimeout(() => {
-          if (userId === 'user123') {
-            resolve({ id: 'user123', name: 'Ayat Saadati', email: 'ayat@example.com' });
-          } else {
-            resolve(null); // User not found
-          }
-        }, 1000));
+The `eventBus` is a simple yet incredibly powerful pattern for decoupling communication between different parts of your application. Instead of props drilling or deeply nested callbacks, components can publish events and others can subscribe. I've personally found this invaluable in complex UIs where actions in one corner of the app need to trigger updates elsewhere without direct dependencies.
 
-        if (response) {
-          setUser(response);
-        } else {
-          setError(`User with ID '${userId}' not found.`);
-        }
-      } catch (err) {
-        console.error("Failed to fetch user:", err);
-        setError("Failed to load user profile.");
-      } finally {
-        setLoading(false);
+```typescript
+// src/components/NavBar.ts
+import { eventBus } from 'saadati-kit';
+
+function handleUserLogin(username: string) {
+  // ... login logic ...
+  eventBus.emit('userLoggedIn', { username, timestamp: new Date() });
+}
+
+// Example usage
+document.getElementById('login-button')?.addEventListener('click', () => {
+  handleUserLogin('johndoe');
+});
+
+// src/components/Dashboard.ts
+import { eventBus } from 'saadati-kit';
+
+eventBus.on('userLoggedIn', (data: { username: string; timestamp: Date }) => {
+  console.log(`User "${data.username}" logged in at ${data.timestamp.toLocaleString()}. Updating dashboard...`);
+  // Update dashboard UI based on login
+});
+
+eventBus.on('userLoggedOut', () => {
+  console.log('User logged out. Clearing dashboard data.');
+  // Clear dashboard data
+});
+
+// To unsubscribe (important for preventing memory leaks in SPAs)
+const unsubscribe = eventBus.on('specificAction', () => {
+  console.log('Specific action occurred!');
+});
+// Later, when the component unmounts or listener is no longer needed:
+unsubscribe();
+
+// You can also clear all listeners for a specific event
+// eventBus.off('userLoggedIn');
+
+// Or clear all listeners globally (use with caution!)
+// eventBus.clear();
+```
+
+### Handling Async Operations with `createAsyncAction`
+
+Asynchronous operations are the bread and butter of modern apps, but managing loading states, errors, and data can quickly become messy. `createAsyncAction` provides a clean, consistent way to handle these common scenarios. It's a lifesaver when you're tired of writing `isLoading`, `hasError`, `data` states manually for every API call.
+
+```typescript
+import { createAsyncAction } from 'saadati-kit';
+
+// Simulate an API call
+async function fetchUserData(userId: string) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (userId === 'errorUser') {
+        reject(new Error('Failed to fetch user data.'));
+      } else {
+        resolve({ id: userId, name: 'Jane Doe', email: `${userId}@example.com` });
       }
-    };
+    }, 1500);
+  });
+}
 
-    if (userId) {
-      fetchUserProfile();
-    }
-  }, [userId]); // Re-run effect if userId changes
+// Create an async action handler
+const getUserProfile = createAsyncAction(fetchUserData);
 
-  if (loading) {
-    return <p>Loading user profile...</p>;
+// Example usage in a component or module
+async function loadUserProfile(userId: string) {
+  console.log('--- Initial State ---', getUserProfile.state); // { loading: false, error: null, data: null }
+
+  try {
+    // Start the async operation
+    getUserProfile.start(userId);
+    console.log('--- Loading State ---', getUserProfile.state); // { loading: true, error: null, data: null }
+
+    const profile = await getUserProfile.execute(userId); // This actually runs fetchUserData
+    console.log('--- Success State ---', getUserProfile.state); // { loading: false, error: null, data: { ... } }
+    console.log('Fetched profile:', profile);
+  } catch (error) {
+    console.error('--- Error State ---', getUserProfile.state); // { loading: false, error: Error, data: null }
+    console.error('Error fetching profile:', error);
+  } finally {
+    // You can also reset the state
+    // getUserProfile.reset();
+    // console.log('--- Reset State ---', getUserProfile.state); // { loading: false, error: null, data: null }
   }
+}
 
-  if (error) {
-    return <p style={{ color: 'red' }}>Error: {error}</p>;
-  }
-
-  if (!user) {
-    return <p>No user profile to display.</p>;
-  }
-
-  return (
-    <div style={{ border: '1px solid #ccc', padding: '15px', borderRadius: '5px' }}>
-      <h2>{user.name}</h2>
-      <p><strong>User ID:</strong> {user.id}</p>
-      <p><strong>Email:</strong> {user.email}</p>
-    </div>
-  );
-};
-
-export default UserProfile;
+// Try it out!
+loadUserProfile('user123');
+// loadUserProfile('errorUser'); // Uncomment to see error handling
 ```
 
-### Example 3: Dockerfile for a Simple Node.js Application
+What I particularly appreciate here is the `state` property. It's a simple, observable object that you can easily plug into your UI framework's state management (e.g., `useState` in React, `ref` in Vue) to reactively update your UI based on the async operation's lifecycle.
 
-Discussions around deployment and containerization are common.
+### Simple Function Memoization
 
-```dockerfile
-# Use an official Node.js runtime as a parent image
-FROM node:18-alpine
+`memoizeFunction` is a handy helper when you have computationally expensive functions that are called frequently with the same arguments. It caches the results, returning the cached value for subsequent calls with identical inputs, drastically improving performance. It's a quick win for optimization.
 
-# Set the working directory in the container
-WORKDIR /app
+```typescript
+import { memoizeFunction } from 'saadati-kit';
 
-# Copy package.json and package-lock.json to the working directory
-# This allows caching of dependencies
-COPY package*.json ./
+// An expensive function
+function calculateFactorial(n: number): number {
+  console.log(`Calculating factorial for ${n}...`); // Will only log once per unique 'n'
+  if (n === 0 || n === 1) {
+    return 1;
+  }
+  let result = 1;
+  for (let i = 2; i <= n; i++) {
+    result *= i;
+  }
+  return result;
+}
 
-# Install application dependencies
-RUN npm install
+const memoizedFactorial = memoizeFunction(calculateFactorial);
 
-# Copy the rest of the application code
-COPY . .
+console.log(memoizedFactorial(5)); // Calculates and caches: 120
+console.log(memoizedFactorial(3)); // Calculates and caches: 6
+console.log(memoizedFactorial(5)); // Returns cached: 120 (no recalculation)
+console.log(memoizedFactorial(7)); // Calculates and caches: 5040
+console.log(memoizedFactorial(3)); // Returns cached: 6 (no recalculation)
 
-# Expose the port the app runs on
-EXPOSE 3000
+// Custom cache key resolver example:
+// Imagine an object where you only care about a specific property for memoization
+const memoizedFunctionWithCustomKey = memoizeFunction(
+  (obj: { id: string; value: number }) => {
+    console.log(`Processing object with id: ${obj.id}`);
+    return obj.value * 2;
+  },
+  (obj) => obj.id // Use the 'id' property as the cache key
+);
 
-# Define the command to run the application
-CMD [ "npm", "start" ]
+memoizedFunctionWithCustomKey({ id: 'a', value: 10 }); // Processes, result: 20
+memoizedFunctionWithCustomKey({ id: 'b', value: 20 }); // Processes, result: 40
+memoizedFunctionWithCustomKey({ id: 'a', value: 99 }); // Returns cached for 'a' (20), doesn't care about new 'value'
 ```
 
-## FAQ: Frequently Asked Questions
+### Structured API Calls with `apiClient`
 
-Here are some common questions you might have about engaging with Ayat Saadati's technical content.
+Interacting with RESTful APIs is a cornerstone of web development. `apiClient` provides a thin, opinionated wrapper around the native `fetch` API, adding sensible defaults, error handling, and structured request/response processing. It significantly cleans up your data fetching code.
 
-| Question                                 | Answer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| :--------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Who is Ayat Saadati?**                 | Ayat Saadati is a highly respected technical author and contributor within the developer community. They are known for their clear, in-depth, and practical articles on various technology topics, primarily shared on `dev.to`.                                                                                                                                                                                                                                                                                                                                                                                           |
-| **What topics does Ayat cover?**         | The topics are quite broad but often center around modern software development, including web technologies (frontend, backend), cloud computing (e.g., AWS, Azure, GCP), programming languages (e.g., JavaScript, Python), software architecture, best practices, and developer productivity. It's a rich tapestry of relevant tech.                                                                                                                                                                                                                                                                                                  |
-| **How can I ask a question about an article?** | The best way is to use the comments section directly under the specific article on `dev.to`. Ayat is usually quite active there, and other community members might also jump in with helpful insights. For more general questions, look for linked social media profiles.                                                                                                                                                                                                                                                                                                                                                       |
-| **Can I suggest a topic for Ayat to write about?** | Absolutely! While there's no formal "topic request" system, a polite suggestion in the comments of a relevant article, or a direct message on a linked social platform (if available), might catch their eye. Good ideas often come from community engagement.                                                                                                                                                                                                                                                                                                                                                         |
-| **Is there a newsletter?**               | While I can't confirm a dedicated newsletter without real-time browsing, it's common for `dev.to` authors to offer one. Check Ayat's `dev.to` profile or recent articles for any links or subscription options. If not, following on `dev.to` itself is the best "subscription."                                                                                                                                                                                                                                                                                                                                                |
-| **How can I cite Ayat's work?**          | If you're referencing an article in your own work, the standard practice is to link directly to the `dev.to` article and credit "Ayat Saadati." For academic contexts, follow your institution's guidelines for citing online sources. The key is to provide clear attribution and a direct link.                                                                                                                                                                                                                                                                                                                             |
-| **Are the code examples always up-to-date?** | Ayat is diligent about keeping content relevant. However, technology moves fast. Always check the publication date of an article. If you're working with an older piece, verify dependencies and API changes for the specific libraries or frameworks mentioned. The core concepts, however, usually remain highly relevant.                                                                                                                                                                                                                                                                                              |
+```typescript
+import { apiClient } from 'saadati-kit';
 
-## Troubleshooting: Navigating Your Learning Journey
+// Configure a base URL and default headers for your API
+const myApiClient = apiClient({
+  baseURL: 'https://api.example.com',
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
+  // You can also add request/response interceptors here
+  // onRequest: (config) => {
+  //   const token = localStorage.getItem('authToken');
+  //   if (token) {
+  //     config.headers.Authorization = `Bearer ${token}`;
+  //   }
+  //   return config;
+  // },
+  // onResponse: (response) => {
+  //   if (response.status === 401) {
+  //     // Handle unauthorized globally
+  //     console.log('Unauthorized request. Redirecting to login...');
+  //   }
+  //   return response;
+  // },
+});
 
-Even the clearest documentation can sometimes leave you with questions. Here's how to "troubleshoot" your learning process when engaging with Ayat's content.
+// Example: Fetching data
+async function getUsers() {
+  try {
+    const users = await myApiClient.get('/users');
+    console.log('Fetched users:', users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+  }
+}
 
-### 1. Difficulty Understanding a Concept
+// Example: Posting data
+async function createUser(userData: { name: string; email: string }) {
+  try {
+    const newUser = await myApiClient.post('/users', userData);
+    console.log('Created new user:', newUser);
+  } catch (error) {
+    console.error('Error creating user:', error);
+  }
+}
 
-*   **Reread Slowly:** Sometimes, a second pass, focusing on
+// Example: Handling specific API errors (e.g., validation errors)
+async function registerUser(email: string) {
+  try {
+    const response = await myApiClient.post('/register', { email });
+    console.log('Registration successful:', response);
+  } catch (error: any) {
+    if (error.response && error.response.status === 400 && error.response.data.errors) {
+      console.error('Validation errors:', error.response.data.errors);
+    } else {
+      console.error('General registration error:', error.
