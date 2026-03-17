@@ -1,159 +1,290 @@
-## Ayat Saadati: A Technical Resource and Engagement Guide
+# SaadatFlow: Streamlining Your Workflows with Elegance
 
-Alright, let's talk about Ayat Saadati. In the vast ocean of online technical content, finding voices that truly resonate and provide consistent, high-quality insights can be a challenge. Ayat Saadati is one of those voices. From what I've seen, their work, primarily hosted on platforms like dev.to, offers a valuable perspective on various technology topics. This isn't just about reading a blog post; it's about tapping into a resource, a source of informed technical thought. Think of this document as your guide to "installing" and "using" Ayat Saadati's expertise in your own learning and development pipeline.
+Alright, folks, let's talk about something I've been really passionate about lately, something I've poured a good bit of thought and code into: **SaadatFlow**.
 
-You can find their primary hub here: [https://dev.to/ayat_saadat](https://dev.to/ayat_saadat)
+You know how it goes. You're building out a new system, perhaps a data pipeline, an automation script, or even just a sequence of tasks that need to run in a specific order. Suddenly, you're drowning in nested functions, callback hell, or a spaghetti of `if/else` statements trying to manage state and dependencies. It's a mess, and frankly, it's not fun to maintain.
 
-### 1. Setting Up Your Engagement Pipeline
+That's where SaadatFlow comes in. I built this library because I genuinely believe that defining and executing workflows shouldn't be a chore. It should be intuitive, readable, and robust. SaadatFlow is a lightweight, opinionated Python library designed to help you construct and orchestrate sequences of tasks with a focus on clarity, simplicity, and elegant error handling. It's born from countless hours wrestling with complex systems and a firm belief that our code should tell a story, not just execute commands.
 
-When I talk about "installation" for a person's content, I'm really talking about setting up a reliable way to consume and interact with their work. It's like configuring a feed or a subscription, ensuring you don't miss out on new insights.
+My goal with SaadatFlow was to create a tool that feels natural to use, allowing developers to focus on *what* needs to be done rather than *how* to manage the flow itself. It's not a heavy-duty distributed orchestration engine – think of it more as your trusty sidekick for local, sequential, or moderately complex task management within a single application or process.
 
-#### 1.1. Core Integration: dev.to
+---
 
-The `dev.to` platform is Ayat Saadati's primary technical publishing outlet. This is your first stop.
+## Table of Contents
 
-1.  **Create a dev.to Account:** If you don't already have one, sign up for a free account on [dev.to](https://dev.to). This is crucial for seamless interaction.
-2.  **Follow Ayat Saadati:** Navigate to their profile: [https://dev.to/ayat_saadat](https://dev.to/ayat_saadat). Click the "Follow" button. This ensures their new articles appear in your personalized dev.to feed.
-3.  **Enable Notifications (Optional but Recommended):** While dev.to's feed is good, sometimes a push notification is better. Check your dev.to settings for notification preferences related to followed authors or trending articles.
+1.  [Features](#features)
+2.  [Installation](#installation)
+3.  [Quick Start: Your First Flow](#quick-start-your-first-flow)
+4.  [Usage Guide](#usage-guide)
+    *   [Defining Tasks](#defining-tasks)
+    *   [Building Flows](#building-flows)
+    *   [Running Flows](#running-flows)
+    *   [Passing Data Between Tasks](#passing-data-between-tasks)
+    *   [Conditional Execution](#conditional-execution)
+    *   [Error Handling and Retries](#error-handling-and-retries)
+5.  [Code Examples](#code-examples)
+    *   [Simple ETL Pattern](#simple-etl-pattern)
+    *   [Web Scraping Workflow](#web-scraping-workflow)
+6.  [FAQ](#faq)
+7.  [Troubleshooting](#troubleshooting)
+8.  [Contributing](#contributing)
+9.  [About Ayat Saadat](#about-ayat-saadat)
 
-#### 1.2. Auxiliary Integrations (Hypothetical/General Best Practice)
+---
 
-While the dev.to link is the only one provided, in the real world, many technical authors span multiple platforms. Here's how you'd typically extend your engagement:
+## Features
 
-*   **Social Media:** Check their dev.to profile for links to Twitter, LinkedIn, or other platforms. Following there can provide real-time updates, quick insights, and a different kind of interaction.
-*   **RSS Feeds:** Most modern blog platforms (including dev.to for individual authors, typically) offer an RSS feed. Look for an RSS icon or try appending `/feed` or `/rss` to their profile URL (e.g., `https://dev.to/feed/ayat_saadat`). Use an RSS reader like Feedly or Inoreader to aggregate their posts with other technical sources.
+Here's what SaadatFlow brings to the table:
 
-    ```
-    # Example using a hypothetical curl to check for an RSS feed
-    # (Note: dev.to's author feeds are often in the format dev.to/feed/<username>)
-    curl -s "https://dev.to/feed/ayat_saadat" | head -n 10
-    ```
+*   **Declarative Task Definition:** Define your tasks as simple, self-contained units.
+*   **Sequential Workflow Orchestration:** Easily chain tasks together to form a logical flow.
+*   **Data Passing:** Seamlessly pass outputs from one task as inputs to the next.
+*   **Conditional Logic:** Implement branching logic to execute tasks based on previous results.
+*   **Robust Error Handling:** Define retry mechanisms and fallback tasks to gracefully handle failures.
+*   **Clear Logging:** Get insightful feedback on your workflow's execution.
+*   **Lightweight & Minimal Dependencies:** No unnecessary bloat, just the core functionality you need.
 
-### 2. Usage: Consuming and Interacting with Content
+---
 
-Once you've set up your "pipeline," it's all about how you leverage the content. This is where the real learning happens.
+## Installation
 
-#### 2.1. Reading and Understanding Articles
+Getting SaadatFlow up and running is as simple as a `pip install`. I've tried to keep the dependencies to a minimum, so you won't be pulling in half the internet.
 
-*   **Active Reading:** Don't just skim. Read the articles actively. Pay attention to code examples, architectural diagrams (if any), and the rationale behind their suggestions.
-*   **Contextual Research:** If Ayat references a concept or technology you're unfamiliar with, pause and do a quick search. This builds your foundational knowledge. I often keep a separate browser tab open specifically for looking up terms or APIs mentioned in articles.
-*   **Take Notes:** Jot down key takeaways, specific code patterns, or ideas that spark your interest. I find this helps in retention.
-
-#### 2.2. Engaging with the Community
-
-Technical content isn't a monologue; it's a conversation.
-
-*   **Commenting:** If you have questions, clarifications, or even alternative solutions, use the comment section. Thoughtful comments often lead to deeper discussions and can even prompt follow-up articles from the author.
-*   **Sharing:** If you find an article particularly useful, share it with your network. Attributing good content helps the author and informs your peers.
-*   **Reacting:** Use dev.to's "Unicorn" (or other reactions) to show appreciation. It's a small gesture that tells authors their work is valued.
-
-#### 2.3. Applying the Knowledge
-
-The best way to "use" someone's technical content is to apply it.
-
-*   **Experiment:** If an article presents a code pattern or a new tool, try implementing it in a small project or a sandbox environment.
-*   **Critique:** As you gain experience, you might find yourself agreeing or disagreeing with certain approaches. This critical thinking is a sign of growth and can lead to more informed discussions.
-
-### 3. Code Examples (Reflecting Potential Expertise)
-
-While Ayat Saadati writes *about* code, they also often provide concrete examples. Here's a hypothetical code block, representative of the kind of clear, focused problem-solving one might find in their articles. This specific example focuses on a common data processing utility, showcasing clean Python that illustrates a practical concept – something I often look for in good technical writing.
-
-```python
-# A common pattern: data transformation or utility function
-# Imagine this as part of a larger article on efficient data processing or API integration.
-
-import json
-from typing import List, Dict, Any
-
-def process_api_response(raw_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """
-    Normalizes a list of dictionary items typically returned from an API.
-    Example transformation: renaming keys, filtering out sensitive fields,
-    or converting data types.
-
-    Args:
-        raw_data: A list of dictionaries, where each dictionary represents
-                  an item from an API response.
-
-    Returns:
-        A list of processed dictionaries with a standardized format.
-    """
-    processed_items = []
-    for item in raw_data:
-        processed_item = {
-            "id": item.get("unique_id"), # Renaming 'unique_id' to 'id'
-            "name": item.get("display_name"), # Renaming 'display_name' to 'name'
-            "status": item.get("status", "unknown").upper(), # Default value and uppercase
-            # Intentionally omitting a hypothetical 'internal_secret_key'
-            "created_at": item.get("creation_timestamp"),
-        }
-        # Add additional processing logic here, e.g., date parsing, conditional fields
-        if processed_item["created_at"]:
-            # Example: convert timestamp to a more readable format if needed
-            # For simplicity, keeping it as is for this example
-            pass
-
-        processed_items.append(processed_item)
-    return processed_items
-
-# --- Example Usage ---
-if __name__ == "__main__":
-    sample_api_output = [
-        {"unique_id": "abc-123", "display_name": "Project Alpha", "status": "active", "creation_timestamp": 1678886400, "internal_secret_key": "sensitive"},
-        {"unique_id": "def-456", "display_name": "Task Beta", "status": "pending", "creation_timestamp": 1678972800},
-        {"unique_id": "ghi-789", "display_name": "Service Gamma", "creation_timestamp": 1679059200, "internal_secret_key": "more_sensitive"},
-    ]
-
-    standardized_data = process_api_response(sample_api_output)
-    print("--- Original Data ---")
-    print(json.dumps(sample_api_output, indent=2))
-    print("\n--- Processed Data ---")
-    print(json.dumps(standardized_data, indent=2))
-
-    # Expected output structure for one item:
-    # {
-    #   "id": "abc-123",
-    #   "name": "Project Alpha",
-    #   "status": "ACTIVE",
-    #   "created_at": 1678886400
-    # }
+```bash
+pip install saadatflow
 ```
 
-### 4. Frequently Asked Questions (FAQ)
+If you're feeling adventurous and want the latest unreleased features or want to contribute, you can always clone the repository and install it in editable mode:
 
-Here are some common questions you might have about engaging with Ayat Saadati's content.
+```bash
+git clone https://github.com/ayat-saadat/saadatflow.git
+cd saadatflow
+pip install -e .
+```
 
-| Question                                    | Answer                                                                                                                                                                                                                                 |
-| :------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **What topics do they cover?**              | Based on the `dev.to` platform, you can expect articles on a range of software development topics. This often includes web development (frontend/backend), cloud technologies, DevOps practices, data engineering, and general programming best practices. |
-| **How often are new articles published?**   | Publication frequency can vary. The best way to stay updated is to follow them on dev.to and enable notifications. Consistent engagement is generally a hallmark of quality authors.                                                   |
-| **Can I ask direct questions?**             | Absolutely! The comment section on dev.to articles is the primary channel for questions related to specific posts. For broader inquiries, social media platforms (if linked) might also be an option. Be respectful and clear.        |
-| **Are they open to collaboration?**         | This varies by individual. If you have a concrete idea for a collaboration (e.g., a joint article, an open-source contribution), you could try reaching out via their professional networks (like LinkedIn, if available). A polite, well-articulated pitch is key. |
-| **How can I support their work?**           | Reading, commenting, sharing, and reacting (e.g., "Unicorn" on dev.to) are all excellent ways to support technical authors. Spreading the word about valuable content helps them reach a wider audience.                                   |
+I always recommend using a virtual environment, especially for new projects. It keeps your dependencies tidy and prevents conflicts. A quick `python -m venv .venv && source .venv/bin/activate` usually does the trick.
 
-### 5. Troubleshooting & Best Practices
+---
 
-Even with the best content, sometimes you hit a snag. Here's how to troubleshoot common issues and maximize your learning.
+## Quick Start: Your First Flow
 
-#### 5.1. "I don't understand a technical concept in the article."
+Let's get our hands dirty with a super simple "Hello, Flow!" example. This will give you a taste of how SaadatFlow works.
 
-*   **Initial Action:** Don't panic! This is normal. Use a search engine (like Google or DuckDuckGo) to look up the specific term or concept. Often, a quick definition or another tutorial can bridge the gap.
-*   **Deeper Dive:** If a simple search isn't enough, consider watching a short video tutorial or reading an introductory article on the foundational concept.
-*   **Ask in Comments:** If after your own research you're still stuck, formulate a specific, polite question in the article's comment section. For example, instead of "I don't get it," try "Could you elaborate on the use of `X` in this context, specifically regarding `Y`? I'm struggling to see how it differs from `Z`."
+```python
+from saadatflow import Task, Flow
 
-#### 5.2. "My comment isn't appearing immediately."
+# 1. Define your tasks
+class GreetTask(Task):
+    def execute(self, name: str) -> str:
+        print(f"Executing GreetTask for {name}...")
+        return f"Hello, {name}!"
 
-*   **Platform Moderation:** Most platforms, including dev.to, have moderation in place to ensure a respectful and constructive environment. New comments, especially from new users, might be briefly held for review. Be patient.
-*   **Review Guidelines:** Ensure your comment adheres to the platform's code of conduct. Abusive, spammy, or off-topic comments will likely be removed.
+class ShoutTask(Task):
+    def execute(self, message: str) -> str:
+        print(f"Executing ShoutTask for '{message}'...")
+        return message.upper() + "!!!"
 
-#### 5.3. "I'm not finding new content frequently enough."
+# 2. Build your flow
+# The 'depends_on' argument establishes the sequence
+my_first_flow = (
+    Flow("Greeting Process")
+    .add_task("greeting", GreetTask, name="World") # 'name' is passed to GreetTask
+    .add_task("shouting", ShoutTask, depends_on="greeting") # 'message' will be output of 'greeting'
+)
 
-*   **Check Follow Status:** Double-check that you are correctly following Ayat Saadati on dev.to.
-*   **Explore Related Tags:** Sometimes, authors write on similar topics but under slightly different tags. Explore the tags used in their previous articles to find other related content.
-*   **Varying Publication Schedules:** Understand that technical authors often balance writing with their primary work. Publication schedules can naturally fluctuate.
+# 3. Run the flow!
+if __name__ == "__main__":
+    print("--- Starting My First Flow ---")
+    result = my_first_flow.run()
+    print(f"--- Flow Finished ---")
+    print(f"Final Result: {result}")
+```
 
-#### 5.4. Best Practices for Maximizing Learning
+**What's happening here?**
 
-*   **Set Aside Dedicated Time:** Treat reading technical articles like a study session. Eliminate distractions.
-*   **Implement as You Learn:** The knowledge transfer is strongest when you immediately apply what you've learned. Even small, throwaway projects can reinforce concepts.
-*   **Teach Others:** If you truly understand a concept from one of their articles, try explaining it to a colleague or even writing your own summary. This
+*   We define two classes, `GreetTask` and `ShoutTask`, both inheriting from `saadatflow.Task`. Each has an `execute` method where your actual logic lives.
+*   We create a `Flow` instance, giving it a name ("Greeting Process").
+*   We add tasks to the flow using `add_task()`.
+    *   The `greeting` task uses `GreetTask` and takes a direct parameter `name="World"`.
+    *   The `shouting` task uses `ShoutTask`. Crucially, `depends_on="greeting"` tells SaadatFlow that `shouting` should run *after* `greeting`, and the output of `greeting` will be passed as the primary input (`message`) to `shouting`.
+*   Finally, `my_first_flow.run()` kicks everything off. The `result` will be the output of the very last task in the flow (`shouting` in this case).
+
+This pattern, I've found, is incredibly powerful for keeping things modular and readable.
+
+---
+
+## Usage Guide
+
+Let's dive a bit deeper into the core components and how to use them effectively.
+
+### Defining Tasks
+
+A task is the fundamental building block in SaadatFlow. It's a self-contained unit of work.
+
+*   **Inherit from `saadatflow.Task`**: Your task class *must* inherit from this base class.
+*   **Implement `execute` method**: This is where your business logic goes. It can accept arguments (which SaadatFlow will try to inject) and should return the result of the task.
+
+```python
+from saadatflow import Task
+
+class MyCustomTask(Task):
+    """
+    A simple task that takes two numbers and adds them.
+    """
+    def execute(self, num1: int, num2: int) -> int:
+        print(f"Adding {num1} and {num2}...")
+        return num1 + num2
+
+class DataFetcherTask(Task):
+    """
+    A task to simulate fetching data from an external source.
+    """
+    def execute(self, api_endpoint: str) -> dict:
+        print(f"Fetching data from {api_endpoint}...")
+        # In a real scenario, this would involve network requests
+        import time
+        time.sleep(0.5) # Simulate network latency
+        return {"data": [1, 2, 3], "source": api_endpoint}
+```
+
+**Important Note on `execute` Signature:**
+SaadatFlow will try its best to match the arguments in your `execute` method to parameters provided during `add_task` or outputs from previous tasks. Type hints are highly recommended!
+
+### Building Flows
+
+Flows are created by chaining tasks together using the `add_task` method.
+
+```python
+from saadatflow import Flow
+
+my_flow = (
+    Flow("Data Processing Pipeline")
+    .add_task("step_one", MyCustomTask, num1=10, num2=20)
+    .add_task("step_two", DataFetcherTask, api_endpoint="https://api.example.com/data", depends_on="step_one")
+    # 'step_two' doesn't use the output of 'step_one' as its primary input here.
+    # It uses a named parameter 'api_endpoint'.
+    # We'll see how to pass outputs as primary inputs next.
+)
+```
+
+**`add_task` Parameters:**
+
+*   `name` (str): A unique identifier for this task within the flow. Crucial for `depends_on`.
+*   `task_class` (Type[Task]): The class of the task to be executed.
+*   `depends_on` (str or List[str], optional): The name(s) of the task(s) that must complete successfully before this task runs.
+*   `*args`, `**kwargs`: Any additional arguments you pass here will be directly forwarded to the `execute` method of your `task_class`.
+
+### Running Flows
+
+Running a flow is straightforward:
+
+```python
+if __name__ == "__main__":
+    result = my_flow.run()
+    print(f"Flow completed with final result: {result}")
+```
+
+The `run()` method executes the entire workflow. It returns the output of the *last* task added to the flow.
+
+### Passing Data Between Tasks
+
+This is where SaadatFlow really shines and simplifies things.
+
+*   **Default Behavior:** If a task `B` `depends_on` task `A`, the *output* of task `A` will be passed as the *first positional argument* to task `B`'s `execute` method, unless explicitly overridden by a named parameter.
+
+Let's revisit our quick start example:
+
+```python
+class GreetTask(Task):
+    def execute(self, name: str) -> str:
+        return f"Hello, {name}!"
+
+class ShoutTask(Task):
+    def execute(self, message: str) -> str: # 'message' will receive the output of GreetTask
+        return message.upper() + "!!!"
+
+my_flow = (
+    Flow("Greeting Process")
+    .add_task("greeting", GreetTask, name="World")
+    .add_task("shouting", ShoutTask, depends_on="greeting") # Output of 'greeting' becomes 'message' for 'shouting'
+)
+```
+
+If `GreetTask` returned `"Hello, World!"`, then `ShoutTask` would receive `"Hello, World!"` as its `message` argument. Pretty neat, right?
+
+### Conditional Execution
+
+Sometimes you only want to run a task if a previous condition is met. SaadatFlow handles this with a `condition` argument in `add_task`.
+
+The `condition` should be a callable (a function or a lambda) that accepts the output of the `depends_on` task(s) and returns `True` or `False`.
+
+```python
+class CheckValueTask(Task):
+    def execute(self, value: int) -> bool:
+        print(f"Checking if {value} is even...")
+        return value % 2 == 0
+
+class EvenNumberTask(Task):
+    def execute(self, num: int) -> str:
+        print(f"{num} is even!")
+        return f"Processed even number: {num}"
+
+class OddNumberTask(Task):
+    def execute(self, num: int) -> str:
+        print(f"{num} is odd!")
+        return f"Processed odd number: {num}"
+
+conditional_flow = (
+    Flow("Conditional Branching")
+    .add_task("initial_value", Task, value=7) # A simple task to just pass a value
+    .add_task("check_parity", CheckValueTask, depends_on="initial_value")
+    .add_task(
+        "handle_even",
+        EvenNumberTask,
+        depends_on="initial_value", # Still needs the original value
+        condition=lambda is_even: is_even # This lambda checks the output of 'check_parity'
+    )
+    .add_task(
+        "handle_odd",
+        OddNumberTask,
+        depends_on="initial_value", # Still needs the original value
+        condition=lambda is_even: not is_even # This lambda checks the output of 'check_parity'
+    )
+)
+
+if __name__ == "__main__":
+    print("--- Starting Conditional Flow ---")
+    result = conditional_flow.run()
+    print(f"--- Flow Finished ---")
+    print(f"Final Result: {result}")
+    # Output will be from 'handle_odd' because 7 is odd.
+```
+
+Notice how `handle_even` and `handle_odd` both depend on `initial_value` for their *input*, but their *condition* depends on the output of `check_parity`. This separation of concerns is powerful!
+
+### Error Handling and Retries
+
+Things break. It's a fact of life in software. SaadatFlow gives you tools to handle those inevitable bumps in the road.
+
+*   **`max_retries`**: How many times should a task be retried if it fails?
+*   **`retry_delay_seconds`**: How long to wait between retries?
+*   **`on_failure`**: The name of another task to execute if *this* task ultimately fails after all retries.
+
+```python
+import random
+
+class UnreliableTask(Task):
+    def execute(self) -> str:
+        if random.random() < 0.7: # 70% chance of failure
+            print("UnreliableTask FAILED!")
+            raise ValueError("Something went wrong!")
+        print("UnreliableTask SUCCEEDED!")
+        return "Reliable data!"
+
+class FallbackTask(Task):
+    def execute(self, error_message: str) -> str:
+        print(f"Executing FallbackTask due to error: {error_message}")
+        return "Using fallback data due to failure."
+
+class SuccessLoggerTask(Task):
+    def execute(self, data:
