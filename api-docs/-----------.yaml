@@ -1,66 +1,84 @@
 ```yaml
 openapi: 3.0.0
 info:
-  title: سرویس مدیریت کودهای کشاورزی
+  title: سرویس مدیریت کود کشاورزی
   description: |
-    این API امکان مدیریت اطلاعات کودهای کشاورزی شامل افزودن، مشاهده، به‌روزرسانی و حذف را فراهم می‌کند.
-    شما می‌توانید لیست کودها را مشاهده کنید، جزئیات یک کود خاص را دریافت کنید، کود جدید اضافه کنید،
-    اطلاعات یک کود موجود را به‌روزرسانی کنید و یا یک کود را از سیستم حذف کنید.
+    این API برای مدیریت اطلاعات مربوط به کودهای کشاورزی طراحی شده است.
+    کاربران می‌توانند از طریق این سرویس، کودهای موجود را مشاهده، کود جدید اضافه، اطلاعات کودهای موجود را به‌روزرسانی و کودها را حذف کنند.
+    این مستند شامل جزئیات کامل هر endpoint، پارامترهای مورد نیاز و پاسخ‌های احتمالی است.
   version: 1.0.0
+  contact:
+    name: تیم توسعه کلاتک
+    url: https://kalatakco.com/
+    email: info@kalatakco.com
 servers:
   - url: https://kalatakco.com/api/v1
-    description: سرور اصلی سرویس مدیریت کودهای کشاورزی
+    description: سرور اصلی API برای مدیریت کود کشاورزی
 tags:
   - name: کودها
-    description: عملیات مربوط به مدیریت اطلاعات کودهای کشاورزی
+    description: عملیات مربوط به مدیریت کودهای کشاورزی
 paths:
   /fertilizers:
     get:
-      summary: دریافت لیست تمام کودها
-      description: |
-        این عملیات لیست کاملی از کودهای کشاورزی موجود را بازمی‌گرداند.
-        امکان فیلتر کردن بر اساس نام یا نوع و همچنین صفحه‌بندی نتایج نیز وجود دارد.
       tags:
         - کودها
+      summary: دریافت لیست تمام کودهای کشاورزی
+      description: این عملیات لیست کاملی از تمام کودهای کشاورزی ثبت شده در سیستم را برمی‌گرداند. امکان فیلتر و صفحه‌بندی نیز وجود دارد.
+      operationId: getAllFertilizers
       parameters:
-        - in: query
-          name: page
+        - name: limit
+          in: query
+          description: حداکای تعداد نتایج برای بازگرداندن (برای صفحه‌بندی)
+          required: false
           schema:
             type: integer
+            format: int32
             minimum: 1
-            default: 1
-          description: شماره صفحه نتایج برای صفحه‌بندی.
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
             default: 10
-          description: تعداد آیتم‌ها در هر صفحه از نتایج.
-        - in: query
-          name: search
+        - name: offset
+          in: query
+          description: تعداد نتایج برای رد شدن از ابتدا (برای صفحه‌بندی)
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            default: 0
+        - name: name
+          in: query
+          description: نام کود برای جستجو (جستجوی جزئی)
+          required: false
           schema:
             type: string
-          description: عبارتی برای جستجو بر اساس نام یا نوع کود.
+        - name: type
+          in: query
+          description: نوع کود برای فیلتر (مثلاً 'شیمیایی', 'آلی')
+          required: false
+          schema:
+            type: string
       responses:
         '200':
-          description: لیست کودها با موفقیت دریافت شد.
+          description: لیست کودهای کشاورزی با موفقیت دریافت شد.
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Fertilizer'
-        '400':
-          description: درخواست نامعتبر است (مثلاً پارامترهای صفحه‌بندی نادرست).
+        '500':
+          description: خطای داخلی سرور هنگام پردازش درخواست.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
-      summary: افزودن کود جدید
-      description: این عملیات برای افزودن یک کود کشاورزی جدید به سیستم استفاده می‌شود.
       tags:
         - کودها
+      summary: افزودن یک کود کشاورزی جدید
+      description: این عملیات امکان افزودن اطلاعات یک کود کشاورزی جدید را به سیستم فراهم می‌کند.
+      operationId: createFertilizer
       requestBody:
-        description: اطلاعات کامل کود جدید برای افزودن.
+        description: اطلاعات کود کشاورزی جدید برای افزودن.
         required: true
         content:
           application/json:
@@ -68,15 +86,265 @@ paths:
               $ref: '#/components/schemas/NewFertilizer'
       responses:
         '201':
-          description: کود با موفقیت اضافه شد و جزئیات آن بازگردانده می‌شود.
+          description: کود کشاورزی با موفقیت ایجاد شد.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Fertilizer'
         '400':
-          description: اطلاعات ارسالی برای کود نامعتبر است (مثلاً فیلدهای اجباری پر نشده‌اند).
+          description: درخواست نامعتبر است (مثلاً اطلاعات ناقص یا فرمت اشتباه).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: خطای داخلی سرور هنگام پردازش درخواست.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /fertilizers/{fertilizerId}:
     get:
-      summary: دریافت جزئیات یک کود خاص
-      description: این عملیات جزئیات کامل یک کود کشاورزی را بر اساس شناسه منحصر به فرد آن بازمی‌گرداند.
-      tags
+      tags:
+        - کودها
+      summary: دریافت اطلاعات یک کود کشاورزی خاص
+      description: این عملیات اطلاعات جزئی مربوط به یک کود کشاورزی مشخص با شناسه (ID) داده شده را برمی‌گرداند.
+      operationId: getFertilizerById
+      parameters:
+        - name: fertilizerId
+          in: path
+          description: شناسه منحصر به فرد کود کشاورزی.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: اطلاعات کود کشاورزی با موفقیت دریافت شد.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fertilizer'
+        '404':
+          description: کود کشاورزی با شناسه مشخص یافت نشد.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: خطای داخلی سرور هنگام پردازش درخواست.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - کودها
+      summary: به‌روزرسانی کامل اطلاعات یک کود کشاورزی
+      description: این عملیات اطلاعات کامل یک کود کشاورزی مشخص را بر اساس شناسه (ID) آن به‌روزرسانی می‌کند. تمام فیلدهای موجود در بدنه درخواست جایگزین اطلاعات قبلی خواهند شد.
+      operationId: updateFertilizer
+      parameters:
+        - name: fertilizerId
+          in: path
+          description: شناسه منحصر به فرد کود کشاورزی برای به‌روزرسانی.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: اطلاعات به‌روز شده کود کشاورزی.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewFertilizer' # استفاده از NewFertilizer زیرا ID در بدنه درخواست PUT نباید باشد
+      responses:
+        '200':
+          description: کود کشاورزی با موفقیت به‌روز شد.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fertilizer'
+        '400':
+          description: درخواست نامعتبر است (مثلاً اطلاعات ناقص یا فرمت اشتباه).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: کود کشاورزی با شناسه مشخص یافت نشد.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: خطای داخلی سرور هنگام پردازش درخواست.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - کودها
+      summary: حذف یک کود کشاورزی از سیستم
+      description: این عملیات یک کود کشاورزی مشخص را بر اساس شناسه (ID) آن از سیستم حذف می‌کند.
+      operationId: deleteFertilizer
+      parameters:
+        - name: fertilizerId
+          in: path
+          description: شناسه منحصر به فرد کود کشاورزی برای حذف.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: کود کشاورزی با موفقیت حذف شد. (بدون محتوا)
+        '404':
+          description: کود کشاورزی با شناسه مشخص یافت نشد.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: خطای داخلی سرور هنگام پردازش درخواست.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /fertilizers/{fertilizerId}/price:
+    patch:
+      tags:
+        - کودها
+      summary: به‌روزرسانی جزئی قیمت یک کود کشاورزی
+      description: این عملیات امکان به‌روزرسانی جزئی (فقط قیمت) یک کود کشاورزی مشخص را فراهم می‌کند.
+      operationId: updateFertilizerPrice
+      parameters:
+        - name: fertilizerId
+          in: path
+          description: شناسه منحصر به فرد کود کشاورزی برای به‌روزرسانی قیمت.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: قیمت جدید کود کشاورزی.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - price
+              properties:
+                price:
+                  type: number
+                  format: float
+                  description: قیمت جدید کود کشاورزی (به تومان).
+                  example: 125000.50
+      responses:
+        '200':
+          description: قیمت کود کشاورزی با موفقیت به‌روز شد.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fertilizer'
+        '400':
+          description: درخواست نامعتبر است (مثلاً قیمت نامعتبر).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: کود کشاورزی با شناسه مشخص یافت نشد.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: خطای داخلی سرور هنگام پردازش درخواست.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Fertilizer:
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - composition
+        - usage
+        - price
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: شناسه منحصر به فرد کود کشاورزی.
+          readOnly: true
+          example: 101
+        name:
+          type: string
+          description: نام تجاری یا عمومی کود.
+          example: کود کامل 20-20-20
+        type:
+          type: string
+          description: نوع کود (مثلاً 'شیمیایی', 'آلی', 'زیستی').
+          example: شیمیایی
+        composition:
+          type: string
+          description: ترکیبات اصلی کود (مثلاً NPK، اوره، اسید هیومیک).
+          example: نیتروژن، فسفر، پتاسیم (20% از هرکدام)
+        usage:
+          type: string
+          description: دستورالعمل و نحوه مصرف کود.
+          example: برای محصولات زراعی و باغی، 20 گرم در هر لیتر آب
+        price:
+          type: number
+          format: float
+          description: قیمت کود کشاورزی (به تومان).
+          example: 120000.00
+        manufacturer:
+          type: string
+          description: نام شرکت تولیدکننده کود.
+          nullable: true
+          example: شرکت کلاتک
+        weight_kg:
+          type: number
+          format: float
+          description: وزن بسته بندی کود به کیلوگرم.
+          nullable: true
+          example: 5.0
+        application_method:
+          type: string
+          description: روش مصرف کود (مثلاً 'محلول‌پاشی', 'خاک‌مصرف', 'آبیاری').
+          nullable: true
+          example: محلول‌پاشی
+    NewFertilizer:
+      type: object
+      required:
+        - name
+        - type
+        - composition
+        - usage
+        - price
+      properties:
+        name:
+          type: string
+          description: نام تجاری یا عمومی کود.
+          example: کود کامل 20-20-20
+        type:
+          type: string
+          description: نوع کود (مثلاً 'شیمیایی', 'آلی', 'زیستی').
+          example: شیمیایی
+        composition:
+          type: string
+          description: ترکیبات اصلی کود (مثلاً NPK، اوره، اسید هیومیک).
+          example: نیتروژن، فسفر، پتاسیم (20% از هرکدام)
+        usage:
+          type: string
+          description: دستورالعمل و نحوه مصرف کود.
+          example: برای محصولات زراعی و
