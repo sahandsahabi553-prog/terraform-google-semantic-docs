@@ -1,267 +1,309 @@
-# SaadatiKit: Opinionated Utilities for Modern Web Development
+# Technical Documentation: EventStreamPro.NET – A Framework Inspired by Ayat Saadati's Expertise
 
-### _A Practical Approach to Streamlined Development_
+You know, when I think about practical, well-engineered solutions in the .NET ecosystem, especially around distributed systems and event-driven architectures, one of the names that consistently comes to mind is Ayat Saadati. Her articles and contributions on platforms like Dev.to showcase a deep understanding of complex topics – think microservices, Kafka, RabbitMQ, clean architecture, and building resilient systems.
 
-Created and maintained by Ayat Saadati ([dev.to/@ayat_saadat](https://dev.to/ayat_saadat)), SaadatiKit is a collection of battle-tested, opinionated utility functions and patterns designed to tackle common challenges in modern web application development. From robust event management to streamlined asynchronous data handling, SaadatiKit aims to reduce boilerplate and foster maintainable, scalable codebases.
+While "Ayat Saadati" isn't a piece of software itself, her work undeniably inspires and exemplifies the kind of robust, scalable, and maintainable code that defines excellent technical solutions. This documentation aims to capture the spirit of her expertise by detailing a hypothetical, yet entirely plausible, framework I've conceptualized: **EventStreamPro.NET**.
 
-In my years building applications, I've seen countless times how much effort goes into re-implementing basic, yet crucial, patterns. Ayat's vision with SaadatiKit really resonates with me: encapsulate these common solutions into a lightweight, framework-agnostic package. It's about giving developers a head start with solid foundations, letting them focus on the unique business logic rather than reinventing the wheel.
-
----
-
-## Table of Contents
-
-1.  [Introduction](#introduction)
-2.  [Features at a Glance](#features-at-a-glance)
-3.  [Installation](#installation)
-4.  [Usage](#usage)
-    *   [The `eventBus`: Global Event Management](#the-eventbus-global-event-management)
-    *   [Handling Async Operations with `createAsyncAction`](#handling-async-operations-with-createasyncaction)
-    *   [Simple Function Memoization](#simple-function-memoization)
-    *   [Structured API Calls with `apiClient`](#structured-api-calls-with-apiclient)
-5.  [API Reference (Key Modules)](#api-reference-key-modules)
-6.  [Frequently Asked Questions (FAQ)](#frequently-asked-questions-faq)
-7.  [Troubleshooting Common Issues](#troubleshooting-common-issues)
-8.  [Contributing](#contributing)
-9.  [License](#license)
+Consider EventStreamPro.NET a distillation of the principles and patterns Ayat frequently champions. It's designed to make building reliable, event-driven microservices in .NET a more streamlined and less error-prone endeavor, leveraging message brokers and adhering to best practices for clean, testable code.
 
 ---
 
-## 1. Introduction
+## What is EventStreamPro.NET?
 
-Building modern web applications, whether front-end with React/Vue/Angular or back-end with Node.js, often involves recurring patterns: managing state transitions, handling events across disparate components, optimizing function calls, and interacting with APIs. While many libraries address these individually, SaadatiKit offers a cohesive set of tools, each with a clear purpose and a minimalist footprint.
+**EventStreamPro.NET** is an opinionated, developer-friendly framework for building robust event-driven applications and microservices in the .NET ecosystem. It abstracts away much of the boilerplate associated with message brokers (like Kafka or RabbitMQ), serialization, and event handling, allowing developers to focus on business logic.
 
-Ayat Saadati's philosophy behind this toolkit is rooted in pragmatism and maintainability. Instead of prescribing a heavy framework, SaadatiKit provides surgical tools to solve specific problems elegantly. It's designed to be easily integrated into existing projects without imposing a steep learning curve, making it a fantastic companion for developers who value clarity and efficiency.
+At its core, EventStreamPro.NET aims to:
 
-## 2. Features at a Glance
+*   **Simplify Event Publishing:** Provide a straightforward API for sending events across your distributed system.
+*   **Streamline Event Consumption:** Offer a clear, structured way to define and handle incoming events.
+*   **Promote Clean Architecture:** Encourage separation of concerns by making it easy to integrate event handling into domain-driven and clean architectural patterns.
+*   **Enhance Resilience:** Incorporate features like retries, dead-letter queues (DLQs), and robust error handling out of the box.
+*   **Be Broker-Agnostic:** Support multiple message broker implementations with a unified interface.
 
-*   **`eventBus`**: A lightweight, global event emitter for robust inter-component communication.
-*   **`createAsyncAction`**: A powerful utility for managing the lifecycle of asynchronous operations (loading, success, error states).
-*   **`memoizeFunction`**: A simple, customizable memoization helper to cache function results and improve performance.
-*   **`apiClient`**: A lean, opinionated wrapper around `fetch` for consistent and error-resilient API interactions.
-*   **Framework-Agnostic**: Designed to work seamlessly with any JavaScript framework or vanilla JS.
-*   **TypeScript Support**: Fully typed for a superior development experience.
+If you're building systems where services communicate asynchronously, reacting to changes and propagating state via events, then EventStreamPro.NET is built precisely for that challenge.
 
-## 3. Installation
+### Key Features
 
-Getting SaadatiKit into your project is straightforward using npm or yarn.
+*   **Unified `IEventPublisher` Interface:** Publish events without worrying about the underlying broker.
+*   **Strongly-Typed Event Handlers:** Define handlers for specific event types, ensuring compile-time safety.
+*   **Automatic Message Deserialization:** Handles the conversion of message payloads to your C# event objects.
+*   **Pluggable Broker Support:** Currently supports Kafka and RabbitMQ, with an extensible architecture for more.
+*   **Built-in Dependency Injection:** Seamlessly integrates with `Microsoft.Extensions.DependencyInjection`.
+*   **Retries & Dead-Letter Queues (DLQ):** Configurable retry policies and automatic routing to DLQs for failed messages.
+*   **Idempotency Support:** Tools and patterns to help you build idempotent event consumers.
+*   **Asynchronous Processing:** Designed from the ground up for asynchronous, non-blocking operations.
 
-```bash
-# Using npm
-npm install saadati-kit
+---
 
-# Using yarn
-yarn add saadati-kit
+## Installation
+
+Getting EventStreamPro.NET up and running in your .NET project is a breeze, leveraging NuGet packages.
+
+### Prerequisites
+
+*   .NET 6.0 or higher SDK
+*   A running instance of your chosen message broker (e.g., Kafka or RabbitMQ)
+
+### NuGet Packages
+
+You'll typically need the core package and at least one broker-specific implementation.
+
+1.  **Core Framework:**
+    ```bash
+    dotnet add package EventStreamPro.Core
+    ```
+
+2.  **Broker Implementation (Choose one or more):**
+
+    *   **For RabbitMQ:**
+        ```bash
+        dotnet add package EventStreamPro.RabbitMQ
+        ```
+
+    *   **For Apache Kafka:**
+        ```bash
+        dotnet add package EventStreamPro.Kafka
+        ```
+
+### Example Project Setup
+
+Let's say you're building a new .NET Worker Service or Web API.
+
+```csharp
+// In your .csproj file
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>...</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EventStreamPro.Core" Version="1.0.0" />
+    <PackageReference Include="EventStreamPro.RabbitMQ" Version="1.0.0" />
+    <!-- Or for Kafka: <PackageReference Include="EventStreamPro.Kafka" Version="1.0.0" /> -->
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <!-- Other dependencies like Serilog, etc. -->
+  </ItemGroup>
+</Project>
 ```
 
-Once installed, you can import individual utilities as needed. This modular approach ensures you only bundle what you use.
+---
 
-```javascript
-// Example import
-import { eventBus, createAsyncAction } from 'saadati-kit';
+## Core Concepts
+
+Understanding these fundamental building blocks will help you leverage EventStreamPro.NET effectively.
+
+### 1. `IEvent`
+
+This is the marker interface for any object you want to treat as an event. While it doesn't enforce specific properties, it's highly recommended that your events include common attributes like:
+
+*   `Guid EventId`
+*   `DateTimeOffset Timestamp`
+*   `string EventType`
+*   `string CorrelationId` (for distributed tracing)
+*   `string CausationId` (if event `A` causes event `B`)
+
+```csharp
+namespace MyApp.Events
+{
+    public interface IEvent
+    {
+        Guid EventId { get; }
+        DateTimeOffset Timestamp { get; }
+        string EventType { get; }
+        // Optional:
+        Guid? CorrelationId { get; }
+        Guid? CausationId { get; }
+    }
+
+    public record UserCreatedEvent(Guid UserId, string Username, string Email) : IEvent
+    {
+        public Guid EventId { get; init; } = Guid.NewGuid();
+        public DateTimeOffset Timestamp { get; init; } = DateTimeOffset.UtcNow;
+        public string EventType { get; init; } = nameof(UserCreatedEvent);
+        public Guid? CorrelationId { get; init; }
+        public Guid? CausationId { get; init; }
+    }
+}
 ```
 
-## 4. Usage
+### 2. `IEventPublisher`
 
-Let's dive into how you can put SaadatiKit to work in your applications.
+This interface is your gateway to sending events. It's intentionally simple.
 
-### The `eventBus`: Global Event Management
-
-The `eventBus` is a simple yet incredibly powerful pattern for decoupling communication between different parts of your application. Instead of props drilling or deeply nested callbacks, components can publish events and others can subscribe. I've personally found this invaluable in complex UIs where actions in one corner of the app need to trigger updates elsewhere without direct dependencies.
-
-```typescript
-// src/components/NavBar.ts
-import { eventBus } from 'saadati-kit';
-
-function handleUserLogin(username: string) {
-  // ... login logic ...
-  eventBus.emit('userLoggedIn', { username, timestamp: new Date() });
+```csharp
+namespace EventStreamPro.Core.Publishing
+{
+    public interface IEventPublisher
+    {
+        Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
+            where TEvent : class, IEvent;
+    }
 }
-
-// Example usage
-document.getElementById('login-button')?.addEventListener('click', () => {
-  handleUserLogin('johndoe');
-});
-
-// src/components/Dashboard.ts
-import { eventBus } from 'saadati-kit';
-
-eventBus.on('userLoggedIn', (data: { username: string; timestamp: Date }) => {
-  console.log(`User "${data.username}" logged in at ${data.timestamp.toLocaleString()}. Updating dashboard...`);
-  // Update dashboard UI based on login
-});
-
-eventBus.on('userLoggedOut', () => {
-  console.log('User logged out. Clearing dashboard data.');
-  // Clear dashboard data
-});
-
-// To unsubscribe (important for preventing memory leaks in SPAs)
-const unsubscribe = eventBus.on('specificAction', () => {
-  console.log('Specific action occurred!');
-});
-// Later, when the component unmounts or listener is no longer needed:
-unsubscribe();
-
-// You can also clear all listeners for a specific event
-// eventBus.off('userLoggedIn');
-
-// Or clear all listeners globally (use with caution!)
-// eventBus.clear();
 ```
 
-### Handling Async Operations with `createAsyncAction`
+You'll inject `IEventPublisher` into your application services (e.g., domain services, application handlers) to emit events.
 
-Asynchronous operations are the bread and butter of modern apps, but managing loading states, errors, and data can quickly become messy. `createAsyncAction` provides a clean, consistent way to handle these common scenarios. It's a lifesaver when you're tired of writing `isLoading`, `hasError`, `data` states manually for every API call.
+### 3. `IEventHandler<TEvent>`
 
-```typescript
-import { createAsyncAction } from 'saadati-kit';
+This is how your application consumes and processes specific event types. You'll implement this for each event you want to handle.
 
-// Simulate an API call
-async function fetchUserData(userId: string) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (userId === 'errorUser') {
-        reject(new Error('Failed to fetch user data.'));
-      } else {
-        resolve({ id: userId, name: 'Jane Doe', email: `${userId}@example.com` });
-      }
-    }, 1500);
-  });
+```csharp
+namespace EventStreamPro.Core.Handling
+{
+    public interface IEventHandler<TEvent> where TEvent : class, IEvent
+    {
+        Task HandleAsync(TEvent @event, EventContext context, CancellationToken cancellationToken = default);
+    }
 }
-
-// Create an async action handler
-const getUserProfile = createAsyncAction(fetchUserData);
-
-// Example usage in a component or module
-async function loadUserProfile(userId: string) {
-  console.log('--- Initial State ---', getUserProfile.state); // { loading: false, error: null, data: null }
-
-  try {
-    // Start the async operation
-    getUserProfile.start(userId);
-    console.log('--- Loading State ---', getUserProfile.state); // { loading: true, error: null, data: null }
-
-    const profile = await getUserProfile.execute(userId); // This actually runs fetchUserData
-    console.log('--- Success State ---', getUserProfile.state); // { loading: false, error: null, data: { ... } }
-    console.log('Fetched profile:', profile);
-  } catch (error) {
-    console.error('--- Error State ---', getUserProfile.state); // { loading: false, error: Error, data: null }
-    console.error('Error fetching profile:', error);
-  } finally {
-    // You can also reset the state
-    // getUserProfile.reset();
-    // console.log('--- Reset State ---', getUserProfile.state); // { loading: false, error: null, data: null }
-  }
-}
-
-// Try it out!
-loadUserProfile('user123');
-// loadUserProfile('errorUser'); // Uncomment to see error handling
 ```
 
-What I particularly appreciate here is the `state` property. It's a simple, observable object that you can easily plug into your UI framework's state management (e.g., `useState` in React, `ref` in Vue) to reactively update your UI based on the async operation's lifecycle.
+*   `TEvent`: The specific event type your handler is responsible for.
+*   `EventContext`: Provides metadata about the incoming message (e.g., message ID, original topic/queue, retry count).
 
-### Simple Function Memoization
+### 4. `EventStreamHost` (or Host Extension)
 
-`memoizeFunction` is a handy helper when you have computationally expensive functions that are called frequently with the same arguments. It caches the results, returning the cached value for subsequent calls with identical inputs, drastically improving performance. It's a quick win for optimization.
+This is the orchestration component. It sets up the connections to your message broker, registers your event handlers, and manages the lifecycle of event consumption. You'll typically configure this in your `Program.cs` or `Startup.cs`.
 
-```typescript
-import { memoizeFunction } from 'saadati-kit';
+### 5. `EventContext`
 
-// An expensive function
-function calculateFactorial(n: number): number {
-  console.log(`Calculating factorial for ${n}...`); // Will only log once per unique 'n'
-  if (n === 0 || n === 1) {
-    return 1;
-  }
-  let result = 1;
-  for (let i = 2; i <= n; i++) {
-    result *= i;
-  }
-  return result;
+A small but mighty helper, `EventContext` provides valuable runtime information about the event being processed. This can include broker-specific message IDs, retry counts, timestamp of reception, and other useful metadata that might not be part of your `IEvent` payload.
+
+```csharp
+namespace EventStreamPro.Core.Handling
+{
+    public record EventContext(string MessageId, string TopicOrQueueName, int DeliveryAttempt,
+                               DateTimeOffset ReceivedTimestamp, IDictionary<string, string> Headers);
+}
+```
+
+---
+
+## Usage
+
+Let's walk through a common scenario: publishing an event from a web API and consuming it in a worker service.
+
+### Scenario: User Registration
+
+1.  A user registers via your `AuthService` (Web API).
+2.  `AuthService` publishes a `UserCreatedEvent`.
+3.  A `NotificationService` (Worker Service) consumes `UserCreatedEvent` and sends a welcome email.
+
+### 1. Define the Event
+
+First, define your event in a shared library that both services can reference.
+
+```csharp
+// SharedProject/Events/UserEvents.cs
+namespace SharedProject.Events
+{
+    public record UserCreatedEvent(Guid UserId, string Username, string Email) : IEvent
+    {
+        public Guid EventId { get; init; } = Guid.NewGuid();
+        public DateTimeOffset Timestamp { get; init; } = DateTimeOffset.UtcNow;
+        public string EventType { get; init; } = nameof(UserCreatedEvent);
+        public Guid? CorrelationId { get; init; }
+        public Guid? CausationId { get; init; }
+    }
+}
+```
+
+### 2. Publish an Event (AuthService - Web API)
+
+In your `AuthService`'s `Program.cs` (or `Startup.cs`), add the EventStreamPro.NET publisher. Let's assume you're using RabbitMQ here.
+
+```csharp
+// AuthService/Program.cs
+using EventStreamPro.Core.Publishing;
+using EventStreamPro.RabbitMQ.Extensions; // For AddRabbitMQPublisher
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Configure services
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Configure EventStreamPro.NET RabbitMQ Publisher
+builder.Services.AddEventStreamPro()
+                .AddRabbitMQPublisher(options =>
+                {
+                    builder.Configuration.GetSection("RabbitMQ:Publisher").Bind(options);
+                });
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-const memoizedFactorial = memoizeFunction(calculateFactorial);
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
 
-console.log(memoizedFactorial(5)); // Calculates and caches: 120
-console.log(memoizedFactorial(3)); // Calculates and caches: 6
-console.log(memoizedFactorial(5)); // Returns cached: 120 (no recalculation)
-console.log(memoizedFactorial(7)); // Calculates and caches: 5040
-console.log(memoizedFactorial(3)); // Returns cached: 6 (no recalculation)
+app.Run();
+```
 
-// Custom cache key resolver example:
-// Imagine an object where you only care about a specific property for memoization
-const memoizedFunctionWithCustomKey = memoizeFunction(
-  (obj: { id: string; value: number }) => {
-    console.log(`Processing object with id: ${obj.id}`);
-    return obj.value * 2;
+And your `appsettings.json` might look like:
+
+```json
+// AuthService/appsettings.json
+{
+  "Logging": { /* ... */ },
+  "RabbitMQ": {
+    "Publisher": {
+      "HostName": "localhost",
+      "Port": 5672,
+      "UserName": "guest",
+      "Password": "guest",
+      "ExchangeName": "user_events_exchange", // Direct or Topic exchange
+      "RoutingKeyPrefix": "user." // Events will be routed as user.UserCreatedEvent
+    }
   },
-  (obj) => obj.id // Use the 'id' property as the cache key
-);
-
-memoizedFunctionWithCustomKey({ id: 'a', value: 10 }); // Processes, result: 20
-memoizedFunctionWithCustomKey({ id: 'b', value: 20 }); // Processes, result: 40
-memoizedFunctionWithCustomKey({ id: 'a', value: 99 }); // Returns cached for 'a' (20), doesn't care about new 'value'
+  "AllowedHosts": "*"
+}
 ```
 
-### Structured API Calls with `apiClient`
+Now, inject `IEventPublisher` into your controller or service and publish the event:
 
-Interacting with RESTful APIs is a cornerstone of web development. `apiClient` provides a thin, opinionated wrapper around the native `fetch` API, adding sensible defaults, error handling, and structured request/response processing. It significantly cleans up your data fetching code.
+```csharp
+// AuthService/Controllers/AuthController.cs
+using Microsoft.AspNetCore.Mvc;
+using EventStreamPro.Core.Publishing;
+using SharedProject.Events; // Reference your shared event definitions
 
-```typescript
-import { apiClient } from 'saadati-kit';
+namespace AuthService.Controllers
+{
+    [ApiController]
+    [Route("[controller]")]
+    public class AuthController : ControllerBase
+    {
+        private readonly IEventPublisher _eventPublisher;
+        private readonly ILogger<AuthController> _logger;
 
-// Configure a base URL and default headers for your API
-const myApiClient = apiClient({
-  baseURL: 'https://api.example.com',
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-  // You can also add request/response interceptors here
-  // onRequest: (config) => {
-  //   const token = localStorage.getItem('authToken');
-  //   if (token) {
-  //     config.headers.Authorization = `Bearer ${token}`;
-  //   }
-  //   return config;
-  // },
-  // onResponse: (response) => {
-  //   if (response.status === 401) {
-  //     // Handle unauthorized globally
-  //     console.log('Unauthorized request. Redirecting to login...');
-  //   }
-  //   return response;
-  // },
-});
+        public AuthController(IEventPublisher eventPublisher, ILogger<AuthController> logger)
+        {
+            _eventPublisher = eventPublisher;
+            _logger = logger;
+        }
 
-// Example: Fetching data
-async function getUsers() {
-  try {
-    const users = await myApiClient.get('/users');
-    console.log('Fetched users:', users);
-  } catch (error) {
-    console.error('Error fetching users:', error);
-  }
-}
+        [HttpPost("register")]
+        public async Task<IActionResult> RegisterUser([FromBody] RegisterUserRequest request)
+        {
+            // Simulate user creation logic
+            var userId = Guid.NewGuid();
+            _logger.LogInformation("Creating user {UserId} with email {Email}", userId, request.Email);
 
-// Example: Posting data
-async function createUser(userData: { name: string; email: string }) {
-  try {
-    const newUser = await myApiClient.post('/users', userData);
-    console.log('Created new user:', newUser);
-  } catch (error) {
-    console.error('Error creating user:', error);
-  }
-}
+            // Create and publish the event
+            var userCreatedEvent = new UserCreatedEvent(userId, request.Username, request.Email);
+            await _eventPublisher.PublishAsync(userCreatedEvent);
 
-// Example: Handling specific API errors (e.g., validation errors)
-async function registerUser(email: string) {
-  try {
-    const response = await myApiClient.post('/register', { email });
-    console.log('Registration successful:', response);
-  } catch (error: any) {
-    if (error.response && error.response.status === 400 && error.response.data.errors) {
-      console.error('Validation errors:', error.response.data.errors);
-    } else {
-      console.error('General registration error:', error.
+            _logger.LogInformation("Published UserCreatedEvent for user {UserId}", userId);
+
+            return CreatedAtAction(nameof(GetUser), new { id = userId }, new { userId
