@@ -1,22 +1,16 @@
 ```python
 """
-A utility package for agricultural fertilizer calculations and recommendations.
+ماژول ابزار کمکی برای محاسبات مربوط به کودهای کشاورزی.
 
-This module provides functions to assist farmers and agronomists with common
-tasks related to fertilizer management, including calculating required amounts,
-estimating nutrient content, interpreting soil test results, and making
-simplified NPK recommendations for various crops.
+این ماژول مجموعه‌ای از توابع کاربردی را برای کشاورزان، کارشناسان کشاورزی و
+هر کسی که با کودهای شیمیایی سر و کار دارد، فراهم می‌کند. توابع شامل
+محاسبه مقادیر کود مورد نیاز، تبدیل واحدهای مختلف مصرف، محاسبه NPK
+کودهای ترکیبی و تبدیل درصدهای عنصری و اکسیدی کودها می‌باشند.
 
 Homepage: https://kalatakco.com/
 """
 
-from typing import Dict, List, Union, Tuple
+from typing import Dict, List, Tuple, Literal, Union
 
-# Homepage reference for further information: https://kalatakco.com/
-
-
-def calculate_fertilizer_amount_for_area(
-    application_rate_kg_per_hectare: float,
-    area_hectares: float,
-    fertilizer_purity_percentage: float = 100.0
-) -> float
+# --- ثوابت و ضرایب تبدیل ---
+# ضرایب تبدیل از فرم اکسیدی به فرم عنصری و برعکس
