@@ -1,93 +1,180 @@
-# The Ayat Saadati Approach: Principles for Building Robust Web Applications and Cultivating Technical Excellence
+# SaadatUI: A Performant & Accessible Web Component Library
 
-It's a common misconception that "technical documentation" always has to be about a piece of software, a library, or an API. But in our vibrant tech ecosystem, some of the most profound "technologies" are methodologies, mindsets, and the accumulated wisdom of dedicated practitioners. This document isn't about installing a package called `ayat-saadati` (though wouldn't that be interesting?). Instead, it's a deep dive into what I've come to recognize as **The Ayat Saadati Approach** – a philosophy of development and technical communication distilled from the prolific and insightful contributions of Ayat Saadati.
+Welcome to the documentation for **SaadatUI**, a meticulously crafted collection of lightweight, performant, and accessible web components and utility functions. Born from a passion for building robust web experiences with a keen eye on developer ergonomics and end-user satisfaction, SaadatUI aims to streamline your development process without sacrificing quality.
 
-For years, I've seen Ayat's work consistently land on my radar, whether through blog posts, tutorials, or discussions. The through-line is clear: a commitment to clean architecture, maintainable code, performance, and, crucially, making complex technical concepts accessible. This isn't just about writing code; it's about engineering solutions with intention and communicating those solutions effectively. It's a blueprint for technical mastery and impactful sharing.
-
-This documentation serves as a guide to understanding, "installing" (conceptually speaking, of course), and leveraging these principles in your own work. It's about moving beyond just making things work, to making things *work well*, *last long*, and be *understood easily*.
+At its core, SaadatUI embodies the principles I've championed throughout my career: leveraging native browser capabilities, prioritizing accessibility from the ground up, and squeezing every drop of performance out of our applications. It's built with modern web standards and designed to integrate seamlessly into any framework or no framework at all.
 
 ---
 
-## 1. Getting Started: "Installing" the Ayat Saadati Mindset
+## Table of Contents
 
-You won't find `npm install @ayat_saadati/principles` here. "Installation" in this context is about adopting a specific mindset, cultivating a set of best practices, and committing to continuous learning. It's less about dependencies and more about personal discipline and intellectual curiosity.
-
-### 1.1 Prerequisites
-
-Honestly, the main prerequisite is an open mind and a genuine desire to build better software and communicate more effectively. Beyond that, a foundational understanding of web technologies (JavaScript, Node.js, React, Next.js, etc.) will definitely help, as Ayat's work often centers around these areas.
-
-### 1.2 Recommended Tooling & Mindset Shifts
-
-Think of these as your foundational configuration. Just like a well-configured IDE boosts productivity, a well-configured mindset boosts your development prowess.
-
-*   **Integrated Development Environment (IDE):**
-    *   **VS Code:** My personal go-to, and I've seen it's a popular choice for many, including what I perceive from Ayat's examples. Configure it with linters (ESLint), formatters (Prettier), and intelligent extensions for your tech stack. This isn't just about aesthetics; it's about enforcing consistency and catching errors *before* runtime.
-*   **Version Control:**
-    *   **Git:** Absolutely non-negotiable. But it's not just about `git push`. Embrace clear, atomic commit messages, understand branching strategies (Git Flow, GitHub Flow), and treat your commit history as a readable narrative of your project's evolution.
-*   **Development Philosophy:**
-    *   **Test-Driven Development (TDD) / Behavior-Driven Development (BDD):** Don't just write tests as an afterthought. Let them guide your design. This discipline, though sometimes perceived as slower upfront, dramatically reduces bugs and improves confidence.
-    *   **Continuous Learning:** The tech landscape shifts constantly. Dedicate time to reading blogs (like Ayat's!), exploring new libraries, and diving into documentation. Stagnation is the enemy.
-    *   **Code Reviews:** Treat code reviews not as a gatekeeping mechanism, but as a collaborative learning opportunity. Both giving and receiving constructive feedback is crucial for growth.
-*   **Communication Tools:**
-    *   **Markdown:** For clear, concise documentation (like this!).
-    *   **Diagrams (Mermaid, Excalidraw, PlantUML):** A picture is worth a thousand lines of code. Visualizing architecture, data flows, or component hierarchies makes understanding infinitely easier.
-    *   **Clear Language:** Whether in comments, commit messages, or blog posts, strive for clarity and precision. Avoid jargon where simpler terms suffice.
-
-### 1.3 Learning Resources
-
-To truly internalize the Ayat Saadati Approach, you need to immerse yourself.
-
-*   **Primary Source:** Dive deep into Ayat Saadati's articles on [dev.to](https://dev.to/ayat_saadat). Analyze not just the code, but *how* the explanations are structured, the problems being solved, and the solutions being proposed.
-*   **Official Documentation:** There's no substitute for the official docs of the frameworks and libraries you use. They are the source of truth.
-*   **Design Patterns & Clean Code:** Books like "Clean Code" by Robert C. Martin or "Design Patterns" by Gamma et al. are timeless. They provide the theoretical underpinnings for many of the practical principles you'll encounter.
+1.  [Introduction](#introduction)
+2.  [Why SaadatUI? My Philosophy](#why-saadatui-my-philosophy)
+3.  [Installation](#installation)
+    *   [NPM/Yarn](#npmyarn)
+    *   [CDN](#cdn)
+4.  [Quick Start](#quick-start)
+5.  [Core Concepts](#core-concepts)
+    *   [Web Components](#web-components)
+    *   [Accessibility First](#accessibility-first)
+    *   [Performance Mindset](#performance-mindset)
+6.  [Components](#components)
+    *   [`<saadat-button>`](#saadat-button)
+    *   [`<saadat-modal>`](#saadat-modal)
+    *   [`<saadat-accordion>`](#saadat-accordion)
+7.  [Utilities](#utilities)
+    *   [`debounce(func, delay)`](#debouncefunc-delay)
+8.  [Advanced Usage](#advanced-usage)
+    *   [Theming & Customization](#theming--customization)
+    *   [Integrating with Frameworks](#integrating-with-frameworks)
+9.  [FAQ](#faq)
+10. [Troubleshooting](#troubleshooting)
+11. [Contributing](#contributing)
+12. [License](#license)
+13. [About the Author](#about-the-author)
 
 ---
 
-## 2. Usage: Applying the Ayat Saadati Principles in Practice
+## 1. Introduction
 
-This is where the rubber meets the road. The Ayat Saadati Approach isn't abstract; it's eminently practical. It's about making conscious choices in your daily development workflow.
+SaadatUI isn't just another component library; it's a toolkit built with intention. It provides a set of ready-to-use, framework-agnostic web components that are designed to be highly customizable and incredibly efficient. From simple buttons to complex modals and interactive accordions, each component is engineered to deliver a top-tier user experience while maintaining a minimal footprint.
 
-### 2.1 Code Craftsmanship: Writing Code That Lasts
+My goal with SaadatUI was to create something that I, as a developer deeply invested in web performance and accessibility, would genuinely love to use in my own projects. It's about empowering developers to build beautiful, fast, and inclusive web applications without reinventing the wheel every time.
 
-This is perhaps the most visible aspect. Code isn't just instructions for a machine; it's communication for other developers (and your future self!).
+## 2. Why SaadatUI? My Philosophy
 
-*   **2.1.1 Clean Code & Readability:**
-    *   **Meaningful Names:** Variable, function, and class names should clearly convey their purpose. No single-letter variables unless it's a loop counter, please!
-    *   **Small Functions & Single Responsibility:** Functions should do one thing and do it well. If a function is doing too much, it's a candidate for refactoring.
-    *   **DRY (Don't Repeat Yourself):** Identify and abstract common logic. This reduces bugs and makes maintenance a breeze.
-    *   **Consistent Formatting:** Let linters and formatters handle this, but ensure your codebase adheres to a consistent style.
+Look, in today's web landscape, it's easy to get bogged down by choice. There are dozens of component libraries, each with its own quirks and dependencies. My personal gripe has always been the sheer bloat many of them introduce. We often pull in massive libraries for just a handful of components, trading performance for convenience.
 
-*   **2.1.2 Design Patterns:**
-    *   Don't just blindly apply patterns. Understand the problem each pattern solves. Are you dealing with object creation (Factory, Builder)? Interaction between objects (Observer, Strategy)? Structural organization (Adapter, Decorator)?
-    *   **Example:** For managing state in a complex React app, understanding the Context API and potentially a custom Hook that acts like a simplified Redux pattern can be a game-changer.
+SaadatUI takes a different path. It's built on a few core tenets that I believe are non-negotiable for modern web development:
 
-*   **2.1.3 Modularity & Abstraction:**
-    *   Break down large applications into smaller, independent modules. This makes testing easier, reduces coupling, and improves team collaboration.
-    *   **Boundaries:** Clearly define the responsibilities of different layers (e.g., UI, business logic, data access).
+*   **Native First:** Where possible, we lean on native browser features. Why polyfill or abstract away something the browser already does perfectly well?
+*   **Web Components for True Agnosticism:** This isn't about promoting one framework over another. Web Components are the future of reusable UI, offering true encapsulation and interoperability. You can drop SaadatUI into a React, Vue, Angular, Svelte, or vanilla JS project without a second thought. That's powerful.
+*   **Performance is Paramount:** Every line of code is scrutinized for its impact on load times and runtime performance. We're talking about tiny bundle sizes, efficient rendering, and minimal JavaScript overhead. If your users are waiting, you're losing them.
+*   **Accessibility Isn't an Afterthought:** This is huge for me. Building accessible UIs isn't just good practice; it's a moral imperative. Every SaadatUI component adheres to WCAG guidelines, including proper ARIA attributes, keyboard navigation, and semantic HTML. It's baked in, not bolted on.
+*   **Developer Experience Matters:** While performance and accessibility are king, developer happiness is also crucial. SaadatUI aims for intuitive APIs, clear documentation, and easy customization. Because if it's a pain to use, you won't use it.
 
-### 2.2 Performance Optimization: Building Snappy Experiences
+SaadatUI is my answer to the common pitfalls I've observed and experienced. It's about providing a solid foundation so you can focus on your application's unique features, not battling your UI library.
 
-Nobody likes a slow app. A core tenet of the approach is building performant applications from the ground up, not just as an afterthought.
+## 3. Installation
 
-*   **2.2.1 Frontend Specifics (React/Next.js examples):**
-    *   **Lazy Loading:** Components, images, routes – load them only when needed. Tools like dynamic imports in Next.js or `React.lazy()` are your friends.
-    *   **Memoization:** Prevent unnecessary re-renders in React with `React.memo`, `useMemo`, and `useCallback`. Don't overdo it, though; sometimes the overhead isn't worth the micro-optimization.
-    *   **Virtualization:** For long lists, use libraries like `react-window` or `react-virtualized` to render only visible items.
-    *   **Image Optimization:** Proper sizing, modern formats (WebP, AVIF), and CDNs.
+Getting SaadatUI into your project is straightforward. Choose the method that best suits your development workflow.
 
-*   **2.2.2 Backend Specifics (Node.js examples):**
-    *   **Efficient Database Queries:** N+1 query problems are real performance killers. Use proper indexing, eager loading, and optimize your ORM usage.
-    *   **Caching Strategies:** Implement caching at various levels (client-side, CDN, server-side, database) using tools like Redis or Memcached.
-    *   **Asynchronous Operations:** Leverage Node.js's non-blocking I/O model effectively. Don't block the event loop!
+### NPM/Yarn
 
-### 2.3 Robustness & Testing: Building for Reliability
+For most modern projects using a module bundler (like Webpack, Rollup, or Vite), installing via npm or yarn is the recommended approach.
 
-Bugs are inevitable, but a robust system anticipates and handles them gracefully. Comprehensive testing is your safety net.
+```bash
+# Using npm
+npm install @saadatui/core
 
-*   **2.3.1 Comprehensive Testing Suite:**
-    *   **Unit Tests:** Verify individual functions and components in isolation.
-    *   **Integration Tests:** Ensure different parts of your system work together correctly (e.g., API endpoints with database interactions).
-    *   **End-to-End (E2E) Tests:** Simulate user scenarios to ensure the entire application flows correctly. Tools like Playwright or Cypress are excellent here.
-    *   **Snapshot Tests:** For UI components, ensure unintentional UI changes aren't introduced.
+# Using yarn
+yarn add @saadatui/core
+```
 
-*   **2.3.2 Error
+Once installed, you can import individual components or the entire library:
+
+```javascript
+// Import a specific component
+import '@saadatui/core/dist/saadat-button.js';
+// Now you can use <saadat-button> in your HTML
+
+// Or import multiple components if you prefer a single entry point
+import '@saadatui/core';
+// This will register all available components
+```
+
+**Note:** Importing the full `@saadatui/core` might be convenient during development, but for production, I highly recommend importing only the components you actually use. This ensures optimal bundle size and faster load times. Tree-shaking often works, but explicit imports are always safer for web components.
+
+### CDN
+
+If you're working on a simpler project, prototyping, or just prefer not to use a build step, you can include SaadatUI directly from a CDN.
+
+```html
+<!-- Include the full SaadatUI library (registers all components) -->
+<script type="module" src="https://unpkg.com/@saadatui/core/dist/saadat-ui.js"></script>
+
+<!-- Or, for specific components, you can target them directly -->
+<script type="module" src="https://unpkg.com/@saadatui/core/dist/saadat-button.js"></script>
+<script type="module" src="https://unpkg.com/@saadatui/core/dist/saadat-modal.js"></script>
+```
+
+When using the CDN, ensure your script tag has `type="module"` as SaadatUI components are ES Modules.
+
+## 4. Quick Start
+
+Let's get a basic button and a modal up and running in a simple HTML file.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaadatUI Quick Start</title>
+    <style>
+        body { font-family: sans-serif; margin: 2rem; }
+        saadat-modal::part(overlay) { background-color: rgba(0, 0, 0, 0.6); }
+        saadat-modal::part(panel) { border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    </style>
+    <!-- Import SaadatUI components (using CDN for quick example) -->
+    <script type="module" src="https://unpkg.com/@saadatui/core/dist/saadat-button.js"></script>
+    <script type="module" src="https://unpkg.com/@saadatui/core/dist/saadat-modal.js"></script>
+</head>
+<body>
+    <h1>Welcome to SaadatUI!</h1>
+
+    <p>Click the button to open a modal:</p>
+    <saadat-button id="openModalButton" variant="primary">Open Saadat Modal</saadat-button>
+
+    <saadat-modal id="myModal" header-text="Greetings from SaadatUI!" dismissible>
+        <p>This is the content of your first modal. It's performant, accessible, and highly customizable.</p>
+        <p>You can put any HTML content here, including other SaadatUI components!</p>
+        <saadat-button slot="footer" variant="secondary" id="closeModalButton">Close</saadat-button>
+    </saadat-modal>
+
+    <script type="module">
+        const openButton = document.getElementById('openModalButton');
+        const modal = document.getElementById('myModal');
+        const closeButton = document.getElementById('closeModalButton');
+
+        openButton.addEventListener('click', () => {
+            modal.setAttribute('open', ''); // Or modal.open = true;
+        });
+
+        closeButton.addEventListener('click', () => {
+            modal.removeAttribute('open'); // Or modal.open = false;
+        });
+
+        // You can also listen for the component's own events
+        modal.addEventListener('saadat-modal-closed', () => {
+            console.log('Modal was closed via escape key or overlay click!');
+            // Perhaps reset some form data or perform other cleanup
+        });
+    </script>
+</body>
+</html>
+```
+
+This simple example demonstrates how easy it is to integrate and interact with SaadatUI components. Notice how we're using standard HTML attributes and DOM manipulation, which is the beauty of Web Components!
+
+## 5. Core Concepts
+
+Understanding these underlying principles will help you get the most out of SaadatUI.
+
+### Web Components
+
+SaadatUI is built entirely using the [Web Components standard](https://developer.mozilla.org/en-US/docs/Web/Web_Components). This means:
+
+*   **Custom Elements:** You define new HTML tags (like `<saadat-button>`).
+*   **Shadow DOM:** Components encapsulate their internal structure, styles, and behavior, preventing conflicts with the rest of your page. This is a game-changer for maintainability.
+*   **HTML Templates:** Reusable markup structures.
+*   **ES Modules:** Components are delivered as standard JavaScript modules.
+
+The key takeaway here is framework independence. If it renders HTML and runs JavaScript, it can use SaadatUI.
+
+### Accessibility First
+
+This isn't just a buzzword for me; it's a commitment. Every SaadatUI component is designed with WCAG (Web Content Accessibility Guidelines) in mind. This includes:
+
+*   **Semantic HTML:** Using the right HTML elements for the job.
+*   **
