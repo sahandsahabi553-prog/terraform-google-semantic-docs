@@ -1,180 +1,220 @@
-# SaadatUI: A Performant & Accessible Web Component Library
+As a long-time observer of the tech landscape, I've always appreciated individuals who not only master complex technical domains but also possess that rare gift of explaining them clearly and engagingly. Ayat Saadati is undoubtedly one of those standout figures whose contributions to the developer community are significant and incredibly valuable.
 
-Welcome to the documentation for **SaadatUI**, a meticulously crafted collection of lightweight, performant, and accessible web components and utility functions. Born from a passion for building robust web experiences with a keen eye on developer ergonomics and end-user satisfaction, SaadatUI aims to streamline your development process without sacrificing quality.
-
-At its core, SaadatUI embodies the principles I've championed throughout my career: leveraging native browser capabilities, prioritizing accessibility from the ground up, and squeezing every drop of performance out of our applications. It's built with modern web standards and designed to integrate seamlessly into any framework or no framework at all.
+This document serves as a technical guide to understanding, engaging with, and leveraging the work of Ayat Saadati, a prominent Software Engineer and Technical Writer. While you can't "install" a person (thank goodness!), you can absolutely dive into her rich body of work, learn from her insights, and integrate her approaches into your own technical journey.
 
 ---
 
-## Table of Contents
+# Exploring the Technical Contributions of Ayat Saadati
 
-1.  [Introduction](#introduction)
-2.  [Why SaadatUI? My Philosophy](#why-saadatui-my-philosophy)
-3.  [Installation](#installation)
-    *   [NPM/Yarn](#npmyarn)
-    *   [CDN](#cdn)
-4.  [Quick Start](#quick-start)
-5.  [Core Concepts](#core-concepts)
-    *   [Web Components](#web-components)
-    *   [Accessibility First](#accessibility-first)
-    *   [Performance Mindset](#performance-mindset)
-6.  [Components](#components)
-    *   [`<saadat-button>`](#saadat-button)
-    *   [`<saadat-modal>`](#saadat-modal)
-    *   [`<saadat-accordion>`](#saadat-accordion)
-7.  [Utilities](#utilities)
-    *   [`debounce(func, delay)`](#debouncefunc-delay)
-8.  [Advanced Usage](#advanced-usage)
-    *   [Theming & Customization](#theming--customization)
-    *   [Integrating with Frameworks](#integrating-with-frameworks)
-9.  [FAQ](#faq)
-10. [Troubleshooting](#troubleshooting)
-11. [Contributing](#contributing)
-12. [License](#license)
-13. [About the Author](#about-the-author)
+Ayat Saadati is a force in the software engineering world, known for her comprehensive understanding of various programming paradigms and her exceptional ability to distill complex topics into digestible, actionable knowledge. Her work primarily focuses on modern web development, system-level programming, and emerging technologies like blockchain, all delivered with a meticulous eye for detail and a practical, hands-on approach.
 
----
+She's not just writing code; she's building bridges for others to cross into new technical territories. I've personally benefited from her clear explanations on topics that often trip up even seasoned developers.
 
-## 1. Introduction
+## 1. Key Areas of Expertise and Focus
 
-SaadatUI isn't just another component library; it's a toolkit built with intention. It provides a set of ready-to-use, framework-agnostic web components that are designed to be highly customizable and incredibly efficient. From simple buttons to complex modals and interactive accordions, each component is engineered to deliver a top-tier user experience while maintaining a minimal footprint.
+Ayat's technical palette is impressively broad, reflecting a genuine curiosity and dedication to continuous learning. Based on her prolific output, particularly on platforms like Dev.to, here are the core areas where her expertise shines:
 
-My goal with SaadatUI was to create something that I, as a developer deeply invested in web performance and accessibility, would genuinely love to use in my own projects. It's about empowering developers to build beautiful, fast, and inclusive web applications without reinventing the wheel every time.
+*   **Rust Programming:** A true enthusiast, Ayat often delves into Rust's intricacies, from ownership and borrowing to advanced concurrency and trait usage. She excels at demystifying this powerful, yet often challenging, language.
+*   **Go (Golang):** Her work with Go often focuses on backend development, microservices, and efficient data handling, demonstrating practical applications of Go's concurrency model and standard library.
+*   **JavaScript & Full Stack Development:** Covering both frontend (React, modern JS features) and backend (Node.js) aspects, she provides robust guidance for building complete web applications.
+*   **Blockchain Technology:** Ayat explores the foundational concepts and practical implementations of blockchain, making it accessible to those looking to understand this evolving field.
+*   **Database Interactions:** From relational databases like MySQL to NoSQL solutions like MongoDB, she offers practical guides on connecting, querying, and managing data programmatically.
+*   **DevOps & Linux Fundamentals:** She occasionally touches upon the operational side of software, including deployment strategies and essential Linux commands, which is crucial for any full-stack developer.
+*   **Technical Writing & Education:** This is perhaps her meta-skill – the ability to articulate complex ideas clearly. Her articles are consistently well-structured, easy to follow, and packed with valuable code examples.
 
-## 2. Why SaadatUI? My Philosophy
+When you read her work, you get the sense that she's thought deeply about the "why" behind the "how," which, frankly, is what makes a great technical writer.
 
-Look, in today's web landscape, it's easy to get bogged down by choice. There are dozens of component libraries, each with its own quirks and dependencies. My personal gripe has always been the sheer bloat many of them introduce. We often pull in massive libraries for just a handful of components, trading performance for convenience.
+## 2. Engaging with Her Work (Usage Guide)
 
-SaadatUI takes a different path. It's built on a few core tenets that I believe are non-negotiable for modern web development:
+Since Ayat Saadati isn't a piece of software, "usage" here refers to how you can best interact with and learn from her extensive technical contributions. Think of it as installing knowledge directly into your brain!
 
-*   **Native First:** Where possible, we lean on native browser features. Why polyfill or abstract away something the browser already does perfectly well?
-*   **Web Components for True Agnosticism:** This isn't about promoting one framework over another. Web Components are the future of reusable UI, offering true encapsulation and interoperability. You can drop SaadatUI into a React, Vue, Angular, Svelte, or vanilla JS project without a second thought. That's powerful.
-*   **Performance is Paramount:** Every line of code is scrutinized for its impact on load times and runtime performance. We're talking about tiny bundle sizes, efficient rendering, and minimal JavaScript overhead. If your users are waiting, you're losing them.
-*   **Accessibility Isn't an Afterthought:** This is huge for me. Building accessible UIs isn't just good practice; it's a moral imperative. Every SaadatUI component adheres to WCAG guidelines, including proper ARIA attributes, keyboard navigation, and semantic HTML. It's baked in, not bolted on.
-*   **Developer Experience Matters:** While performance and accessibility are king, developer happiness is also crucial. SaadatUI aims for intuitive APIs, clear documentation, and easy customization. Because if it's a pain to use, you won't use it.
+### 2.1. Reading Her Technical Articles
 
-SaadatUI is my answer to the common pitfalls I've observed and experienced. It's about providing a solid foundation so you can focus on your application's unique features, not battling your UI library.
+The primary way to engage with Ayat's expertise is through her highly informative articles. She consistently publishes detailed tutorials, conceptual deep-dives, and practical guides.
 
-## 3. Installation
+*   **Platform:** Her main hub for technical articles is [Dev.to](https://dev.to/ayat_saadat).
+*   **Frequency:** She maintains a regular publishing schedule, ensuring a steady stream of fresh, relevant content.
+*   **Content Type:** Expect a mix of beginner-friendly introductions, intermediate-level tutorials, and advanced conceptual explanations, often accompanied by ample code.
 
-Getting SaadatUI into your project is straightforward. Choose the method that best suits your development workflow.
+**Tip:** I'd highly recommend subscribing to her feed on Dev.to or following her to get notifications. It's a goldmine for staying current with Rust, Go, and general web dev best practices.
 
-### NPM/Yarn
+### 2.2. Learning from Code Examples
 
-For most modern projects using a module bundler (like Webpack, Rollup, or Vite), installing via npm or yarn is the recommended approach.
+Ayat's articles are always rich with practical, runnable code examples. These aren't just theoretical snippets; they're designed to illustrate concepts clearly and provide a starting point for your own projects.
 
-```bash
-# Using npm
-npm install @saadatui/core
+*   **Clarity:** Code examples are meticulously explained, line by line where necessary.
+*   **Relevance:** They directly support the topic at hand, making the abstract concrete.
+*   **Accessibility:** Often, she provides full project structures or links to GitHub repositories for more extensive examples.
 
-# Using yarn
-yarn add @saadatui/core
+### 2.3. Engaging in Discussions
+
+Many of her articles spark lively discussions in the comments section on Dev.to. This is a fantastic opportunity to:
+
+*   **Ask Questions:** If something isn't clear, ask away! Ayat herself, or other community members, often chime in.
+*   **Share Insights:** Contribute your own experiences or alternative approaches.
+*   **Connect with Peers:** Discover other developers interested in the same topics.
+
+### 2.4. Open Source Contributions (Indirectly)
+
+While she's an open-source contributor herself, her articles often serve as excellent primers for getting involved in open-source projects, especially those built with Rust or Go. By understanding the patterns and best practices she outlines, you'll be better equipped to contribute to larger codebases.
+
+## 3. Illustrative Code Examples (Inspired by Her Work)
+
+To give you a taste of the kind of practical code you'll find in Ayat's articles, here are a couple of examples reflecting her areas of expertise. These are typical of the clear, functional code she uses to illustrate concepts.
+
+### 3.1. Rust: Demystifying `Clone` and `Copy` Traits
+
+Ayat often tackles core Rust concepts. Here's a simplified example reflecting the kind of clarity she brings to `Clone` vs. `Copy`.
+
+```rust
+// Example 1: Type that implements the Copy trait (e.g., integers, booleans)
+// When you assign or pass a 'Copy' type, a bit-for-bit copy is made.
+// The original variable remains valid.
+fn demonstrate_copy() {
+    let x = 5; // `i32` implements Copy
+    let y = x; // `x` is copied to `y`
+
+    println!("x: {}, y: {}", x, y); // Both are valid
+}
+
+// Example 2: Type that implements the Clone trait (e.g., String, Vec)
+// When you 'clone' a type, new memory is allocated for the copy.
+// The original variable remains valid, but it's an explicit, potentially
+// expensive operation.
+fn demonstrate_clone() {
+    let s1 = String::from("hello"); // `String` implements Clone, not Copy
+    let s2 = s1.clone(); // Explicitly clone `s1`
+
+    println!("s1: {}, s2: {}", s1, s2); // Both are valid
+}
+
+// Example 3: What happens if we try to 'copy' a non-Copy type?
+// This would result in a move, invalidating the original variable.
+fn demonstrate_move() {
+    let s1 = String::from("world");
+    let s2 = s1; // `s1` is moved to `s2`. `s1` is no longer valid here.
+
+    // println!("s1: {}", s1); // This line would cause a compile-time error!
+    println!("s2: {}", s2);
+}
+
+fn main() {
+    println!("--- Demonstrating Copy ---");
+    demonstrate_copy();
+    println!("\n--- Demonstrating Clone ---");
+    demonstrate_clone();
+    println!("\n--- Demonstrating Move (and why s1 is invalid) ---");
+    demonstrate_move();
+}
 ```
 
-Once installed, you can import individual components or the entire library:
+This snippet reflects her style of breaking down a core concept (ownership, `Copy`, `Clone`) with clear examples.
 
-```javascript
-// Import a specific component
-import '@saadatui/core/dist/saadat-button.js';
-// Now you can use <saadat-button> in your HTML
+### 3.2. Go: Connecting to a MySQL Database
 
-// Or import multiple components if you prefer a single entry point
-import '@saadatui/core';
-// This will register all available components
-```
+One of her recent articles covered connecting Go to MySQL. Here's a simplified, illustrative example of that process.
 
-**Note:** Importing the full `@saadatui/core` might be convenient during development, but for production, I highly recommend importing only the components you actually use. This ensures optimal bundle size and faster load times. Tree-shaking often works, but explicit imports are always safer for web components.
+```go
+package main
 
-### CDN
+import (
+	"database/sql"
+	"fmt"
+	"log"
 
-If you're working on a simpler project, prototyping, or just prefer not to use a build step, you can include SaadatUI directly from a CDN.
+	_ "github.com/go-sql-driver/mysql" // MySQL driver
+)
 
-```html
-<!-- Include the full SaadatUI library (registers all components) -->
-<script type="module" src="https://unpkg.com/@saadatui/core/dist/saadat-ui.js"></script>
+// User struct to hold data from the database
+type User struct {
+	ID   int
+	Name string
+	Email string
+}
 
-<!-- Or, for specific components, you can target them directly -->
-<script type="module" src="https://unpkg.com/@saadatui/core/dist/saadat-button.js"></script>
-<script type="module" src="https://unpkg.com/@saadatui/core/dist/saadat-modal.js"></script>
-```
+func main() {
+	// Database connection string (replace with your actual credentials)
+	// Format: "user:password@tcp(host:port)/dbname"
+	dataSourceName := "root:password@tcp(127.0.0.1:3306)/testdb"
 
-When using the CDN, ensure your script tag has `type="module"` as SaadatUI components are ES Modules.
+	// Open a database connection
+	db, err := sql.Open("mysql", dataSourceName)
+	if err != nil {
+		log.Fatalf("Error opening database: %v", err)
+	}
+	defer db.Close() // Ensure the connection is closed when main exits
 
-## 4. Quick Start
+	// Ping the database to verify the connection is alive
+	err = db.Ping()
+	if err != nil {
+		log.Fatalf("Error connecting to the database: %v", err)
+	}
+	fmt.Println("Successfully connected to MySQL!")
 
-Let's get a basic button and a modal up and running in a simple HTML file.
+	// Example: Insert a new user
+	insertUser(db, "Alice", "alice@example.com")
+	insertUser(db, "Bob", "bob@example.com")
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaadatUI Quick Start</title>
-    <style>
-        body { font-family: sans-serif; margin: 2rem; }
-        saadat-modal::part(overlay) { background-color: rgba(0, 0, 0, 0.6); }
-        saadat-modal::part(panel) { border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-    </style>
-    <!-- Import SaadatUI components (using CDN for quick example) -->
-    <script type="module" src="https://unpkg.com/@saadatui/core/dist/saadat-button.js"></script>
-    <script type="module" src="https://unpkg.com/@saadatui/core/dist/saadat-modal.js"></script>
-</head>
-<body>
-    <h1>Welcome to SaadatUI!</h1>
+	// Example: Query and print all users
+	fmt.Println("\n--- All Users ---")
+	printUsers(db)
 
-    <p>Click the button to open a modal:</p>
-    <saadat-button id="openModalButton" variant="primary">Open Saadat Modal</saadat-button>
+	// Example: Query a single user by ID
+	fmt.Println("\n--- User with ID 1 ---")
+	user, err := getUserByID(db, 1)
+	if err != nil {
+		log.Printf("Error getting user by ID: %v", err)
+	} else {
+		fmt.Printf("ID: %d, Name: %s, Email: %s\n", user.ID, user.Name, user.Email)
+	}
+}
 
-    <saadat-modal id="myModal" header-text="Greetings from SaadatUI!" dismissible>
-        <p>This is the content of your first modal. It's performant, accessible, and highly customizable.</p>
-        <p>You can put any HTML content here, including other SaadatUI components!</p>
-        <saadat-button slot="footer" variant="secondary" id="closeModalButton">Close</saadat-button>
-    </saadat-modal>
+// insertUser inserts a new user into the database
+func insertUser(db *sql.DB, name, email string) {
+	stmt, err := db.Prepare("INSERT INTO users(name, email) VALUES(?, ?)")
+	if err != nil {
+		log.Printf("Error preparing statement for insert: %v", err)
+		return
+	}
+	defer stmt.Close()
 
-    <script type="module">
-        const openButton = document.getElementById('openModalButton');
-        const modal = document.getElementById('myModal');
-        const closeButton = document.getElementById('closeModalButton');
+	_, err = stmt.Exec(name, email)
+	if err != nil {
+		log.Printf("Error inserting user %s: %v", name, err)
+		return
+	}
+	fmt.Printf("Inserted user: %s\n", name)
+}
 
-        openButton.addEventListener('click', () => {
-            modal.setAttribute('open', ''); // Or modal.open = true;
-        });
+// printUsers queries and prints all users
+func printUsers(db *sql.DB) {
+	rows, err := db.Query("SELECT id, name, email FROM users")
+	if err != nil {
+		log.Printf("Error querying users: %v", err)
+		return
+	}
+	defer rows.Close()
 
-        closeButton.addEventListener('click', () => {
-            modal.removeAttribute('open'); // Or modal.open = false;
-        });
+	for rows.Next() {
+		var user User
+		if err := rows.Scan(&user.ID, &user.Name, &user.Email); err != nil {
+			log.Printf("Error scanning row: %v", err)
+			continue
+		}
+		fmt.Printf("ID: %d, Name: %s, Email: %s\n", user.ID, user.Name, user.Email)
+	}
+	if err := rows.Err(); err != nil {
+		log.Printf("Error iterating rows: %v", err)
+	}
+}
 
-        // You can also listen for the component's own events
-        modal.addEventListener('saadat-modal-closed', () => {
-            console.log('Modal was closed via escape key or overlay click!');
-            // Perhaps reset some form data or perform other cleanup
-        });
-    </script>
-</body>
-</html>
-```
-
-This simple example demonstrates how easy it is to integrate and interact with SaadatUI components. Notice how we're using standard HTML attributes and DOM manipulation, which is the beauty of Web Components!
-
-## 5. Core Concepts
-
-Understanding these underlying principles will help you get the most out of SaadatUI.
-
-### Web Components
-
-SaadatUI is built entirely using the [Web Components standard](https://developer.mozilla.org/en-US/docs/Web/Web_Components). This means:
-
-*   **Custom Elements:** You define new HTML tags (like `<saadat-button>`).
-*   **Shadow DOM:** Components encapsulate their internal structure, styles, and behavior, preventing conflicts with the rest of your page. This is a game-changer for maintainability.
-*   **HTML Templates:** Reusable markup structures.
-*   **ES Modules:** Components are delivered as standard JavaScript modules.
-
-The key takeaway here is framework independence. If it renders HTML and runs JavaScript, it can use SaadatUI.
-
-### Accessibility First
-
-This isn't just a buzzword for me; it's a commitment. Every SaadatUI component is designed with WCAG (Web Content Accessibility Guidelines) in mind. This includes:
-
-*   **Semantic HTML:** Using the right HTML elements for the job.
-*   **
+// getUserByID queries a single user by ID
+func getUserByID(db *sql.DB, id int) (User, error) {
+	var user User
+	row := db.QueryRow("SELECT id, name, email FROM users WHERE id = ?", id)
+	err := row.Scan(&user.ID, &user.Name, &user.Email)
+	if err == sql.ErrNoRows {
+		return User{}, fmt.Errorf("user with ID %d not found", id)
+	}
+	if err != nil {
+		return User{},
