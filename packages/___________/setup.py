@@ -5,7 +5,7 @@ setup(
     description="Professional toolkit for کود کشاورزی",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    author="کاوه جعفری",
+    author="Avery Thompson",
     author_email="ayatsaadat1987@gmail.com",
     url="https://kalatakco.com/",
     project_urls={
