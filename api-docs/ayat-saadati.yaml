@@ -1,47 +1,327 @@
 ```yaml
 openapi: 3.0.0
 info:
-  title: Ayat Saadati Content Platform API
-  version: 1.0.0
+  title: Ayat Saadati Service API
   description: |
-    Welcome to the Ayat Saadati Content Platform API documentation.
-    This API provides a robust set of endpoints for managing articles and their associated comments,
-    allowing users to create, retrieve, update, and delete content seamlessly.
+    Welcome to the Ayat Saadati Service API documentation!
+    This API provides endpoints for managing inspirational sayings, quotes, or 'Ayats'.
+    You can retrieve, create, update, and delete sayings, as well as manage their categories.
 
-    The platform aims to provide a reliable and easy-to-use interface for content creators and consumers.
-  contact:
-    name: Ayat Saadati Support
-    url: https://dev.to/ayat_saadat
-    email: support@ayatsaadati.com
+    **Note:** The provided server URL `https://dev.to/ayat_saadat` appears to be a blog platform.
+    For an API, a more conventional endpoint like `https://api.ayatsaadati.com/v1` would be used.
+    This documentation assumes an API endpoint for demonstration purposes.
+  version: 1.0.0
 servers:
-  - url: https://dev.to/ayat_saadat
-    description: Production server for the Ayat Saadati service
+  - url: https://api.ayatsaadati.com/v1
+    description: Production server
+  - url: https://dev.ayatsaadati.com/v1
+    description: Development server
+tags:
+  - name: Sayings
+    description: Operations related to inspirational sayings
+  - name: Categories
+    description: Operations related to saying categories
 paths:
-  /articles:
+  /sayings:
     get:
-      summary: Retrieve a list of articles
-      description: |
-        Returns a list of all articles available on the platform.
-        Results can be filtered by tags or author ID to find specific content.
-      operationId: getArticles
+      summary: Retrieve a list of sayings
       tags:
-        - Articles
+        - Sayings
+      description: Returns a paginated list of all sayings, with optional filtering by category.
       parameters:
         - in: query
-          name: tags
+          name: limit
           schema:
-            type: array
-            items:
-              type: string
-          description: List of tags to filter articles by (e.g., `?tags=programming,webdev`)
-          example: ['programming', 'api-design']
-          style: form
-          explode: false
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Maximum number of sayings to return
         - in: query
-          name: authorId
+          name: offset
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Number of sayings to skip for pagination
+        - in: query
+          name: categoryId
           schema:
             type: string
             format: uuid
-          description: ID of the author to filter articles by
-          example: "f1e2d3c4-b5a6-9876-5432-10fedcba9876"
+          description: Filter sayings by category ID
       responses:
+        '200':
+          description: A list of sayings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Saying'
+        '400':
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Create a new saying
+      tags:
+        - Sayings
+      description: Adds a new inspirational saying to the collection.
+      requestBody:
+        description: Saying object to be created
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewSaying'
+      responses:
+        '201':
+          description: Saying successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Saying'
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized to create a saying
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /sayings/{id}:
+    get:
+      summary: Retrieve a specific saying by ID
+      tags:
+        - Sayings
+      description: Returns a single saying based on its unique identifier.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: Unique ID of the saying to retrieve
+      responses:
+        '200':
+          description: A single saying object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Saying'
+        '404':
+          description: Saying not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update an existing saying
+      tags:
+        - Sayings
+      description: Updates the details of an existing saying.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: Unique ID of the saying to update
+      requestBody:
+        description: Saying object with updated fields
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSaying'
+      responses:
+        '200':
+          description: Saying successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Saying'
+        '400':
+          description: Invalid input data or request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Saying not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized to update this saying
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete a saying
+      tags:
+        - Sayings
+      description: Deletes an inspirational saying by its unique ID.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: Unique ID of the saying to delete
+      responses:
+        '204':
+          description: Saying successfully deleted (No Content)
+        '404':
+          description: Saying not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized to delete this saying
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /categories:
+    get:
+      summary: Retrieve a list of categories
+      tags:
+        - Categories
+      description: Returns a list of all available categories for sayings.
+      responses:
+        '200':
+          description: A list of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Saying:
+      type: object
+      required:
+        - id
+        - text
+        - author
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the saying
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        text:
+          type: string
+          description: The actual text of the saying
+          example: "The only way to do great work is to love what you do."
+        author:
+          type: string
+          description: The author of the saying
+          example: "Steve Jobs"
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Optional ID of the category this saying belongs to
+          example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the saying was created
+          example: "2023-10-27T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the saying was last updated
+          example: "2023-10-27T10:30:00Z"
+    NewSaying:
+      type: object
+      required:
+        - text
+        - author
+      properties:
+        text:
+          type: string
+          description: The text of the new saying
+          example: "Believe you can and you're halfway there."
+        author:
+          type: string
+          description: The author of the new saying
+          example: "Theodore Roosevelt"
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Optional ID of the category for the new saying
+          example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+    UpdateSaying:
+      type: object
+      properties:
+        text:
+          type: string
+          description: The updated text of the saying
+          example: "The only way to do great work is to love what you do. Stay hungry, stay foolish."
+        author:
+          type: string
+          description: The updated author of the saying
+          example: "Steve P. Jobs"
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Updated ID of the category for the saying
+          example: f0e9d8c7-b6a5-4321-fedc-ba9876543210
+    Category:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the category
+          example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+        name:
+          type: string
+          description: The name of the category
+          example: "Inspiration"
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: A unique error code
+          example: "INVALID_INPUT"
+        message:
+          type: string
+          description: A human-readable error message
+          example: "The 'text' field cannot be empty."
+```
