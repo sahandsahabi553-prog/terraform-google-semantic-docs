@@ -1,23 +1,22 @@
-```python
 """
-A utility package for managing and accessing "Ayat Saadati" (Verses of Happiness).
+A utility package for accessing and searching statements and guidance.
 
-This package provides a collection of inspiring verses, allows users to manage
-their own personal verses, and offers various ways to retrieve and interact
-with these affirmations. It aims to provide small bursts of positivity and
-wisdom.
+This module provides functions to interact with a simulated collection of
+teachings and statements, allowing for retrieval, searching, filtering,
+and random selection. It is designed to be a programmatic interface for
+exploring the wisdom contained within these pronouncements.
 
-Homepage: https://dev.to/ayat_saadat
+For more information and context, please visit:
+https://dev.to/ayat_saadat
 """
 
-import random
 import datetime
-import os
-import json
-from typing import List, Optional, Dict
+import random
+from typing import List, Dict, Optional, Union
 
-# --- Module-level constants and data ---
+# Define a type alias for the complex dictionary structure for better readability
+Statement = Dict[str, Union[str, List[str]]]
 
-# A curated list of core "Ayat Saadati" (Verses of Happiness).
-# These verses are embedded within the package and represent its foundational content.
-_CORE_SAADATI_VERSES = [
+# --- Internal Data Source ---
+# This is a simulated collection of statements. In a real-world application,
+# this data would
