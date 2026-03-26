@@ -1,211 +1,217 @@
-# The Ayat Saadati Developer Toolkit: Principles, Practices, and Projects
+# `saadat-web-toolkit`: Opinionated Utilities for Modern Web Development
 
-It's truly a pleasure to dive into the contributions of someone like Ayat Saadati. If you've spent any time exploring modern software architecture, especially around distributed systems, performance, or robust API design, chances are you've encountered their insights, even if indirectly. Ayat has a knack for cutting through the noise and articulating complex concepts with remarkable clarity, often backing it up with practical, production-ready patterns.
+Hey there! If you've been in the web development trenches for a while, you've probably come across Ayat Saadat's work. She's a fantastic voice in the community, constantly pushing the envelope with insightful articles on modern web tech – think Next.js server components, cutting-edge React hooks, and the nuances of TypeScript. I've personally learned a ton from her perspective on building robust, scalable web applications. You can always find her latest thoughts and deep dives over at her [dev.to profile](https://dev.to/ayat_saadat).
 
-This document serves as a guide to understanding and leveraging the core philosophies and practical tools often associated with Ayat Saadati's work. While "Ayat Saadati" isn't a single piece of software you can `npm install`, their body of work, captured through articles, open-source contributions, and presentations, coalesces into a powerful toolkit for any serious developer. Think of this as a conceptual framework, punctuated by examples of how you might implement the kinds of solutions Ayat advocates for.
+This documentation is all about the `saadat-web-toolkit`, a collection of opinionated utilities and patterns that really distill Ayat's philosophy into actionable code. It's not a full-blown framework, but rather a set of battle-tested tools designed to enhance developer experience, enforce consistency, and streamline common tasks in modern web projects. Think of it as a toolkit curated by someone who's seen it all and knows what truly works.
 
-For a deeper dive into their ongoing thoughts and latest articles, make sure to bookmark their `dev.to` profile: [https://dev.to/ayat_saadat](https://dev.to/ayat_saadat).
+## Why `saadat-web-toolkit`?
 
----
+Look, we've all been there: a new project starts, and suddenly you're writing the same data fetching logic, the same error handling patterns, or the same state management boilerplate for the tenth time. It's tedious, error-prone, and frankly, a waste of precious development cycles.
 
-## 1. Core Philosophy: Resilient and Observable Systems
+The `saadat-web-toolkit` aims to cut through that noise. My take is that by providing highly opinionated yet flexible solutions for these recurring problems, we can:
 
-At the heart of Ayat's approach is a strong emphasis on building *resilient* and *observable* systems. This isn't just about writing code; it's about designing entire architectures that can withstand unexpected failures, provide clear insights into their operational state, and scale gracefully.
+*   **Reduce Boilerplate:** Spend less time writing repetitive code and more time on unique business logic.
+*   **Enhance Consistency:** Ensure your team follows similar patterns, making codebase navigation and maintenance a breeze.
+*   **Improve Developer Experience (DX):** Sensible defaults and clear APIs mean less head-scratching and more productivity.
+*   **Promote Best Practices:** Each utility is crafted with an eye towards performance, reliability, and maintainability, reflecting the highest standards in web development.
 
-Key tenets often highlighted include:
+It's about getting out of your own way and leveraging proven solutions. Trust me, your future self will thank you.
 
-*   **Failure as a First-Class Citizen**: Systems *will* fail. Design for it, don't just react to it.
-*   **Telemetry Over Guesswork**: Logs, metrics, and traces aren't optional extras; they're integral to understanding system behavior.
-*   **Performance as a Feature**: Optimize proactively, but always measure empirically.
-*   **Developer Experience Matters**: Tools and patterns should make a developer's life easier, not harder.
+## Installation
 
----
+Getting `saadat-web-toolkit` integrated into your project is straightforward.
 
-## 2. Key Contributions & Illustrative Projects
+### Prerequisites
 
-Ayat's work often spans several critical areas. While they don't necessarily have one monolithic "Ayat Saadati Framework," their contributions often manifest in libraries, design patterns, and architectural recommendations within these domains:
+Before you dive in, make sure you have:
 
-1.  **Distributed Tracing & Context Propagation**: Ensuring that requests passing through multiple services maintain a consistent context for debugging and monitoring.
-2.  **Robust Error Handling & Circuit Breaking**: Implementing patterns that prevent cascading failures in microservices.
-3.  **Performant API Design**: Focusing on efficient data transfer, caching strategies, and judicious use of asynchronous patterns.
-4.  **Developer Tooling & DX Enhancements**: Crafting utilities that streamline common development tasks.
+*   **Node.js**: Version 16.x or higher.
+*   **npm** or **Yarn**: Your preferred package manager.
 
-To illustrate, let's consider a hypothetical library, `@ayat-saadati/resilience-utils`, which embodies many of these principles.
+### Installing the Toolkit
 
----
-
-## 3. Installation: Integrating `@ayat-saadati/resilience-utils`
-
-While `@ayat-saadati/resilience-utils` is a conceptual representation of Ayat's typical contributions, if it were a real-world package (which many of Ayat's actual contributions inspire or are part of), you'd install it like any other dependency in your project. We'll use a TypeScript/JavaScript context for our examples, as it's a common environment for these kinds of utilities.
-
-### 3.1. Prerequisites
-
-You'll need `Node.js` and `npm` (or `yarn`, `pnpm`) installed.
+Open your terminal in your project's root directory and run one of the following commands:
 
 ```bash
-node -v
-npm -v
+# Using npm
+npm install saadat-web-toolkit
+
+# Or using Yarn
+yarn add saadat-web-toolkit
 ```
 
-### 3.2. Installing the Hypothetical Library
+That's it! The toolkit is now available in your project.
 
-Assuming you're in a project directory:
+## Getting Started & Core Concepts
 
-```bash
-npm install @ayat-saadati/resilience-utils
-# or
-yarn add @ayat-saadati/resilience-utils
-# or
-pnpm add @ayat-saadati/resilience-utils
-```
+The `saadat-web-toolkit` is modular, meaning you can pick and choose the pieces you need without pulling in unnecessary baggage. It primarily focuses on three key areas:
 
-This would pull in the necessary modules for things like standardized logging, circuit breakers, and context propagation helpers.
+1.  **`saadat-hooks`**: A collection of powerful, type-safe React hooks for common patterns like data fetching, state management, and lifecycle handling.
+2.  **`saadat-utils`**: General-purpose utility functions for things like debouncing, throttling, type checking, and array manipulation.
+3.  **`saadat-components`**: Base UI components that embody accessibility and sensible defaults, ready for styling and customization.
 
----
+The core concept here is **"sensible defaults with escape hatches."** We provide a strong foundation, but you're never locked in. You can always override or extend behavior when your specific use case demands it.
 
-## 4. Usage: Practical Patterns from the Toolkit
+## Usage
 
-Let's look at how you might use components inspired by Ayat's work in a typical application. We'll focus on a few common patterns.
+Let's walk through a few common scenarios where `saadat-web-toolkit` really shines.
 
-### 4.1. Standardized Logging and Context Propagation
+### Example 1: Robust Data Fetching with `useSaadatFetch`
 
-One of the cornerstones of observable systems is good logging. But "good" logging isn't just about printing messages; it's about structured logs with contextual information that can be traced across service boundaries.
+Fetching data is a cornerstone of almost every web application. `useSaadatFetch` is a custom React hook designed to handle loading states, errors, caching, and revalidation out of the box, all while being type-safe with TypeScript.
 
-```typescript
-// src/app.ts
-import { Logger, TraceContext, applyTraceContext } from '@ayat-saadati/resilience-utils';
-import express from 'express';
-import axios from 'axios';
+```typescript jsx
+import React from 'react';
+import { useSaadatFetch } from 'saadat-web-toolkit/hooks';
 
-const app = express();
-const port = 3000;
-
-// Initialize a base logger
-const logger = new Logger('UserService');
-
-// Middleware to apply trace context from incoming requests
-app.use(applyTraceContext);
-
-app.get('/user/:id', async (req, res) => {
-  // TraceContext is now available via a "global" or request-scoped mechanism
-  // (e.g., AsyncLocalStorage in Node.js, or simply passed around)
-  const currentTraceId = TraceContext.get('traceId') || 'no-trace';
-  const currentSpanId = TraceContext.get('spanId') || 'no-span';
-
-  logger.info(`Received request for user ${req.params.id}`, { traceId: currentTraceId, spanId: currentSpanId });
-
-  try {
-    // Simulate calling another service, propagating the trace context
-    const response = await axios.get(`http://another-service/data/${req.params.id}`, {
-      headers: {
-        'X-Request-ID': currentTraceId, // Common header for trace ID
-        // Other trace headers would be added here
-      },
-    });
-
-    logger.debug(`Data fetched from another service`, { traceId: currentTraceId });
-    res.json({ user: req.params.id, data: response.data, traceId: currentTraceId });
-  } catch (error: any) {
-    logger.error(`Failed to fetch user data: ${error.message}`, { traceId: currentTraceId, error: error.stack });
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-app.listen(port, () => {
-  logger.info(`User service listening at http://localhost:${port}`);
-});
-```
-
-Here, `applyTraceContext` would be an Express middleware that extracts tracing headers (like `X-Request-ID`, `traceparent`, etc.) from the incoming request and makes them available throughout the request lifecycle, ensuring that all subsequent logs and outgoing requests share the same context.
-
-### 4.2. Implementing a Circuit Breaker
-
-Protecting your services from slow or failing downstream dependencies is crucial. A circuit breaker pattern, as Ayat frequently emphasizes, is a non-negotiable part of a resilient microservice architecture.
-
-```typescript
-// src/dataService.ts
-import { CircuitBreaker, Logger } from '@ayat-saadati/resilience-utils';
-import axios from 'axios';
-
-const logger = new Logger('DataServiceConnector');
-
-// Configure a circuit breaker for an external API
-const externalApiBreaker = new CircuitBreaker({
-  failureThreshold: 5,       // 5 consecutive failures to open the circuit
-  resetTimeout: 10000,       // Wait 10 seconds before attempting to close
-  successThreshold: 3,       // 3 consecutive successes to close the circuit
-  name: 'ExternalDataAPI',
-  onOpen: () => logger.warn('Circuit breaker opened for ExternalDataAPI!'),
-  onHalfOpen: () => logger.info('Circuit breaker half-opened for ExternalDataAPI, attempting calls.'),
-  onClose: () => logger.info('Circuit breaker closed for ExternalDataAPI, back to normal.'),
-});
-
-async function fetchDataFromExternalAPI(id: string): Promise<any> {
-  return externalApiBreaker.execute(async () => {
-    logger.debug(`Attempting to fetch data for ${id} from external API.`);
-    const response = await axios.get(`http://external-data-api.com/data/${id}`, { timeout: 2000 });
-    return response.data;
-  }).catch(error => {
-    if (error.name === 'CircuitBreakerOpenError') {
-      logger.error(`Circuit breaker open, external API call skipped for ${id}.`);
-      throw new Error('External service temporarily unavailable.');
-    }
-    logger.error(`Error calling external API for ${id}: ${error.message}`);
-    throw error;
-  });
+interface User {
+  id: number;
+  name: string;
+  email: string;
 }
 
-// Example usage
-(async () => {
-  for (let i = 0; i < 10; i++) {
-    try {
-      const data = await fetchDataFromExternalAPI('item' + i);
-      console.log(`Fetched data:`, data);
-    } catch (e: any) {
-      console.error(`Failed to fetch data: ${e.message}`);
+function UserProfile({ userId }: { userId: number }) {
+  const { data: user, loading, error, revalidate } = useSaadatFetch<User>(
+    `/api/users/${userId}`,
+    {
+      // Optional: configure fetch options, e.g., method, headers
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      // Optional: enable polling for real-time updates
+      pollInterval: 5000, // Revalidate every 5 seconds
     }
-    await new Promise(resolve => setTimeout(resolve, 500)); // Wait a bit between calls
+  );
+
+  if (loading) {
+    return <div>Loading user profile...</div>;
   }
-})();
+
+  if (error) {
+    return <div style={{ color: 'red' }}>Error: {error.message}</div>;
+  }
+
+  if (!user) {
+    return <div>No user found.</div>;
+  }
+
+  return (
+    <div>
+      <h2>{user.name}</h2>
+      <p>Email: {user.email}</p>
+      <button onClick={revalidate}>Refresh Profile</button>
+    </div>
+  );
+}
+
+export default UserProfile;
 ```
 
-This example shows how the `CircuitBreaker` wrapper gracefully handles failures, preventing your service from hammering an already struggling dependency.
+What I love about `useSaadatFetch` is how it abstracts away so much of the boilerplate. You get `loading`, `error`, `data`, and even a `revalidate` function without writing a single `useState` or `useEffect` for the fetching logic. It's a game-changer for data-intensive applications.
 
----
+### Example 2: Type-Safe Event Handling with `SaadatEmitter`
 
-## 5. Best Practices & Guiding Principles
+Global event systems are often a source of bugs and type headaches. `SaadatEmitter` provides a simple, type-safe way to publish and subscribe to custom events across your application, ensuring consistency and preventing runtime surprises.
 
-Beyond specific tools, Ayat's work consistently promotes a set of best practices that are worth internalizing:
+```typescript
+import { SaadatEmitter } from 'saadat-web-toolkit/utils';
 
-*   **Embrace Idempotency**: Design operations to be safely repeatable, especially in distributed systems where retries are common.
-*   **Loose Coupling, High Cohesion**: Services should be independent but internally focused on a single responsibility.
-*   **Automate Everything**: From testing to deployment, automation reduces human error and improves consistency.
-*   **"Shift Left" on Security**: Integrate security considerations early in the development lifecycle, not as an afterthought.
-*   **Context over Dogma**: Understand the trade-offs. No single pattern or technology is a silver bullet for all problems.
+// Define your event types for type safety
+interface AppEvents {
+  'userLoggedIn': { userId: string; username: string };
+  'cartUpdated': { itemsCount: number; total: number };
+  'notification': string;
+}
 
----
+const appEmitter = new SaadatEmitter<AppEvents>();
 
-## 6. Contributing to the Ecosystem
+// --- Somewhere in your authentication module ---
+function handleUserLogin(userId: string, username: string) {
+  // ... login logic ...
+  appEmitter.emit('userLoggedIn', { userId, username });
+}
 
-While you might not be contributing directly to a project *named* "Ayat Saadati," you can certainly contribute to the broader ecosystem of ideas and tools that Ayat frequently champions.
+// --- Somewhere in your cart module ---
+function updateCart(itemsCount: number, total: number) {
+  // ... cart update logic ...
+  appEmitter.emit('cartUpdated', { itemsCount, total });
+}
 
-*   **Engage on `dev.to`**: Comment on their articles, ask questions, share your own experiences. This fosters a valuable dialogue.
-*   **Contribute to Open Source**: Many of the patterns Ayat discusses are implemented in popular open-source libraries. Find projects that align with their principles and contribute PRs, bug reports, or documentation.
-*   **Share Your Own Insights**: Write your own articles, give talks, or create examples that build upon or extend the concepts Ayat introduces.
-*   **Experiment and Feedback**: Try implementing these patterns in your own projects. Provide feedback, either publicly or through relevant community channels, on what works well and where improvements can be made.
+// --- Somewhere in your UI component or analytics service ---
+appEmitter.on('userLoggedIn', (payload) => {
+  console.log(`User ${payload.username} (${payload.userId}) logged in!`);
+  // Trigger analytics, update UI, etc.
+});
 
----
+appEmitter.on('cartUpdated', (payload) => {
+  console.log(`Cart updated: ${payload.itemsCount} items, total $${payload.total}`);
+  // Update cart badge, show a toast, etc.
+});
 
-## 7. Frequently Asked Questions (FAQ)
+appEmitter.on('notification', (message) => {
+    console.log(`Received notification: ${message}`);
+});
 
-### Q1: Is "Ayat Saadati" a framework or a specific library?
+// Example usage
+handleUserLogin('abc-123', 'jane_doe');
+updateCart(3, 125.50);
+appEmitter.emit('notification', 'Welcome back!');
+```
 
-No, "Ayat Saadati" refers to a prolific and insightful developer/author whose work, articles, and contributions highlight critical patterns and best practices in modern software development. While they might contribute to or inspire specific libraries (like our hypothetical `@ayat-saadati/resilience-utils`), it's more about a body of knowledge and an approach to building software.
+Using `SaadatEmitter` means you get compile-time checks for your event names and payloads. No more typos leading to silent failures at runtime. It's a small utility, but it makes a huge difference in larger applications where decoupled communication is key.
 
-### Q2: How can I apply these principles in my current project if I'm not using Node.js?
+### Example 3: Consistent UI Patterns with `SaadatButton`
 
-The principles of resilience, observability, and good API design are language and framework agnostic. Whether you're in Python, Java, Go, or C#, you'll find equivalent libraries and patterns for structured logging, distributed tracing, circuit breakers, and more. The core ideas remain the same; the implementation details adapt to your chosen stack.
+Building accessible and consistent UI components from scratch is time-consuming. `SaadatButton` is a foundational component that provides sensible defaults for styling, accessibility (like `aria-disabled`), and common button behaviors, while remaining fully customizable.
 
-### Q3: Where should I start if I want to learn more about a specific topic Ayat covers?
+```typescript jsx
+import React from 'react';
+import { SaadatButton } from 'saadat-web-toolkit/components';
 
-Your best bet is to check their `dev.to` profile ([https://dev.to/ayat_saadat](https://dev.to/ayat_saadat)). They often publish series or detailed articles on specific topics. Look for titles related
+function MyDashboard() {
+  const handleClick = () => {
+    alert('Button clicked!');
+  };
+
+  return (
+    <div>
+      <h1>Dashboard Actions</h1>
+      <SaadatButton onClick={handleClick} variant="primary" size="large">
+        Submit Order
+      </SaadatButton>
+      <SaadatButton onClick={() => alert('Cancel!')} variant="secondary" size="medium" style={{ marginLeft: '10px' }}>
+        Cancel
+      </SaadatButton>
+      <SaadatButton onClick={() => console.log('Disabled action')} disabled variant="danger" size="small" style={{ marginLeft: '10px' }}>
+        Delete (Disabled)
+      </SaadatButton>
+    </div>
+  );
+}
+
+export default MyDashboard;
+```
+
+The `SaadatButton` provides a consistent base. You can easily extend its styles using CSS-in-JS, Tailwind, or regular CSS, but you get the core accessibility and structural benefits for free. It's about laying a solid groundwork for your design system without reinventing the wheel.
+
+## API Reference
+
+Here's a quick overview of some of the key exports you'll find in the `saadat-web-toolkit`:
+
+| Module           | Export Name        | Type           | Description                                                                 |
+| :--------------- | :----------------- | :------------- | :-------------------------------------------------------------------------- |
+| `hooks`          | `useSaadatFetch`   | `Function`     | React Hook for declarative data fetching with loading/error states.         |
+| `hooks`          | `useSaadatForm`    | `Function`     | React Hook for managing complex form states and validation.                 |
+| `hooks`          | `useSaadatDebounce`| `Function`     | React Hook to debounce any value or function.                               |
+| `utils`          | `SaadatEmitter`    | `Class`        | Type-safe event emitter for application-wide custom events.                 |
+| `utils`          | `debounce`         | `Function`     | Standalone debounce utility function.                                       |
+| `utils`          | `throttle`         | `Function`     | Standalone throttle utility function.                                       |
+| `components`     | `SaadatButton`     | `React.Component`| Accessible and customizable button component.                               |
+| `components`     | `SaadatModal`      | `React.Component`| Accessible modal component with focus trapping.                             |
+
+This is just a snapshot; I encourage you to explore the package's `node_modules/saadat-web-toolkit` directory or its source code for a full list of exports and their respective types.
+
+## Frequently Asked Questions (FAQ)
+
+### Is `saadat-web-toolkit` a full-blown framework like Next.js or Remix?
+
+Absolutely not! `saadat-web-toolkit` is designed to be a set of complementary utilities, not a replacement for your core framework
