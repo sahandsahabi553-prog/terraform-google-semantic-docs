@@ -1,273 +1,235 @@
-# Saadati DevKit: Elevating Your Development Experience
+# Ayat Saadati's Tech Compass: Navigating Modern Development
 
-Hey there, fellow developers! I'm Ayat Saadat, and if you've ever found yourself wrestling with boilerplate, inconsistent UI, or just plain repetitive tasks in your web projects, then you're exactly who I had in mind when I started building the Saadati DevKit.
+When you spend enough time in the tech trenches, you start to recognize certain voices that consistently cut through the noise. Ayat Saadati is one of those voices. Through their insightful articles, pragmatic advice, and a clear dedication to fostering better development practices, Ayat has carved out a significant niche in the developer community. This document serves as a guide to understanding and leveraging the "Ayat Saadati approach" – a blend of best practices, thoughtful architecture, and a strong emphasis on community and continuous learning.
 
-This isn't just another library; it's a toolkit born out of years of navigating the trenches of front-end and full-stack development. My goal with Saadati DevKit is simple: to make your development journey smoother, more enjoyable, and frankly, more productive. We're talking about a collection of battle-tested components, hooks, and utilities, all crafted with a TypeScript-first approach to bring robustness and clarity to your codebase.
+Think of this not as documentation for a single software package, but rather a technical exploration of a developer's philosophy, a "toolkit" of ideas and methodologies that, when adopted, can profoundly impact your own development journey. Their contributions often revolve around modern web development, backend services, and architecting robust, maintainable systems.
 
-I truly believe that developer experience (DX) isn't a luxury; it's a necessity. When developers are empowered with intuitive tools, they build better products, faster. That's the core philosophy behind every line of code in this kit.
-
-## Table of Contents
-
-1.  [Introduction](#introduction)
-2.  [Key Features](#key-features)
-3.  [Installation](#installation)
-4.  [Quick Start](#quick-start)
-    *   [Using a Component](#using-a-component)
-    *   [Leveraging a Hook](#leveraging-a-hook)
-5.  [Core Concepts](#core-concepts)
-    *   [The Saadati Design System](#the-saadati-design-system)
-    *   [API Interaction Hooks](#api-interaction-hooks)
-    *   [Form Management Utilities](#form-management-utilities)
-6.  [Advanced Usage](#advanced-usage)
-    *   [Custom Theming](#custom-theming)
-    *   [Extending Components](#extending-components)
-7.  [API Reference (Highlights)](#api-reference-highlights)
-8.  [Frequently Asked Questions (FAQ)](#frequently-asked-questions-faq)
-9.  [Troubleshooting](#troubleshooting)
-10. [Contributing](#contributing)
-11. [License](#license)
-12. [About the Author](#about-the-author)
+You can find a wealth of their direct contributions and insights on their `dev.to` profile: [https://dev.to/ayat_saadat](https://dev.to/ayat_saadat)
 
 ---
 
-## 1. Introduction
+## 1. The Core Principles: What Drives the Ayat Saadati Approach?
 
-The modern web development landscape is incredible, but let's be honest, it can also be a bit of a minefield. You've got to juggle state management, API calls, UI consistency, accessibility, and robust error handling, all while trying to hit those deadlines. It's a lot!
+From my perspective, after following their work for a while, several key tenets consistently emerge in Ayat's contributions. These aren't just abstract ideas; they're practical guidelines that shape how one approaches software development.
 
-Saadati DevKit is my answer to some of these challenges. It's an opinionated, TypeScript-first collection designed to give you a head start without locking you into a rigid framework. We provide:
+### 1.1 Clean Code & Maintainability
+This is non-negotiable. Ayat consistently champions code that is readable, understandable, and easy to maintain. This includes clear naming conventions, small functions, well-defined responsibilities, and a focus on reducing cognitive load for anyone reading the code (including your future self!). It's about writing code as if the next person to work on it is a psychopath who knows where you live.
 
-*   **A Solid Foundation:** Ready-to-use, accessible UI components that follow a coherent design system.
-*   **Smart Utilities:** Hooks and helper functions that abstract away common complexities like API fetching, form validation, and state management.
-*   **Developer-Centric Design:** Everything is typed, documented, and built with maintainability in mind. My personal pet peeve is poorly typed libraries – you won't find that here.
+### 1.2 Pragmatic Problem Solving
+While advocating for best practices, there's always an underlying current of pragmatism. It's not about blindly following dogma, but about understanding *why* certain patterns exist and applying them judiciously to solve real-world problems. Sometimes, the "perfect" solution isn't the "best" solution for a given context.
 
-Think of it as your reliable co-pilot, helping you navigate the sometimes turbulent skies of web development.
+### 1.3 Community & Knowledge Sharing
+Ayat is a firm believer in the power of shared knowledge. Their articles aren't just tutorials; they're often deep dives into problems, architectural decisions, and lessons learned. This commitment to giving back and fostering a collaborative learning environment is a hallmark of their presence in the tech space.
 
-## 2. Key Features
+### 1.4 Continuous Learning & Adaptability
+The tech landscape changes at a dizzying pace. The Ayat Saadati approach implicitly encourages developers to stay curious, embrace new technologies, and continuously refine their skills. It's about seeing learning not as a chore, but as an integral part of being a professional developer.
 
-Here's a snapshot of what makes Saadati DevKit a valuable addition to your toolkit:
+---
 
-*   **TypeScript Native:** Built from the ground up with TypeScript for superior type safety and autocompletion. No more guessing prop types!
-*   **Comprehensive UI Components:** A growing set of accessible, themeable React components (e.g., `Button`, `Input`, `Modal`, `Table`, `Spinner`).
-*   **Powerful Data Fetching Hooks:** Streamline your API interactions with `useSaadatiFetch` and `useSaadatiMutation`, complete with caching, loading states, and error handling.
-*   **Robust Form Utilities:** Simplify form creation, validation, and submission with `useSaadatiForm` and associated helper functions.
-*   **Theming System:** Easily customize the look and feel to match your brand guidelines.
-*   **Built for Performance:** Components are optimized for minimal re-renders and efficient resource usage.
-*   **Accessibility First:** Every component is designed with WCAG guidelines in mind, because good UX means good accessibility.
+## 2. Setting Up Your "Ayat Saadati Toolkit" (Installation)
 
-## 3. Installation
+Since we're not installing a single piece of software, "installation" here refers to setting up a development environment that aligns with the principles Ayat often demonstrates and advocates for. This means a robust, efficient, and well-configured workspace.
 
-Getting started with Saadati DevKit is straightforward. We're available via `npm` and `yarn`.
+### 2.1 Essential Development Environment
+These are the foundational tools I've found indispensable for following modern development practices, many of which align with what you'd see in Ayat's examples.
 
-First, open your terminal in your project's root directory:
+*   **Version Control**:
+    *   **Git**: Absolutely critical. If you're not using Git, you're missing out.
+    *   **GitHub/GitLab/Bitbucket**: For remote repository hosting and collaborative workflows.
+        ```bash
+        # Install Git (macOS, using Homebrew)
+        brew install git
+
+        # Install Git (Debian/Ubuntu)
+        sudo apt update
+        sudo apt install git
+        ```
+*   **Integrated Development Environment (IDE)**:
+    *   **VS Code**: My personal go-to. It's lightweight, incredibly powerful, and has an enormous ecosystem of extensions that make life easier.
+        *   *Recommended Extensions*: ESLint, Prettier, Docker, GitLens, REST Client, various language-specific extensions (e.g., for TypeScript, Python, Go).
+        ```bash
+        # Install VS Code (macOS, using Homebrew Cask)
+        brew install --cask visual-studio-code
+
+        # Or download directly from code.visualstudio.com
+        ```
+*   **Terminal Emulator**:
+    *   **iTerm2 (macOS)** or **Windows Terminal (Windows)**, combined with shells like **Zsh (with Oh My Zsh)** or **PowerShell**, provide a much better experience than default terminals.
+
+### 2.2 Language Runtimes & Package Managers
+Ayat's work frequently touches on JavaScript/TypeScript, often in the context of Node.js.
+
+*   **Node.js & npm/Yarn**:
+    *   **Node.js**: The JavaScript runtime.
+    *   **`nvm` (Node Version Manager)**: Crucial for managing multiple Node.js versions, which is incredibly common across projects.
+    *   **`npm` or `yarn`**: Package managers for JavaScript projects.
+        ```bash
+        # Install nvm (macOS/Linux)
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+
+        # After installing nvm, restart your terminal, then:
+        nvm install --lts # Installs the latest LTS version
+        nvm use --lts
+        nvm alias default lts
+
+        # npm comes with Node.js. To install yarn (globally):
+        npm install -g yarn
+        ```
+*   **TypeScript**:
+    *   Essential for large-scale JavaScript applications. It adds static typing, greatly improving maintainability and catching errors early.
+        ```bash
+        # Install TypeScript globally
+        npm install -g typescript
+        ```
+
+### 2.3 Containerization (Highly Recommended)
+*   **Docker**: For consistent development and deployment environments. It decouples your application from your host machine, ensuring "it works on my machine" becomes "it works everywhere."
+    ```bash
+    # Install Docker Desktop (macOS/Windows)
+    # Download from docker.com/products/docker-desktop
+    # For Linux, follow instructions on docs.docker.com/engine/install/
+    ```
+
+### 2.4 Example Project Setup
+While there isn't a single "Ayat Saadati project" to clone, the best way to "install" their philosophy is to start a project with strong foundational principles. Many of their articles provide excellent starting points or architectural patterns.
+
+Let's imagine a common scenario: a Node.js/TypeScript REST API.
 
 ```bash
-# Using npm
-npm install @ayat-saadat/devkit
+# 1. Create a new project directory
+mkdir my-ayat-project && cd my-ayat-project
 
-# Or using yarn
-yarn add @ayat-saadat/devkit
+# 2. Initialize a Node.js project
+npm init -y
+
+# 3. Install core dependencies
+npm install express dotenv cors
+npm install -D typescript @types/node @types/express @types/cors ts-node-dev rimraf
+
+# 4. Initialize TypeScript
+npx tsc --init
+
+# 5. Configure tsconfig.json (example adjustments)
+# Open tsconfig.json and set:
+# "outDir": "./dist",
+# "rootDir": "./src",
+# "esModuleInterop": true,
+# "skipLibCheck": true,
+# "forceConsistentCasingInFileNames": true,
+
+# 6. Add scripts to package.json
+# "scripts": {
+#   "build": "rimraf dist && tsc",
+#   "start": "node dist/index.js",
+#   "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+# }
+
+# Now you have a basic setup to start building with their recommended structure.
 ```
 
-**Peer Dependencies:**
+---
 
-Saadati DevKit relies on `react` and `react-dom` (versions 17.x or 18.x) as peer dependencies. Make sure you have them installed in your project:
+## 3. Putting It Into Practice: Usage & Code Examples
 
-```bash
-npm install react react-dom
-# or
-yarn add react react-dom
+Applying Ayat's principles means focusing on structure, clarity, and maintainability. Let's look at a simple Node.js/TypeScript example for a hypothetical user service, demonstrating modularity and clean architecture.
+
+### 3.1 Scenario: A User Management API
+We want to create a simple API to `GET` all users and `POST` a new user. We'll separate concerns into controllers, services, and routes.
+
+**Project Structure:**
+
+```
+my-ayat-project/
+├── src/
+│   ├── interfaces/
+│   │   └── User.ts          # Defines the User data structure
+│   ├── services/
+│   │   └── userService.ts   # Business logic for user operations
+│   ├── controllers/
+│   │   └── userController.ts # Handles request/response, delegates to service
+│   ├── routes/
+│   │   └── userRoutes.ts    # Defines API endpoints and maps to controllers
+│   ├── app.ts               # Express application setup
+│   └── index.ts             # Entry point
+├── .env                     # Environment variables
+├── package.json
+├── tsconfig.json
+└── ...
 ```
 
-Once installed, you're ready to import and use the components and hooks in your application!
+### 3.2 Code Examples
 
-## 4. Quick Start
+#### `src/interfaces/User.ts`
+Defining types is fundamental for clarity and type safety.
 
-Let's dive right in with a couple of common use cases. I always find that seeing a bit of code helps to cement understanding.
-
-### Using a Component
-
-Here's how you might use the `SaadatiButton` component in a simple React application.
-
-```typescript jsx
-// src/App.tsx
-import React from 'react';
-import { SaadatiButton } from '@ayat-saadat/devkit';
-import '@ayat-saadat/devkit/dist/styles.css'; // Don't forget to import the styles!
-
-function App() {
-  const handleClick = () => {
-    alert('Button clicked!');
-  };
-
-  return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-      <h1>Welcome to Saadati DevKit!</h1>
-      <p>This is a simple example using the SaadatiButton.</p>
-      <SaadatiButton onClick={handleClick} variant="primary" size="large">
-        Click Me!
-      </SaadatiButton>
-      <SaadatiButton onClick={() => alert('Secondary action!')} variant="secondary" disabled>
-        Disabled Button
-      </SaadatiButton>
-    </div>
-  );
+```typescript
+// src/interfaces/User.ts
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: Date;
 }
 
-export default App;
-```
-
-**A quick note:** The `import '@ayat-saadat/devkit/dist/styles.css';` line is crucial for the default styling to apply. You'll typically add this once in your main `index.tsx` or `App.tsx` file.
-
-### Leveraging a Hook
-
-Let's fetch some data using the `useSaadatiFetch` hook. This hook handles loading states, errors, and data caching for you – a real time-saver in my book.
-
-```typescript jsx
-// src/components/UserList.tsx
-import React from 'react';
-import { useSaadatiFetch, SaadatiSpinner, SaadatiAlert } from '@ayat-saadat/devkit';
-
-interface User {
-  id: number;
+export interface NewUser {
   name: string;
   email: string;
 }
-
-function UserList() {
-  const { data: users, loading, error } = useSaadatiFetch<User[]>('https://jsonplaceholder.typicode.com/users');
-
-  if (loading) {
-    return <SaadatiSpinner size="large" />;
-  }
-
-  if (error) {
-    return <SaadatiAlert type="error" message={`Failed to load users: ${error.message}`} />;
-  }
-
-  if (!users || users.length === 0) {
-    return <p>No users found.</p>;
-  }
-
-  return (
-    <div>
-      <h2>User List</h2>
-      <ul>
-        {users.map((user) => (
-          <li key={user.id}>
-            <strong>{user.name}</strong> ({user.email})
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-export default UserList;
 ```
 
-And then you'd use `UserList` in your `App.tsx`:
+#### `src/services/userService.ts`
+This is where the core business logic lives. It should be independent of the HTTP layer.
 
-```typescript jsx
-// src/App.tsx (continued)
-import UserList from './components/UserList';
+```typescript
+// src/services/userService.ts
+import { User, NewUser } from '../interfaces/User';
+import { v4 as uuidv4 } from 'uuid'; // npm install uuid @types/uuid
 
-// ... inside App component return ...
-      <hr style={{ margin: '40px 0' }} />
-      <UserList />
-// ...
-```
+// A simple in-memory "database" for demonstration
+const users: User[] = [];
 
-See? Less boilerplate, more focus on your application logic. That's what we're aiming for.
+export class UserService {
+  public async getAllUsers(): Promise<User[]> {
+    // In a real application, this would fetch from a database
+    console.log('Fetching all users...');
+    return users;
+  }
 
-## 5. Core Concepts
-
-To truly get the most out of Saadati DevKit, it's helpful to understand the underlying philosophies and patterns.
-
-### The Saadati Design System
-
-At the heart of our UI components is a thoughtfully designed system. This isn't just about pretty pixels; it's about consistency, predictability, and maintainability.
-
-*   **Tokens:** We use design tokens for colors, spacing, typography, and more. This makes theming a breeze and ensures visual harmony across your application.
-*   **Variants:** Components often come with `variant` props (e.g., `primary`, `secondary`, `outline`, `ghost`) to easily adapt their appearance for different contexts.
-*   **Sizes:** Standardized `size` props (`small`, `medium`, `large`) help maintain consistent scaling.
-*   **Accessibility:** Every component is built with proper ARIA attributes, keyboard navigation support, and focus management. This is non-negotiable for me.
-
-### API Interaction Hooks
-
-The `useSaadatiFetch` and `useSaadatiMutation` hooks are designed to abstract away the complexities of data fetching and modification.
-
-*   **`useSaadatiFetch<T>(url: string, options?: RequestInit)`:** For GET requests.
-    *   Manages `loading`, `error`, and `data` states.
-    *   Includes a basic in-memory caching mechanism to prevent redundant requests.
-    *   Supports `refetch` function for manual data reloading.
-*   **`useSaadatiMutation<TData, TVariables>(url: string, options?: RequestInit)`:** For POST, PUT, DELETE, etc.
-    *   Provides a `mutate` function to trigger the API call.
-    *   Manages `loading`, `error`, and `data` for the mutation operation.
-    *   Offers `onSuccess` and `onError` callbacks for side effects.
-
-I've always found dealing with loading and error states to be tedious, so these hooks are crafted to make that part of your life significantly easier.
-
-### Form Management Utilities
-
-Forms are the backbone of many applications, and often a source of frustration. `useSaadatiForm` aims to change that.
-
-*   **`useSaadatiForm<TValues>(initialValues: TValues, validationSchema?: object)`:**
-    *   Manages form state (`values`, `errors`, `touched`).
-    *   Integrates seamlessly with validation libraries like Yup or Zod (via `validationSchema`).
-    *   Provides `handleChange`, `handleBlur`, `handleSubmit` functions.
-    *   Offers `reset` and `setFieldValue` for programmatic control.
-
-My philosophy here is to provide a robust yet flexible foundation. I'm a big proponent of keeping forms clean and manageable, and this hook is a direct reflection of that.
-
-## 6. Advanced Usage
-
-Once you're comfortable with the basics, you'll likely want to customize Saadati DevKit to fit your specific needs.
-
-### Custom Theming
-
-The DevKit uses CSS variables under the hood, making customization incredibly flexible. You can override default theme values globally.
-
-Create a `theme.css` file (or just add to your global styles):
-
-```css
-/* src/styles/theme.css */
-:root {
-  /* Primary Color */
-  --sd-color-primary-500: #6200ee; /* A nice vibrant purple */
-  --sd-color-primary-600: #3700b3;
-  --sd-color-primary-700: #1a008a;
-
-  /* Accent Color */
-  --sd-color-accent-500: #03dac6; /* Teal */
-  --sd-color-accent-600: #018786;
-
-  /* Neutral Colors */
-  --sd-color-neutral-100: #f5f5f5;
-  --sd-color-neutral-500: #9e9e9e;
-  --sd-color-neutral-900: #212121;
-
-  /* Spacing */
-  --sd-spacing-xs: 4px;
-  --sd-spacing-sm: 8px;
-  --sd-spacing-md: 16px;
-  --sd-spacing-lg: 24px;
-
-  /* Border Radius */
-  --sd-border-radius-sm: 4px;
-  --sd-border-radius-md: 8px;
+  public async createUser(userData: NewUser): Promise<User> {
+    // In a real application, this would save to a database
+    const newUser: User = {
+      id: uuidv4(),
+      name: userData.name,
+      email: userData.email,
+      createdAt: new Date(),
+    };
+    users.push(newUser);
+    console.log(`User created: ${newUser.name}`);
+    return newUser;
+  }
 }
 ```
+*   **Opinion**: Notice how `UserService` doesn't know anything about `Request` or `Response` objects. This separation of concerns is *critical*. It makes testing easier and the service reusable.
 
-Then, import this file *after* the default Saadati DevKit styles in your `index.tsx` or `App.tsx`:
+#### `src/controllers/userController.ts`
+The controller acts as a bridge between the HTTP request and the business logic in the service layer.
 
-```typescript jsx
-// src/index.tsx
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import '@ayat-saadat/devkit/dist/styles.css'; // Default styles first
-import './styles/theme.css'; // Your custom theme overrides second
-import App from './App';
+```typescript
+// src/controllers/userController.ts
+import { Request, Response } from 'express';
+import { UserService } from '../services/userService';
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-root.render(
-  <React.StrictMode
+export class UserController {
+  private userService: UserService;
+
+  constructor(userService: UserService) {
+    this.userService = userService;
+  }
+
+  public async getUsers(req: Request, res: Response): Promise<void> {
+    try {
+      const users = await this.userService.getAllUsers();
+      res.status(200).json(users);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      res.status(
