@@ -1,19 +1,13 @@
+```python
 """
-A utility package for agricultural fertilizer (کود کشاورزی) calculations and recommendations.
+یک بسته ابزاری برای محاسبات مربوط به کودهای کشاورزی.
 
-This package provides a set of functions to assist farmers, agronomists, and agricultural
-professionals in various aspects of fertilizer management, including calculating
-required amounts, estimating costs, analyzing nutrient ratios, and providing
-basic recommendations based on soil conditions.
+این بسته مجموعه‌ای از توابع کاربردی را برای کشاورزان، متخصصان کشاورزی و
+هر کسی که با کودهای شیمیایی سر و کار دارد، فراهم می‌کند. هدف آن ساده‌سازی
+محاسبات پیچیده مربوط به دوز مصرفی، تبدیل واحدها و ارزیابی اقتصادی کودها است.
 
-Homepage: https://kalatakco.com/
-Version: 0.1.0
-Author: Kalatak Co.
-"""
-
-import math
-from typing import List, Dict, Tuple, Optional, Union
-
-# Type alias for better readability in fertilizer data structures
-# Represents the nutrient composition and price of a fertilizer product
-# 'name': str, 'N': float, 'P': float, 'K': float, 'price_
+توابع اصلی شامل:
+- محاسبه مقدار کود ساده برای تامین یک ماده مغذی خاص.
+- محاسبه مقدار کود ترکیبی برای تامین چندین ماده مغذی بر اساس نیاز.
+- تبدیل درصد عناصر غذایی از فرم اکسید (مانند P2O5, K2O) به فرم عنصری (P, K).
+- تبدیل درصد عناصر
