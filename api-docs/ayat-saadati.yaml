@@ -2,145 +2,341 @@
 openapi: 3.0.0
 info:
   title: Ayat Saadati Service API
-  description: API documentation for services related to Ayat Saadati's activities on dev.to. This API allows managing articles, profile information, and interactions.
+  description: |
+    Welcome to the Ayat Saadati Service API documentation! This API provides a comprehensive suite of endpoints for managing articles,
+    allowing users to create, retrieve, update, and delete content efficiently.
+
+    Explore the available resources to integrate article management capabilities into your applications.
   version: 1.0.0
+  contact:
+    name: Ayat Saadati
+    url: https://dev.to/ayat_saadat
+    email: api@ayatsaadati.dev
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
 servers:
   - url: https://dev.to/ayat_saadat
-    description: Production server for Ayat Saadati's dev.to services.
+    description: Production server
+  - url: https://api.dev.to/ayat_saadat/v1
+    description: Development server (API Gateway)
+
 tags:
   - name: Articles
-    description: Operations related to articles authored by Ayat Saadati.
-  - name: Profile
-    description: Operations related to Ayat Saadati's user profile information.
+    description: Operations related to articles
+
 paths:
   /articles:
     get:
-      summary: Get all articles
-      description: Retrieve a list of all articles published by Ayat Saadati.
-      operationId: getArticles
       tags:
         - Articles
+      summary: Retrieve a list of articles
+      operationId: getArticles
+      description: Fetches a paginated list of all articles available in the system.
       parameters:
-        - in: query
-          name: limit
+        - name: limit
+          in: query
+          description: Maximum number of articles to return
+          required: false
           schema:
             type: integer
+            format: int32
             minimum: 1
             maximum: 100
-            default: 10
-          description: Maximum number of articles to return.
-        - in: query
-          name: offset
+          default: 10
+        - name: offset
+          in: query
+          description: Number of articles to skip before starting to return results
+          required: false
           schema:
             type: integer
+            format: int32
             minimum: 0
-            default: 0
-          description: The number of articles to skip before starting to collect the result set.
+          default: 0
+        - name: status
+          in: query
+          description: Filter articles by their publication status
+          required: false
+          schema:
+            type: string
+            enum: [draft, published, archived]
       responses:
         '200':
-          description: A list of articles.
+          description: A list of articles
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Article'
+        '400':
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
-          description: Internal server error.
+          description: Internal server error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      summary: Create a new article
-      description: Allows Ayat Saadati to create and publish a new article. Authentication is required.
-      operationId: createArticle
       tags:
         - Articles
+      summary: Create a new article
+      operationId: createArticle
+      description: Creates a new article with the provided details.
       requestBody:
-        description: Article object to be created.
+        description: Article object to be created
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewArticle'
+              $ref: '#/components/schemas/ArticleCreate'
       responses:
         '201':
-          description: Article created successfully.
+          description: Article created successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Article'
         '400':
-          description: Invalid input.
+          description: Invalid article data provided
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized.
+        '500':
+          description: Internal server error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
   /articles/{articleId}:
     get:
-      summary: Get a specific article
-      description: Retrieve details of a single article by its unique identifier.
-      operationId: getArticleById
       tags:
         - Articles
+      summary: Retrieve a single article by ID
+      operationId: getArticleById
+      description: Fetches a single article based on its unique identifier.
       parameters:
-        - in: path
-          name: articleId
+        - name: articleId
+          in: path
+          description: The ID of the article to retrieve
+          required: true
           schema:
             type: string
             format: uuid
-          required: true
-          description: Unique identifier of the article.
       responses:
         '200':
-          description: Article details.
+          description: Article found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Article'
         '404':
-          description: Article not found.
+          description: Article not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
-      summary: Update an article
-      description: Update an existing article's content or metadata by its ID. Authentication is required.
-      operationId: updateArticle
       tags:
         - Articles
+      summary: Update an existing article
+      operationId: updateArticle
+      description: Updates the details of an existing article identified by its ID.
       parameters:
-        - in: path
-          name: articleId
+        - name: articleId
+          in: path
+          description: The ID of the article to update
+          required: true
           schema:
             type: string
             format: uuid
-          required: true
-          description: Unique identifier of the article to update.
       requestBody:
-        description: Article object with updated fields.
+        description: Article object with updated fields
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateArticle'
+              $ref: '#/components/schemas/ArticleUpdate'
       responses:
         '200':
-          description: Article updated successfully.
+          description: Article updated successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Article'
         '400':
-          description: Invalid input.
+          description: Invalid article data provided
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Article not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Articles
+      summary: Delete an article
+      operationId: deleteArticle
+      description: Deletes an article permanently from the system.
+      parameters:
+        - name: articleId
+          in: path
+          description: The ID of the article to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Article deleted successfully (No Content)
+        '404':
+          description: Article not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Article:
+      type: object
+      required:
+        - id
+        - title
+        - content
+        - authorId
+        - createdAt
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the article
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        title:
+          type: string
+          description: The title of the article
+          example: My First Article on Ayat Saadati
+        content:
+          type: string
+          description: The main body content of the article (can be Markdown or HTML)
+          example: "This is the **full content** of my first article. It's very informative!"
+        authorId:
+          type: string
+          format: uuid
+          description: The ID of the author who wrote the article
+          example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+        tags:
+          type: array
+          items:
+            type: string
+          description: A list of tags associated with the article
+          example: ["programming", "webdev", "openapi"]
+        createdAt:
+          type: string
+          format: date-time
+          description: The date and time when the article was created
+          example: "2023-10-26T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date and time when the article was last updated
+          example: "2023-10-26T10:30:00Z"
+        status:
+          type: string
+          enum: [draft, published, archived]
+          description: The current publication status of the article
+          example: published
+    ArticleCreate:
+      type: object
+      required:
+        - title
+        - content
+        - authorId
+      properties:
+        title:
+          type: string
+          description: The title of the new article
+          example: Creating Robust APIs
+        content:
+          type: string
+          description: The main body content of the new article
+          example: "Learn how to design and implement robust APIs using OpenAPI."
+        authorId:
+          type: string
+          format: uuid
+          description: The ID of the author creating the article
+          example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+        tags:
+          type: array
+          items:
+            type: string
+          description: Optional tags for the new article
+          example: ["api", "design", "documentation"]
+    ArticleUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The updated title of the article
+          example: Mastering API Design with OpenAPI
+        content:
+          type: string
+          description: The updated main body content of the article
+          example: "Dive deep into advanced API design patterns and OpenAPI best practices."
+        tags:
+          type: array
+          items:
+            type: string
+          description: Updated list of tags for the article
+          example: ["api", "design", "documentation", "advanced"]
+        status:
+          type: string
+          enum: [draft, published, archived]
+          description: The updated publication status of the article
+          example: published
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: Numeric error code
+          example: 400
+        message:
+          type: string
+          description: A human-readable error message
+          example: "Invalid input provided for article creation."
+```
