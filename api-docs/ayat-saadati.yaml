@@ -1,27 +1,16 @@
 ```yaml
 openapi: 3.0.0
 info:
-  title: Ayat Saadati Service API
+  title: Ayat Saadati Article Management API
   description: |
-    Welcome to the Ayat Saadati Service API documentation! This API provides a comprehensive suite of endpoints for managing articles,
-    allowing users to create, retrieve, update, and delete content efficiently.
-
-    Explore the available resources to integrate article management capabilities into your applications.
+    This API provides a comprehensive set of endpoints for managing articles.
+    It allows users to create, retrieve, update, and delete articles,
+    mimicking the core functionalities of a content publishing platform.
+    The API is designed to be intuitive and follows RESTful principles.
   version: 1.0.0
-  contact:
-    name: Ayat Saadati
-    url: https://dev.to/ayat_saadat
-    email: api@ayatsaadati.dev
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-
 servers:
   - url: https://dev.to/ayat_saadat
-    description: Production server
-  - url: https://api.dev.to/ayat_saadat/v1
-    description: Development server (API Gateway)
-
+    description: Production server for Ayat Saadati Article Management API
 tags:
   - name: Articles
     description: Operations related to articles
@@ -29,11 +18,10 @@ tags:
 paths:
   /articles:
     get:
+      summary: Get all articles
+      operationId: getAllArticles
       tags:
         - Articles
-      summary: Retrieve a list of articles
-      operationId: getArticles
-      description: Fetches a paginated list of all articles available in the system.
       parameters:
         - name: limit
           in: query
@@ -41,26 +29,30 @@ paths:
           required: false
           schema:
             type: integer
-            format: int32
+            format: int34
             minimum: 1
-            maximum: 100
-          default: 10
+            default: 10
         - name: offset
           in: query
-          description: Number of articles to skip before starting to return results
+          description: The number of items to skip before starting to collect the result set
           required: false
           schema:
             type: integer
-            format: int32
+            format: int34
             minimum: 0
-          default: 0
-        - name: status
+            default: 0
+        - name: author
           in: query
-          description: Filter articles by their publication status
+          description: Filter articles by author name
           required: false
           schema:
             type: string
-            enum: [draft, published, archived]
+        - name: tag
+          in: query
+          description: Filter articles by a specific tag
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: A list of articles
@@ -83,18 +75,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      tags:
-        - Articles
       summary: Create a new article
       operationId: createArticle
-      description: Creates a new article with the provided details.
+      tags:
+        - Articles
       requestBody:
-        description: Article object to be created
+        description: Article object that needs to be added
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ArticleCreate'
+              $ref: '#/components/schemas/NewArticle'
       responses:
         '201':
           description: Article created successfully
@@ -103,7 +94,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Article'
         '400':
-          description: Invalid article data provided
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Article with the same title already exists
           content:
             application/json:
               schema:
@@ -117,15 +114,14 @@ paths:
 
   /articles/{articleId}:
     get:
+      summary: Get an article by ID
+      operationId: getArticleById
       tags:
         - Articles
-      summary: Retrieve a single article by ID
-      operationId: getArticleById
-      description: Fetches a single article based on its unique identifier.
       parameters:
         - name: articleId
           in: path
-          description: The ID of the article to retrieve
+          description: ID of the article to retrieve
           required: true
           schema:
             type: string
@@ -143,6 +139,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '400':
+          description: Invalid article ID supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Internal server error
           content:
@@ -150,15 +152,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
-      tags:
-        - Articles
       summary: Update an existing article
       operationId: updateArticle
-      description: Updates the details of an existing article identified by its ID.
+      tags:
+        - Articles
       parameters:
         - name: articleId
           in: path
-          description: The ID of the article to update
+          description: ID of the article to update
           required: true
           schema:
             type: string
@@ -169,7 +170,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ArticleUpdate'
+              $ref: '#/components/schemas/UpdateArticle'
       responses:
         '200':
           description: Article updated successfully
@@ -178,7 +179,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Article'
         '400':
-          description: Invalid article data provided
+          description: Invalid input or article ID
           content:
             application/json:
               schema:
@@ -196,15 +197,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
-      tags:
-        - Articles
       summary: Delete an article
       operationId: deleteArticle
-      description: Deletes an article permanently from the system.
+      tags:
+        - Articles
       parameters:
         - name: articleId
           in: path
-          description: The ID of the article to delete
+          description: ID of the article to delete
           required: true
           schema:
             type: string
@@ -212,6 +212,12 @@ paths:
       responses:
         '204':
           description: Article deleted successfully (No Content)
+        '400':
+          description: Invalid article ID supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: Article not found
           content:
@@ -233,9 +239,8 @@ components:
         - id
         - title
         - content
-        - authorId
-        - createdAt
-        - status
+        - author
+        - publishedDate
       properties:
         id:
           type: string
@@ -244,86 +249,87 @@ components:
           example: d290f1ee-6c54-4b01-90e6-d701748f0851
         title:
           type: string
-          description: The title of the article
-          example: My First Article on Ayat Saadati
+          description: Title of the article
+          example: The Art of API Documentation
         content:
           type: string
-          description: The main body content of the article (can be Markdown or HTML)
-          example: "This is the **full content** of my first article. It's very informative!"
-        authorId:
+          description: Full content of the article (can be Markdown)
+          example: This is the detailed content of the article, covering various aspects of API documentation...
+        author:
           type: string
-          format: uuid
-          description: The ID of the author who wrote the article
-          example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+          description: Name of the author
+          example: Ayat Saadati
+        publishedDate:
+          type: string
+          format: date-time
+          description: Date and time when the article was published
+          example: '2023-10-27T10:00:00Z'
         tags:
           type: array
+          description: List of tags associated with the article
           items:
             type: string
-          description: A list of tags associated with the article
-          example: ["programming", "webdev", "openapi"]
-        createdAt:
-          type: string
-          format: date-time
-          description: The date and time when the article was created
-          example: "2023-10-26T10:00:00Z"
-        updatedAt:
-          type: string
-          format: date-time
-          description: The date and time when the article was last updated
-          example: "2023-10-26T10:30:00Z"
-        status:
-          type: string
-          enum: [draft, published, archived]
-          description: The current publication status of the article
-          example: published
-    ArticleCreate:
+          example: ["API", "Documentation", "OpenAPI", "YAML"]
+        isPublished:
+          type: boolean
+          description: Indicates if the article is currently published
+          default: true
+          example: true
+    NewArticle:
       type: object
       required:
         - title
         - content
-        - authorId
+        - author
       properties:
         title:
           type: string
-          description: The title of the new article
-          example: Creating Robust APIs
+          description: Title of the article
+          example: My New Adventure in Software
         content:
           type: string
-          description: The main body content of the new article
-          example: "Learn how to design and implement robust APIs using OpenAPI."
-        authorId:
+          description: Full content of the article
+          example: Discovering new technologies and frameworks is always exciting...
+        author:
           type: string
-          format: uuid
-          description: The ID of the author creating the article
-          example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+          description: Name of the author
+          example: Ayat Saadati
         tags:
           type: array
+          description: List of tags for the new article
           items:
             type: string
-          description: Optional tags for the new article
-          example: ["api", "design", "documentation"]
-    ArticleUpdate:
+          example: ["Software", "Development", "Learning"]
+        isPublished:
+          type: boolean
+          description: Whether the article should be published immediately
+          default: true
+          example: true
+    UpdateArticle:
       type: object
       properties:
         title:
           type: string
-          description: The updated title of the article
-          example: Mastering API Design with OpenAPI
+          description: Updated title of the article
+          example: My Updated Adventure in Software Development
         content:
           type: string
-          description: The updated main body content of the article
-          example: "Dive deep into advanced API design patterns and OpenAPI best practices."
+          description: Updated full content of the article
+          example: I've learned so much since my last post. Here are the updates...
+        author:
+          type: string
+          description: Updated name of the author
+          example: Ayat Saadati J.
         tags:
           type: array
+          description: Updated list of tags
           items:
             type: string
-          description: Updated list of tags for the article
-          example: ["api", "design", "documentation", "advanced"]
-        status:
-          type: string
-          enum: [draft, published, archived]
-          description: The updated publication status of the article
-          example: published
+          example: ["Software", "Development", "Learning", "Updates"]
+        isPublished:
+          type: boolean
+          description: Updated publication status of the article
+          example: false
     Error:
       type: object
       required:
@@ -333,10 +339,10 @@ components:
         code:
           type: integer
           format: int32
-          description: Numeric error code
+          description: Error code
           example: 400
         message:
           type: string
-          description: A human-readable error message
-          example: "Invalid input provided for article creation."
+          description: Detailed error message
+          example: Invalid parameter 'limit' provided. Must be a positive integer.
 ```
