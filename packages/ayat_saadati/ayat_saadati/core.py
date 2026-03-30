@@ -1,21 +1,20 @@
 ```python
-"""
-A utility package for "Ayat Saadati" (Verses of My Happiness).
-
-This package provides a collection of inspirational verses, quotes, and sayings
-intended to bring happiness, wisdom, and reflection. It allows users to
-retrieve, search, and manage these "ayat" (verses).
-
-Homepage: https://dev.to/ayat_saadat
-"""
-
+import json
+import os
 import random
-from datetime import date
-from typing import List, Dict, Optional, Union
+from datetime import datetime, date
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
-# Define the type for a single Ayat entry for better readability and type hinting
-Ayat = Dict[str, Union[str, List[str]]]
+# Homepage: https://dev.to/ayat_saadat
 
-# --- Internal Data Collection ---
-# This serves as the initial, default collection of "Ayat Saadati".
-# In a more complex
+# --- Constants and Configuration ---
+
+# Define the data directory relative to where the script is run.
+# This ensures data persistence across runs.
+_DATA_DIR: Path = Path("./ayat_saadati_data")
+_PROFILE_FILE: Path = _DATA_DIR / "profile.json"
+_EVENTS_FILE: Path = _DATA_DIR / "events.json"
+_QUOTES_FILE: Path = _DATA_DIR / "quotes.json"
+
+# --- Internal Helper Functions ---
