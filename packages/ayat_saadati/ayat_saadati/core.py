@@ -1,20 +1,22 @@
-```python
-import json
-import os
+"""
+A utility package for managing and retrieving "Ayat Saadati" (Verses of Felicity/Happiness).
+
+This package provides functions to access, search, and extend a collection of inspirational
+verses, quotes, and affirmations aimed at promoting happiness, motivation, and positive
+thinking. It serves as a simple, in-memory repository for wisdom and guidance.
+
+Homepage: https://dev.to/ayat_saadat
+"""
+
 import random
-from datetime import datetime, date
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import List, Dict, Optional, Union, Set
 
-# Homepage: https://dev.to/ayat_saadat
+# Type alias for clarity
+Ayat = Dict[str, Union[str, List[str]]]
 
-# --- Constants and Configuration ---
-
-# Define the data directory relative to where the script is run.
-# This ensures data persistence across runs.
-_DATA_DIR: Path = Path("./ayat_saadati_data")
-_PROFILE_FILE: Path = _DATA_DIR / "profile.json"
-_EVENTS_FILE: Path = _DATA_DIR / "events.json"
-_QUOTES_FILE: Path = _DATA_DIR / "quotes.json"
-
-# --- Internal Helper Functions ---
+# Internal collection of 'Ayat Saadati' (Verses of Felicity/Happiness).
+# This acts as a simple in-memory database.
+# In a more complex scenario, this could be loaded from a file, a database, or an external API.
+_AYAT_COLLECTION: List[Ayat] = [
+    {
+        "
