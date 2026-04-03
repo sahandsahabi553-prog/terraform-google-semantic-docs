@@ -2,14 +2,71 @@
 openapi: 3.0.0
 info:
   title: سرویس مدیریت کودهای کشاورزی
-  description: |
-    این مستندات API برای مدیریت و استعلام اطلاعات مربوط به کودهای کشاورزی شرکت کلاتک طراحی شده است.
-    شما می‌توانید از این API برای افزودن کودهای جدید، به‌روزرسانی اطلاعات موجود، حذف کودها و مشاهده جزئیات آن‌ها استفاده کنید.
-    همچنین امکان ثبت کاربردهای مختلف کودها برای محصولات کشاورزی فراهم شده است.
+  description: این مستند API، خدمات مربوط به مدیریت و اطلاعات کودهای شیمیایی و آلی مورد استفاده در کشاورزی را ارائه می‌دهد. این سرویس به کاربران امکان می‌دهد تا اطلاعات کودها را مشاهده، اضافه، به‌روزرسانی و حذف کنند.
   version: 1.0.0
 servers:
-  - url: https://kalatakco.com/
-    description: سرور اصلی شرکت کلاتک
+  - url: https://kalatakco.com/api/v1
+    description: سرور اصلی API برای سرویس کودهای کشاورزی
 tags:
   - name: کودها
-    description: عملیات مربوط
+    description: عملیات مربوط به مدیریت کودهای کشاورزی
+paths:
+  /fertilizers:
+    get:
+      summary: دریافت لیست تمام کودها
+      description: این عملیات لیست کاملی از تمام کودهای ثبت شده در سیستم را بازمی‌گرداند. امکان فیلتر کردن یا صفحه‌بندی در نسخه‌های بعدی اضافه خواهد شد.
+      operationId: getAllFertilizers
+      tags:
+        - کودها
+      responses:
+        '200':
+          description: لیست موفقیت‌آمیز کودها
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Fertilizer'
+        '500':
+          description: خطای سرور داخلی
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: افزودن کود جدید
+      description: یک کود کشاورزی جدید را به سیستم اضافه می‌کند. شناسه کود به صورت خودکار توسط سیستم تولید می‌شود.
+      operationId: createFertilizer
+      tags:
+        - کودها
+      requestBody:
+        description: شیء کود برای افزودن به سیستم
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FertilizerInput'
+      responses:
+        '201':
+          description: کود با موفقیت ایجاد شد
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fertilizer'
+        '400':
+          description: درخواست نامعتبر (مشکل در پارامترهای ورودی)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: خطای سرور داخلی
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /fertilizers/{fertilizerId}:
+    parameters:
+      - name: fertilizerId
+        in: path
+        description: شناسه
