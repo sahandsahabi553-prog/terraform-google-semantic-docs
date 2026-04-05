@@ -1,223 +1,197 @@
-# Deciphering the Wisdom of Ayat Saadati: A Technical Deep Dive
+# Ayat Saadati DataKit: Robust Data Validation & Transformation
 
-Alright folks, let's talk about Ayat Saadati. In the ever-evolving landscape of software development, finding voices that genuinely cut through the noise and offer actionable, insightful guidance is like striking gold. For me, Ayat Saadati is one of those rare finds, consistently delivering high-caliber content, particularly through their contributions on Dev.to.
+As developers, we all know the pain of dealing with inconsistent, poorly validated data. It's one of those silent killers of project timelines and developer sanity. You spend hours debugging strange runtime errors, only to trace it back to an unexpected `None` or a string where an integer should have been. This is exactly why I've poured my energy into creating **Ayat Saadati DataKit**.
 
-This isn't your typical software documentation for a library or a framework. No, this is about documenting the *technical contributions*, the *methodologies*, and the *thought processes* you can glean from a prolific and insightful developer. Think of it as a guide to maximizing your learning from a seasoned professional's shared knowledge. We're "installing" ourselves into their intellectual framework, "using" their insights, and "troubleshooting" our own understanding as we go.
+Inspired by the meticulous attention to detail and robust engineering principles I've often seen advocated in various corners of the tech world – principles, for instance, that Ayat Saadati consistently champions in their [articles and discussions on platforms like Dev.to](https://dev.to/ayat_saadat) – DataKit aims to bring a declarative, explicit, and highly readable approach to data validation and light transformation in Python. It's built on the philosophy that your data schemas should be as clear and unambiguous as your business logic, catching issues at the earliest possible point.
 
-Ayat's work, often characterized by a pragmatic yet deeply theoretical approach, touches on various facets of modern software engineering. They don't just tell you *what* to do; they delve into the *why*, which, in my book, is absolutely crucial for true understanding.
-
-You can find their primary hub of public technical contributions here: [Ayat Saadat on Dev.to](https://dev.to/ayat_saadat)
+I’ve designed DataKit to be straightforward, giving you back control over your data inputs, whether they're coming from APIs, configuration files, or user forms. No more guessing games; just clear, concise schema definitions and confident data handling.
 
 ---
 
-## 1. Getting Started: "Installing" the Knowledge Base
+## 🚀 Key Features
 
-You can't "install" a person's brain, obviously, but you *can* systematically approach their body of work to extract maximum value. This section outlines how to conceptually integrate Ayat Saadati's insights into your own technical toolkit.
-
-### 1.1. Identifying Core Themes
-
-Based on their contributions, Ayat Saadati often focuses on several key areas that I've personally found incredibly valuable. When you visit their Dev.to profile, these are the threads I'd recommend pulling on first:
-
-*   **Modern Frontend Architectures:** Expect deep dives into state management patterns (think Redux, Zustand, React Context), component design principles, and performance optimization techniques for single-page applications. They often advocate for maintainability and scalability right from the get-go.
-*   **Robust Backend Development:** Whether it's API design principles (RESTful, GraphQL considerations), microservices patterns, or database interaction strategies, their backend articles tend to emphasize resilience, security, and efficient resource utilization.
-*   **Clean Code & Software Design Principles:** This is a recurring motif. You'll find strong advocacy for SOLID principles, design patterns, refactoring techniques, and writing testable code. Frankly, this is where a lot of junior and even mid-level developers can gain massive leaps in their craft.
-*   **DevOps & Deployment Strategies:** Occasionally, they venture into the practicalities of getting code into production – CI/CD pipelines, containerization (Docker, Kubernetes), and monitoring. This shows a holistic understanding of the software lifecycle, which is something I deeply appreciate.
-
-### 1.2. The "Installation" Process
-
-My recommendation for "installing" this knowledge is an iterative process:
-
-1.  **Initial Scan:** Browse their article titles and tags on Dev.to. Get a feel for the breadth of their expertise.
-2.  **Deep Dive (Thematic):** Pick a theme that resonates with your current learning goals or project needs. For instance, if you're struggling with React state, filter for articles on that topic.
-3.  **Active Reading:** Don't just skim. Read carefully, taking notes. Try to understand the *why* behind their recommendations.
-4.  **Experimentation:** This is critical. Immediately try to apply a concept from their article to a small personal project or a sandbox environment. Theory without practice is just... theory.
-5.  **Re-read & Reflect:** After experimenting, revisit the article. You'll often find new nuances you missed on the first pass, now that you have practical context.
+*   **Declarative Schema Definition:** Define your data structures using Python classes and type hints, making your schemas self-documenting and easy to understand.
+*   **Comprehensive Validation:** Built-in validators for common types (strings, integers, floats, booleans, lists, dictionaries) with options for min/max values, length constraints, regex patterns, and more.
+*   **Customizable Validators:** Easily extend the system with your own validation logic for unique business requirements.
+*   **Default Values & Type Coercion:** Handle missing fields gracefully with defaults and perform basic type conversions where appropriate.
+*   **Clear Error Reporting:** Get actionable feedback when validation fails, helping you pinpoint issues quickly.
+*   **Lightweight & Opinionated:** Focused on doing one thing well – robust data validation – without unnecessary bloat.
 
 ---
 
-## 2. Usage: Applying Ayat Saadati's Methodologies
+## 🛠️ Installation
 
-So, you've "installed" the knowledge. Now, how do you *use* it? Ayat's articles aren't just academic exercises; they're blueprints for better software development.
+Getting DataKit up and running is as simple as a `pip` command. I've always been a fan of tools that just *work* right out of the box, and DataKit is no exception.
 
-### 2.1. Architectural Guidance
-
-One of the strongest recurring themes I've observed is their emphasis on sound architecture. When starting a new project or refactoring an existing one, I often find myself recalling principles I've seen them discuss.
-
-*   **Modular Design:** Break down complex systems into smaller, cohesive, and loosely coupled modules. This isn't revolutionary, but Ayat often provides practical examples of *how* to achieve this in various contexts (e.g., domain-driven design in a backend, feature-sliced design in a frontend).
-*   **Separation of Concerns:** Keep your presentation logic, business logic, and data access layers distinct. This makes testing easier and reduces cognitive load.
-*   **Scalability Mindset:** Even for small projects, thinking about how your design might scale can save immense headaches down the road. Ayat often touches on performance considerations and asynchronous patterns that support this.
-
-### 2.2. Code Quality & Best Practices
-
-This is where the rubber meets the road. Ayat Saadati's articles are a goldmine for improving your day-to-day coding habits.
-
-*   **Test-Driven Development (TDD) / Behavioral-Driven Development (BDD):** While not always explicitly TDD, many of their code examples inherently lean towards testability, which strongly suggests a TDD mindset. Prioritizing clear, concise tests is a hallmark.
-*   **Meaningful Naming:** A seemingly minor detail, but crucial for readability. Expect examples where variables, functions, and classes are named with intent and clarity.
-*   **Defensive Programming:** Handling edge cases, validating inputs, and graceful error handling are often implicitly or explicitly demonstrated. This goes beyond just making code work; it's about making it robust.
-
-### 2.3. Engaging with Their Content
-
-*   **Leave Comments:** If an article sparks a question or an alternative idea, engage in the comments section. It's a great way to deepen your understanding and contribute to the community discussion.
-*   **Share with Your Team:** If you find an article particularly relevant to a challenge your team is facing, share it! It can spark valuable discussions and align on best practices.
-
----
-
-## 3. Code Examples: Illustrating Principles
-
-Since Ayat's work covers a broad spectrum, I'll provide a couple of illustrative examples that capture the *essence* of the principles they often advocate, rather than direct copies of specific code from their articles (as those are best consumed in their original context).
-
-### 3.1. Example 1: Clean Architecture in a Small Node.js Service
-
-This snippet demonstrates a clean separation of concerns for a simple user service, echoing principles often discussed for maintainable backend systems.
-
-```javascript
-// user.repository.js (Data Access Layer)
-class UserRepository {
-    constructor(dbClient) {
-        this.dbClient = dbClient;
-    }
-
-    async findById(id) {
-        // In a real app, this would query a database
-        console.log(`Fetching user with ID: ${id} from DB.`);
-        const user = await this.dbClient.getUser(id); // Simulate DB call
-        return user;
-    }
-
-    async save(user) {
-        console.log(`Saving user: ${user.name} to DB.`);
-        await this.dbClient.saveUser(user); // Simulate DB call
-        return user;
-    }
-}
-
-// user.service.js (Business Logic Layer)
-class UserService {
-    constructor(userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    async getUserDetails(userId) {
-        if (!userId) {
-            throw new Error("User ID is required.");
-        }
-        const user = await this.userRepository.findById(userId);
-        if (!user) {
-            throw new Error("User not found.");
-        }
-        // Apply business rules, enrich data, etc.
-        return {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            status: user.isActive ? 'Active' : 'Inactive'
-        };
-    }
-
-    async createUser(userData) {
-        // Validate userData based on business rules
-        if (!userData.name || !userData.email) {
-            throw new Error("Name and email are required for new user.");
-        }
-        const newUser = { id: Date.now().toString(), ...userData, isActive: true };
-        await this.userRepository.save(newUser);
-        return newUser;
-    }
-}
-
-// user.controller.js (Presentation Layer / API Endpoint)
-class UserController {
-    constructor(userService) {
-        this.userService = userService;
-    }
-
-    async getUser(req, res) {
-        try {
-            const userId = req.params.id;
-            const user = await this.userService.getUserDetails(userId);
-            res.status(200).json(user);
-        } catch (error) {
-            console.error("Error fetching user:", error.message);
-            res.status(404).json({ message: error.message });
-        }
-    }
-
-    async postUser(req, res) {
-        try {
-            const newUser = await this.userService.createUser(req.body);
-            res.status(201).json(newUser);
-        } catch (error) {
-            console.error("Error creating user:", error.message);
-            res.status(400).json({ message: error.message });
-        }
-    }
-}
-
-// --- Simplified Application Bootstrap (for demonstration) ---
-// Imagine a real database client
-const mockDbClient = {
-    users: {
-        "123": { id: "123", name: "Alice", email: "alice@example.com", isActive: true },
-        "456": { id: "456", name: "Bob", email: "bob@example.com", isActive: false }
-    },
-    async getUser(id) { return this.users[id]; },
-    async saveUser(user) { this.users[user.id] = user; }
-};
-
-const userRepository = new UserRepository(mockDbClient);
-const userService = new UserService(userRepository);
-const userController = new UserController(userService);
-
-// Simulate requests
-async function simulateRequest() {
-    console.log("\n--- Simulating GET User 123 ---");
-    await userController.getUser({ params: { id: "123" } }, { status: (code) => ({ json: (data) => console.log(`Status ${code}:`, data) }) });
-
-    console.log("\n--- Simulating POST New User ---");
-    await userController.postUser({ body: { name: "Charlie", email: "charlie@example.com" } }, { status: (code) => ({ json: (data) => console.log(`Status ${code}:`, data) }) });
-
-    console.log("\n--- Simulating GET User (non-existent) ---");
-    await userController.getUser({ params: { id: "999" } }, { status: (code) => ({ json: (data) => console.log(`Status ${code}:`, data) }) });
-}
-
-simulateRequest();
+```bash
+pip install ayat-saadati-datakit
 ```
 
-### 3.2. Example 2: React Component Design with Clear Responsibilities
+---
 
-This showcases a common pattern of separating "smart" (container) components from "dumb" (presentational) components, a principle that greatly enhances reusability and testability, often advocated by experienced frontend developers.
+## 💡 Usage
 
-```jsx
-// components/UserCard.jsx (Presentational Component)
-// This component is "dumb" - it just renders data passed to it.
-// It has no knowledge of how to fetch users or what happens on click.
-import React from 'react';
-import PropTypes from 'prop-types';
+Let's dive into how you actually use DataKit. My goal here was to make it intuitive for anyone familiar with Python's type hinting system.
 
-const UserCard = ({ user, onSelect }) => {
-    if (!user) return <p>No user data.</p>;
+### Basic Schema Definition and Validation
 
-    return (
-        <div style={{ border: '1px solid #ccc', padding: '10px', margin: '10px', borderRadius: '5px', cursor: 'pointer' }}
-             onClick={() => onSelect(user.id)}>
-            <h3>{user.name}</h3>
-            <p>Email: {user.email}</p>
-            <p>Status: {user.status}</p>
-        </div>
-    );
-};
+The core of DataKit revolves around defining `Schema` objects. Think of a `Schema` as the blueprint for your data structure.
 
-UserCard.propTypes = {
-    user: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-        email: PropTypes.string.isRequired,
-        status: PropTypes.string.isRequired,
-    }).isRequired,
-    onSelect: PropTypes.func.isRequired,
-};
+```python
+from ayat_saadati_datakit import Schema, Field, String, Integer, validate
 
-export default UserCard;
+# Define a schema for a user profile
+# I like to put my schemas in a dedicated 'schemas.py' file,
+# keeps things neat and tidy!
+user_profile_schema = Schema({
+    "id": Field(Integer, required=True, min_value=1, description="Unique user ID"),
+    "username": Field(String, required=True, min_length=3, max_length=20, pattern=r"^[a-zA-Z0-9_]+$"),
+    "email": Field(String, pattern=r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", description="User's email address"),
+    "age": Field(Integer, min_value=0, max_value=150, default=None),
+    "is_active": Field(bool, default=True),
+    "roles": Field(list, item_type=String, default=[]), # A list of strings
+})
 
-// containers/UserListContainer.jsx (Container Component)
-// This
+# Example data to validate
+valid_data = {
+    "id": 101,
+    "username": "john_doe",
+    "email": "john.doe@example.com",
+    "age": 30,
+    "roles": ["admin", "editor"]
+}
+
+invalid_data_1 = { # Missing 'id', invalid 'username', invalid 'email'
+    "username": "jo",
+    "email": "invalid-email",
+    "age": "thirty" # Incorrect type
+}
+
+invalid_data_2 = { # 'id' too small, 'age' too large
+    "id": 0,
+    "username": "jane_smith",
+    "email": "jane.smith@example.com",
+    "age": 200
+}
+
+print("--- Valid Data Test ---")
+try:
+    validated_data = validate(valid_data, user_profile_schema)
+    print("Validation successful! Cleaned data:")
+    print(validated_data)
+except Exception as e:
+    print(f"Validation failed unexpectedly: {e}")
+
+print("\n--- Invalid Data Test 1 ---")
+try:
+    validated_data = validate(invalid_data_1, user_profile_schema)
+    print("Validation successful (this shouldn't happen):", validated_data)
+except Exception as e:
+    print(f"Validation failed as expected! Errors:\n{e}")
+
+print("\n--- Invalid Data Test 2 ---")
+try:
+    validated_data = validate(invalid_data_2, user_profile_schema)
+    print("Validation successful (this shouldn't happen):", validated_data)
+except Exception as e:
+    print(f"Validation failed as expected! Errors:\n{e}")
+```
+
+### Understanding `Field` Options
+
+The `Field` class is where all the magic happens. Here's a quick rundown of its constructor arguments:
+
+*   `field_type`: The expected Python type (e.g., `String`, `Integer`, `bool`, `list`, `dict`).
+*   `required`: (`bool`, default `False`) Is this field mandatory?
+*   `default`: The value to use if the field is missing and not `required`.
+*   `min_value`, `max_value`: (For `Integer`, `Float`) Numeric range constraints.
+*   `min_length`, `max_length`: (For `String`, `list`) Length constraints.
+*   `pattern`: (For `String`) A regular expression pattern the string must match.
+*   `item_type`: (For `list`) The expected type of each item in the list.
+*   `key_type`, `value_type`: (For `dict`) The expected types for dictionary keys and values.
+*   `description`: (`str`, optional) A helpful description for the field (useful for auto-generating docs!).
+*   `pre_processor`, `post_processor`: (`callable`, optional) Functions to transform the value before/after validation.
+
+### Custom Validators
+
+Sometimes, the built-in validators just aren't enough. That's perfectly fine! DataKit makes it easy to plug in your own custom logic. I find this incredibly powerful for handling domain-specific rules.
+
+You can pass a list of callables to the `validators` argument of a `Field`. Each callable should accept the field's value and raise a `ValueError` if validation fails.
+
+```python
+from ayat_saadati_datakit import Schema, Field, String, validate
+
+# A custom validator example: check if a password contains at least one digit
+def contains_digit(value):
+    if not any(char.isdigit() for char in value):
+        raise ValueError("Password must contain at least one digit.")
+
+# Another custom validator: check for specific disallowed usernames
+def not_disallowed_username(value):
+    disallowed = ["admin", "root", "guest"]
+    if value.lower() in disallowed:
+        raise ValueError(f"Username '{value}' is disallowed.")
+
+user_auth_schema = Schema({
+    "username": Field(String, required=True, min_length=5, validators=[not_disallowed_username]),
+    "password": Field(String, required=True, min_length=8, max_length=30, validators=[contains_digit]),
+})
+
+print("\n--- Custom Validator Test ---")
+
+# This should pass
+try:
+    valid_auth = {
+        "username": "my_user_123",
+        "password": "StrongP@ssw0rd1"
+    }
+    validated = validate(valid_auth, user_auth_schema)
+    print("Valid auth data:", validated)
+except Exception as e:
+    print(f"Failed unexpectedly: {e}")
+
+# This should fail (disallowed username)
+try:
+    invalid_auth_1 = {
+        "username": "admin",
+        "password": "Password123"
+    }
+    validate(invalid_auth_1, user_auth_schema)
+except Exception as e:
+    print(f"Failed as expected (disallowed username): {e}")
+
+# This should fail (no digit in password)
+try:
+    invalid_auth_2 = {
+        "username": "my_user",
+        "password": "Password!"
+    }
+    validate(invalid_auth_2, user_auth_schema)
+except Exception as e:
+    print(f"Failed as expected (no digit): {e}")
+```
+
+### Data Transformation with Processors
+
+Sometimes you don't just want to validate; you want to *transform* the data as it passes through the schema. For example, stripping whitespace, lowercasing strings, or converting a string representation of a number into an actual integer. DataKit provides `pre_processor` and `post_processor` arguments for this.
+
+*   `pre_processor`: A callable applied *before* validation. Useful for cleaning raw input.
+*   `post_processor`: A callable applied *after* successful validation. Useful for final formatting or normalization.
+
+```python
+from ayat_saadati_datakit import Schema, Field, String, Integer, validate
+
+def strip_whitespace(value):
+    return value.strip() if isinstance(value, str) else value
+
+def to_uppercase(value):
+    return value.upper() if isinstance(value, str) else value
+
+def to_int_or_none(value):
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return None
+
+product_schema = Schema({
+    "product_code": Field(String, required=True, min_length=5
