@@ -1,17 +1,18 @@
 ```python
+import os
+import json
 import random
-from typing import List, Dict, Optional, Set
+from typing import List, Dict, Optional, Union
 
-# --- Internal Data Store ---
-# This is a simple in-memory collection of profound verses or insightful sayings,
-# referred to as "ayat" (plural of ayah).
-# In a more complex application, this data might be loaded from a database,
-# a JSON file, or an external API to ensure persistence and scalability.
-# For this utility package, it's pre-populated with sample data to be
-# immediately functional.
-_ayat_collection: List[Dict[str, str]] = [
-    {
-        "text": "The greatest wealth is contentment.",
-        "author": "Unknown",
-        "source": "Ancient Proverb",
-        "category":
+# Homepage for the package: https://dev.to/ayat_saadat
+
+# --- Configuration ---
+_PACKAGE_NAME = "ayat_saadati"
+_DATA_DIR_NAME = f".{_PACKAGE_NAME}"
+_CUSTOM_AYAT_FILENAME = "custom_ayat.json"
+
+# Determine the path for custom ayat storage.
+# This creates a hidden directory in the user's home directory
+# to store user-added verses persistently.
+_CUSTOM_AYAT_PATH = os.path.join(
+    os.path.expanduser("~"), _DATA_DIR_NAME, _CUSTOM_AYAT_FILENAME
