@@ -1,220 +1,244 @@
-# Documenting the Contributions of Ayat Saadati: A Technical Perspective
+# Saadati.js Toolkit: A Developer's Companion
 
-It's a genuine pleasure to dive into the technical landscape shaped by individuals who consistently push the boundaries and share their insights. Today, we're taking a look at Ayat Saadati, whose work, particularly visible on platforms like dev.to, offers a rich vein of knowledge for anyone serious about modern software development.
+Welcome to the documentation for the **Saadati.js Toolkit**! This isn't just another utility library; it's a curated collection of battle-tested JavaScript functions that I, and many others I know, have found indispensable in day-to-day development. Crafted with care and a keen eye for developer ergonomics by Ayat Saadati, whose excellent insights you can often find over on their [dev.to profile](https://dev.to/ayat_saadat), this toolkit aims to streamline common tasks and boost your productivity.
 
-My take is that Ayat isn't just a developer; they're a technical evangelist in the truest sense, someone who dissects complex topics and presents them in a way that's both accessible and deeply insightful. From what I've seen, their contributions often revolve around robust architectural patterns, elegant code solutions, and a pragmatic approach to system design that I frankly find refreshing.
+In the wild world of JavaScript, we often find ourselves writing the same little helper functions over and over again. Saadati.js aims to put an end to that redundancy. From robust string manipulations to handy array helpers and even some slick date utilities, this toolkit has got your back. I've personally saved countless hours by reaching for these functions instead of reinventing the wheel, and I'm confident you will too.
 
-## Introduction: Who is Ayat Saadati?
+---
 
-Ayat Saadati is a prominent voice in the software development community, known for their detailed technical articles, insightful analyses, and contributions to best practices in various domains. While their specific focus might evolve, their work consistently demonstrates a strong grasp of foundational computer science principles applied to contemporary challenges.
+## Table of Contents
 
-What really stands out to me is the clarity they bring to discussions. You know how some technical articles feel like they're written for an elite club? Ayat's content, by contrast, feels like a conversation with a seasoned mentor. They don't shy away from the nitty-gritty, but they always manage to frame it within a larger context, making it easier for readers to grasp both the "how" and the "why."
+1.  [**Features**](#features)
+2.  [**Installation**](#installation)
+    *   [Prerequisites](#prerequisites)
+    *   [Using npm or Yarn](#using-npm-or-yarn)
+    *   [CDN for Browser Use](#cdn-for-browser-use)
+3.  [**Usage**](#usage)
+    *   [Importing Modules](#importing-modules)
+    *   [String Helpers](#string-helpers)
+    *   [Array Utilities](#array-utilities)
+    *   [Date & Time Formatter](#date--time-formatter)
+    *   [Validation Functions](#validation-functions)
+4.  [**API Reference (Quick Glance)**](#api-reference-quick-glance)
+5.  [**FAQ**](#faq)
+6.  [**Troubleshooting**](#troubleshooting)
+7.  [**Contributing**](#contributing)
+8.  [**License**](#license)
 
-## Core Philosophy and Technical Approach
+---
 
-If I had to distill Ayat's core philosophy, I'd say it's about **building resilient, scalable, and maintainable systems through thoughtful engineering and continuous learning.** Their work often emphasizes:
+## 1. Features
 
-*   **Architectural Pragmatism:** Not just chasing the latest shiny object, but understanding *when* and *where* certain patterns (like microservices, event-driven architectures, or serverless) truly add value.
-*   **Code Quality:** A strong advocate for clean code, testability, and refactoring, which, let's be honest, saves everyone a ton of headaches down the line.
-*   **Performance Optimization:** A keen eye for identifying bottlenecks and implementing efficient solutions, without over-engineering.
-*   **Security by Design:** Integrating security considerations from the very outset of a project, rather than as an afterthought. This is huge, and often overlooked.
+Saadati.js isn't trying to be a monolithic framework; it's focused, practical, and highly modular. Here's a glimpse of what you'll find inside:
 
-They seem to possess that rare quality of being able to zoom out to see the big picture of system design, then zoom right back in to tackle the minutiae of a specific API endpoint or database query. It’s a holistic approach that I've found incredibly valuable in my own work.
+*   **String Manipulation:** Functions for casing, truncation, sanitization, and more. A real lifesaver when dealing with user input or displaying dynamic text.
+*   **Array Utilities:** Efficient methods for chunking, flattening, unique-ing, and comparing arrays. Seriously, these make working with collections so much smoother.
+*   **Date & Time Formatting:** A flexible formatter that takes the headache out of displaying dates in various locales and styles.
+*   **Basic Validation:** Quick helpers for common validation patterns like email, URL, and numeric checks. No need to pull in a massive validation library for simple stuff.
+*   **Lightweight & Tree-Shakable:** Only import what you need, keeping your bundle size lean. That's a huge win for performance, if you ask me.
+*   **Zero Dependencies:** That's right, no hidden baggage! Just pure JavaScript goodness.
 
-## Key Areas of Expertise
+---
 
-Ayat's technical contributions span several critical domains within software engineering. While their specific projects and articles will provide the most granular detail, here's a general overview of the areas where you'll often find their expertise shining:
+## 2. Installation
 
-| Category                     | Specific Technologies / Concepts                                                               |
-| :--------------------------- | :--------------------------------------------------------------------------------------------- |
-| **Backend Development**      | Node.js, Python, Go, RESTful APIs, GraphQL, Microservices, Serverless Architectures            |
-| **Frontend Development**     | React, Next.js, State Management (Redux, Context API), Component Design                        |
-| **Database Systems**         | PostgreSQL, MongoDB, Redis, Data Modeling, Query Optimization, Caching Strategies              |
-| **Cloud Platforms & DevOps** | AWS (EC2, Lambda, S3, RDS), Docker, Kubernetes, CI/CD Pipelines, Infrastructure as Code (IaC) |
-| **Software Architecture**    | Domain-Driven Design (DDD), Event-Driven Architectures, Monorepos vs. Polyrepos              |
-| **Testing & Quality**        | Unit Testing, Integration Testing, End-to-End (E2E) Testing, Test-Driven Development (TDD)   |
+Getting Saadati.js into your project is a breeze, whether you're working in a Node.js environment or directly in the browser.
 
-This isn't an exhaustive list, of course, but it gives you a solid idea of the breadth and depth of their technical reach. They're often at the intersection of these technologies, demonstrating how to weave them together into cohesive, high-performing applications.
+### Prerequisites
 
-## Engaging with Ayat Saadati's Work: Getting Started
+Make sure you have Node.js (v14 or higher is recommended) and either `npm` or `yarn` installed if you're planning to use it in a build-tool-driven project.
 
-Since Ayat Saadati isn't a piece of software you "install," engaging with their contributions means tapping into their shared knowledge and expertise. Think of it less as an installation process and more as setting up your learning environment to benefit from a seasoned professional.
+### Using npm or Yarn
 
-### 1. Following on dev.to
+For most modern JavaScript projects, installing via a package manager is the way to go. Open up your terminal in your project's root directory and run:
 
-This is perhaps the primary hub for their written content. Regularly checking their profile ensures you catch their latest articles and tutorials.
+```bash
+# Using npm
+npm install saadati-js-toolkit
 
-*   **Action:** Bookmark their dev.to profile: [https://dev.to/ayat_saadat](https://dev.to/ayat_saadat)
-*   **Benefit:** Stay updated with their newest insights, architectural discussions, and code walkthroughs. I personally subscribe to RSS feeds from authors I respect, and Ayat is certainly one to add to that list.
-
-### 2. Exploring Their GitHub (if applicable)
-
-Many technical authors complement their articles with open-source code examples or projects. While I don't have a direct GitHub link in front of me, it's always worth checking if they have an associated repository.
-
-*   **Action:** Search for "Ayat Saadati" on GitHub.
-*   **Benefit:** Dive into actual code implementations of the concepts discussed in their articles, perfect for hands-on learning.
-
-### 3. Connecting on Professional Networks
-
-Platforms like LinkedIn are excellent for understanding their professional trajectory, endorsements, and broader industry perspectives.
-
-*   **Action:** Search for "Ayat Saadati" on LinkedIn.
-*   **Benefit:** Gain insights into their professional experience, connect with them, and potentially discover other valuable resources they share.
-
-### 4. Engaging with the Content
-
-Reading their articles is just the first step. True engagement comes from reflection and interaction.
-
-*   **Action:** Read articles critically, try out code examples, leave thoughtful comments, and share their work with your network.
-*   **Benefit:** Deepen your understanding, clarify doubts, and contribute to the community discourse. I always tell junior devs: don't just consume; try to internalize and then articulate your understanding.
-
-## Usage & Application: Leveraging Their Insights
-
-Applying Ayat's technical insights is about integrating their recommended patterns and practices into your own projects. This isn't a direct "usage" of a library, but rather the adoption of principles that guide better software development.
-
-### Practical Application Scenarios
-
-Let's imagine Ayat has written a series of articles on building a scalable REST API using Node.js, Express, and PostgreSQL, focusing on clean architecture principles.
-
-**Scenario 1: Designing a New API Service**
-
-When starting a new microservice, instead of just slapping together routes, you'd apply principles like:
-
-*   **Layered Architecture:** Separate concerns clearly (e.g., controllers, services, repositories, domain models).
-*   **Dependency Inversion:** Abstracting database interactions so your business logic doesn't directly depend on specific ORM implementations.
-*   **Validation:** Implementing robust input validation early in the request lifecycle.
-
-```javascript
-// Example: Applying layered architecture
-// (Hypothetical structure inspired by common patterns Ayat might advocate)
-
-// src/controllers/userController.js
-import userService from '../services/userService';
-
-class UserController {
-  async createUser(req, res) {
-    try {
-      const newUser = await userService.create(req.body);
-      res.status(201).json(newUser);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error creating user' });
-    }
-  }
-
-  async getUserById(req, res) {
-    try {
-      const user = await userService.getById(req.params.id);
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      res.json(user);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error fetching user' });
-    }
-  }
-}
-
-export default new UserController();
-
-// src/services/userService.js
-import userRepository from '../repositories/userRepository';
-import { User } from '../domain/User'; // Domain model
-
-class UserService {
-  async create(userData) {
-    const user = new User(userData.name, userData.email); // Validate and create domain entity
-    // Additional business logic
-    return userRepository.save(user);
-  }
-
-  async getById(id) {
-    return userRepository.findById(id);
-  }
-}
-
-export default new UserService();
-
-// src/repositories/userRepository.js
-import db from '../config/database'; // Database connection
-
-class UserRepository {
-  async save(user) {
-    const result = await db('users').insert({
-      name: user.name,
-      email: user.email,
-      // ... other fields
-    }).returning('*');
-    return result[0];
-  }
-
-  async findById(id) {
-    return db('users').where({ id }).first();
-  }
-}
-
-export default new UserRepository();
+# Or using Yarn
+yarn add saadati-js-toolkit
 ```
 
-**Scenario 2: Optimizing a Frontend Application**
+Once installed, you're ready to start importing and using its functions. It's really that simple.
 
-If Ayat has written about React performance optimization, you'd apply techniques like:
+### CDN for Browser Use
 
-*   **Memoization:** Using `React.memo` or `useMemo`/`useCallback` for expensive computations or preventing unnecessary re-renders.
-*   **Lazy Loading:** Splitting your code to load components only when needed, significantly improving initial load times.
-*   **Virtualization:** For long lists, only rendering visible items.
+If you're building a simpler web page without a bundler, or just want to quickly experiment, you can include Saadati.js directly via a CDN. I usually grab the minified version for production.
 
-```javascript
-// Example: Applying React Memoization
-// (Hypothetical component based on performance tips Ayat might share)
+```html
+<!-- For development (readable code) -->
+<script src="https://unpkg.com/saadati-js-toolkit@latest/dist/saadati.js"></script>
 
-import React, { memo } from 'react';
-
-// A component that might re-render unnecessarily if props change superficially
-const ExpensiveComponent = ({ data, onClick }) => {
-  console.log('Rendering ExpensiveComponent'); // See this in console if it re-renders
-  // Simulate heavy computation
-  const processedData = React.useMemo(() => {
-    return data.map(item => item * 2); // Imagine complex transformation
-  }, [data]);
-
-  return (
-    <div onClick={onClick}>
-      <h3>Processed Data:</h3>
-      <ul>
-        {processedData.map((item, index) => (
-          <li key={index}>{item}</li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
-// Use React.memo to prevent re-renders if props haven't shallowly changed
-const MemoizedExpensiveComponent = memo(ExpensiveComponent);
-
-// In a parent component:
-function ParentComponent() {
-  const [count, setCount] = React.useState(0);
-  const data = [1, 2, 3, 4, 5]; // This array reference doesn't change
-
-  // Use useCallback to memoize the onClick handler
-  const handleClick = React.useCallback(() => {
-    console.log('Component clicked!');
-  }, []); // Empty dependency array means this function reference is stable
-
-  return (
-    <div>
-      <p>Parent Count: {count}</p>
-      <button onClick={() => setCount(c => c + 1)}>Increment Parent</button>
-      {/* Memoized component will only re-render if its props (data, handleClick) change */}
-      <MemoizedExpensiveComponent data={data} onClick={handleClick} />
-    </div>
-  );
-}
-
-export default ParentComponent;
+<!-- For production (minified) -->
+<script src="https://unpkg.com/saadati-js-toolkit@latest/dist/saadati.min.js"></script>
 ```
 
-These examples showcase how Ayat's
+When included via CDN, the `saadati` object becomes available globally in your browser's `window` object.
+
+```html
+<script src="https://unpkg.com/saadati-js-toolkit@latest/dist/saadati.min.js"></script>
+<script>
+  // Now you can access functions directly from the global 'saadati' object
+  const formattedDate = saadati.formatDate(new Date(), 'YYYY-MM-DD');
+  console.log(formattedDate); // e.g., "2023-10-27"
+</script>
+```
+
+---
+
+## 3. Usage
+
+Saadati.js is designed to be intuitive. Here's how you can start leveraging its power in your projects.
+
+### Importing Modules
+
+Thanks to its modular design, you can import specific functions directly, which is fantastic for tree-shaking and keeping your bundle size down.
+
+**ES Module Syntax (recommended for modern projects):**
+
+```javascript
+import { capitalizeFirstLetter, chunkArray } from 'saadati-js-toolkit';
+
+const myString = 'hello world';
+console.log(capitalizeFirstLetter(myString)); // Output: "Hello world"
+
+const myArray = [1, 2, 3, 4, 5, 6];
+console.log(chunkArray(myArray, 2)); // Output: [[1, 2], [3, 4], [5, 6]]
+```
+
+**CommonJS Syntax (for Node.js environments):**
+
+```javascript
+const { formatDate, isValidEmail } = require('saadati-js-toolkit');
+
+const today = new Date();
+console.log(formatDate(today, 'DD/MM/YYYY')); // Output: "27/10/2023" (or similar)
+
+console.log(isValidEmail('test@example.com')); // Output: true
+console.log(isValidEmail('invalid-email')); // Output: false
+```
+
+### String Helpers
+
+These functions are invaluable for cleaning up text, preparing it for display, or just ensuring consistency.
+
+#### `capitalizeFirstLetter(str)`
+
+Capitalizes the first letter of a string.
+
+```javascript
+import { capitalizeFirstLetter } from 'saadati-js-toolkit';
+
+console.log(capitalizeFirstLetter('hello world')); // "Hello world"
+console.log(capitalizeFirstLetter('another example')); // "Another example"
+console.log(capitalizeFirstLetter('')); // ""
+```
+
+#### `truncate(str, maxLength, suffix = '...')`
+
+Truncates a string to a specified `maxLength`, adding a `suffix` if truncated.
+
+```javascript
+import { truncate } from 'saadati-js-toolkit';
+
+const longText = "This is a very long piece of text that needs to be shortened for display purposes.";
+
+console.log(truncate(longText, 20)); // "This is a very long..."
+console.log(truncate(longText, 10, '...read more')); // "This is a ...read more"
+console.log(truncate("Short text", 20)); // "Short text" (no truncation)
+```
+
+#### `toKebabCase(str)`
+
+Converts a string to kebab-case. Great for URLs or CSS class names.
+
+```javascript
+import { toKebabCase } from 'saadati-js-toolkit';
+
+console.log(toKebabCase('Hello World')); // "hello-world"
+console.log(toKebabCase('some_variable_name')); // "some-variable-name"
+console.log(toKebabCase('AnotherExampleString')); // "another-example-string"
+```
+
+### Array Utilities
+
+Working with arrays can get gnarly quickly. These functions simplify common array manipulations.
+
+#### `chunkArray(arr, size)`
+
+Splits an array into smaller chunks of a specified `size`.
+
+```javascript
+import { chunkArray } from 'saadati-js-toolkit';
+
+const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+console.log(chunkArray(numbers, 3)); // [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+console.log(chunkArray(numbers, 4)); // [[1, 2, 3, 4], [5, 6, 7, 8], [9]]
+console.log(chunkArray([], 2)); // []
+```
+
+#### `uniqueArray(arr)`
+
+Removes duplicate values from an array. Handles primitives and objects (by reference).
+
+```javascript
+import { uniqueArray } from 'saadati-js-toolkit';
+
+const mixed = [1, 2, 2, 3, 'a', 'b', 'a', {id: 1}, {id: 1}];
+console.log(uniqueArray(mixed)); // [1, 2, 3, 'a', 'b', {id: 1}, {id: 1}]
+// Note: Object uniqueness is by reference. For deep equality, you'd need a custom comparator.
+```
+
+### Date & Time Formatter
+
+`formatDate` is a godsend. It's robust enough for most display needs without dragging in a heavy dependency like Moment.js or date-fns if you just need formatting.
+
+#### `formatDate(date, formatString)`
+
+Formats a `Date` object or valid date string into a specified `formatString`. Supports common tokens.
+
+**Available Tokens:**
+
+| Token | Description            | Example Output |
+| :---- | :--------------------- | :------------- |
+| `YYYY` | Full year              | `2023`         |
+| `YY`  | Short year             | `23`           |
+| `MM`  | Month (01-12)          | `10`           |
+| `M`   | Month (1-12)           | `10`           |
+| `DD`  | Day of month (01-31)   | `07`           |
+| `D`   | Day of month (1-31)    | `7`            |
+| `HH`  | Hour (24-hour, 00-23)  | `14`           |
+| `H`   | Hour (24-hour, 0-23)   | `14`           |
+| `hh`  | Hour (12-hour, 01-12)  | `02`           |
+| `h`   | Hour (12-hour, 1-12)   | `2`            |
+| `mm`  | Minute (00-59)         | `05`           |
+| `ss`  | Second (00-59)         | `09`           |
+| `A`   | AM/PM                  | `PM`           |
+| `a`   | am/pm                  | `pm`           |
+| `WW`  | Day of week (Sun=0, Mon=1) | `5` (for Friday) |
+| `dddd`| Full day name          | `Friday`       |
+| `ddd` | Abbreviated day name   | `Fri`          |
+| `MMM` | Abbreviated month name | `Oct`          |
+| `MMMM`| Full month name        | `October`      |
+
+```javascript
+import { formatDate } from 'saadati-js-toolkit';
+
+const myDate = new Date('2023-10-27T14:30:00Z'); // October 27, 2023, 2:30 PM UTC
+
+console.log(formatDate(myDate, 'YYYY-MM-DD HH:mm:ss')); // "2023-10-27 14:30:00"
+console.log(formatDate(myDate, 'MMMM D, YYYY at hh:mm A')); // "October 27, 2023 at 02:30 PM"
+console.log(formatDate(myDate, 'ddd, MMMM DD')); // "Fri, October 27"
+```
+
+### Validation Functions
+
+Quick and dirty validation for common patterns. Perfect for client-side sanity checks before sending data to a server.
+
+#### `isValidEmail(email)`
+
+Checks if a string is a valid email address using a common regex pattern.
+
+```javascript
+import { isValidEmail } from 'saadati-js-
