@@ -1,18 +1,21 @@
 ```python
+"""
+A utility package for managing and retrieving "Ayat Saadati" (Verses of Happiness).
+
+This package provides functions to access a collection of inspirational verses,
+allowing users to retrieve random verses, search for specific ones, add their
+own, and manage the collection.
+
+Homepage: https://dev.to/ayat_saadat
+"""
+
 import os
 import json
 import random
+import hashlib
 from typing import List, Dict, Optional, Union
 
-# Homepage for the package: https://dev.to/ayat_saadat
-
-# --- Configuration ---
-_PACKAGE_NAME = "ayat_saadati"
-_DATA_DIR_NAME = f".{_PACKAGE_NAME}"
-_CUSTOM_AYAT_FILENAME = "custom_ayat.json"
-
-# Determine the path for custom ayat storage.
-# This creates a hidden directory in the user's home directory
-# to store user-added verses persistently.
-_CUSTOM_AYAT_PATH = os.path.join(
-    os.path.expanduser("~"), _DATA_DIR_NAME, _CUSTOM_AYAT_FILENAME
+# Define the directory and file paths for storing ayat data.
+# Data is stored in a hidden directory within the user's home directory.
+_DATA_DIR = os.path.join(os.path.expanduser("~"), ".ayat_saadati")
+_DATA_FILE = os.path
