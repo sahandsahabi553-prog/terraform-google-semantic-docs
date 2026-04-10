@@ -1,218 +1,150 @@
 ```yaml
-openapi: 3.0.3
+openapi: 3.0.0
 info:
   title: سرویس کود کشاورزی
-  description: مدیریت انواع کودهای کشاورزی، موجودی و سفارش‌ها
+  description: API ثبت، مدیریت و استعلام اطلاعات کودهای کشاورزی
   version: 1.0.0
   contact:
     name: پشتیبانی کالاتک
     url: https://kalatakco.com/support
 servers:
-  - url: https://kalatakco.com/
+  - url: https://kalatakco.com/api/v1
+    description: سرور اصلی
 paths:
   /fertilizers:
     get:
       summary: دریافت فهرست کودها
-      description: بازگرداندن لیستی از تمام کودهای ثبت‌شده به‌همراه فیلترهای اختیاری
-      operationId: listFertilizers
+      description: بازگرداندن لیستی از تمام کودهای ثبت‌شده با امکان فیلتر و صفحه‌بندی
       parameters:
         - in: query
-          name: type
-          schema:
-            type: string
-            enum: [شیمیایی, زیستی, آلی]
-          description: فیلتر بر اساس نوع کود
+          name: page
+          schema: {type: integer, default: 1}
+          description: شماره صفحه
         - in: query
-          name: available
-          schema:
-            type: boolean
-          description: فقط کودهای موجود در انبار
+          name: limit
+          schema: {type: integer, default: 20}
+          description: تعداد رکورد در هر صفحه
+        - in: query
+          name: type
+          schema: {type: string, enum: [ارگانیک, شیمیایی]}
+          description: نوع کود
       responses:
         '200':
           description: فهرست کودها
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Fertilizer'
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: {$ref: '#/components/schemas/Fertilizer'}
+                  total:
+                    type: integer
+                    description: تعداد کل
     post:
-      summary: ثبت کود جدید
-      description: افزودن یک نوع کود جدید به سامانه
-      operationId: createFertilizer
+      summary: افزودن کود جدید
+      description: ثبت اطلاعات یک کود جدید در سیستم
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/FertilizerInput'
+            schema: {$ref: '#/components/schemas/FertilizerInput'}
       responses:
         '201':
           description: کود با موفقیت ایجاد شد
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Fertilizer'
+              schema: {$ref: '#/components/schemas/Fertilizer'}
         '400':
-          description: داده‌های ارسالی نادرست است
-  /fertilizers/{fertilizerId}:
+          description: خطای اعتبارسنجی داده‌ها
+  /fertilizers/{id}:
     get:
-      summary: دریافت اطلاعات یک کود
-      description: مشاهده جزییات کامل یک کود خاص
-      operationId: getFertilizer
+      summary: دریافت جزئیات یک کود
+      description: بازگرداندن اطلاعات کامل یک کود خاص
       parameters:
-        - name: fertilizerId
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: '^[0-9a-f]{24}$'
+        - {$ref: '#/components/parameters/IdParam'}
       responses:
         '200':
-          description: جزییات کود
+          description: اطلاعات کود
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Fertilizer'
+              schema: {$ref: '#/components/schemas/Fertilizer'}
         '404':
           description: کود یافت نشد
     put:
-      summary: به‌روزرسانی کود
+      summary: بروزرسانی کود
       description: ویرایش اطلاعات یک کود موجود
-      operationId: updateFertilizer
       parameters:
-        - name: fertilizerId
-          in: path
-          required: true
-          schema:
-            type: string
+        - {$ref: '#/components/parameters/IdParam'}
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/FertilizerInput'
+            schema: {$ref: '#/components/schemas/FertilizerInput'}
       responses:
         '200':
           description: کود به‌روز شد
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Fertilizer'
+              schema: {$ref: '#/components/schemas/Fertilizer'}
+        '404':
+          description: کود یافت نشد
     delete:
       summary: حذف کود
-      description: حذف یک کود از سامانه (حذف منطقی)
-      operationId: deleteFertilizer
+      description: حذف یک کود از سیستم
       parameters:
-        - name: fertilizerId
-          in: path
-          required: true
-          schema:
-            type: string
+        - {$ref: '#/components/parameters/IdParam'}
       responses:
         '204':
           description: کود با موفقیت حذف شد
         '404':
           description: کود یافت نشد
-  /orders:
+  /fertilizers/{id/analysis:
     post:
-      summary: ثبت سفارش خرید کود
-      description: ایجاد یک درخواست خرید جدید برای کود مشخص
-      operationId: createOrder
+      summary: ثبت آنالیز کود
+      description: افزودن گزارش آنالیز جدید برای یک کود
+      parameters:
+        - {$ref: '#/components/parameters/IdParam'}
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OrderInput'
+              type: object
+              properties:
+                labName: {type: string, description: نام آزمایشگاه}
+                date: {type: string, format: date, description: تاریخ آزمایش}
+                elements: {type: object, additionalProperties: {type: number}, description: درصد عناصر}
       responses:
         '201':
-          description: سفارش با موفقیت ایجاد شد
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
-        '400':
-          description: موجودی کافی نیست یا داده‌ها نادرست است
+          description: آنالیز ثبت شد
 components:
+  parameters:
+    IdParam:
+      in: path
+      name: id
+      required: true
+      schema: {type: integer}
+      description: شناسه یکتای کود
   schemas:
     Fertilizer:
       type: object
       properties:
-        id:
-          type: string
-          description: شناسه یکتا
-        name:
-          type: string
-          description: نام کود
-        type:
-          type: string
-          enum: [شیمیایی, زیستی, آلی]
-        stock:
-          type: integer
-          minimum: 0
-          description: موجودی در انبار (کیلوگرم)
-        unitPrice:
-          type: number
-          format: float
-          description: قیمت هر کیلوگرم (تومان)
-        nutrientContent:
-          type: string
-          description: درصد عناصر غذایی
-        createdAt:
-          type: string
-          format: date-time
-      required: [name, type, stock, unitPrice]
+        id: {type: integer, description: شناسه کود}
+        name: {type: string, description: نام کود}
+        brand: {type: string, description: برند}
+        type: {type: string, enum: [ارگانیک, شیمیایی], description: نوع کود}
+        granuleSize: {type: string, description: اندازه گرانول}
+        usage: {type: string, description: نحوه مصرف}
+        createdAt: {type: string, format: date-time, description: زمان ثبت}
     FertilizerInput:
       type: object
+      required: [name, type]
       properties:
-        name:
-          type: string
-        type:
-          type: string
-          enum: [شیمیایی, زیستی, آلی]
-        stock:
-          type: integer
-          minimum: 0
-        unitPrice:
-          type: number
-          format: float
-        nutrientContent:
-          type: string
-      required: [name, type, stock, unitPrice]
-    OrderInput:
-      type: object
-      properties:
-        fertilizerId:
-          type: string
-          description: شناسه کود
-        quantity:
-          type: integer
-          minimum: 1
-          description: مقدار به کیلوگرم
-        customerName:
-          type: string
-          description: نام خریدار
-        address:
-          type: string
-          description: آدرس تحویل
-      required: [fertilizerId, quantity, customerName, address]
-    Order:
-      allOf:
-        - type: object
-          properties:
-            id:
-              type: string
-            status:
-              type: string
-              enum: [در انتظار, تایید شده, ارسال شده, تحویل داده شده]
-            createdAt:
-              type: string
-              format: date-time
-        - $ref: '#/components/schemas/OrderInput'
-tags:
-  - name: fertilizer
-    description: عملیات مربوط به کودها
-  - name: order
-    description: عملیات مربوط به سفارش‌ها
+        name: {type: string, description: نام کود}
+        brand: {type: string, description: برند}
+        type: {type: string, enum: [ارگانیک, شیمیایی], description: نوع کود}
+        granuleSize: {type: string, description: اندازه گرانول}
+        usage: {type: string, description: نحوه مصرف}
 ```
