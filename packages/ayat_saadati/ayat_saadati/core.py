@@ -1,266 +1,192 @@
-```python
-#!/usr/bin/env python3
 """
-ayat_saadati – Utilities for managing, indexing, and studying Qur’ānic verses
-(ayat) with the Arabic gematric system commonly referred to as “Ṣaʿadātī”.
+ayat_saadati/__init__.py
 
-The package provides:
-----------------------------------------------------------
-- `search_verse(…)`:  Fast, case-insensitive verse search
-- `calc_gematria(…)`: Ṣaʿadātī gematric value of any text
-- `verse_gematria(…)`: Gematria for a single verse
-- `top_verses(…)`:  Top-N verses by gematric value
-- `export_csv(…)`:  Dump results to a CSV file
-----------------------------------------------------------
+Utilities inspired by Ayat Saadati – practical helpers for everyday Python
+projects.
 
-Home-page: https://dev.to/ayat_saadati
-Author : Ayat Saadati
-License: MIT
+Homepage: https://dev.to/ayat_saadati
 """
 
 from __future__ import annotations
 
-import csv
 import re
-import unicodedata
+import secrets
+import string
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Tuple
-
-# --------------------------------------------------------------------------- #
-# CONSTANTS
-# --------------------------------------------------------------------------- #
-DATA_DIR = Path(__file__).with_suffix("") / "data"
-VERSE_FILE = DATA_DIR / "quran_verses.txt"
+from typing import Iterable, List, Optional, Tuple
 
 
-# --------------------------------------------------------------------------- #
-# GEMATRIA MAPPING – Ṣaʿadātī System (Arabic ABJAD order)
-# --------------------------------------------------------------------------- #
-ABJAD: Dict[str, int] = {
-    "ا": 1,
-    "ب": 2,
-    "ج": 3,
-    "د": 4,
-    "ﻫ": 5,
-    "و": 6,
-    "ز": 7,
-    "ح": 8,
-    "ط": 9,
-    "ی": 10,
-    "ك": 20,
-    "ل": 30,
-    "م": 40,
-    "ن": 50,
-    "س": 60,
-    "ع": 70,
-    "ف": 80,
-    "ص": 90,
-    "ق": 100,
-    "ر": 200,
-    "ش": 300,
-    "ت": 400,
-    "ث": 500,
-    "خ": 600,
-    "ذ": 700,
-    "ض": 800,
-    "ظ": 900,
-    "غ": 1000,
-}
-
-# Pre-computed reverse index for quick search
-_REVERSE_INDEX: Dict[str, List[int]] = {}
-_VERSES: List[str] = []
-
-
-def _init_data() -> None:
-    """Load verses into memory and build a reverse search index."""
-    global _VERSES, _REVERSE_INDEX
-    if _VERSES:
-        return
-
-    if not VERSE_FILE.exists():
-        # Provide minimal fallback for demonstration purposes
-        _VERSES = [
-            "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ",
-            "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",
-            "الرَّحْمَنِ الرَّحِيمِ",
-            "مَالِكِ يَوْمِ الدِّينِ",
-            "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
-        ]
-    else:
-        _VERSES = VERSE_FILE.read_text(encoding="utf-8").splitlines()
-
-    for idx, verse in enumerate(_VERSES):
-        for token in re.findall(r"\w+", _normalize_arabic(verse)):
-            _REVERSE_INDEX.setdefault(token, []).append(idx)
-
-
-def _normalize_arabic(text: str) -> str:
-    """Remove diacritics and normalize Arabic letters."""
-    text = unicodedata.normalize("NFKC", text)
-    text = re.sub(r"[ً-ُ-ِ-ْ-ٰ-ٍ-ٌ-ّ]", "", text)
-    return text
-
-
-# --------------------------------------------------------------------------- #
-# PUBLIC API
-# --------------------------------------------------------------------------- #
-def search_verse(query: str, limit: int = 5) -> List[Tuple[int, str]]:
+def slugify(text: str, max_len: int = 60) -> str:
     """
-    Search for verses that contain the given Arabic word.
-
-    Parameters
-    ----------
-    query : str
-        Arabic word (or part of it). Diacritics are ignored.
-    limit : int, optional
-        Maximum number of results to return, by default 5.
-
-    Returns
-    -------
-    List[Tuple[int, str]]
-        List of (index, verse) pairs.
-    """
-    _init_data()
-    clean_query = _normalize_arabic(query)
-    matched_indices: Iterable[int] = (
-        idx
-        for token, indices in _REVERSE_INDEX.items()
-        if clean_query in token
-        for idx in indices
-    )
-    # unique while preserving order
-    seen: set[int] = set()
-    results: List[Tuple[int, str]] = []
-    for idx in matched_indices:
-        if idx not in seen:
-            seen.add(idx)
-            results.append((idx, _VERSES[idx]))
-            if len(results) >= limit:
-                break
-    return results
-
-
-def calc_gematria(text: str) -> int:
-    """
-    Calculate Ṣaʿadātī gematric value for any Arabic text.
+    Create a URL-friendly slug (`-` separated, lowercase) from *text*.
 
     Parameters
     ----------
     text : str
-        Input Arabic string.
+        Raw title / headline.
+    max_len : int, optional
+        Maximum number of characters allowed.  Defaults to 60.
 
     Returns
     -------
-    int
-        Sum of letter values according to the ABJAD order.
+    str
+        Clean slug safe for URLs and file names.
+
+    Examples
+    --------
+    >>> slugify("Python Tips & Tricks!")
+    'python-tips-tricks'
     """
-    total = 0
-    for char in _normalize_arabic(text):
-        total += ABJAD.get(char, 0)
-    return total
+    slug = re.sub(r"[^\w\s-]", "", text).strip().lower()
+    slug = re.sub(r"[-\s]+", "-", slug)
+    return slug[:max_len] or "untitled"
 
 
-def verse_gematria(verse: str) -> int:
+def secure_token(k: int = 32) -> str:
     """
-    Convenience wrapper around `calc_gematria` for a single verse.
+    Generate a cryptographically secure random token.
 
     Parameters
     ----------
-    verse : str
-        Arabic verse.
+    k : int, optional
+        Desired length (characters).  Default is 32.
 
     Returns
     -------
-    int
-        Its gematric value.
+    str
+        URL-safe token containing letters and digits.
+
+    Examples
+    --------
+    >>> len(secure_token(16)) == 16
+    True
     """
-    return calc_gematria(verse)
+    alphabet = string.ascii_letters + string.digits
+    return "".join(secrets.choice(alphabet) for _ in range(k))
 
 
-def top_verses(n: int = 10) -> List[Tuple[int, str, int]]:
+def find_files(
+    root: Path,
+    *,
+    suffixes: Iterable[str] = (".py",),
+    include_hidden: bool = False,
+) -> List[Path]:
     """
-    Return the top-N verses with the highest gematric values.
+    Recursively collect files matching given extension(s).
 
     Parameters
     ----------
-    n : int, optional
-        Number of top verses, by default 10.
+    root : Path
+        Starting directory.
+    suffixes : Iterable[str], optional
+        Tuple of suffixes to keep (dot-inclusive).  Default is ('.py',).
+    include_hidden : bool, optional
+        Whether to include hidden files/directories.  Defaults to False.
 
     Returns
     -------
-    List[Tuple[int, str, int]]
-        List of (index, verse, value) sorted by value descending.
+    List[Path]
+        Sorted list of matching file paths.
     """
-    _init_data()
-    scored = [(idx, v, verse_gematria(v)) for idx, v in enumerate(_VERSES)]
-    scored.sort(key=lambda t: t[2], reverse=True)
-    return scored[:n]
+    suffixes = tuple(s.lower() for s in suffixes)
+    results: List[Path] = []
+
+    for path in root.rglob("*"):
+        if path.is_file() and path.suffix.lower() in suffixes:
+            if not include_hidden and any(
+                part.startswith(".")
+                for part in path.relative_to(root).parts
+            ):
+                continue
+            results.append(path)
+
+    return sorted(results)
 
 
-def export_csv(
-    rows: List[Tuple[int, str, int]], output_path: str | Path, *, append: bool = False
-) -> None:
+def partition(
+    items: Iterable[str], keyword: str
+) -> Tuple[List[str], List[str]]:
     """
-    Write (index, verse, value) rows to a CSV file.
+    Split *items* into two lists: those containing *keyword* and those not.
 
     Parameters
     ----------
-    rows : List[Tuple[int, str, int]]
-        Data to export.
-    output_path : str | pathlib.Path
-        Destination file.
-    append : bool, optional
-        Append instead of overwrite, by default False.
+    items : Iterable[str]
+        Input iterable of strings.
+    keyword : str
+        Substring to test for inclusion.
+
+    Returns
+    -------
+    Tuple[List[str], List[str]]
+        (matched, unmatched)
+
+    Examples
+    --------
+    >>> partition(["apple", "pear", "apricot"], "ap")
+    (['apple', 'apricot'], ['pear'])
     """
-    output_path = Path(output_path)
-    mode: str = "a" if append else "w"
-    with output_path.open(mode, encoding="utf-8", newline="") as fh:
-        writer = csv.writer(fh)
-        if not append or output_path.stat().st_size == 0:
-            writer.writerow(["index", "verse", "gematria"])
-        for row in rows:
-            writer.writerow(row)
+    matched, unmatched = [], []
+    kw_low = keyword.lower()
+    for item in items:
+        (matched if kw_low in item.lower() else unmatched).append(item)
+    return matched, unmatched
 
 
-# --------------------------------------------------------------------------- #
-# CLI ENTRY-POINT (for python -m ayat_saadati)
-# --------------------------------------------------------------------------- #
-def _cli() -> None:
-    """Basic CLI demo."""
-    import argparse
-    import textwrap
+def extract_emails(text: str, unique: bool = True) -> List[str]:
+    """
+    Extract email addresses from raw text.
 
-    parser = argparse.ArgumentParser(
-        description="Ayat Saadati – Qur’ān verse gematria utilities"
+    Parameters
+    ----------
+    text : str
+        Arbitrary string that may contain e-mails.
+    unique : bool, optional
+        If True, return only unique addresses.  Defaults to True.
+
+    Returns
+    -------
+    List[str]
+        List of e-mail addresses found.
+    """
+    pattern = re.compile(
+        r"(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b",
+        re.IGNORECASE,
     )
-    sub = parser.add_subparsers(dest="cmd", required=True)
-
-    # search
-    p_search = sub.add_parser("search", help="Search for a word in the verses")
-    p_search.add_argument("word", help="Arabic word")
-    p_search.add_argument("-l", "--limit", type=int, default=5)
-
-    # gematria
-    p_gem = sub.add_parser("gematria", help="Gematric value of a text")
-    p_gem.add_argument("text", help="Arabic text")
-
-    # top
-    p_top = sub.add_parser("top", help="Top verses by gematria")
-    p_top.add_argument("-n", type=int, default=10)
-
-    args = parser.parse_args()
-
-    if args.cmd == "search":
-        for idx, verse in search_verse(args.word, limit=args.limit):
-            print(f"{idx:>4} | {verse}")
-    elif args.cmd == "gematria":
-        print(calc_gematria(args.text))
-    elif args.cmd == "top":
-        for idx, verse, value in top_verses(n=args.n):
-            print(f"{idx:>4} | {value:>5} | {verse}")
+    matches = pattern.findall(text)
+    return sorted(list(dict.fromkeys(matches))) if unique else matches
 
 
-if __name__ == "__main__":
-    _cli()
-```
+def batch(
+    iterable: Iterable[str], size: int
+) -> Iterable[List[str]]:
+    """
+    Yield successive *size*-length chunks of *iterable*.
+
+    Parameters
+    ----------
+    iterable : Iterable[str]
+        Input data.
+    size : int
+        Chunk size (must be > 0).
+
+    Yields
+    ------
+    List[str]
+        Chunk of *size* items (last chunk may be shorter).
+
+    Examples
+    --------
+    >>> list(batch("ABCDEFG", 3))
+    [['A', 'B', 'C'], ['D', 'E', 'F'], ['G']]
+    """
+    if size <= 0:
+        raise ValueError("size must be > 0")
+    chunk: List[str] = []
+    for item in iterable:
+        chunk.append(item)
+        if len(chunk) == size:
+            yield chunk
+            chunk = []
+    if chunk:  # last partial chunk
+        yield chunk
