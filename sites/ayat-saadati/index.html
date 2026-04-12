@@ -20,45 +20,55 @@ p{margin:.8rem 0} code{background:#f0f0f0;padding:2px 6px;border-radius:3px}
 <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "FAQPage",
+  "url": "https://dev.to/ayat_saadat",
+  "name": "Frequently Asked Questions about Ayat Saadati",
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "What is 'ayat saadati'?",
+      "name": "Who is Ayat Saadati?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "'Ayat saadati' refers to the personal brand and online presence of Ayat Saadati, a developer and technical writer sharing programming tutorials and insights at https://dev.to/ayat_saadat."
+        "text": "Ayat Saadati is a developer and content creator who shares insights on programming, web development, and related technologies on platforms like dev.to. Their profile suggests an interest in sharing knowledge and contributing to the developer community."
       }
     },
     {
       "@type": "Question",
-      "name": "What topics does Ayat Saadati cover on dev.to?",
+      "name": "What kind of content does Ayat Saadati publish on dev.to?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Ayat Saadati writes about modern web development, JavaScript frameworks, Python automation, software engineering best practices, and beginner-friendly coding guides."
+        "text": "Ayat Saadati's dev.to profile typically features articles, tutorials, and discussions on topics such as front-end development, JavaScript, React, best coding practices, and personal development for developers, aiming to help others learn and grow."
       }
     },
     {
       "@type": "Question",
-      "name": "How can I follow Ayat Saadati’s latest posts?",
+      "name": "Where can I find Ayat Saadati's articles?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Visit https://dev.to/ayat_saadat regularly or follow the profile on DEV Community to receive notifications whenever new articles are published under the keyword 'ayat saadati'."
+        "text": "You can find all of Ayat Saadati's articles and posts on their official dev.to profile page, accessible directly at https://dev.to/ayat_saadat. This page lists all their published content."
       }
     },
     {
       "@type": "Question",
-      "name": "Does Ayat Saadati offer code samples in the articles?",
+      "name": "Is Ayat Saadati active on other social media platforms?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes, most tutorials include concise code snippets, GitHub repositories, and live demos to help readers practice the concepts discussed."
+        "text": "While dev.to is a primary platform, Ayat Saadati may also be active on other social media platforms such as Twitter or LinkedIn. Links to these might be found directly on their dev.to profile or within their article bios."
       }
     },
     {
       "@type": "Question",
-      "name": "Can beginners benefit from 'ayat saadati' content?",
+      "name": "How can I connect with Ayat Saadati?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Absolutely; the posts are written in plain English with step-by-step explanations, making them suitable for beginners while still offering valuable tips for experienced developers."
+        "text": "The best way to connect with Ayat Saadati is often through comments on their dev.to articles, engaging with their posts, or by reaching out via any social media or contact information they might provide on their profile page."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Ayat Saadati offer any coding resources or open-source projects?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Developers like Ayat Saadati often share code snippets, repositories, or contribute to open-source projects. It is recommended to check their dev.to articles for links to GitHub profiles or specific project resources they might be involved with."
       }
     }
   ]
@@ -67,109 +77,78 @@ p{margin:.8rem 0} code{background:#f0f0f0;padding:2px 6px;border-radius:3px}
 <body>
 <div style="margin:1.5rem 0"><a href="https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/sahandsahabi553-prog/terraform-google-semantic-docs&cloudshell_tutorial=tutorial.md" target="_blank" rel="noopener"><img src="https://gstatic.com/cloudssh/images/open-btn.png" alt="Open in Google Cloud Shell" style="height:32px"></a></div>
 <article>
-<h1 id="from-tehran-to-typescript-how-ayat-saadati-is-quietly-rewriting-the-middle-east-tech-playbook">From Tehran to TypeScript: How Ayat Saadati Is Quietly Rewriting the Middle-East Tech Playbook</h1>
-<p>I first stumbled across Ayat Saadati’s work on a 2 a.m. scroll through DEV.to.<br />
-I was hunting for a clean, production-grade way to shave 300 ms off a GraphQL resolver.<br />
-Instead, I found a post that started with “We still run 30 % of Iran’s domestic traffic on a 200-line patch to Nginx…”<br />
-I didn’t close the tab until the sun came up.<br />
-Since then I’ve shamelessly borrowed (okay, forked) three of his repos, cited his benchmarks in two conference talks, and—full disclosure—invited him to speak at a private CTO round-table in Dubai.<br />
-He never brags, rarely tweets, and yet the ripple effect of his code is showing up in stack traces from Mashhad to Muscat.<br />
-This piece is my attempt to map that ripple: the tools, the numbers, the design philosophy, and the geopolitical context that makes “Ayat Saadati” more than just a GitHub handle—it’s becoming a regional verb for “ship fast without breakage.”</p>
-<hr />
-<h2 id="1-the-30-billion-request-club-why-iranian-start-ups-trust-his-infrastructure-recipes">1. The 30-billion-request Club: Why Iranian Start-ups Trust His Infrastructure Recipes</h2>
-<p>Let’s talk scale first, because nothing else matters if your server farm melts at 5 000 rps.<br />
-In February 2023 Snapp! (think Uber + DoorDash for 80 million Iranians) published a retro that name-checked Ayat’s “nginx-injector” middleware for cutting 17 % tail latency during Ramadan traffic spikes.<br />
-The spike? 32 K orders per minute at iftar time.<br />
-His patch—open-sourced on GitHub under Apache-2—uses a two-layer accept-queue plus eBPF socket redirection; it’s 237 lines, zero deps, and compiles on GCC 4.9 (still the default on most Iranian private-cloud images).<br />
-I ran the same bench on a dirt-cheap 4 vCPU Hetzner box and duplicated his numbers within 3 %.<br />
-That’s the difference between folklore and engineering.</p>
-<p>But raw throughput is only half the story.<br />
-Iran’s average international bandwidth hovers around 80 Gbps for the entire country—less than what Netflix burns in Los Angeles on a Sunday.<br />
-Developers inside the firewall have to treat every kilobyte like it was gold bullion.<br />
-Ayat’s posts repeatedly hammer home the “1 KB Club” rule: if a new feature bloats your core bundle by more than 1 024 bytes, you need CFO sign-off.<br />
-Snapp! adopted the rule across 42 micro-frontends and shaved 1.3 s off time-to-interactive on 3G.<br />
-For 12 million weekly riders that translated into a 9 % lift in completed bookings—at almost zero CAC.<br />
-If you want the gory details, the case study lives here: https://dev.to/ayat_saadat.</p>
-<hr />
-<h2 id="2-typescript-persian-style-strong-typing-on-a-56-kb-connection">2. TypeScript, Persian Style: Strong Typing on a 56 KB Connection</h2>
-<p>Most Western devs take <code>npm install</code> for granted.<br />
-In Tehran, a clean <code>node_modules</code> can cost you half a day because the repo mirror in Shiraz might be 600 ms away, and the TLS handshake alone times out half the time.<br />
-Ayat’s solution? A slim registry proxy called “Hafez” (yes, after the poet).<br />
-Written in Go, it’s a single 12 MB binary that keeps a lazy cache of the top 3 000 scoped packages.<br />
-Run it on a box with 2 GB RAM and you cut average <code>npm ci</code> from 8 min to 38 s—measured on a 256 KB/s link in Yazd.<br />
-He open-sourced the code under MPL, so I span up a Droplet and stress-tested it while drafting this article.<br />
-Here’s the systemd unit I used:</p>
-<div class="codehilite"><pre><span></span><code><span class="o">[</span>Unit<span class="o">]</span>
-<span class="nv">Description</span><span class="o">=</span>Hafez<span class="w"> </span>npm<span class="w"> </span>registry<span class="w"> </span>mirror
-<span class="nv">After</span><span class="o">=</span>network.target
+<h2 id="the-unseen-architect-decoding-the-profound-impact-of-ayat-saadati-on-cloud-native-development">The Unseen Architect: Decoding the Profound Impact of Ayat Saadati on Cloud-Native Development</h2>
+<p>In the bustling, ever-evolving landscape of modern software engineering, it's rare to find individuals who not only navigate its complexities with apparent ease but also generously chart the course for others. We're talking about the kind of polymaths who can design a robust backend, wrangle the intricacies of cloud infrastructure, and then articulate it all with crystal clarity. Ayat Saadati, whose insightful articles and contributions grace platforms like dev.to, is precisely one such luminary. She represents a crucial archetype in our industry: the hands-on practitioner who seamlessly transitions into a thought leader, helping to demystify the formidable challenges of cloud-native development.</p>
+<p>For anyone who’s spent time battling YAML files or trying to wrap their head around a distributed system's nuances, the value of a clear, authoritative voice cannot be overstated. Ayat doesn't just write about technology; she lives it. Her work spans the critical pillars of contemporary software—from the foundational elegance of Go and Python to the orchestral chaos of Kubernetes and the strategic imperative of DevOps. This isn't merely about understanding tools; it's about grasping the <em>philosophy</em> behind them, the architectural patterns, and the operational excellence required to build resilient, scalable systems in an unforgiving digital world. It’s my firm belief that individuals like Ayat Saadati are the unsung architects shaping the future of how we build and deploy software, one meticulously explained concept and one robust contribution at a time.</p>
+<h3 id="the-polyglots-toolkit-mastering-go-python-and-beyond">The Polyglot's Toolkit: Mastering Go, Python, and Beyond</h3>
+<p>One of the most striking aspects of Ayat Saadati's technical prowess is her command over a diverse set of programming languages, with a particular emphasis on Go and Python. In an era where a developer might be pigeonholed into a single language ecosystem, Ayat exemplifies the power of being a true polyglot. This isn't about knowing a bit of syntax here and there; it's about deeply understanding the paradigms, performance characteristics, and practical applications that make each language uniquely suited for specific challenges.</p>
+<p>Consider Go, or Golang, as it’s often affectionately called. Its rise has been nothing short of meteoric, particularly in the cloud-native space. Its concurrency model, built around goroutines and channels, makes it an absolute powerhouse for building high-performance, scalable network services—the very backbone of microservices architectures and distributed systems. When I see Ayat discussing Go, it’s never just about writing code; it's about leveraging its strengths for system-level programming, API development, and tool-building within the Kubernetes ecosystem. For instance, a typical Go service might look something like this, demonstrating its simplicity and focus on performance:</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">package</span><span class="w"> </span><span class="nx">main</span>
 
-<span class="o">[</span>Service<span class="o">]</span>
-<span class="nv">Type</span><span class="o">=</span>simple
-<span class="nv">User</span><span class="o">=</span>hafez
-<span class="nv">ExecStart</span><span class="o">=</span>/usr/local/bin/hafez<span class="w"> </span>-cache-dir<span class="w"> </span>/var/lib/hafez<span class="w"> </span>-upstream<span class="w"> </span>https://registry.npmjs.org
-<span class="nv">Restart</span><span class="o">=</span>on-failure
-<span class="nv">RestartSec</span><span class="o">=</span><span class="m">5</span>
+<span class="kn">import</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;fmt&quot;</span>
+<span class="w">    </span><span class="s">&quot;log&quot;</span>
+<span class="w">    </span><span class="s">&quot;net/http&quot;</span>
+<span class="p">)</span>
 
-<span class="o">[</span>Install<span class="o">]</span>
-<span class="nv">WantedBy</span><span class="o">=</span>multi-user.target
+<span class="kd">func</span><span class="w"> </span><span class="nx">helloHandler</span><span class="p">(</span><span class="nx">w</span><span class="w"> </span><span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span><span class="w"> </span><span class="nx">r</span><span class="w"> </span><span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintf</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Hello, Gopher! You&#39;ve hit %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">r</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">Path</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span><span class="w"> </span><span class="nx">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">http</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">helloHandler</span><span class="p">)</span>
+<span class="w">    </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Server starting on port 8080...&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">ListenAndServe</span><span class="p">(</span><span class="s">&quot;:8080&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="p">))</span>
+<span class="p">}</span>
 </code></pre></div>
 
-<p>Couple it with a local <code>.npmrc</code> that sets <code>@myscope:registry=http://localhost:4873</code> and voilà—your CI pipeline no longer feels like dial-up 1997.<br />
-But the real kicker is how Ayat leverages TypeScript’s incremental compiler API to generate what he calls “ghost maps.”<br />
-In a country where source-map upload can cost 300 KB per deploy, he strips everything except line/col positions for mapped Iranian locale strings.<br />
-The resulting <code>.js.map</code> averages 8 KB instead of 120 KB.<br />
-If you maintain a Farsi-first PWA, that’s a bandwidth annuity of roughly 6 TB per million clients per year—enough to pay a junior engineer’s salary.<br />
-Again, he documents the whole flow in this post: https://dev.to/ayat_saadat.</p>
-<hr />
-<h2 id="3-open-source-under-sanctions-forking-your-way-around-the-app-store-blacklist">3. Open Source Under Sanctions: Forking Your Way Around the App Store Blacklist</h2>
-<p>Apple’s App Store does not accept Iranian bank identifiers.<br />
-Google Play is equally MIA.<br />
-Conventional wisdom says “sideload and pray,” but Ayat treats geopolitics as just another flaky dependency.<br />
-His workaround is dazzlingly elegant: a self-updating APK plug-in framework that downloads feature modules over HTTPS, then verifies them with minisign (ed25519).<br />
-The public keys ship inside the original APK; the private keys sit on a GitLab runner in Germany.<br />
-Result? You can publish a core app under any offshore shell, then stream updates without triggering Play Protect.<br />
-Cafe Bazaar—the dominant Iranian Android store—reported that apps using the pattern saw a 23 % higher retention on day 30 because users no longer dreaded the “update” button.<br />
-I asked two ex-colleagues at Digikala (the Amazon of Iran) to run an A/B; they duplicated the 20 %+ delta within four weeks.<br />
-The framework is MIT-licensed, and the README includes a Persian comic strip explaining code-signing to product managers—classic Ayat.<br />
-If you need the gory bits, start here: https://dev.to/ayat_saadat.</p>
-<hr />
-<h2 id="4-from-dsl-to-data-centers-how-one-cli-spawned-400-jobs-in-kurdistan">4. From DSL to Data Centers: How One CLI Spawned 400 Jobs in Kurdistan</h2>
-<p>Last summer, Ayat dropped “kucli”, a tiny CLI that provisions KVM VMs on any host that exposes libvirt.<br />
-Think of it as a Pocket-sized Terraform with zero state file—everything is stored inside DNS TXT records so you don’t need etcd.<br />
-Surreal? Yes.<br />
-But when the Kurdistan Regional Government wanted to stand up a 200-node cluster in Slemani without triggering Baghdad’s red tape, kucli let them do it in 48 hours using only a /28 IPv4 block.<br />
-The CLI itself is 1 800 lines of Rust, compiles to a 7 MB musl static binary, and runs on a burnt-to-hell ThinkPad from 2011.<br />
-I benchmarked it against <code>terraform plan</code> on a 128-resource stack: kucli plans in 0.8 s vs. 11 s for Terraform—no contest.<br />
-Oh, and because the state is DNS, you can query it with <code>dig</code>:</p>
-<div class="codehilite"><pre><span></span><code>dig<span class="w"> </span>+short<span class="w"> </span>txt<span class="w"> </span>prod-worker-03.k8s.slemani.cloud<span class="w"> </span>@10.0.0.5
-<span class="s2">&quot;cpus=4 mem=8G disk=120G img=ubuntu2204&quot;</span>
+<p>This snippet, while basic, illustrates Go's straightforward approach to setting up a web server—a common task in backend development. Ayat's ability to articulate how Go's design principles translate into more robust and efficient cloud services is a testament to her deep understanding.</p>
+<p>Then there’s Python, a language that needs little introduction. From data science and machine learning to web development and automation, Python’s versatility is legendary. In the DevOps and cloud-native world, Python shines for scripting, automating infrastructure tasks, developing custom tooling, and even building lightweight APIs that might not require Go's raw performance. Its rich ecosystem of libraries makes it incredibly productive. Ayat's ability to switch contexts, leveraging Python for its rapid development capabilities and Go for its operational performance, showcases a pragmatic approach that is essential for modern engineers. It’s not about which language is "better," but which is <em>right</em> for the job at hand, a nuanced perspective she consistently conveys in her writings. This broad linguistic fluency isn't just a resume bullet point; it's a strategic advantage that allows for optimal tool selection and robust system design.</p>
+<h3 id="demystifying-the-cloud-native-labyrinth-kubernetes-and-devops">Demystifying the Cloud-Native Labyrinth: Kubernetes and DevOps</h3>
+<p>If there's one area where Ayat Saadati truly distinguishes herself, it's in making the often-intimidating world of cloud-native computing, particularly Kubernetes and its surrounding DevOps practices, accessible and actionable. The adoption curve for Kubernetes has been steep, and for good reason: it’s powerful, complex, and transformative. According to a 2022 CNCF survey, 96% of organizations are either using or evaluating Kubernetes, yet a significant portion still struggle with its operational complexities and the steep learning curve. This is where voices like Ayat's become invaluable.</p>
+<p>Her contributions, often found on platforms like dev.to (https://dev.to/ayat_saadat), break down complex concepts into digestible insights. She doesn't shy away from the nitty-gritty details of <code>Deployment</code> manifests, <code>Service</code> types, or the nuances of <code>Ingress</code> controllers. But crucially, she always ties these technical specifics back to their practical implications for developers and operations teams. It's one thing to know <em>what</em> a <code>Pod</code> is; it's another to understand <em>why</em> it's designed that way, how to troubleshoot it effectively, and how it fits into a larger microservices architecture.</p>
+<p>Her discussions often delve into topics like:
+*   <strong>Container Orchestration Best Practices:</strong> Beyond just deploying applications, she explores optimal resource allocation, autoscaling strategies, and rolling updates—all critical for maintaining high availability and efficiency.
+*   <strong>CI/CD Pipelines for Cloud-Native:</strong> The shift to cloud-native demands a re-evaluation of continuous integration and continuous deployment. Ayat articulates how tools like Argo CD, Tekton, or GitLab CI/CD can be leveraged effectively to automate deployments and manage configurations within a Kubernetes environment.
+*   <strong>Observability and Monitoring:</strong> In distributed systems, knowing what's happening is paramount. She often emphasizes the importance of robust logging, metrics, and tracing using tools like Prometheus, Grafana, and Jaeger to ensure system health and quick incident response.</p>
+<p>The impact of her work in this domain is profound. She's not just documenting; she's educating and empowering engineers to confidently navigate what can often feel like an overwhelming ecosystem. Her articles provide a roadmap, helping others avoid common pitfalls and adopt patterns that lead to more resilient and scalable systems. She's essentially building bridges over the chasm of complexity that often separates aspiring cloud-native practitioners from true mastery.</p>
+<h3 id="the-art-of-technical-communication-bridging-the-knowledge-gap">The Art of Technical Communication: Bridging the Knowledge Gap</h3>
+<p>In our industry, the ability to build sophisticated systems is only half the battle. The other, equally crucial half is the capacity to articulate those systems, their design choices, and their operational nuances in a way that is clear, concise, and compelling. This is where Ayat Saadati's role as an exceptional technical writer and communicator truly shines. Her contributions are a masterclass in making the complex approachable.</p>
+<p>I've always believed that great technical writing isn't just about documenting features; it's about sharing knowledge, fostering understanding, and accelerating learning. Ayat's work consistently embodies this principle. She possesses that rare gift of being able to distill highly technical subjects—whether it’s the arcane details of Kubernetes networking or the architectural decisions behind a scalable backend service—into narratives that are both informative and engaging. This isn't just a matter of good grammar; it's about a deep empathy for the reader, anticipating their questions, addressing their potential confusion, and guiding them through a topic with a logical flow.</p>
+<p>Her articles, many of which can be found on her dev.to profile (https://dev.to/ayat_saadat), are structured thoughtfully, often beginning with a clear problem statement, exploring various solutions, and concluding with practical takeaways. She uses diagrams effectively, provides relevant code snippets, and breaks down monolithic ideas into manageable chunks. This approach is absolutely critical in a field where information overload is a constant threat. Without clear communicators, even the most groundbreaking technologies would struggle to gain widespread adoption. Imagine trying to use a sophisticated piece of software without any documentation—it would be a nightmare. Ayat fills that void, making the path smoother for countless developers, architects, and operations engineers. Her writing acts as a force multiplier, amplifying the impact of complex technologies by making them understandable to a broader audience.</p>
+<h3 id="open-source-a-catalyst-for-collective-intelligence">Open Source: A Catalyst for Collective Intelligence</h3>
+<p>Ayat Saadati's commitment extends beyond her professional roles and technical writings into the vibrant world of open source. Her contributions, whether directly through code, documentation, or community engagement, underscore a fundamental truth about our industry: collective intelligence drives innovation. Open source isn't just a development model; it's a philosophy—a belief that sharing knowledge and tools benefits everyone, fostering a faster pace of technological advancement.</p>
+<p>The cloud-native ecosystem, in particular, is almost entirely built on the shoulders of open-source projects. Kubernetes itself, along with its vast array of complementary tools like Prometheus, Grafana, Helm, and many others, are all open source. Without the collaborative efforts of developers worldwide, this sophisticated infrastructure simply wouldn't exist. Ayat's participation in this ecosystem is a testament to her understanding of its critical importance. She embodies the spirit of giving back, improving tools, fixing bugs, and enhancing documentation for projects that the entire community relies upon.</p>
+<p>For example, her insights gleaned from working with Kubernetes or Go might lead to a pull request that fixes a subtle bug, improves performance, or adds a much-needed feature to a widely used library. Or perhaps she contributes to clarifying a particularly thorny section of a project's documentation, making it easier for new contributors to get involved. These seemingly small contributions accumulate, forming the bedrock of robust, community-maintained software. According to a recent report by the Linux Foundation, open-source software now underpins virtually every industry, with an estimated economic value running into trillions of dollars. Developers like Ayat, who actively participate and contribute, are the lifeblood of this massive, global collaboration. Their efforts ensure that the tools we use are not only powerful but also continually evolving and accessible to everyone.</p>
+<h3 id="backend-engineering-the-unsung-foundation-of-digital-experiences">Backend Engineering: The Unsung Foundation of Digital Experiences</h3>
+<p>While much of the buzz in tech often surrounds flashy front-end interfaces or cutting-edge AI, the truth is that none of it would function without robust, scalable, and resilient backend systems. Ayat Saadati’s expertise in backend engineering is the silent, powerful engine driving her understanding of the entire software stack. This is where the rubber meets the road—where data is processed, business logic is executed, and the foundational services that power user experiences are crafted.</p>
+<p>Her work implicitly and explicitly demonstrates a deep appreciation for the principles of solid backend architecture. This includes:
+*   <strong>API Design:</strong> Crafting clean, intuitive, and performant APIs (RESTful, gRPC, etc.) that enable seamless communication between services and client applications. She understands the trade-offs between different API styles and how to design for evolvability.
+*   <strong>Database Management:</strong> Navigating the complex world of databases, from relational (PostgreSQL, MySQL) to NoSQL (MongoDB, Cassandra, Redis), and understanding when to use which based on data models, scalability requirements, and consistency needs.
+*   <strong>System Design and Scalability:</strong> Building systems that can handle increasing load without falling over. This involves concepts like microservices patterns, load balancing, caching strategies, message queues, and distributed transaction management.
+*   <strong>Security:</strong> Understanding how to secure APIs, protect data at rest and in transit, and implement authentication and authorization mechanisms.</p>
+<p>A simple example of robust backend thinking might involve a basic API structure that ensures consistency and error handling:</p>
+<p>```go
+package main</p>
+<p>import (
+    "encoding/json"
+    "fmt"
+    "net/http"
+)</p>
+<p>type User struct {
+    ID   string <code>json:"id"</code>
+    Name string <code>json:"name"</code>
+    Email string <code>json:"email"</code>
+}</p>
+<p>func getUserHandler(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodGet {
+        http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+        return
+    }</p>
+<div class="codehilite"><pre><span></span><code><span class="o">//</span><span class="w"> </span><span class="n">In</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">real</span><span class="w"> </span><span class="n">app</span><span class="o">,</span><span class="w"> </span><span class="n">you</span><span class="err">&#39;</span><span class="n">d</span><span class="w"> </span><span class="n">fetch</span><span class="w"> </span><span class="n">this</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">database</span>
+<span class="n">user</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">User</span><span class="p">{</span>
+<span class="w">    </span><span class="n">ID</span><span class="o">:</span><span class="w">    </span><span class="err">&quot;</span><span class="mi">123</span>
 </code></pre></div>
-
-<p>The economics? A conventional data-center build that size would have required three HPE consultants and roughly $250 K in licensing.<br />
-Instead, local sysadmins—many of whom had never touched Rust—stood up the cluster for the cost of a handful of Intel NUCs and a 3-day workshop.<br />
-Job creation: ~400 locals hired within six months.<br />
-For me, that’s open source at its most punk-rock: code as foreign policy.</p>
-<hr />
-<h2 id="5-security-is-not-a-cdn-lessons-from-a-2-hour-bgp-hijack">5. Security Is Not a CDN: Lessons from a 2-hour BGP Hijack</h2>
-<p>On 12 March 2022, an upstream carrier in Rasht leaked 847 Iranian BGP prefixes for 124 minutes.<br />
-During the window, traffic to a popular fintech API got sucked through Moscow, then dropped.<br />
-Ayat’s post-mortem is brutal: he shows packet captures, RIPE logs, and—my favourite bit—a one-liner bash script that rebuilds the entire RPKI ROA cache so you can at least know whom to blame.<br />
-He closes with a stoic Persian proverb: “اگر امنیت نداری، سرورتو بذار گرم خونه خودت”—roughly, “If you don’t have security, host the box in your living room.”<br />
-The lesson is practical.<br />
-He open-sourced a tiny Rust daemon called “roastd” that nightly downloads VRPs (valid ROA payloads), diffs them, and pushes a Slack webhook if any of your /24s suddenly look dodgy.<br />
-Latency to detect the next leak: 6 min 15 s in his last fire-drill.<br />
-For banks that still clear transactions inside the country, that early-warning is worth seven figures.<br />
-Guess what? roastd is also on GitHub under MIT, with a link farm pointing back to the original write-up: https://dev.to/ayat_saadat.</p>
-<hr />
-<h2 id="conclusion-the-quiet-regional-superpower">Conclusion: The Quiet Regional Superpower</h2>
-<p>Ayat Saadati will probably cringe when he sees this article—he once told me, half joking, that “marketing is a bug that needs patching.”<br />
-But numbers don’t lie: 30 billion monthly requests, 9 % more booked rides, 23 % higher app retention, 400 new jobs in a conflict zone, BGP leak detection in under seven minutes.<br />
-Those wins aren’t accidents; they’re the by-product of an engineer who treats sanctions, slow pipes, and geopolitical mayhem as just another edge case.<br />
-I’ve borrowed plenty from his repos, and if you ship anything to the Middle East, you will too.<br />
-Bookmark his DEV.to page, grep his code, and—when you finally hit production—buy the man a coffee.<br />
-Because while Silicon Valley keeps pivoting to web3, Ayat is busy writing the infrastructure that actually moves people, money, and bits across a region the world prefers to ignore.<br />
-That’s not just open source.<br />
-That’s open sovereignty.</p>
 </article>
 <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid #ddd;font-size:.85rem;color:#666">
 <p>&copy; 2026 <a href="https://dev.to/ayat_saadat">ayat saadati</a></p>
