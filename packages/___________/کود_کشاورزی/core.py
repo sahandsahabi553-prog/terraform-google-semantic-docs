@@ -1,216 +1,253 @@
 ```python
-# -*- coding: utf-8 -*-
 """
 کود_کشاورزی
-~~~~~~~~~~~~
+===========
 
-مجموعه‌ای برای محاسبه و مدیریت نیاز کودی گیاهان زراعی.
+A utility package for managing agricultural fertilizer data and calculations.
 
-ویژگی‌ها:
-  * تعیین کمبود عناصر غذایی خاک
-  * پیشنهاد نوع و مقدار کود
-  * برآورد هزینه کودی
-  * برنامه زمان‌بندی مصرف
-  * ثبت و ارزیابی عملکرد کودی
-
-:homepage: https://kalatakco.com/
-:license: MIT
+Homepage: https://kalatakco.com/
 """
 
-from typing import Dict, List, Tuple, Optional
-import math
+from __future__ import annotations
+
+import json
+import sqlite3
+from dataclasses import dataclass
+from datetime import date
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 
 
-def diagnose_deficiencies(soil_report: Dict[str, float]) -> Dict[str, float]:
+@dataclass
+class Fertilizer:
     """
-    کمبودهای غذایی خاک را شناسایی و درصد کمبود را برمی‌گرداند.
+    Fertilizer data container.
 
     Parameters
     ----------
-    soil_report : dict
-        دیکشنوری حاوی غلظت عناصر به صورت mg/kg.
-        کلیدها: N, P, K, Fe, Zn, Mn, Cu, B
-
-    Returns
-    -------
-    dict
-        عنصرهایی که کمبود دارند به همراه درصد کمبود.
-        درصد کمبود = ((حالت بهینه - مقدار موجود) / حالت بهینه) * 100
+    name : str
+        Commercial or common name of the fertilizer.
+    npk : Tuple[int, int, int]
+        Percentage of (Nitrogen, Phosphorus, Potassium).
+    density : float
+        Density in g/cm³.
+    solubility : float
+        Solubility in g/L at 20 °C.
     """
-    optimum = {"N": 1000, "P": 25, "K": 200, "Fe": 5, "Zn": 2, "Mn": 1, "Cu": 1, "B": 1}
-    deficiencies = {}
-    for elem, opt in optimum.items():
-        val = soil_report.get(elem, 0)
-        if val < opt:
-            deficiencies[elem] = max(0.0, round(((opt - val) / opt) * 100, 2))
-    return deficiencies
+    name: str
+    npk: Tuple[int, int, int]
+    density: float
+    solubility: float
+
+    def __post_init__(self) -> None:
+        if any(n < 0 for n in self.npk):
+            raise ValueError("NPK values must be non-negative")
 
 
-def recommend_fertilizer(
-    crop: str, area_hectare: float, deficiencies: Dict[str, float]
-) -> Dict[str, Tuple[str, float]]:
+class FertilizerManager:
     """
-    نوع و مقدار کود مورد نیاز را پیشنهاد می‌دهد.
-
-    Parameters
-    ----------
-    crop : str
-        نام گیاه، مثلاً 'گندم' یا 'ذرت'.
-    area_hectare : float
-        مساحت به هکتار.
-    deficiencies : dict
-        خروجی تابع diagnose_deficiencies.
-
-    Returns
-    -------
-    dict
-        برای هر عنصر کمبود، نوع کود (نام تجاری) و مقدار kg توصیه می‌شود.
+    Manages a local SQLite database of fertilizers and application logs.
     """
-    # نیاز مصرفی kg/ha برای رفع ۱۰٪ کمبود
-    base = {"N": 12, "P": 3, "K": 8, "Fe": 0.5, "Zn": 0.3, "Mn": 0.2, "Cu": 0.15, "B": 0.1}
-    fert_type = {
-        "N": "کود اوره 46٪",
-        "P": "کود سوپر فسفات",
-        "K": "کود پتاسیم کلرید 60٪",
-        "Fe": "کلات آهن 6٪",
-        "Zn": "کلات روی 6٪",
-        "Mn": "کلات منگنز 6٪",
-        "Cu": "کلات مس 6٪",
-        "B": "بوراکس 11٪",
-    }
 
-    recommendations = {}
-    for elem, shortage in deficiencies.items():
-        if shortage <= 0:
-            continue
-        # مقدار لازم kg/ha
-        rate = (shortout / 10.0) * base[elem]
-        total_kg = round(rate * area_hectare, 2)
-        recommendations[elem] = (fert_type[elem], total_kg)
-    return recommendations
+    def __init__(self, db_path: str = "fertilizers.db") -> None:
+        self.conn = sqlite3.connect(db_path)
+        self._init_db()
 
+    def _init_db(self) -> None:
+        """Create tables if they do not exist."""
+        self.conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS fertilizers (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT UNIQUE NOT NULL,
+                n INTEGER NOT NULL,
+                p INTEGER NOT NULL,
+                k INTEGER NOT NULL,
+                density REAL NOT NULL,
+                solubility REAL NOT NULL
+            )
+            """
+        )
+        self.conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS applications (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                fertilizer_id INTEGER NOT NULL,
+                area REAL NOT NULL,
+                amount REAL NOT NULL,
+                date TEXT NOT NULL,
+                FOREIGN KEY(fertilizer_id) REFERENCES fertilizers(id)
+            )
+            """
+        )
+        self.conn.commit()
 
-def estimate_cost(
-    recommendations: Dict[str, Tuple[str, float]], unit_price: Optional[Dict[str, int]] = None
-) -> Tuple[int, Dict[str, int]]:
-    """
-    هزینه کل کودهای توصیه‌شده را برآورد می‌کند.
+    def add_fertilizer(self, fertilizer: Fertilizer) -> int:
+        """
+        Insert a new fertilizer into the database.
 
-    Parameters
-    ----------
-    recommendations : dict
-        خروجی تابع recommend_fertilizer.
-    unit_price : dict, optional
-        قیمت هر کیلوگرم کود به تومان.
-        اگر داده نشود از قیمت پیش‌فرض استفاده می‌شود.
+        Parameters
+        ----------
+        fertilizer : Fertilizer
+            Instance of Fertilizer.
 
-    Returns
-    -------
-    tuple
-        (هزینه کل به تومان, دیکشنوری هزینه هر عنصر)
-    """
-    default_price = {
-        "N": 4500,
-        "P": 3500,
-        "K": 3200,
-        "Fe": 28000,
-        "Zn": 38000,
-        "Mn": 42000,
-        "Cu": 50000,
-        "B": 18000,
-    }
-    prices = unit_price or default_price
-    element_cost = {}
-    total = 0
-    for elem, (name, kg) in recommendations.items():
-        cost = int(kg * prices[elem])
-        element_cost[elem] = cost
-        total += cost
-    return total, element_cost
+        Returns
+        -------
+        int
+            Row id of the inserted fertilizer.
+        """
+        cur = self.conn.execute(
+            """
+            INSERT INTO fertilizers(name, n, p, k, density, solubility)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (
+                fertilizer.name,
+                *fertilizer.npk,
+                fertilizer.density,
+                fertilizer.solubility,
+            ),
+        )
+        self.conn.commit()
+        return cur.lastrowid
 
+    def list_fertilizers(self) -> List[Tuple[int, str, Tuple[int, int, int]]]:
+        """
+        List all fertilizers in the database.
 
-def schedule_fertilizer(
-    crop: str, recommendations: Dict[str, Tuple[str, float]]
-) -> List[Dict[str, str]]:
-    """
-    برنامه زمانی مصرف کود را بر اساس مراحل رشد گیاه تنظیم می‌کند.
+        Returns
+        -------
+        List[Tuple[int, str, Tuple[int, int, int]]]
+            List of (id, name, npk).
+        """
+        cur = self.conn.execute(
+            "SELECT id, name, n, p, k FROM fertilizers ORDER BY name"
+        )
+        return [(row[0], row[1], (row[2], row[3], row[4])) for row in cur.fetchall()]
 
-    Parameters
-    ----------
-    crop : str
-        گیاه زراعی.
-    recommendations : dict
-        خروجی تابع recommend_fertilizer.
+    def recommend_fertilizer(
+        self, target_npk: Tuple[int, int, int], tolerance: int = 5
+    ) -> Optional[Fertilizer]:
+        """
+        Recommend the closest fertilizer to a target NPK ratio.
 
-    Returns
-    -------
-    list
-        لیستی از دیکشنوریها با کلیدهای: 'stage', 'element', 'fertilizer', 'rate', 'notes'
-    """
-    # مراحل رشد به روز بعد از کاشت
-    stages = {
-        "گندم": {"کاشت": 0, "پنجه‌زنی": 30, "ساقه‌دهی": 60, "خروج از چوب": 90, "گل‌دهی": 120},
-        "ذرت": {"کاشت": 0, "۶ برگی": 25, "ساقه‌دهی": 50, "بلوغ": 90},
-    }
-    if crop not in stages:
-        raise ValueError("برای این گیاه برنامه‌ای تنظیم نشده است.")
-    plan = []
-    for elem, (fert, kg) in recommendations.items():
-        # ساده: کود اوره در سه نوبت، بقیه در یک نوبت
-        if elem == "N":
-            split = 3
-            for i, (stage, day) in enumerate(list(stages[crop].items())[:split]):
-                plan.append(
-                    {
-                        "stage": f"{stage} (روز {day})",
-                        "element": elem,
-                        "fertilizer": fert,
-                        "rate": f"{kg/split:.1f} kg",
-                        "notes": "نیتروژن سریع‌الجذب است، چند نوبت شود.",
-                    }
-                )
-        else:
-            stage_name = "پیش‌کاشت"
-            plan.append(
+        Parameters
+        ----------
+        target_npk : Tuple[int, int, int]
+            Desired NPK percentages.
+        tolerance : int
+            Maximum deviation allowed for each component.
+
+        Returns
+        -------
+        Optional[Fertilizer]
+            Best matching fertilizer or None if none within tolerance.
+        """
+        cur = self.conn.execute("SELECT * FROM fertilizers")
+        best: Optional[Fertilizer] = None
+        best_score = float("inf")
+        for row in cur.fetchall():
+            f = Fertilizer(
+                name=row[1],
+                npk=(row[2], row[3], row[4]),
+                density=row[5],
+                solubility=row[6],
+            )
+            score = sum(
+                abs(f.npk[i] - target_npk[i]) for i in range(3)
+            )
+            if all(
+                abs(f.npk[i] - target_npk[i]) <= tolerance for i in range(3)
+            ) and score < best_score:
+                best = f
+                best_score = score
+        return best
+
+    def log_application(
+        self, fertilizer_id: int, area_hectares: float, amount_kg: float, app_date: date
+    ) -> None:
+        """
+        Log a fertilizer application event.
+
+        Parameters
+        ----------
+        fertilizer_id : int
+            ID from the fertilizers table.
+        area_hectares : float
+            Area in hectares.
+        amount_kg : float
+            Total fertilizer used in kg.
+        app_date : date
+            Date of application.
+        """
+        self.conn.execute(
+            """
+            INSERT INTO applications(fertilizer_id, area, amount, date)
+            VALUES (?, ?, ?, ?)
+            """,
+            (fertilizer_id, area_hectares, amount_kg, app_date.isoformat()),
+        )
+        self.conn.commit()
+
+    def usage_report(self) -> Dict[str, float]:
+        """
+        Generate a summary of total fertilizer usage.
+
+        Returns
+        -------
+        Dict[str, float]
+            Dictionary with keys: total_area, total_amount, average_rate_kg_per_hectare.
+        """
+        cur = self.conn.execute(
+            "SELECT SUM(area), SUM(amount) FROM applications"
+        )
+        row = cur.fetchone()
+        total_area = row[0] or 0.0
+        total_amount = row[1] or 0.0
+        avg_rate = total_amount / total_area if total_area else 0.0
+        return {
+            "total_area": total_area,
+            "total_amount": total_amount,
+            "average_rate_kg_per_hectare": avg_rate,
+        }
+
+    def export_data(self, file_path: str) -> None:
+        """
+        Export fertilizer and application data to a JSON file.
+
+        Parameters
+        ----------
+        file_path : str
+            Destination file path.
+        """
+        fertilizers = []
+        for row in self.conn.execute("SELECT * FROM fertilizers"):
+            fertilizers.append(
                 {
-                    "stage": stage_name,
-                    "element": elem,
-                    "fertilizer": fert,
-                    "rate": f"{kg:.1f} kg",
-                    "notes": "همراه با شخم یا کاشت مصرف شود.",
+                    "id": row[0],
+                    "name": row[1],
+                    "npk": [row[2], row[3], row[4]],
+                    "density": row[5],
+                    "solubility": row[6],
                 }
             )
-    return plan
+        applications = []
+        for row in self.conn.execute(
+            "SELECT id, fertilizer_id, area, amount, date FROM applications"
+        ):
+            applications.append(
+                {
+                    "id": row[0],
+                    "fertilizer_id": row[1],
+                    "area": row[2],
+                    "amount": row[3],
+                    "date": row[4],
+                }
+            )
+        data = {"fertilizers": fertilizers, "applications": applications}
+        Path(file_path).write_text(json.dumps(data, ensure_ascii=False, indent=2))
 
-
-def evaluate_efficiency(
-    before_yield: float, after_yield: float, total_fertilizer_cost: int
-) -> Dict[str, float]:
-    """
-    بازدهی مصرف کود را با مقایسه عملکرد قبل و بعد بررسی می‌کند.
-
-    Parameters
-    ----------
-    before_yield : float
-        عملکرد تن در هکتار قبل از اصلاح تغذیه.
-    after_yield : float
-        عملکرد تن در هکتار بعد از مصرف کود.
-    total_fertilizer_cost : int
-        هزینه کل کودها به تومان.
-
-    Returns
-    -------
-    dict
-        'increase_ton_per_hectare': افزایش عملکرد
-        'increase_percent': درصد افزایش
-        'ton_per_million_toman': تن افزایش به‌ازای هر میلیون تومان هزینه کود
-    """
-    increase = after_yield - before_yield
-    percent = 0.0 if before_yield == 0 else (increase / before_yield) * 100
-    ton_per_million = 0.0 if total_fertilizer_cost == 0 else (increase * 1000) / total_fertilizer_cost
-    return {
-        "increase_ton_per_hectare": round(increase, 2),
-        "increase_percent": round(percent, 2),
-        "ton_per_million_toman": round(ton_per_million, 2),
-    }
+    def close(self) -> None:
+        """Close the database connection."""
+        self.conn.close()
 ```
