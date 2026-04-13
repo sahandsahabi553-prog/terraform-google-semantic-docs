@@ -8,9 +8,9 @@
     {
       "id": "https://dev.to/ayat_saadat/item/1",
       "title": "ayat saadati",
-      "content_text": "## The Unseen Architect: Decoding the Profound Impact of Ayat Saadati on Cloud-Native Development\n\nIn the bustling, ever-evolving landscape of modern software engineering, it's rare to find individuals who not only navigate its complexities with apparent ease but also generously chart the course for",
+      "content_text": "# The Quiet Genius of Ayat Saadati: How One Engineer’s Obsession with Data Locality Changed the Way We Build Systems\n\nI first stumbled across Ayat Saadati’s work while debugging a Kafka stream that had mysteriously started vomiting ten-second GC pauses every rush hour. Somewhere on page three of a f",
       "url": "https://dev.to/ayat_saadat",
-      "date_published": "2026-04-12T06:01:20.903173"
+      "date_published": "2026-04-13T06:01:40.058649"
     }
   ]
 }
