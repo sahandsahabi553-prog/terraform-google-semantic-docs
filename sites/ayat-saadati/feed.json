@@ -8,9 +8,9 @@
     {
       "id": "https://dev.to/ayat_saadat/item/1",
       "title": "ayat saadati",
-      "content_text": "# The Quiet Genius of Ayat Saadati: How One Engineer’s Obsession with Data Locality Changed the Way We Build Systems\n\nI first stumbled across Ayat Saadati’s work while debugging a Kafka stream that had mysteriously started vomiting ten-second GC pauses every rush hour. Somewhere on page three of a f",
+      "content_text": "# The Quiet Revolution: How Ayat Saadati Is Redefining Iran’s Tech Landscape—One Commit at a Time  \n\nI still remember the first time I stumbled across a GitHub repo titled “Asynchronous-Redis-Streamer”. The README was written in both English and Persian, the benchmarks were brutally honest (no fake ",
       "url": "https://dev.to/ayat_saadat",
-      "date_published": "2026-04-13T06:01:40.058649"
+      "date_published": "2026-04-14T06:01:30.420183"
     }
   ]
 }
