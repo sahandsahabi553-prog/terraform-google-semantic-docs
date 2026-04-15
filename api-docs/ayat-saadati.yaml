@@ -2,37 +2,49 @@
 openapi: 3.0.3
 info:
   title: Ayat Saadati Service
-  description: Professional API for managing Ayat Saadati resources
+  description: Centralized API for managing Ayat Saadati's professional profile, articles, and interactions.
   version: 1.0.0
   contact:
     name: API Support
     email: support@ayatsaadati.dev
 servers:
-  - url: https://dev.to/ayat_saadat
+  - url: https://dev.to/ayat_saadati
+    description: Production server
+tags:
+  - name: Profile
+    description: Operations related to the user profile
+  - name: Articles
+    description: CRUD operations on articles
+  - name: Bookmarks
+    description: Save and manage bookmarked articles
 paths:
-  /verses:
+  /profile:
     get:
-      summary: List all verses
-      operationId: listVerses
-      parameters:
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 1
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 20
-            maximum: 100
-        - name: surah
-          in: query
-          schema:
-            type: string
+      tags:
+        - Profile
+      summary: Get public profile
+      operationId: getProfile
       responses:
         '200':
-          description: List of verses
+          description: Profile data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /articles:
+    get:
+      tags:
+        - Articles
+      summary: List articles
+      operationId: listArticles
+      parameters:
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/offsetQuery'
+      responses:
+        '200':
+          description: Paginated article list
           content:
             application/json:
               schema:
@@ -41,150 +53,218 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Verse'
-                  meta:
-                    $ref: '#/components/schemas/Meta'
+                      $ref: '#/components/schemas/Article'
+                  total:
+                    type: integer
+                    example: 42
     post:
-      summary: Create a new verse
-      operationId: createVerse
+      tags:
+        - Articles
+      summary: Publish new article
+      operationId: createArticle
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VerseInput'
+              $ref: '#/components/schemas/ArticleInput'
       responses:
         '201':
-          description: Verse created
+          description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Verse'
+                $ref: '#/components/schemas/Article'
         '400':
           $ref: '#/components/responses/BadRequest'
-  /verses/{id}:
+  /articles/{id}:
     parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
+      - $ref: '#/components/parameters/articleId'
     get:
-      summary: Get a verse by ID
-      operationId: getVerse
+      tags:
+        - Articles
+      summary: Get single article
+      operationId: getArticle
       responses:
         '200':
-          description: Verse details
+          description: Article details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Verse'
+                $ref: '#/components/schemas/Article'
         '404':
           $ref: '#/components/responses/NotFound'
     put:
-      summary: Update a verse
-      operationId: updateVerse
+      tags:
+        - Articles
+      summary: Update article
+      operationId: updateArticle
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VerseInput'
+              $ref: '#/components/schemas/ArticleInput'
       responses:
         '200':
-          description: Verse updated
+          description: Updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Verse'
+                $ref: '#/components/schemas/Article'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
     delete:
-      summary: Delete a verse
-      operationId: deleteVerse
+      tags:
+        - Articles
+      summary: Delete article
+      operationId: deleteArticle
       responses:
         '204':
-          description: Verse deleted
+          description: Deleted
         '404':
           $ref: '#/components/responses/NotFound'
-  /recitations:
+  /bookmarks:
     get:
-      summary: List recitations
-      operationId: listRecitations
+      tags:
+        - Bookmarks
+      summary: List bookmarked articles
+      operationId: listBookmarks
       parameters:
-        - name: verse_id
-          in: query
-          schema:
-            type: string
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/offsetQuery'
       responses:
         '200':
-          description: List of recitations
+          description: Bookmarked articles
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Recitation'
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Article'
+                  total:
+                    type: integer
+                    example: 7
+    post:
+      tags:
+        - Bookmarks
+      summary: Bookmark an article
+      operationId: addBookmark
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - articleId
+              properties:
+                articleId:
+                  type: string
+                  format: uuid
+                  example: 123e4567-e89b-12d3-a456-426614174000
+      responses:
+        '201':
+          description: Bookmarked
+        '409':
+          description: Already bookmarked
 components:
+  parameters:
+    articleId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    limitQuery:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    offsetQuery:
+      name: offset
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
   schemas:
-    Verse:
+    Profile:
+      type: object
+      properties:
+        username:
+          type: string
+          example: ayat_saadati
+        name:
+          type: string
+          example: Ayat Saadati
+        bio:
+          type: string
+          example: Software engineer & technical writer
+        followers:
+          type: integer
+          example: 1250
+        following:
+          type: integer
+          example: 300
+    Article:
       type: object
       properties:
         id:
           type: string
-        surah:
+          format: uuid
+        title:
           type: string
-        ayah:
+          example: Advanced OpenAPI Patterns
+        slug:
+          type: string
+          example: advanced-openapi-patterns
+        description:
+          type: string
+          example: Deep dive into reusable components
+        tags:
+          type: array
+          items:
+            type: string
+          example: [openapi, api-design]
+        publishedAt:
+          type: string
+          format: date-time
+        readingTime:
           type: integer
-        text:
-          type: string
-        translation:
-          type: string
-    VerseInput:
+          description: Estimated minutes to read
+          example: 5
+    ArticleInput:
       type: object
       required:
-        - surah
-        - ayah
-        - text
+        - title
+        - bodyMarkdown
       properties:
-        surah:
+        title:
           type: string
-        ayah:
-          type: integer
-        text:
+          minLength: 3
+          maxLength: 120
+        description:
           type: string
-        translation:
+          maxLength: 300
+        bodyMarkdown:
           type: string
-    Recitation:
-      type: object
-      properties:
-        id:
-          type: string
-        verse_id:
-          type: string
-        audio_url:
-          type: string
-        reciter:
-          type: string
-    Meta:
-      type: object
-      properties:
-        page:
-          type: integer
-        limit:
-          type: integer
-        total:
-          type: integer
+        tags:
+          type: array
+          items:
+            type: string
+            maxLength: 20
+          maxItems: 4
   responses:
-    BadRequest:
-      description: Invalid request
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              message:
-                type: string
     NotFound:
       description: Resource not found
       content:
@@ -194,4 +274,17 @@ components:
             properties:
               message:
                 type: string
+                example: Resource not found
+    BadRequest:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Invalid input
+    Unauthorized:
+      description: Authentication required
 ```
