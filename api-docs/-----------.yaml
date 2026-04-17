@@ -1,313 +1,194 @@
-```yaml
-openapi: 3.0.3
+```yml
+openapi: 3.0.0
 info:
-  title: سرویس کود کشاورزی
-  description: مدیریت موجودی، سفارش و توزیع کودهای کشاورزی
+  title: سرویس کد کشاورزی
+  description: API برای مدیریت کد کشاورزی
   version: 1.0.0
 servers:
   - url: https://kalatakco.com/
+    description: سرور اصلی
 paths:
-  /fertilizers:
+  /kod:
     get:
-      summary: دریافت فهرست کودها
-      description: بازگرداندن لیستی از تمام کودهای ثبت شده به همراه فیلترهای قابل تنظیم
-      operationId: listFertilizers
+      summary: دریافت لیست کد کشاورزی
+      description: دریافت لیست تمام کد کشاورزی
+      operationId: getKodList
+      tags:
+        - کد کشاورزی
+      responses:
+        '200':
+          description: لیست کد کشاورزی
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Kod'
+        '500':
+          description: خطای سرور
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: ایجاد کد کشاورزی جدید
+      description: ایجاد یک کد کشاورزی جدید
+      operationId: createKod
+      tags:
+        - کد کشاورزی
+      requestBody:
+        description: اطلاعات کد کشاورزی جدید
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Kod'
+      responses:
+        '201':
+          description: کد کشاورزی ایجاد شده
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Kod'
+        '400':
+          description: درخواست نامعتبر
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /kod/{id}:
+    get:
+      summary: دریافت اطلاعات کد کشاورزی
+      description: دریافت اطلاعات یک کد کشاورزی
+      operationId: getKod
+      tags:
+        - کد کشاورزی
       parameters:
-        - name: type
-          in: query
-          description: نوع کود (کود شیمیایی، زیستی، آلی)
-          required: false
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: شناسه کد کشاورزی
+      responses:
+        '200':
+          description: اطلاعات کد کشاورزی
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Kod'
+        '404':
+          description: کد کشاورزی پیدا نشد
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: ویرایش کد کشاورزی
+      description: ویرایش یک کد کشاورزی
+      operationId: updateKod
+      tags:
+        - کد کشاورزی
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: شناسه کد کشاورزی
+      requestBody:
+        description: اطلاعات ویرایش شده کد کشاورزی
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Kod'
+      responses:
+        '200':
+          description: کد کشاورزی ویرایش شده
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Kod'
+        '400':
+          description: درخواست نامعتبر
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: حذف کد کشاورزی
+      description: حذف یک کد کشاورزی
+      operationId: deleteKod
+      tags:
+        - کد کشاورزی
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: شناسه کد کشاورزی
+      responses:
+        '204':
+          description: کد کشاورزی حذف شده
+        '404':
+          description: کد کشاورزی پیدا نشد
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /kod/search:
+    get:
+      summary: جستجوی کد کشاورزی
+      description: جستجوی کد کشاورزی بر اساس نام یا شناسه
+      operationId: searchKod
+      tags:
+        - کد کشاورزی
+      parameters:
+        - in: query
+          name: query
           schema:
             type: string
-        - name: page
-          in: query
-          description: شماره صفحه
-          schema:
-            type: integer
-            default: 1
-        - name: limit
-          in: query
-          description: تعداد رکوردها در هر صفحه
-          schema:
-            type: integer
-            default: 20
+          required: true
+          description: نام یا شناسه کد کشاورزی
       responses:
         '200':
-          description: لیست کودها
+          description: نتایج جستجو
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Fertilizer'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Kod'
         '400':
-          $ref: '#/components/responses/BadRequest'
-    post:
-      summary: ثبت کود جدید
-      description: افزودن محصول جدید به سیستم توسط هماهنگ‌کننده یا مدیر
-      operationId: createFertilizer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FertilizerInput'
-      responses:
-        '201':
-          description: کود با موفقیت ایجاد شد
+          description: درخواست نامعتبر
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-  /fertilizers/{id}:
-    parameters:
-      - $ref: '#/components/parameters/FertilizerId'
-    get:
-      summary: دریافت جزئیات یک کود
-      description: نمایش اطلاعات کامل یک کود خاص
-      operationId: getFertilizer
-      responses:
-        '200':
-          description: اطلاعات کود
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Fertilizer'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    put:
-      summary: بروزرسانی اطلاعات کود
-      description: ویرایش مشخصات یک کود از پیش ثبت شده
-      operationId: updateFertilizer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FertilizerInput'
-      responses:
-        '200':
-          description: بروزرسانی موفق
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IdResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    delete:
-      summary: حذف کود
-      description: حذف منطقی کود از سیستم (soft delete)
-      operationId: deleteFertilizer
-      responses:
-        '204':
-          description: حذف موفق
-        '404':
-          $ref: '#/components/responses/NotFound'
-  /orders:
-    post:
-      summary: ثبت سفارش جدید
-      description: ثبت درخواست خرید کود کشاورز
-      operationId: createOrder
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OrderInput'
-      responses:
-        '201':
-          description: سفارش با موفقیت ثبت شد
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-  /orders/{id}:
-    parameters:
-      - $ref: '#/components/parameters/OrderId'
-    get:
-      summary: دریافت جزئیات سفارش
-      description: مشاهده وضعیت و اقلام سفارش
-      operationId: getOrder
-      responses:
-        '200':
-          description: سفارش
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    delete:
-      summary: لغو سفارش
-      description: لغو سفارش تا پیش از بارگیری نهایی
-      operationId: cancelOrder
-      responses:
-        '204':
-          description: لغو موفق
-        '400':
-          $ref: '#/components/responses/BadRequest'
+                $ref: '#/components/schemas/Error'
 components:
-  parameters:
-    FertilizerId:
-      name: id
-      in: path
-      required: true
-      description: شناسه یکتای کود
-      schema:
-        type: integer
-        format: int64
-    OrderId:
-      name: id
-      in: path
-      required: true
-      description: شناسه یکتای سفارش
-      schema:
-        type: integer
-        format: int64
   schemas:
-    Fertilizer:
+    Kod:
       type: object
       properties:
         id:
           type: integer
-          format: int64
-          description: شناسه
+          description: شناسه کد کشاورزی
         name:
           type: string
-          description: نام محصول
-        type:
+          description: نام کد کشاورزی
+        code:
           type: string
-          description: نوع (chemical, bio, organic)
-        unit:
-          type: string
-          description: واحد اندازه‌گیری (کیلوگرم، لیتر)
-        price:
-          type: number
-          description: قیمت هر واحد به ریال
-        stock:
-          type: number
-          description: موجودی در انبار
-    FertilizerInput:
-      type: object
+          description: کد کشاورزی
       required:
+        - id
         - name
-        - type
-        - unit
-        - price
-        - stock
-      properties:
-        name:
-          type: string
-          minLength: 2
-          maxLength: 100
-          description: نام
-        type:
-          type: string
-          enum: [chemical, bio, organic]
-          description: نوع کود
-        unit:
-          type: string
-          enum: [kg, liter]
-          description: واحد اندازه‌گیری
-        price:
-          type: number
-          minimum: 1000
-          description: قیمت هر واحد (ريال)
-        stock:
-          type: number
-          minimum: 0
-          description: موجودی اولیه
-    OrderInput:
+        - code
+    Error:
       type: object
+      properties:
+        message:
+          type: string
+          description: پیام خطا
       required:
-        - farmerId
-        - items
-      properties:
-        farmerId:
-          type: integer
-          description: شناسه کشاورز
-        deliveryAddress:
-          type: string
-          description: آدرس ارسال
-        items:
-          type: array
-          minItems: 1
-          items:
-            type: object
-            required:
-              - fertilizerId
-              - quantity
-            properties:
-              fertilizerId:
-                type: integer
-                description: شناسه کود
-              quantity:
-                type: number
-                description: مقدار سفارش (به واحد کود)
-    IdResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-          example: true
-        id:
-          type: integer
-          format: int64
-          description: شناسه رکورد ایجاد/بروزرسانی شده
-    Order:
-      allOf:
-        - type: object
-          properties:
-            id:
-              type: integer
-              format: int64
-            status:
-              type: string
-              enum: [pending, paid, shipped, delivered, cancelled]
-              description: وضعیت
-            totalPrice:
-              type: number
-              description: جمع کل سفارش
-            createdAt:
-              type: string
-              format: date-time
-              description: زمان ثبت
-        - $ref: '#/components/schemas/OrderInput'
-  responses:
-    BadRequest:
-      description: درخواست نامعتبر (پارامتر یا بدنه نادرست)
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              success:
-                type: boolean
-                example: false
-              message:
-                type: string
-                example: خطا در پارامتر ارسالی
-    NotFound:
-      description: رکورد مورد نظر یافت نشد
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              success:
-                type: boolean
-                example: false
-              message:
-                type: string
-                example: کود مورد نظر وجود ندارد
+        - message
 ```
