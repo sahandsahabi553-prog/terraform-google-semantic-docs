@@ -1,290 +1,276 @@
 ```yaml
-openapi: 3.0.3
+openapi: 3.0.0
 info:
-  title: Ayat Saadati Service
-  description: Centralized API for managing Ayat Saadati's professional profile, articles, and interactions.
+  title: Ayat Saadati Service API
+  description: |
+    Welcome to the Ayat Saadati Service API documentation. This API provides
+    endpoints for managing various resources related to the Ayat Saadati platform,
+    including articles, users, and more. This documentation aims to guide
+    developers through the available endpoints, request/response structures,
+    and authentication mechanisms.
+
+    **Key Features:**
+    - Create, Read, Update, and Delete (CRUD) operations for core resources.
+    - Secure access using API keys or token-based authentication (to be implemented).
+    - Detailed error responses for robust client-side handling.
+
+    We strive to provide a consistent and easy-to-use API experience.
   version: 1.0.0
-  contact:
-    name: API Support
-    email: support@ayatsaadati.dev
 servers:
-  - url: https://dev.to/ayat_saadati
-    description: Production server
-tags:
-  - name: Profile
-    description: Operations related to the user profile
-  - name: Articles
-    description: CRUD operations on articles
-  - name: Bookmarks
-    description: Save and manage bookmarked articles
+  - url: https://dev.to/ayat_saadat
+    description: Production server for Ayat Saadati service
 paths:
-  /profile:
-    get:
-      tags:
-        - Profile
-      summary: Get public profile
-      operationId: getProfile
-      responses:
-        '200':
-          description: Profile data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Profile'
-        '404':
-          $ref: '#/components/responses/NotFound'
   /articles:
     get:
-      tags:
-        - Articles
-      summary: List articles
-      operationId: listArticles
+      summary: Get all articles
+      description: Retrieve a list of all articles available on the platform, with optional filtering and pagination.
+      operationId: getAllArticles
       parameters:
-        - $ref: '#/components/parameters/limitQuery'
-        - $ref: '#/components/parameters/offsetQuery'
+        - name: limit
+          in: query
+          description: Maximum number of articles to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 10
+        - name: offset
+          in: query
+          description: Number of articles to skip for pagination
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            default: 0
       responses:
         '200':
-          description: Paginated article list
+          description: A paginated list of articles.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Article'
-                  total:
-                    type: integer
-                    example: 42
+                type: array
+                items:
+                  $ref: '#/components/schemas/Article'
+        '400':
+          description: Invalid query parameters.
     post:
-      tags:
-        - Articles
-      summary: Publish new article
+      summary: Create a new article
+      description: Submit new article data to create a new entry on the platform.
       operationId: createArticle
       requestBody:
+        description: Article object that needs to be added
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ArticleInput'
+              $ref: '#/components/schemas/NewArticle'
       responses:
         '201':
-          description: Created
+          description: Article created successfully.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Article'
         '400':
-          $ref: '#/components/responses/BadRequest'
-  /articles/{id}:
-    parameters:
-      - $ref: '#/components/parameters/articleId'
+          description: Invalid input provided.
+        '401':
+          description: Unauthorized request.
+  /articles/{articleId}:
     get:
-      tags:
-        - Articles
-      summary: Get single article
-      operationId: getArticle
+      summary: Get an article by ID
+      description: Retrieve a single article's details using its unique identifier.
+      operationId: getArticleById
+      parameters:
+        - name: articleId
+          in: path
+          description: ID of the article to retrieve
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
-          description: Article details
+          description: Article details found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Article'
         '404':
-          $ref: '#/components/responses/NotFound'
+          description: Article not found.
     put:
-      tags:
-        - Articles
-      summary: Update article
+      summary: Update an existing article
+      description: Update the details of an existing article identified by its ID.
       operationId: updateArticle
+      parameters:
+        - name: articleId
+          in: path
+          description: ID of the article to update
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
+        description: Article object with updated fields
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ArticleInput'
+              $ref: '#/components/schemas/UpdateArticle'
       responses:
         '200':
-          description: Updated
+          description: Article updated successfully.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Article'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          description: Invalid input provided.
         '404':
-          $ref: '#/components/responses/NotFound'
+          description: Article not found.
+        '401':
+          description: Unauthorized request.
     delete:
-      tags:
-        - Articles
-      summary: Delete article
+      summary: Delete an article
+      description: Remove an article from the platform using its unique identifier.
       operationId: deleteArticle
+      parameters:
+        - name: articleId
+          in: path
+          description: ID of the article to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '204':
-          description: Deleted
+          description: Article deleted successfully. No content.
         '404':
-          $ref: '#/components/responses/NotFound'
-  /bookmarks:
+          description: Article not found.
+        '401':
+          description: Unauthorized request.
+  /users/{userId}/articles:
     get:
-      tags:
-        - Bookmarks
-      summary: List bookmarked articles
-      operationId: listBookmarks
+      summary: Get articles by a specific user
+      description: Retrieve a list of all articles authored by a specific user.
+      operationId: getArticlesByUser
       parameters:
-        - $ref: '#/components/parameters/limitQuery'
-        - $ref: '#/components/parameters/offsetQuery'
+        - name: userId
+          in: path
+          description: ID of the user whose articles are to be retrieved
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          description: Maximum number of articles to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 10
       responses:
         '200':
-          description: Bookmarked articles
+          description: A list of articles by the specified user.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Article'
-                  total:
-                    type: integer
-                    example: 7
-    post:
-      tags:
-        - Bookmarks
-      summary: Bookmark an article
-      operationId: addBookmark
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - articleId
-              properties:
-                articleId:
-                  type: string
-                  format: uuid
-                  example: 123e4567-e89b-12d3-a456-426614174000
-      responses:
-        '201':
-          description: Bookmarked
-        '409':
-          description: Already bookmarked
+                type: array
+                items:
+                  $ref: '#/components/schemas/Article'
+        '404':
+          description: User not found.
 components:
-  parameters:
-    articleId:
-      name: id
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
-    limitQuery:
-      name: limit
-      in: query
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 20
-    offsetQuery:
-      name: offset
-      in: query
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
   schemas:
-    Profile:
-      type: object
-      properties:
-        username:
-          type: string
-          example: ayat_saadati
-        name:
-          type: string
-          example: Ayat Saadati
-        bio:
-          type: string
-          example: Software engineer & technical writer
-        followers:
-          type: integer
-          example: 1250
-        following:
-          type: integer
-          example: 300
     Article:
       type: object
       properties:
         id:
           type: string
           format: uuid
+          description: Unique identifier for the article.
+          readOnly: true
         title:
           type: string
-          example: Advanced OpenAPI Patterns
-        slug:
+          description: Title of the article.
+          example: "Understanding OpenAPI 3.0"
+        content:
           type: string
-          example: advanced-openapi-patterns
-        description:
+          description: Full content of the article, typically in Markdown or HTML.
+          example: "OpenAPI 3.0 is a specification for machine-readable interface files for describing, producing, consuming, and visualizing RESTful web services."
+        authorId:
           type: string
-          example: Deep dive into reusable components
+          format: uuid
+          description: Unique identifier for the author of the article.
+          example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
         tags:
           type: array
           items:
             type: string
-          example: [openapi, api-design]
-        publishedAt:
+          description: A list of tags associated with the article.
+          example: ["OpenAPI", "REST", "Documentation"]
+        createdAt:
           type: string
           format: date-time
-        readingTime:
-          type: integer
-          description: Estimated minutes to read
-          example: 5
-    ArticleInput:
-      type: object
+          description: Date and time when the article was created.
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          description: Date and time when the article was last updated.
+          readOnly: true
       required:
+        - id
         - title
-        - bodyMarkdown
+        - content
+        - authorId
+        - createdAt
+        - updatedAt
+    NewArticle:
+      type: object
       properties:
         title:
           type: string
-          minLength: 3
-          maxLength: 120
-        description:
+          description: Title of the new article.
+          example: "My First Article on Ayat Saadati"
+        content:
           type: string
-          maxLength: 300
-        bodyMarkdown:
+          description: Full content of the new article.
+          example: "This is the exciting content of my very first article. Hope you enjoy it!"
+        authorId:
           type: string
+          format: uuid
+          description: Unique identifier for the author creating the article.
+          example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
         tags:
           type: array
           items:
             type: string
-            maxLength: 20
-          maxItems: 4
-  responses:
-    NotFound:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              message:
-                type: string
-                example: Resource not found
-    BadRequest:
-      description: Validation error
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              message:
-                type: string
-                example: Invalid input
-    Unauthorized:
-      description: Authentication required
+          description: A list of tags to associate with the new article.
+          example: ["Beginner", "Welcome"]
+      required:
+        - title
+        - content
+        - authorId
+    UpdateArticle:
+      type: object
+      properties:
+        title:
+          type: string
+          description: New title for the article.
+          example: "Updated Title for My First Article"
+        content:
+          type: string
+          description: New full content for the article.
+          example: "The content of my first article has been updated with more details."
+        tags:
+          type: array
+          items:
+            type: string
+          description: An updated list of tags for the article.
+          example: ["Beginner", "Welcome", "Revised"]
+      # All fields are optional for update, as only specific fields might be changed
 ```
