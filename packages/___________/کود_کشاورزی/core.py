@@ -1,17 +1,13 @@
 ```python
 """
-A utility package for agricultural fertilizer calculations and information.
+یک ماژول کاربردی برای محاسبات و مدیریت کودهای کشاورزی.
 
-This package provides functions to assist farmers and agriculturalists with common tasks
-related to fertilizer management, including calculating nutrient requirements,
-converting between nutrient forms, estimating costs, and managing liquid fertilizer dilutions.
+این ماژول ابزارهایی را برای کشاورزان، متخصصان کشاورزی و باغبانان فراهم می‌کند تا بتوانند
+مقادیر مورد نیاز کود را محاسبه کنند، اطلاعات مربوط به کودهای رایج را بازیابی کنند،
+نرخ‌های کاربرد را بین واحدهای مختلف تبدیل کرده و تخمین هزینه را انجام دهند.
 
-Homepage: https://kalatakco.com/
-"""
-
-import math
-from typing import Dict, Union, Tuple, Optional
-
-# --- Constants for nutrient conversions ---
-# These factors are used to convert between elemental forms (P, K) and their oxide forms (P2O5, K2O).
-# P2O5 to P: Atomic weight P (30.97) * 2 / Molecular weight P2O5 (141.94) = 61
+امکانات اصلی:
+- محاسبه مقدار کود محصول مورد نیاز برای تامین یک مقدار مشخص ماده مغذی.
+- محاسبه مقدار ماده مغذی تامین شده توسط یک مقدار مشخص کود محصول.
+- تخمین هزینه کود بر اساس مقدار و قیمت واحد.
+- بازیابی اطلاعات (درصد NPK) برای کودهای شیمیایی رایج
