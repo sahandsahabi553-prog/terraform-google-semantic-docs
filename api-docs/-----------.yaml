@@ -1,194 +1,69 @@
-```yml
+```yaml
 openapi: 3.0.0
 info:
-  title: سرویس کد کشاورزی
-  description: API برای مدیریت کد کشاورزی
+  title: سرویس مدیریت کودهای کشاورزی
+  description: API برای مدیریت و دسترسی به اطلاعات کودهای کشاورزی شامل افزودن، مشاهده، به‌روزرسانی و حذف کودها. این سرویس به کشاورزان و فروشندگان کود کمک می‌کند تا موجودی و مشخصات کودها را به صورت کارآمدی مدیریت کنند.
   version: 1.0.0
 servers:
   - url: https://kalatakco.com/
-    description: سرور اصلی
+    description: سرور اصلی خدمات کود کشاورزی
+tags:
+  - name: مدیریت کودها
+    description: عملیات مربوط به مشاهده، افزودن، به‌روزرسانی و حذف کودهای کشاورزی.
 paths:
-  /kod:
+  /fertilizers:
     get:
-      summary: دریافت لیست کد کشاورزی
-      description: دریافت لیست تمام کد کشاورزی
-      operationId: getKodList
       tags:
-        - کد کشاورزی
+        - مدیریت کودها
+      summary: دریافت لیست همه کودها
+      description: این عملیات لیست کاملی از کودهای کشاورزی موجود را بازمی‌گرداند. امکان فیلتر کردن بر اساس نام یا نوع کود برای جستجوی دقیق‌تر وجود دارد.
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          description: نام تجاری یا عمومی کود برای فیلتر کردن (جستجوی جزئی)
+          example: اوره
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum: [شیمیایی, آلی, زیستی, NPK, ریزمغذی]
+          description: نوع کود برای فیلتر کردن
+          example: شیمیایی
       responses:
         '200':
-          description: لیست کد کشاورزی
+          description: لیست کودها با موفقیت دریافت شد.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Kod'
+                  $ref: '#/components/schemas/Fertilizer'
+        '400':
+          description: درخواست نامعتبر. پارامترهای ارسالی صحیح نیستند.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
-          description: خطای سرور
+          description: خطای داخلی سرور. مشکلی در پردازش درخواست پیش آمده است.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      summary: ایجاد کد کشاورزی جدید
-      description: ایجاد یک کد کشاورزی جدید
-      operationId: createKod
       tags:
-        - کد کشاورزی
+        - مدیریت کودها
+      summary: افزودن یک کود جدید
+      description: این عملیات امکان افزودن یک کود کشاورزی جدید به سیستم را فراهم می‌کند. تمام مشخصات کود باید در بدنه درخواست ارسال شود.
       requestBody:
-        description: اطلاعات کد کشاورزی جدید
+        description: مشخصات کامل کود جدیدی که قرار است اضافه شود.
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Kod'
+              $ref: '#/components/schemas/NewFertilizer'
       responses:
         '201':
-          description: کد کشاورزی ایجاد شده
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Kod'
-        '400':
-          description: درخواست نامعتبر
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /kod/{id}:
-    get:
-      summary: دریافت اطلاعات کد کشاورزی
-      description: دریافت اطلاعات یک کد کشاورزی
-      operationId: getKod
-      tags:
-        - کد کشاورزی
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
-          description: شناسه کد کشاورزی
-      responses:
-        '200':
-          description: اطلاعات کد کشاورزی
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Kod'
-        '404':
-          description: کد کشاورزی پیدا نشد
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    put:
-      summary: ویرایش کد کشاورزی
-      description: ویرایش یک کد کشاورزی
-      operationId: updateKod
-      tags:
-        - کد کشاورزی
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
-          description: شناسه کد کشاورزی
-      requestBody:
-        description: اطلاعات ویرایش شده کد کشاورزی
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Kod'
-      responses:
-        '200':
-          description: کد کشاورزی ویرایش شده
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Kod'
-        '400':
-          description: درخواست نامعتبر
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    delete:
-      summary: حذف کد کشاورزی
-      description: حذف یک کد کشاورزی
-      operationId: deleteKod
-      tags:
-        - کد کشاورزی
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
-          description: شناسه کد کشاورزی
-      responses:
-        '204':
-          description: کد کشاورزی حذف شده
-        '404':
-          description: کد کشاورزی پیدا نشد
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /kod/search:
-    get:
-      summary: جستجوی کد کشاورزی
-      description: جستجوی کد کشاورزی بر اساس نام یا شناسه
-      operationId: searchKod
-      tags:
-        - کد کشاورزی
-      parameters:
-        - in: query
-          name: query
-          schema:
-            type: string
-          required: true
-          description: نام یا شناسه کد کشاورزی
-      responses:
-        '200':
-          description: نتایج جستجو
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Kod'
-        '400':
-          description: درخواست نامعتبر
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-components:
-  schemas:
-    Kod:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: شناسه کد کشاورزی
-        name:
-          type: string
-          description: نام کد کشاورزی
-        code:
-          type: string
-          description: کد کشاورزی
-      required:
-        - id
-        - name
-        - code
-    Error:
-      type: object
-      properties:
-        message:
-          type: string
-          description: پیام خطا
-      required:
-        - message
-```
+          description: کود با موفقیت ایجاد شد و شناسه جدید به آن اختصاص
