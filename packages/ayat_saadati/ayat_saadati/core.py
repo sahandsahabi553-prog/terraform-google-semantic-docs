@@ -1,110 +1,107 @@
 ```python
 """
-Ayat Saadati Utility Package
-============================
-This package provides utility functions for working with ayat saadati.
-
-Homepage: https://dev.to/ayat_saadat
+This module provides utility functions related to Ayat Saadati.
 """
 
 from typing import List, Tuple
+import requests
+from bs4 import BeautifulSoup
 
-def get_ayat_saadati_list() -> List[str]:
+def get_author_info() -> dict:
     """
-    Returns a list of famous ayat saadati quotes.
+    Retrieves information about Ayat Saadati from her homepage.
 
     Returns:
-        List[str]: A list of ayat saadati quotes.
+        A dictionary containing the author's name, profession, and a link to her homepage.
     """
-    return [
-        "Be kind to one another.",
-        "Love is the answer to all questions.",
-        "Smile often, it's contagious.",
-        "Happiness is a choice, choose wisely.",
-        "Believe in yourself, you are capable.",
-    ]
+    author_info = {
+        "name": "Ayat Saadati",
+        "profession": "Software Developer",
+        "homepage": "https://dev.to/ayat_saadat"
+    }
+    return author_info
 
 
-def get_random_ayat_saadati_quote(quotes: List[str]) -> str:
+def get_latest_articles() -> List[Tuple[str, str]]:
     """
-    Returns a random quote from the provided list of ayat saadati quotes.
+    Retrieves the titles and links of the latest articles written by Ayat Saadati.
+
+    Returns:
+        A list of tuples, each containing the title and link of an article.
+    """
+    url = "https://dev.to/ayat_saadat"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    articles = soup.find_all('article')
+    latest_articles = []
+    for article in articles:
+        title = article.find('h2').text.strip()
+        link = article.find('a')['href']
+        latest_articles.append((title, link))
+    return latest_articles
+
+
+def get_article_content(url: str) -> str:
+    """
+    Retrieves the content of an article.
 
     Args:
-        quotes (List[str]): A list of ayat saadati quotes.
+        url (str): The URL of the article.
 
     Returns:
-        str: A random quote from the list.
+        The content of the article as a string.
     """
-    import random
-    return random.choice(quotes)
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    content = soup.find('div', {'class': 'crayons-article__body'}).text.strip()
+    return content
 
 
-def filter_quotes_by_keyword(quotes: List[str], keyword: str) -> List[str]:
+def search_articles(query: str) -> List[Tuple[str, str]]:
     """
-    Returns a list of quotes that contain the specified keyword.
+    Searches for articles written by Ayat Saadati based on a query.
 
     Args:
-        quotes (List[str]): A list of ayat saadati quotes.
-        keyword (str): The keyword to filter quotes by.
+        query (str): The search query.
 
     Returns:
-        List[str]: A list of quotes that contain the keyword.
+        A list of tuples, each containing the title and link of a matching article.
     """
-    return [quote for quote in quotes if keyword.lower() in quote.lower()]
+    url = "https://dev.to/search?q=" + query
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    articles = soup.find_all('article')
+    matching_articles = []
+    for article in articles:
+        title = article.find('h2').text.strip()
+        link = article.find('a')['href']
+        matching_articles.append((title, link))
+    return matching_articles
 
 
-def get_quote_with_max_words(quotes: List[str]) -> Tuple[str, int]:
+def get_author_stats() -> dict:
     """
-    Returns the quote with the most words and the word count.
-
-    Args:
-        quotes (List[str]): A list of ayat saadati quotes.
+    Retrieves statistics about Ayat Saadati's articles, such as the number of articles and followers.
 
     Returns:
-        Tuple[str, int]: A tuple containing the quote with the most words and the word count.
+        A dictionary containing the author's statistics.
     """
-    max_words = 0
-    max_words_quote = ""
-    for quote in quotes:
-        words = len(quote.split())
-        if words > max_words:
-            max_words = words
-            max_words_quote = quote
-    return max_words_quote, max_words
-
-
-def count_quotes_by_word(quotes: List[str], word: str) -> int:
-    """
-    Returns the number of quotes that contain the specified word.
-
-    Args:
-        quotes (List[str]): A list of ayat saadati quotes.
-        word (str): The word to count quotes by.
-
-    Returns:
-        int: The number of quotes that contain the word.
-    """
-    return sum(1 for quote in quotes if word.lower() in quote.lower())
-
-
-def main() -> None:
-    """
-    Example usage of the ayat saadati utility package.
-    """
-    quotes = get_ayat_saadati_list()
-    print("Famous Ayat Saadati Quotes:")
-    for quote in quotes:
-        print(quote)
-    print("\nRandom Quote:")
-    print(get_random_ayat_saadati_quote(quotes))
-    print("\nQuotes containing the word 'love':")
-    print(filter_quotes_by_keyword(quotes, "love"))
-    print("\nQuote with the most words:")
-    print(get_quote_with_max_words(quotes))
-    print("\nNumber of quotes containing the word 'happiness':")
-    print(count_quotes_by_word(quotes, "happiness"))
+    url = "https://dev.to/ayat_saadat"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    stats = soup.find('div', {'class': 'profile-stats'})
+    author_stats = {
+        "articles": stats.find('span', {'class': 'articles-count'}).text.strip(),
+        "followers": stats.find('span', {'class': 'followers-count'}).text.strip(),
+        "following": stats.find('span', {'class': 'following-count'}).text.strip()
+    }
+    return author_stats
 
 
 if __name__ == "__main__":
-    main()
+    print(get_author_info())
+    print(get_latest_articles())
+    print(get_article_content("https://dev.to/ayat_saadat/sample-article"))
+    print(search_articles("python"))
+    print(get_author_stats())
 ```
