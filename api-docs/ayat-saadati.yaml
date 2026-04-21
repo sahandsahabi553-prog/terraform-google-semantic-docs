@@ -4,21 +4,21 @@ info:
   title: Ayat Saadati Service
   description: API documentation for Ayat Saadati service
   version: 1.0.0
+  contact:
+    name: Ayat Saadati
+    url: https://dev.to/ayat_saadat
+    email: ayat.saadat@example.com
 servers:
   - url: https://dev.to/ayat_saadat
     description: Development server
-tags:
-  - name: users
-    description: User management
-  - name: posts
-    description: Post management
 paths:
   /users:
     get:
-      tags:
-        - users
       summary: Retrieve a list of users
       description: Returns a list of all users
+      operationId: getUsers
+      tags:
+        - Users
       responses:
         '200':
           description: A list of users
@@ -35,12 +35,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      tags:
-        - users
       summary: Create a new user
       description: Creates a new user
+      operationId: createUser
+      tags:
+        - Users
       requestBody:
-        required: true
+        description: User to create
         content:
           application/json:
             schema:
@@ -60,16 +61,18 @@ paths:
                 $ref: '#/components/schemas/Error'
   /users/{userId}:
     get:
-      tags:
-        - users
       summary: Retrieve a user by ID
       description: Returns a user by ID
+      operationId: getUserById
+      tags:
+        - Users
       parameters:
         - in: path
           name: userId
-          required: true
           schema:
             type: integer
+          required: true
+          description: User ID
       responses:
         '200':
           description: A user
@@ -84,18 +87,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
-      tags:
-        - users
       summary: Update a user
       description: Updates a user
+      operationId: updateUser
+      tags:
+        - Users
       parameters:
         - in: path
           name: userId
-          required: true
           schema:
             type: integer
+          required: true
+          description: User ID
       requestBody:
-        required: true
+        description: User to update
         content:
           application/json:
             schema:
@@ -114,16 +119,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
-      tags:
-        - users
       summary: Delete a user
       description: Deletes a user
+      operationId: deleteUser
+      tags:
+        - Users
       parameters:
         - in: path
           name: userId
-          required: true
           schema:
             type: integer
+          required: true
+          description: User ID
       responses:
         '204':
           description: User deleted
@@ -135,10 +142,11 @@ paths:
                 $ref: '#/components/schemas/Error'
   /posts:
     get:
-      tags:
-        - posts
       summary: Retrieve a list of posts
       description: Returns a list of all posts
+      operationId: getPosts
+      tags:
+        - Posts
       responses:
         '200':
           description: A list of posts
@@ -155,12 +163,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      tags:
-        - posts
       summary: Create a new post
       description: Creates a new post
+      operationId: createPost
+      tags:
+        - Posts
       requestBody:
-        required: true
+        description: Post to create
         content:
           application/json:
             schema:
@@ -178,31 +187,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /posts/{postId}:
-    get:
-      tags:
-        - posts
-      summary: Retrieve a post by ID
-      description: Returns a post by ID
-      parameters:
-        - in: path
-          name: postId
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: A post
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Post'
-        '404':
-          description: Post not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
 components:
   schemas:
     User:
@@ -210,10 +194,13 @@ components:
       properties:
         id:
           type: integer
+          description: User ID
         name:
           type: string
+          description: User name
         email:
           type: string
+          description: User email
       required:
         - id
         - name
@@ -223,10 +210,13 @@ components:
       properties:
         id:
           type: integer
+          description: Post ID
         title:
           type: string
+          description: Post title
         content:
           type: string
+          description: Post content
       required:
         - id
         - title
@@ -234,11 +224,13 @@ components:
     Error:
       type: object
       properties:
-        message:
-          type: string
         code:
           type: integer
+          description: Error code
+        message:
+          type: string
+          description: Error message
       required:
-        - message
         - code
+        - message
 ```
