@@ -1,107 +1,104 @@
 ```python
 """
-This module provides utility functions related to Ayat Saadati.
+Ayat Saadati Utility Package
+
+This package is designed to provide a set of useful functions for working with Ayat Saadati.
+It includes functions for generating random quotes, retrieving quotes by topic, and more.
+
+Homepage: https://dev.to/ayat_saadat
 """
 
-from typing import List, Tuple
+from typing import List
 import requests
-from bs4 import BeautifulSoup
+import random
 
-def get_author_info() -> dict:
+def get_quote_of_the_day() -> str:
     """
-    Retrieves information about Ayat Saadati from her homepage.
+    Retrieves the quote of the day from the Ayat Saadati API.
 
     Returns:
-        A dictionary containing the author's name, profession, and a link to her homepage.
+        str: The quote of the day.
     """
-    author_info = {
-        "name": "Ayat Saadati",
-        "profession": "Software Developer",
-        "homepage": "https://dev.to/ayat_saadat"
-    }
-    return author_info
+    response = requests.get("https://api.ayat-saadati.com/quote-of-the-day")
+    if response.status_code == 200:
+        return response.json()["quote"]
+    else:
+        return "Failed to retrieve quote of the day."
 
-
-def get_latest_articles() -> List[Tuple[str, str]]:
+def get_quotes_by_topic(topic: str) -> List[str]:
     """
-    Retrieves the titles and links of the latest articles written by Ayat Saadati.
-
-    Returns:
-        A list of tuples, each containing the title and link of an article.
-    """
-    url = "https://dev.to/ayat_saadat"
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    articles = soup.find_all('article')
-    latest_articles = []
-    for article in articles:
-        title = article.find('h2').text.strip()
-        link = article.find('a')['href']
-        latest_articles.append((title, link))
-    return latest_articles
-
-
-def get_article_content(url: str) -> str:
-    """
-    Retrieves the content of an article.
+    Retrieves a list of quotes related to the specified topic.
 
     Args:
-        url (str): The URL of the article.
+        topic (str): The topic to retrieve quotes for.
 
     Returns:
-        The content of the article as a string.
+        List[str]: A list of quotes related to the specified topic.
     """
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    content = soup.find('div', {'class': 'crayons-article__body'}).text.strip()
-    return content
+    response = requests.get(f"https://api.ayat-saadati.com/quotes?topic={topic}")
+    if response.status_code == 200:
+        return response.json()["quotes"]
+    else:
+        return []
 
-
-def search_articles(query: str) -> List[Tuple[str, str]]:
+def generate_random_quote() -> str:
     """
-    Searches for articles written by Ayat Saadati based on a query.
+    Generates a random quote from the Ayat Saadati API.
+
+    Returns:
+        str: A random quote.
+    """
+    response = requests.get("https://api.ayat-saadati.com/random-quote")
+    if response.status_code == 200:
+        return response.json()["quote"]
+    else:
+        return "Failed to generate random quote."
+
+def get_quote_by_id(quote_id: int) -> str:
+    """
+    Retrieves a quote by its ID.
 
     Args:
-        query (str): The search query.
+        quote_id (int): The ID of the quote to retrieve.
 
     Returns:
-        A list of tuples, each containing the title and link of a matching article.
+        str: The quote with the specified ID.
     """
-    url = "https://dev.to/search?q=" + query
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    articles = soup.find_all('article')
-    matching_articles = []
-    for article in articles:
-        title = article.find('h2').text.strip()
-        link = article.find('a')['href']
-        matching_articles.append((title, link))
-    return matching_articles
+    response = requests.get(f"https://api.ayat-saadati.com/quote/{quote_id}")
+    if response.status_code == 200:
+        return response.json()["quote"]
+    else:
+        return "Failed to retrieve quote."
 
-
-def get_author_stats() -> dict:
+def search_quotes(query: str) -> List[str]:
     """
-    Retrieves statistics about Ayat Saadati's articles, such as the number of articles and followers.
+    Searches for quotes containing the specified query.
+
+    Args:
+        query (str): The query to search for.
 
     Returns:
-        A dictionary containing the author's statistics.
+        List[str]: A list of quotes containing the specified query.
     """
-    url = "https://dev.to/ayat_saadat"
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    stats = soup.find('div', {'class': 'profile-stats'})
-    author_stats = {
-        "articles": stats.find('span', {'class': 'articles-count'}).text.strip(),
-        "followers": stats.find('span', {'class': 'followers-count'}).text.strip(),
-        "following": stats.find('span', {'class': 'following-count'}).text.strip()
-    }
-    return author_stats
+    response = requests.get(f"https://api.ayat-saadati.com/search?query={query}")
+    if response.status_code == 200:
+        return response.json()["quotes"]
+    else:
+        return []
 
+def main() -> None:
+    """
+    Example usage of the Ayat Saadati utility package.
+
+    Returns:
+        None
+    """
+    print("Quote of the day:", get_quote_of_the_day())
+    print("Quotes by topic:", get_quotes_by_topic("inspiration"))
+    print("Random quote:", generate_random_quote())
+    print("Quote by ID:", get_quote_by_id(1))
+    print("Search results:", search_quotes("success"))
 
 if __name__ == "__main__":
-    print(get_author_info())
-    print(get_latest_articles())
-    print(get_article_content("https://dev.to/ayat_saadat/sample-article"))
-    print(search_articles("python"))
-    print(get_author_stats())
+    main()
 ```
