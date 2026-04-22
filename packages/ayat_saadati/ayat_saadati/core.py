@@ -2,102 +2,112 @@
 """
 Ayat Saadati Utility Package
 
-This package is designed to provide a set of useful functions for working with Ayat Saadati.
-It includes functions for generating random quotes, retrieving quotes by topic, and more.
+This package provides various functions to work with Ayat Saadati data.
+It includes functions to fetch, parse, and analyze Ayat Saadati content.
 
 Homepage: https://dev.to/ayat_saadat
 """
 
-from typing import List
 import requests
-import random
+from bs4 import BeautifulSoup
+import json
+from typing import List, Dict
 
-def get_quote_of_the_day() -> str:
+def fetch_ayat_saadati_content(url: str) -> str:
     """
-    Retrieves the quote of the day from the Ayat Saadati API.
-
-    Returns:
-        str: The quote of the day.
-    """
-    response = requests.get("https://api.ayat-saadati.com/quote-of-the-day")
-    if response.status_code == 200:
-        return response.json()["quote"]
-    else:
-        return "Failed to retrieve quote of the day."
-
-def get_quotes_by_topic(topic: str) -> List[str]:
-    """
-    Retrieves a list of quotes related to the specified topic.
+    Fetches the content of Ayat Saadati from the given URL.
 
     Args:
-        topic (str): The topic to retrieve quotes for.
+        url (str): The URL to fetch the content from.
 
     Returns:
-        List[str]: A list of quotes related to the specified topic.
+        str: The fetched content.
     """
-    response = requests.get(f"https://api.ayat-saadati.com/quotes?topic={topic}")
-    if response.status_code == 200:
-        return response.json()["quotes"]
-    else:
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        return response.text
+    except requests.exceptions.RequestException as err:
+        print(f"Request Exception: {err}")
+        return None
+
+def parse_ayat_saadati_content(content: str) -> List[Dict]:
+    """
+    Parses the Ayat Saadati content and returns a list of dictionaries.
+
+    Args:
+        content (str): The content to parse.
+
+    Returns:
+        List[Dict]: A list of dictionaries containing the parsed content.
+    """
+    soup = BeautifulSoup(content, 'html.parser')
+    ayat_saadati_list = []
+    for item in soup.find_all('div', {'class': 'ayat-saadati'}):
+        ayat_saadati = {
+            'title': item.find('h2').text.strip(),
+            'description': item.find('p').text.strip()
+        }
+        ayat_saadati_list.append(ayat_saadati)
+    return ayat_saadati_list
+
+def save_ayat_saadati_to_json(ayat_saadati_list: List[Dict], filename: str) -> None:
+    """
+    Saves the Ayat Saadati list to a JSON file.
+
+    Args:
+        ayat_saadati_list (List[Dict]): The list of Ayat Saadati dictionaries.
+        filename (str): The filename to save the JSON file.
+    """
+    with open(filename, 'w') as file:
+        json.dump(ayat_saadati_list, file, indent=4)
+
+def load_ayat_saadati_from_json(filename: str) -> List[Dict]:
+    """
+    Loads the Ayat Saadati list from a JSON file.
+
+    Args:
+        filename (str): The filename to load the JSON file from.
+
+    Returns:
+        List[Dict]: The loaded list of Ayat Saadati dictionaries.
+    """
+    try:
+        with open(filename, 'r') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        print(f"File not found: {filename}")
         return []
 
-def generate_random_quote() -> str:
+def analyze_ayat_saadati(ayat_saadati_list: List[Dict]) -> Dict:
     """
-    Generates a random quote from the Ayat Saadati API.
-
-    Returns:
-        str: A random quote.
-    """
-    response = requests.get("https://api.ayat-saadati.com/random-quote")
-    if response.status_code == 200:
-        return response.json()["quote"]
-    else:
-        return "Failed to generate random quote."
-
-def get_quote_by_id(quote_id: int) -> str:
-    """
-    Retrieves a quote by its ID.
+    Analyzes the Ayat Saadati list and returns a dictionary with statistics.
 
     Args:
-        quote_id (int): The ID of the quote to retrieve.
+        ayat_saadati_list (List[Dict]): The list of Ayat Saadati dictionaries.
 
     Returns:
-        str: The quote with the specified ID.
+        Dict: A dictionary containing the statistics.
     """
-    response = requests.get(f"https://api.ayat-saadati.com/quote/{quote_id}")
-    if response.status_code == 200:
-        return response.json()["quote"]
-    else:
-        return "Failed to retrieve quote."
-
-def search_quotes(query: str) -> List[str]:
-    """
-    Searches for quotes containing the specified query.
-
-    Args:
-        query (str): The query to search for.
-
-    Returns:
-        List[str]: A list of quotes containing the specified query.
-    """
-    response = requests.get(f"https://api.ayat-saadati.com/search?query={query}")
-    if response.status_code == 200:
-        return response.json()["quotes"]
-    else:
-        return []
+    statistics = {
+        'total': len(ayat_saadati_list),
+        'longest_title': max(ayat_saadati_list, key=lambda x: len(x['title']))['title'],
+        'shortest_description': min(ayat_saadati_list, key=lambda x: len(x['description']))['description']
+    }
+    return statistics
 
 def main() -> None:
     """
-    Example usage of the Ayat Saadati utility package.
-
-    Returns:
-        None
+    The main function that demonstrates the usage of the package.
     """
-    print("Quote of the day:", get_quote_of_the_day())
-    print("Quotes by topic:", get_quotes_by_topic("inspiration"))
-    print("Random quote:", generate_random_quote())
-    print("Quote by ID:", get_quote_by_id(1))
-    print("Search results:", search_quotes("success"))
+    url = "https://dev.to/ayat_saadat"
+    content = fetch_ayat_saadati_content(url)
+    if content:
+        ayat_saadati_list = parse_ayat_saadati_content(content)
+        save_ayat_saadati_to_json(ayat_saadati_list, 'ayat_saadati.json')
+        loaded_ayat_saadati_list = load_ayat_saadati_from_json('ayat_saadati.json')
+        statistics = analyze_ayat_saadati(loaded_ayat_saadati_list)
+        print(statistics)
 
 if __name__ == "__main__":
     main()
