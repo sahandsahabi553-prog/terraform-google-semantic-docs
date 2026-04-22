@@ -1,69 +1,140 @@
-```yaml
+```yml
 openapi: 3.0.0
 info:
-  title: سرویس مدیریت کودهای کشاورزی
-  description: API برای مدیریت و دسترسی به اطلاعات کودهای کشاورزی شامل افزودن، مشاهده، به‌روزرسانی و حذف کودها. این سرویس به کشاورزان و فروشندگان کود کمک می‌کند تا موجودی و مشخصات کودها را به صورت کارآمدی مدیریت کنند.
+  title: سرویس کد کشاورزی
+  description: API برای مدیریت کد کشاورزی
   version: 1.0.0
 servers:
   - url: https://kalatakco.com/
-    description: سرور اصلی خدمات کود کشاورزی
+    description: سرور اصلی
 tags:
-  - name: مدیریت کودها
-    description: عملیات مربوط به مشاهده، افزودن، به‌روزرسانی و حذف کودهای کشاورزی.
+  - name: کد کشاورزی
+    description: مدیریت کد کشاورزی
 paths:
-  /fertilizers:
+  /codes:
     get:
       tags:
-        - مدیریت کودها
-      summary: دریافت لیست همه کودها
-      description: این عملیات لیست کاملی از کودهای کشاورزی موجود را بازمی‌گرداند. امکان فیلتر کردن بر اساس نام یا نوع کود برای جستجوی دقیق‌تر وجود دارد.
-      parameters:
-        - in: query
-          name: name
-          schema:
-            type: string
-          description: نام تجاری یا عمومی کود برای فیلتر کردن (جستجوی جزئی)
-          example: اوره
-        - in: query
-          name: type
-          schema:
-            type: string
-            enum: [شیمیایی, آلی, زیستی, NPK, ریزمغذی]
-          description: نوع کود برای فیلتر کردن
-          example: شیمیایی
+        - کد کشاورزی
+      summary: دریافت لیست کد کشاورزی
+      description: دریافت لیست tất cả کد کشاورزی
+      operationId: getCodes
       responses:
         '200':
-          description: لیست کودها با موفقیت دریافت شد.
+          description: لیست کد کشاورزی
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Fertilizer'
-        '400':
-          description: درخواست نامعتبر. پارامترهای ارسالی صحیح نیستند.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+                  $ref: '#/components/schemas/Code'
         '500':
-          description: خطای داخلی سرور. مشکلی در پردازش درخواست پیش آمده است.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: خطای داخلی سرور
     post:
       tags:
-        - مدیریت کودها
-      summary: افزودن یک کود جدید
-      description: این عملیات امکان افزودن یک کود کشاورزی جدید به سیستم را فراهم می‌کند. تمام مشخصات کود باید در بدنه درخواست ارسال شود.
+        - کد کشاورزی
+      summary: ایجاد کد کشاورزی جدید
+      description: ایجاد کد کشاورزی جدید
+      operationId: createCode
       requestBody:
-        description: مشخصات کامل کود جدیدی که قرار است اضافه شود.
-        required: true
+        description: کد کشاورزی جدید
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewFertilizer'
+              $ref: '#/components/schemas/Code'
       responses:
         '201':
-          description: کود با موفقیت ایجاد شد و شناسه جدید به آن اختصاص
+          description: کد کشاورزی جدید ایجاد شد
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Code'
+        '400':
+          description: درخواست نامعتبر
+  /codes/{codeId}:
+    get:
+      tags:
+        - کد کشاورزی
+      summary: دریافت کد کشاورزی
+      description: دریافت کد کشاورزی با شناسه مشخص
+      operationId: getCode
+      parameters:
+        - in: path
+          name: codeId
+          schema:
+            type: integer
+          required: true
+          description: شناسه کد کشاورزی
+      responses:
+        '200':
+          description: کد کشاورزی
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Code'
+        '404':
+          description: کد کشاورزی یافت نشد
+    put:
+      tags:
+        - کد کشاورزی
+      summary: ویرایش کد کشاورزی
+      description: ویرایش کد کشاورزی با شناسه مشخص
+      operationId: updateCode
+      parameters:
+        - in: path
+          name: codeId
+          schema:
+            type: integer
+          required: true
+          description: شناسه کد کشاورزی
+      requestBody:
+        description: کد کشاورزی ویرایش شده
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Code'
+      responses:
+        '200':
+          description: کد کشاورزی ویرایش شد
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Code'
+        '400':
+          description: درخواست نامعتبر
+    delete:
+      tags:
+        - کد کشاورزی
+      summary: حذف کد کشاورزی
+      description: حذف کد کشاورزی با شناسه مشخص
+      operationId: deleteCode
+      parameters:
+        - in: path
+          name: codeId
+          schema:
+            type: integer
+          required: true
+          description: شناسه کد کشاورزی
+      responses:
+        '204':
+          description: کد کشاورزی حذف شد
+        '404':
+          description: کد کشاورزی یافت نشد
+components:
+  schemas:
+    Code:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: شناسه کد کشاورزی
+        name:
+          type: string
+          description: نام کد کشاورزی
+        description:
+          type: string
+          description: توضیحات کد کشاورزی
+      required:
+        - id
+        - name
+        - description
+```
