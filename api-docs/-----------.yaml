@@ -1,140 +1,241 @@
 ```yml
 openapi: 3.0.0
 info:
-  title: سرویس کد کشاورزی
-  description: API برای مدیریت کد کشاورزی
+  title: سرویس کود کشاورزی
+  description: API برای مدیریت کود کشاورزی
   version: 1.0.0
 servers:
   - url: https://kalatakco.com/
     description: سرور اصلی
 tags:
-  - name: کد کشاورزی
-    description: مدیریت کد کشاورزی
+  - name: کود
+    description: عملیات مربوط به کود
+  - name: کشت
+    description: عملیات مربوط به کشت
 paths:
-  /codes:
+  /cuds:
     get:
       tags:
-        - کد کشاورزی
-      summary: دریافت لیست کد کشاورزی
-      description: دریافت لیست tất cả کد کشاورزی
-      operationId: getCodes
+        - کود
+      summary: دریافت لیست کودها
+      description: دریافت لیست تمام کودهای ثبت شده
+      operationId: getCuds
       responses:
         '200':
-          description: لیست کد کشاورزی
+          description: لیست کودها
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Code'
+                  $ref: '#/components/schemas/Cud'
         '500':
-          description: خطای داخلی سرور
+          description: خطای سرور
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
       tags:
-        - کد کشاورزی
-      summary: ایجاد کد کشاورزی جدید
-      description: ایجاد کد کشاورزی جدید
-      operationId: createCode
+        - کود
+      summary: ثبت کود جدید
+      description: ثبت یک کود جدید
+      operationId: createCud
       requestBody:
-        description: کد کشاورزی جدید
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Code'
+              $ref: '#/components/schemas/Cud'
       responses:
         '201':
-          description: کد کشاورزی جدید ایجاد شد
+          description: کود ثبت شد
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Code'
+                $ref: '#/components/schemas/Cud'
         '400':
-          description: درخواست نامعتبر
-  /codes/{codeId}:
+          description: داده‌های ورود نادرست
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /cuds/{cudId}:
     get:
       tags:
-        - کد کشاورزی
-      summary: دریافت کد کشاورزی
-      description: دریافت کد کشاورزی با شناسه مشخص
-      operationId: getCode
+        - کود
+      summary: دریافت کود
+      description: دریافت یک کود با شناسه مشخص
+      operationId: getCud
       parameters:
         - in: path
-          name: codeId
+          name: cudId
           schema:
             type: integer
           required: true
-          description: شناسه کد کشاورزی
+          description: شناسه کود
       responses:
         '200':
-          description: کد کشاورزی
+          description: کود
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Code'
+                $ref: '#/components/schemas/Cud'
         '404':
-          description: کد کشاورزی یافت نشد
+          description: کود یافت نشد
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     put:
       tags:
-        - کد کشاورزی
-      summary: ویرایش کد کشاورزی
-      description: ویرایش کد کشاورزی با شناسه مشخص
-      operationId: updateCode
+        - کود
+      summary: ویرایش کود
+      description: ویرایش یک کود
+      operationId: updateCud
       parameters:
         - in: path
-          name: codeId
+          name: cudId
           schema:
             type: integer
           required: true
-          description: شناسه کد کشاورزی
+          description: شناسه کود
       requestBody:
-        description: کد کشاورزی ویرایش شده
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Code'
+              $ref: '#/components/schemas/Cud'
       responses:
         '200':
-          description: کد کشاورزی ویرایش شد
+          description: کود ویرایش شد
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Code'
+                $ref: '#/components/schemas/Cud'
         '400':
-          description: درخواست نامعتبر
+          description: داده‌های ورود نادرست
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     delete:
       tags:
-        - کد کشاورزی
-      summary: حذف کد کشاورزی
-      description: حذف کد کشاورزی با شناسه مشخص
-      operationId: deleteCode
+        - کود
+      summary: حذف کود
+      description: حذف یک کود
+      operationId: deleteCud
       parameters:
         - in: path
-          name: codeId
+          name: cudId
           schema:
             type: integer
           required: true
-          description: شناسه کد کشاورزی
+          description: شناسه کود
       responses:
         '204':
-          description: کد کشاورزی حذف شد
+          description: کود حذف شد
         '404':
-          description: کد کشاورزی یافت نشد
+          description: کود یافت نشد
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /keshavarzi:
+    post:
+      tags:
+        - کشت
+      summary: ثبت کشت
+      description: ثبت یک کشت جدید
+      operationId: createKeshavarzi
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Keshavarzi'
+      responses:
+        '201':
+          description: کشت ثبت شد
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Keshavarzi'
+        '400':
+          description: داده‌های ورود نادرست
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /keshavarzi/{keshavarziId}:
+    get:
+      tags:
+        - کشت
+      summary: دریافت کشت
+      description: دریافت یک کشت با شناسه مشخص
+      operationId: getKeshavarzi
+      parameters:
+        - in: path
+          name: keshavarziId
+          schema:
+            type: integer
+          required: true
+          description: شناسه کشت
+      responses:
+        '200':
+          description: کشت
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Keshavarzi'
+        '404':
+          description: کشت یافت نشد
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
-    Code:
+    Cud:
       type: object
       properties:
         id:
           type: integer
-          description: شناسه کد کشاورزی
+          description: شناسه کود
         name:
           type: string
-          description: نام کد کشاورزی
+          description: نام کود
         description:
           type: string
-          description: توضیحات کد کشاورزی
+          description: توضیحات کود
       required:
-        - id
         - name
         - description
+    Keshavarzi:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: شناسه کشت
+        name:
+          type: string
+          description: نام کشت
+        description:
+          type: string
+          description: توضیحات کشت
+      required:
+        - name
+        - description
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: کد خطا
+        message:
+          type: string
+          description: پیغام خطا
+      required:
+        - code
+        - message
 ```
