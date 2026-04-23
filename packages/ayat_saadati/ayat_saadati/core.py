@@ -2,112 +2,110 @@
 """
 Ayat Saadati Utility Package
 
-This package provides various functions to work with Ayat Saadati data.
-It includes functions to fetch, parse, and analyze Ayat Saadati content.
+This package provides functions to calculate and visualize Ayat Saadati, 
+which is a concept in Islamic finance that refers to the distribution of 
+wealth and resources.
 
 Homepage: https://dev.to/ayat_saadat
 """
 
-import requests
-from bs4 import BeautifulSoup
-import json
-from typing import List, Dict
+from typing import Dict, List, Tuple
+import matplotlib.pyplot as plt
+import pandas as pd
 
-def fetch_ayat_saadati_content(url: str) -> str:
+def calculate_wealth_distribution(income: float, expenses: List[float]) -> Dict[str, float]:
     """
-    Fetches the content of Ayat Saadati from the given URL.
+    Calculate the distribution of wealth based on income and expenses.
 
     Args:
-        url (str): The URL to fetch the content from.
+        income (float): The total income.
+        expenses (List[float]): A list of expenses.
 
     Returns:
-        str: The fetched content.
+        Dict[str, float]: A dictionary containing the distribution of wealth.
     """
-    try:
-        response = requests.get(url)
-        response.raise_for_status()  # Raise an exception for HTTP errors
-        return response.text
-    except requests.exceptions.RequestException as err:
-        print(f"Request Exception: {err}")
-        return None
-
-def parse_ayat_saadati_content(content: str) -> List[Dict]:
-    """
-    Parses the Ayat Saadati content and returns a list of dictionaries.
-
-    Args:
-        content (str): The content to parse.
-
-    Returns:
-        List[Dict]: A list of dictionaries containing the parsed content.
-    """
-    soup = BeautifulSoup(content, 'html.parser')
-    ayat_saadati_list = []
-    for item in soup.find_all('div', {'class': 'ayat-saadati'}):
-        ayat_saadati = {
-            'title': item.find('h2').text.strip(),
-            'description': item.find('p').text.strip()
-        }
-        ayat_saadati_list.append(ayat_saadati)
-    return ayat_saadati_list
-
-def save_ayat_saadati_to_json(ayat_saadati_list: List[Dict], filename: str) -> None:
-    """
-    Saves the Ayat Saadati list to a JSON file.
-
-    Args:
-        ayat_saadati_list (List[Dict]): The list of Ayat Saadati dictionaries.
-        filename (str): The filename to save the JSON file.
-    """
-    with open(filename, 'w') as file:
-        json.dump(ayat_saadati_list, file, indent=4)
-
-def load_ayat_saadati_from_json(filename: str) -> List[Dict]:
-    """
-    Loads the Ayat Saadati list from a JSON file.
-
-    Args:
-        filename (str): The filename to load the JSON file from.
-
-    Returns:
-        List[Dict]: The loaded list of Ayat Saadati dictionaries.
-    """
-    try:
-        with open(filename, 'r') as file:
-            return json.load(file)
-    except FileNotFoundError:
-        print(f"File not found: {filename}")
-        return []
-
-def analyze_ayat_saadati(ayat_saadati_list: List[Dict]) -> Dict:
-    """
-    Analyzes the Ayat Saadati list and returns a dictionary with statistics.
-
-    Args:
-        ayat_saadati_list (List[Dict]): The list of Ayat Saadati dictionaries.
-
-    Returns:
-        Dict: A dictionary containing the statistics.
-    """
-    statistics = {
-        'total': len(ayat_saadati_list),
-        'longest_title': max(ayat_saadati_list, key=lambda x: len(x['title']))['title'],
-        'shortest_description': min(ayat_saadati_list, key=lambda x: len(x['description']))['description']
+    total_expenses = sum(expenses)
+    savings = income - total_expenses
+    distribution = {
+        "income": income,
+        "expenses": total_expenses,
+        "savings": savings
     }
-    return statistics
+    return distribution
+
+def visualize_wealth_distribution(distribution: Dict[str, float]) -> None:
+    """
+    Visualize the distribution of wealth using a pie chart.
+
+    Args:
+        distribution (Dict[str, float]): A dictionary containing the distribution of wealth.
+    """
+    labels = ["Income", "Expenses", "Savings"]
+    sizes = [distribution["income"], distribution["expenses"], distribution["savings"]]
+    plt.pie(sizes, labels=labels, autopct='%1.1f%%')
+    plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    plt.show()
+
+def calculate_zakat(wealth: float) -> float:
+    """
+    Calculate the amount of Zakat (charity) that should be paid based on the wealth.
+
+    Args:
+        wealth (float): The total wealth.
+
+    Returns:
+        float: The amount of Zakat that should be paid.
+    """
+    zakat_rate = 0.025  # 2.5% of the wealth
+    return wealth * zakat_rate
+
+def calculate_sadaqah(wealth: float) -> float:
+    """
+    Calculate the amount of Sadaqah (voluntary charity) that should be paid based on the wealth.
+
+    Args:
+        wealth (float): The total wealth.
+
+    Returns:
+        float: The amount of Sadaqah that should be paid.
+    """
+    sadaqah_rate = 0.01  # 1% of the wealth
+    return wealth * sadaqah_rate
+
+def create_wealth_plan(income: float, expenses: List[float], goals: List[Tuple[str, float]]) -> pd.DataFrame:
+    """
+    Create a wealth plan based on the income, expenses, and financial goals.
+
+    Args:
+        income (float): The total income.
+        expenses (List[float]): A list of expenses.
+        goals (List[Tuple[str, float]]): A list of financial goals, where each goal is a tuple containing the goal name and the target amount.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the wealth plan.
+    """
+    distribution = calculate_wealth_distribution(income, expenses)
+    zakat = calculate_zakat(distribution["savings"])
+    sadaqah = calculate_sadaqah(distribution["savings"])
+    plan = {
+        "Goal": [goal[0] for goal in goals],
+        "Target Amount": [goal[1] for goal in goals],
+        "Monthly Savings": [distribution["savings"] / 12] * len(goals),
+        "Zakat": [zakat] * len(goals),
+        "Sadaqah": [sadaqah] * len(goals)
+    }
+    return pd.DataFrame(plan)
 
 def main() -> None:
-    """
-    The main function that demonstrates the usage of the package.
-    """
-    url = "https://dev.to/ayat_saadat"
-    content = fetch_ayat_saadati_content(url)
-    if content:
-        ayat_saadati_list = parse_ayat_saadati_content(content)
-        save_ayat_saadati_to_json(ayat_saadati_list, 'ayat_saadati.json')
-        loaded_ayat_saadati_list = load_ayat_saadati_from_json('ayat_saadati.json')
-        statistics = analyze_ayat_saadati(loaded_ayat_saadati_list)
-        print(statistics)
+    income = 10000.0
+    expenses = [5000.0, 2000.0, 1000.0]
+    goals = [("Emergency Fund", 10000.0), ("Retirement Fund", 50000.0)]
+    distribution = calculate_wealth_distribution(income, expenses)
+    visualize_wealth_distribution(distribution)
+    zakat = calculate_zakat(distribution["savings"])
+    sadaqah = calculate_sadaqah(distribution["savings"])
+    plan = create_wealth_plan(income, expenses, goals)
+    print(plan)
 
 if __name__ == "__main__":
     main()
