@@ -4,10 +4,6 @@ info:
   title: Ayat Saadati Service
   description: API documentation for Ayat Saadati service
   version: 1.0.0
-  contact:
-    name: Ayat Saadati
-    url: https://dev.to/ayat_saadat
-    email: ayat.saadat@example.com
 servers:
   - url: https://dev.to/ayat_saadat
     description: Development server
@@ -41,20 +37,26 @@ paths:
       tags:
         - Users
       requestBody:
-        description: User to create
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/User'
       responses:
         '201':
-          description: User created
+          description: User created successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
         '400':
           description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -69,9 +71,9 @@ paths:
       parameters:
         - in: path
           name: userId
+          required: true
           schema:
             type: integer
-          required: true
           description: User ID
       responses:
         '200':
@@ -86,6 +88,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     put:
       summary: Update a user
       description: Updates a user
@@ -95,25 +103,37 @@ paths:
       parameters:
         - in: path
           name: userId
+          required: true
           schema:
             type: integer
-          required: true
           description: User ID
       requestBody:
-        description: User to update
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/User'
       responses:
         '200':
-          description: User updated
+          description: User updated successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
         '400':
           description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -127,15 +147,21 @@ paths:
       parameters:
         - in: path
           name: userId
+          required: true
           schema:
             type: integer
-          required: true
           description: User ID
       responses:
         '204':
-          description: User deleted
+          description: User deleted successfully
         '404':
           description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -169,14 +195,14 @@ paths:
       tags:
         - Posts
       requestBody:
-        description: Post to create
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Post'
       responses:
         '201':
-          description: Post created
+          description: Post created successfully
           content:
             application/json:
               schema:
@@ -187,10 +213,53 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /posts/{postId}:
+    get:
+      summary: Retrieve a post by ID
+      description: Returns a post by ID
+      operationId: getPostById
+      tags:
+        - Posts
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: integer
+          description: Post ID
+      responses:
+        '200':
+          description: A post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     User:
       type: object
+      required:
+        - id
+        - name
+        - email
       properties:
         id:
           type: integer
@@ -201,12 +270,12 @@ components:
         email:
           type: string
           description: User email
-      required:
-        - id
-        - name
-        - email
     Post:
       type: object
+      required:
+        - id
+        - title
+        - content
       properties:
         id:
           type: integer
@@ -217,20 +286,12 @@ components:
         content:
           type: string
           description: Post content
-      required:
-        - id
-        - title
-        - content
     Error:
       type: object
+      required:
+        - message
       properties:
-        code:
-          type: integer
-          description: Error code
         message:
           type: string
           description: Error message
-      required:
-        - code
-        - message
 ```
