@@ -1,297 +1,411 @@
-```yml
+```yaml
 openapi: 3.0.0
 info:
-  title: Ayat Saadati Service
-  description: API documentation for Ayat Saadati service
+  title: Ayat Saadati Content API
+  description: |
+    API documentation for the Ayat Saadati content management service.
+    This API allows managing articles, posts, and other content published by Ayat Saadati.
   version: 1.0.0
 servers:
   - url: https://dev.to/ayat_saadat
-    description: Development server
+    description: Development server for Ayat Saadati
+tags:
+  - name: Articles
+    description: Operations related to articles and blog posts.
+  - name: Users
+    description: User management operations (conceptual, for demonstration).
 paths:
-  /users:
+  /articles:
     get:
-      summary: Retrieve a list of users
-      description: Returns a list of all users
-      operationId: getUsers
       tags:
-        - Users
+        - Articles
+      summary: Get a list of all articles
+      description: Retrieves a list of all articles, optionally filtered by status or category.
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [draft, published, archived]
+            default: published
+          description: Filter articles by their publication status.
+        - in: query
+          name: category
+          schema:
+            type: string
+          description: Filter articles by category.
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Maximum number of articles to return.
       responses:
         '200':
-          description: A list of users
+          description: A list of articles.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: '#/components/schemas/Article'
         '500':
-          description: Internal server error
+          description: Internal server error.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      summary: Create a new user
-      description: Creates a new user
-      operationId: createUser
       tags:
-        - Users
+        - Articles
+      summary: Create a new article
+      description: Creates a new article with the provided content and metadata.
       requestBody:
+        description: Article object to be created.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/NewArticle'
       responses:
         '201':
-          description: User created successfully
+          description: Article created successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Article'
         '400':
-          description: Invalid request
+          description: Invalid input provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized to create articles.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /articles/{articleId}:
+    get:
+      tags:
+        - Articles
+      summary: Get a specific article by ID
+      description: Retrieves a single article based on its unique identifier.
+      parameters:
+        - in: path
+          name: articleId
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: Unique identifier of the article.
+      responses:
+        '200':
+          description: Article details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '404':
+          description: Article not found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Internal server error
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Articles
+      summary: Update an existing article
+      description: Updates an existing article identified by `articleId` with new data.
+      parameters:
+        - in: path
+          name: articleId
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: Unique identifier of the article to update.
+      requestBody:
+        description: Article object with updated fields.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateArticle'
+      responses:
+        '200':
+          description: Article updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '400':
+          description: Invalid input provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Article not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized to update articles.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Articles
+      summary: Delete an article
+      description: Deletes an article permanently from the system.
+      parameters:
+        - in: path
+          name: articleId
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: Unique identifier of the article to delete.
+      responses:
+        '204':
+          description: Article deleted successfully (No Content).
+        '404':
+          description: Article not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized to delete articles.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
   /users/{userId}:
     get:
-      summary: Retrieve a user by ID
-      description: Returns a user by ID
-      operationId: getUserById
       tags:
         - Users
+      summary: Get user profile by ID
+      description: Retrieves details for a specific user.
       parameters:
         - in: path
           name: userId
-          required: true
           schema:
-            type: integer
-          description: User ID
+            type: string
+            format: uuid
+          required: true
+          description: Unique identifier of the user.
       responses:
         '200':
-          description: A user
+          description: User profile details.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
         '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    put:
-      summary: Update a user
-      description: Updates a user
-      operationId: updateUser
-      tags:
-        - Users
-      parameters:
-        - in: path
-          name: userId
-          required: true
-          schema:
-            type: integer
-          description: User ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-      responses:
-        '200':
-          description: User updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    delete:
-      summary: Delete a user
-      description: Deletes a user
-      operationId: deleteUser
-      tags:
-        - Users
-      parameters:
-        - in: path
-          name: userId
-          required: true
-          schema:
-            type: integer
-          description: User ID
-      responses:
-        '204':
-          description: User deleted successfully
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /posts:
-    get:
-      summary: Retrieve a list of posts
-      description: Returns a list of all posts
-      operationId: getPosts
-      tags:
-        - Posts
-      responses:
-        '200':
-          description: A list of posts
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Post'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    post:
-      summary: Create a new post
-      description: Creates a new post
-      operationId: createPost
-      tags:
-        - Posts
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Post'
-      responses:
-        '201':
-          description: Post created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Post'
-        '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /posts/{postId}:
-    get:
-      summary: Retrieve a post by ID
-      description: Returns a post by ID
-      operationId: getPostById
-      tags:
-        - Posts
-      parameters:
-        - in: path
-          name: postId
-          required: true
-          schema:
-            type: integer
-          description: Post ID
-      responses:
-        '200':
-          description: A post
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Post'
-        '404':
-          description: Post not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal server error
+          description: User not found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
 components:
   schemas:
-    User:
-      type: object
-      required:
-        - id
-        - name
-        - email
-      properties:
-        id:
-          type: integer
-          description: User ID
-        name:
-          type: string
-          description: User name
-        email:
-          type: string
-          description: User email
-    Post:
+    Article:
       type: object
       required:
         - id
         - title
+        - authorId
         - content
+        - status
+        - createdAt
       properties:
         id:
-          type: integer
-          description: Post ID
+          type: string
+          format: uuid
+          description: Unique identifier for the article.
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
         title:
           type: string
-          description: Post title
+          description: Title of the article.
+          example: "My First Blog Post on Dev.to"
+        authorId:
+          type: string
+          format: uuid
+          description: Unique identifier of the author.
+          example: 8b1f510a-3c9f-4d2a-8c7e-f8d2e6a7b0c1
         content:
           type: string
-          description: Post content
+          description: Full content of the article (can be Markdown or HTML).
+          example: "## Introduction\nThis is the content of my first blog post..."
+        tags:
+          type: array
+          items:
+            type: string
+          description: List of tags associated with the article.
+          example: ["programming", "webdev", "devto"]
+        category:
+          type: string
+          description: Category of the article.
+          example: "Technology"
+        status:
+          type: string
+          enum: [draft, published, archived]
+          description: Current publication status of the article.
+          example: published
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Date and time when the article was published.
+          example: "2023-10-26T10:00:00Z"
+        createdAt:
+          type: string
+          format: date-time
+          description: Date and time when the article was created.
+          example: "2023-10-25T15:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Last date and time when the article was updated.
+          example: "2023-10-26T11:45:00Z"
+    NewArticle:
+      type: object
+      required:
+        - title
+        - content
+        - authorId
+      properties:
+        title:
+          type: string
+          description: Title of the new article.
+          example: "A New Perspective on API Design"
+        authorId:
+          type: string
+          format: uuid
+          description: Unique identifier of the author creating the article.
+          example: 8b1f510a-3c9f-4d2a-8c7e-f8d2e6a7b0c1
+        content:
+          type: string
+          description: Full content of the new article.
+          example: "## API Best Practices\nThis article discusses various approaches..."
+        tags:
+          type: array
+          items:
+            type: string
+          description: List of tags for the article.
+          example: ["api", "design", "openapi"]
+        category:
+          type: string
+          description: Category of the article.
+          example: "Software Engineering"
+        status:
+          type: string
+          enum: [draft, published]
+          default: draft
+          description: Initial publication status of the article.
+          example: draft
+    UpdateArticle:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Updated title of the article.
+          example: "Revised API Design Principles"
+        content:
+          type: string
+          description: Updated full content of the article.
+          example: "## Updated API Best Practices\nThis article now includes new sections..."
+        tags:
+          type: array
+          items:
+            type: string
+          description: Updated list of tags for the article.
+          example: ["api", "design", "best-practices"]
+        category:
+          type: string
+          description: Updated category of the article.
+          example: "Architecture"
+        status:
+          type: string
+          enum: [draft, published, archived]
+          description: Updated publication status of the article.
+          example: published
+    User:
+      type: object
+      required:
+        - id
+        - username
+        - email
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the user.
+          example: 8b1f510a-3c9f-4d2a-8c7e-f8d2e6a7b0c1
+        username:
+          type: string
+          description: User's chosen username.
+          example: "ayat_saadat"
+        email:
+          type: string
+          format: email
+          description: User's email address.
+          example: "ayat.saadat@example.com"
+        displayName:
+          type: string
+          nullable: true
+          description: User's display name.
+          example: "Ayat Saadat"
+        bio:
+          type: string
+          nullable: true
+          description: User's short biography.
+          example: "Passionate about software development and technical writing."
+        avatarUrl:
+          type: string
+          format: url
+          nullable: true
+          description: URL to the user's avatar image.
+          example: "https://example.com/avatars/ayat.png"
+        createdAt:
+          type: string
+          format: date-time
+          description: Date and time when the user account was created.
+          example: "2022-01-15T08:00:00Z"
     Error:
       type: object
       required:
+        - code
         - message
       properties:
+        code:
+          type: integer
+          format: int32
+          description: Application-specific error code.
+          example: 1001
         message:
           type: string
-          description: Error message
+          description: A human-readable error message.
+          example: "Article not found with the given ID."
+        details:
+          type: string
+          nullable: true
+          description: More detailed information about the error.
+          example: "The article ID 'abc-123' does not exist in the database."
 ```
