@@ -1,241 +1,103 @@
-```yml
+```yaml
 openapi: 3.0.0
 info:
-  title: سرویس کود کشاورزی
-  description: API برای مدیریت کود کشاورزی
+  title: سرویس مدیریت کود کشاورزی
+  description: |
+    این مستندسازی API برای مدیریت اطلاعات کودهای کشاورزی شرکت کلاتک طراحی شده است.
+    هدف اصلی این API فراهم کردن امکان دسترسی، افزودن، به‌روزرسانی و حذف اطلاعات مربوط به انواع کودها می‌باشد.
+    این سرویس به کشاورزان و فروشندگان کود کمک می‌کند تا اطلاعات دقیق و به‌روزی از محصولات کود در دسترس داشته باشند.
   version: 1.0.0
 servers:
-  - url: https://kalatakco.com/
-    description: سرور اصلی
+  - url: https://kalatakco.com/api/v1
+    description: سرور اصلی API شرکت کلاتک
 tags:
-  - name: کود
-    description: عملیات مربوط به کود
-  - name: کشت
-    description: عملیات مربوط به کشت
+  - name: کودها
+    description: عملیات مربوط به مدیریت کودهای کشاورزی و اطلاعات آن‌ها
 paths:
-  /cuds:
+  /fertilizers:
     get:
+      summary: دریافت لیست همه کودهای کشاورزی
+      operationId: getAllFertilizers
       tags:
-        - کود
-      summary: دریافت لیست کودها
-      description: دریافت لیست تمام کودهای ثبت شده
-      operationId: getCuds
+        - کودها
+      parameters:
+        - name: page
+          in: query
+          description: شماره صفحه برای صفحه‌بندی نتایج. شروع از 1.
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: حداکثر تعداد آیتم‌ها در هر صفحه.
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: search
+          in: query
+          description: کلمه کلیدی برای جستجو در نام، نوع یا توضیحات کودها.
+          required: false
+          schema:
+            type: string
       responses:
         '200':
-          description: لیست کودها
+          description: لیست موفقیت‌آمیز کودها
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Cud'
-        '500':
-          description: خطای سرور
+                  $ref: '#/components/schemas/Fertilizer'
+        '400':
+          description: درخواست نامعتبر (مثلاً پارامترهای صفحه‌بندی اشتباه)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
+      summary: افزودن یک کود کشاورزی جدید
+      operationId: createFertilizer
       tags:
-        - کود
-      summary: ثبت کود جدید
-      description: ثبت یک کود جدید
-      operationId: createCud
+        - کودها
       requestBody:
+        description: اطلاعات کامل کود جدید برای افزودن به سیستم.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Cud'
+              $ref: '#/components/schemas/NewFertilizer'
       responses:
         '201':
-          description: کود ثبت شد
+          description: کود با موفقیت ایجاد شد و در سیستم ثبت گردید.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Cud'
+                $ref: '#/components/schemas/Fertilizer'
         '400':
-          description: داده‌های ورود نادرست
+          description: اطلاعات ارسالی نامعتبر است (مثلاً فیلدهای ضروری وارد نشده‌اند یا فرمت اشتباه است).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /cuds/{cudId}:
+  /fertilizers/{id}:
     get:
+      summary: دریافت جزئیات یک کود کشاورزی خاص
+      operationId: getFertilizerById
       tags:
-        - کود
-      summary: دریافت کود
-      description: دریافت یک کود با شناسه مشخص
-      operationId: getCud
+        - کودها
       parameters:
-        - in: path
-          name: cudId
-          schema:
-            type: integer
+        - name: id
+          in: path
+          description: شناسه منحصر به فرد (UUID) کود مورد نظر.
           required: true
-          description: شناسه کود
-      responses:
-        '200':
-          description: کود
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Cud'
-        '404':
-          description: کود یافت نشد
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    put:
-      tags:
-        - کود
-      summary: ویرایش کود
-      description: ویرایش یک کود
-      operationId: updateCud
-      parameters:
-        - in: path
-          name: cudId
           schema:
-            type: integer
-          required: true
-          description: شناسه کود
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Cud'
-      responses:
-        '200':
-          description: کود ویرایش شد
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Cud'
-        '400':
-          description: داده‌های ورود نادرست
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    delete:
-      tags:
-        - کود
-      summary: حذف کود
-      description: حذف یک کود
-      operationId: deleteCud
-      parameters:
-        - in: path
-          name: cudId
-          schema:
-            type: integer
-          required: true
-          description: شناسه کود
-      responses:
-        '204':
-          description: کود حذف شد
-        '404':
-          description: کود یافت نشد
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /keshavarzi:
-    post:
-      tags:
-        - کشت
-      summary: ثبت کشت
-      description: ثبت یک کشت جدید
-      operationId: createKeshavarzi
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Keshavarzi'
-      responses:
-        '201':
-          description: کشت ثبت شد
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Keshavarzi'
-        '400':
-          description: داده‌های ورود نادرست
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /keshavarzi/{keshavarziId}:
-    get:
-      tags:
-        - کشت
-      summary: دریافت کشت
-      description: دریافت یک کشت با شناسه مشخص
-      operationId: getKeshavarzi
-      parameters:
-        - in: path
-          name: keshavarziId
-          schema:
-            type: integer
-          required: true
-          description: شناسه کشت
-      responses:
-        '200':
-          description: کشت
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Keshavarzi'
-        '404':
-          description: کشت یافت نشد
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-components:
-  schemas:
-    Cud:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: شناسه کود
-        name:
-          type: string
-          description: نام کود
-        description:
-          type: string
-          description: توضیحات کود
-      required:
-        - name
-        - description
-    Keshavarzi:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: شناسه کشت
-        name:
-          type: string
-          description: نام کشت
-        description:
-          type: string
-          description: توضیحات کشت
-      required:
-        - name
-        - description
-    Error:
-      type: object
-      properties:
-        code:
-          type: integer
-          description: کد خطا
-        message:
-          type: string
-          description: پیغام خطا
-      required:
-        - code
-        - message
-```
+            type: string
+            format: uuid
+            example: d290f1ee-6
