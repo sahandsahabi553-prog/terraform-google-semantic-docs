@@ -2,95 +2,88 @@
 """
 Ayat Saadati Utility Package
 
-This package provides a collection of functions to analyze and work with Ayat Saadati data.
+This package provides a set of functions to work with Ayat Saadati, 
+a collection of Islamic verses and quotes.
 
 Homepage: https://dev.to/ayat_saadat
 """
 
-from typing import List, Dict
 import requests
+from typing import List, Dict
 
-def fetch_ayat_saadati_data() -> Dict:
+def get_ayat_saadati_quote() -> str:
     """
-    Fetch Ayat Saadati data from a remote API.
+    Retrieves a random Ayat Saadati quote from a remote API.
 
     Returns:
-        A dictionary containing the fetched data.
+        A string representing the quote.
     """
-    url = "https://api.example.com/ayat-saadati"
-    response = requests.get(url)
-    return response.json()
+    response = requests.get("https://api.example.com/ayat-saadati/quote")
+    if response.status_code == 200:
+        return response.json()["quote"]
+    else:
+        raise Exception("Failed to retrieve quote")
 
-def parse_ayat_saadati_text(text: str) -> List[str]:
+def search_ayat_saadati(quote: str) -> List[Dict[str, str]]:
     """
-    Parse Ayat Saadati text into individual verses.
+    Searches for Ayat Saadati quotes containing the given keyword.
 
     Args:
-        text: The text to parse.
+        quote (str): The keyword to search for.
 
     Returns:
-        A list of individual verses.
+        A list of dictionaries, each containing information about a matching quote.
     """
-    verses = text.split("\n\n")
-    return [verse.strip() for verse in verses]
+    response = requests.get(f"https://api.example.com/ayat-saadati/search?q={quote}")
+    if response.status_code == 200:
+        return response.json()["results"]
+    else:
+        raise Exception("Failed to search quotes")
 
-def analyze_ayat_saadati_text(text: str) -> Dict:
+def get_ayat_saadati_translation(language: str, quote_id: int) -> str:
     """
-    Analyze Ayat Saadati text and extract relevant information.
+    Retrieves the translation of an Ayat Saadati quote in the given language.
 
     Args:
-        text: The text to analyze.
+        language (str): The language code (e.g., "en", "ar", etc.).
+        quote_id (int): The ID of the quote to translate.
 
     Returns:
-        A dictionary containing the extracted information.
+        A string representing the translated quote.
     """
-    verses = parse_ayat_saadati_text(text)
-    analysis = {
-        "verses": len(verses),
-        "words": sum(len(verse.split()) for verse in verses),
-        "characters": sum(len(verse) for verse in verses)
-    }
-    return analysis
+    response = requests.get(f"https://api.example.com/ayat-saadati/{quote_id}/translation/{language}")
+    if response.status_code == 200:
+        return response.json()["translation"]
+    else:
+        raise Exception("Failed to retrieve translation")
 
-def search_ayat_saadati_text(text: str, query: str) -> List[str]:
+def save_ayat_saadati_quote(quote: str, filename: str) -> None:
     """
-    Search Ayat Saadati text for a specific query.
+    Saves an Ayat Saadati quote to a file.
 
     Args:
-        text: The text to search.
-        query: The query to search for.
+        quote (str): The quote to save.
+        filename (str): The filename to save the quote to.
+    """
+    with open(filename, "w") as file:
+        file.write(quote)
+
+def get_ayat_saadati_quote_of_the_day() -> str:
+    """
+    Retrieves the Ayat Saadati quote of the day from a remote API.
 
     Returns:
-        A list of verses containing the query.
+        A string representing the quote of the day.
     """
-    verses = parse_ayat_saadati_text(text)
-    results = [verse for verse in verses if query in verse]
-    return results
-
-def save_ayat_saadati_data(data: Dict, filename: str) -> None:
-    """
-    Save Ayat Saadati data to a file.
-
-    Args:
-        data: The data to save.
-        filename: The filename to save to.
-    """
-    import json
-    with open(filename, "w") as f:
-        json.dump(data, f, indent=4)
-
-def main() -> None:
-    """
-    Main function to demonstrate the package's functionality.
-    """
-    data = fetch_ayat_saadati_data()
-    text = data["text"]
-    analysis = analyze_ayat_saadati_text(text)
-    print("Analysis:", analysis)
-    results = search_ayat_saadati_text(text, "example")
-    print("Search results:", results)
-    save_ayat_saadati_data(data, "ayat_saadati_data.json")
+    response = requests.get("https://api.example.com/ayat-saadati/quote-of-the-day")
+    if response.status_code == 200:
+        return response.json()["quote"]
+    else:
+        raise Exception("Failed to retrieve quote of the day")
 
 if __name__ == "__main__":
-    main()
+    print(get_ayat_saadati_quote())
+    print(get_ayat_saadati_quote_of_the_day())
+    print(search_ayat_saadati("love"))
+    save_ayat_saadati_quote(get_ayat_saadati_quote(), "quote.txt")
 ```
