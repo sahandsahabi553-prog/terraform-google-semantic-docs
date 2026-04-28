@@ -1,286 +1,189 @@
 ```yaml
 openapi: 3.0.0
 info:
-  title: Ayat Saadati Article Service
+  title: Ayat Saadati API
   description: |
-    Welcome to the Ayat Saadati Article Service API documentation!
+    API for managing inspirational quotes and "ayat" (verses/signs), providing comprehensive CRUD operations
+    and convenient retrieval methods like getting a random quote.
+    This service aims to store, categorize, and serve meaningful text snippets.
 
-    This API allows you to manage articles for a developer blog or similar platform. You can create, retrieve, update, and delete articles, as well as manage their publication status.
-
-    Built for developers, by developers.
+    **Note on Server URL:** The URL `https://dev.to/ayat_saadat` appears to be a blog or personal page rather than an API endpoint.
+    The server URLs provided below are hypothetical API endpoints typical for such a service.
   version: 1.0.0
 servers:
-  - url: https://dev.to/ayat_saadat
-    description: Production server for Ayat Saadati
+  - url: https://api.ayatsaadati.com/v1
+    description: Production API server
+  - url: https://dev.ayatsaadati.com/v1
+    description: Development API server
 tags:
-  - name: Articles
-    description: Operations related to articles.
+  - name: Quotes
+    description: Operations related to managing inspirational quotes and "ayat".
 paths:
-  /articles:
+  /quotes:
     get:
+      summary: Retrieve a list of all quotes
+      operationId: getAllQuotes
       tags:
-        - Articles
-      summary: Retrieve a list of articles
-      description: Fetches a paginated list of articles. Can be filtered by author or tags.
-      operationId: getArticles
-      parameters:
-        - name: limit
-          in: query
-          description: Maximum number of articles to return
-          required: false
-          schema:
-            type: integer
-            format: int32
-            minimum: 1
-            default: 10
-        - name: offset
-          in: query
-          description: Number of articles to skip before starting to collect the result set
-          required: false
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-            default: 0
-        - name: authorId
-          in: query
-          description: Filter articles by author ID
-          required: false
-          schema:
-            type: integer
-            format: int64
-        - name: tag
-          in: query
-          description: Filter articles by a specific tag
-          required: false
-          schema:
-            type: string
+        - Quotes
+      description: Fetches all available quotes from the database. Results can be paginated or filtered in future versions.
       responses:
         '200':
-          description: A list of articles
+          description: A successful response returning a list of quotes.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Article'
-              examples:
-                articlesList:
-                  value:
-                    - id: 101
-                      title: "My First Article on OpenAPI"
-                      content: "This is the content of my very first article about OpenAPI specification..."
-                      authorId: 1
-                      isPublished: true
-                      tags: ["OpenAPI", "API Design", "Documentation"]
-                      publishedAt: "2023-01-15T10:00:00Z"
-                      updatedAt: "2023-01-15T10:00:00Z"
-                    - id: 102
-                      title: "The Joys of YAML for API Docs"
-                      content: "Exploring the benefits and pitfalls of using YAML for API documentation..."
-                      authorId: 1
-                      isPublished: false
-                      tags: ["YAML", "API Docs"]
-                      publishedAt: "2023-02-20T14:30:00Z"
-                      updatedAt: "2023-02-20T14:30:00Z"
-        '400':
-          description: Invalid query parameters supplied
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+                  $ref: '#/components/schemas/Quote'
         '500':
-          description: Internal server error
+          description: Internal server error.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
+      summary: Add a new quote
+      operationId: createQuote
       tags:
-        - Articles
-      summary: Create a new article
-      description: Adds a new article to the system. Requires authentication.
-      operationId: createArticle
-      security:
-        - BearerAuth: []
+        - Quotes
+      description: Creates and stores a new quote with its text, author, and optional details.
       requestBody:
-        description: Article object to be created
+        description: Quote object to be added to the collection.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ArticleInput'
-            examples:
-              newArticle:
-                value:
-                  title: "New Article Title Here"
-                  content: "The fascinating content of the new article goes here..."
-                  authorId: 1
-                  tags: ["New", "Example"]
-                  isPublished: false
+              $ref: '#/components/schemas/NewQuote'
       responses:
         '201':
-          description: Article created successfully
+          description: Quote created successfully. Returns the newly created quote with its assigned ID.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Article'
-              examples:
-                createdArticle:
-                  value:
-                    id: 103
-                    title: "New Article Title Here"
-                    content: "The fascinating content of the new article goes here..."
-                    authorId: 1
-                    isPublished: false
-                    tags: ["New", "Example"]
-                    publishedAt: "2023-03-01T09:00:00Z"
-                    updatedAt: "2023-03-01T09:00:00Z"
+                $ref: '#/components/schemas/Quote'
         '400':
-          description: Invalid input provided
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized
+          description: Invalid request payload. Missing required fields or incorrect data types.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Internal server error
+          description: Internal server error.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /articles/{articleId}:
+  /quotes/{quoteId}:
+    parameters:
+      - in: path
+        name: quoteId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: Unique identifier (UUID) of the quote to retrieve, update, or delete.
     get:
+      summary: Retrieve a single quote by ID
+      operationId: getQuoteById
       tags:
-        - Articles
-      summary: Retrieve a single article by ID
-      description: Fetches a specific article using its unique ID.
-      operationId: getArticleById
-      parameters:
-        - name: articleId
-          in: path
-          description: ID of the article to retrieve
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - Quotes
+      description: Fetches a specific quote using its unique identifier.
       responses:
         '200':
-          description: Article found
+          description: Quote found and returned successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Article'
-              examples:
-                singleArticle:
-                  value:
-                    id: 101
-                    title: "My First Article on OpenAPI"
-                    content: "This is the content of my very first article about OpenAPI specification..."
-                    authorId: 1
-                    isPublished: true
-                    tags: ["OpenAPI", "API Design", "Documentation"]
-                    publishedAt: "2023-01-15T10:00:00Z"
-                    updatedAt: "2023-01-15T10:00:00Z"
+                $ref: '#/components/schemas/Quote'
         '404':
-          description: Article not found
+          description: Quote not found for the given ID.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Internal server error
+          description: Internal server error.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
+      summary: Update an existing quote
+      operationId: updateQuote
       tags:
-        - Articles
-      summary: Update an existing article
-      description: Updates an existing article identified by its ID. Requires authentication.
-      operationId: updateArticle
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: articleId
-          in: path
-          description: ID of the article to update
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - Quotes
+      description: Updates the details of an existing quote identified by its ID.
       requestBody:
-        description: Article object with updated fields
+        description: Quote object with the fields to be updated.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ArticleUpdate'
-            examples:
-              updateArticleRequest:
-                value:
-                  title: "Updated Article Title"
-                  content: "This is the revised content of the article."
-                  authorId: 1
-                  tags: ["OpenAPI", "Updated"]
-                  isPublished: true
+              $ref: '#/components/schemas/NewQuote' # Assumes all fields of NewQuote are updatable
       responses:
         '200':
-          description: Article updated successfully
+          description: Quote updated successfully. Returns the updated quote.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Article'
-              examples:
-                updatedArticleResponse:
-                  value:
-                    id: 101
-                    title: "Updated Article Title"
-                    content: "This is the revised content of the article."
-                    authorId: 1
-                    isPublished: true
-                    tags: ["OpenAPI", "Updated"]
-                    publishedAt: "2023-01-15T10:00:00Z"
-                    updatedAt: "2023-03-01T15:00:00Z"
+                $ref: '#/components/schemas/Quote'
         '400':
-          description: Invalid input provided
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized
+          description: Invalid request payload or ID mismatch.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '404':
-          description: Article not found
+          description: Quote not found for the given ID.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Internal server error
+          description: Internal server error.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
+      summary: Delete a quote by ID
+      operationId: deleteQuote
       tags:
-        - Articles
-      summary: Delete an article
-      description: Removes an article from the system by its ID. Requires authentication.
-      operationId: deleteArticle
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: articleId
-          in: path
-          description: ID
+        - Quotes
+      description: Permanently deletes a quote from the database using its unique identifier.
+      responses:
+        '204':
+          description: Quote deleted successfully. No content returned.
+        '404':
+          description: Quote not found for the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /quotes/random:
+    get:
+      summary: Retrieve a random quote
+      operationId: getRandomQuote
+      tags:
+        - Quotes
+      description: Fetches a single random quote from the collection. Useful for daily inspiration.
+      responses:
+        '200':
+          description: A random quote successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quote'
+        '404':
+          description: No quotes available in the database to retrieve.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
