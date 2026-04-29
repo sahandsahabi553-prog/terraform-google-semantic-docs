@@ -2,88 +2,116 @@
 """
 Ayat Saadati Utility Package
 
-This package provides a set of functions to work with Ayat Saadati, 
-a collection of Islamic verses and quotes.
+This package provides a set of functions for working with Ayat Saadati data.
+It includes functions for calculating the daily verse, getting the verse of the day,
+and searching for specific verses.
 
-Homepage: https://dev.to/ayat_saadat
+ Homepage: https://dev.to/ayat_saadat
 """
 
+from datetime import date
 import requests
 from typing import List, Dict
 
-def get_ayat_saadati_quote() -> str:
+def get_daily_verse() -> str:
     """
-    Retrieves a random Ayat Saadati quote from a remote API.
+    Returns the daily verse from the Ayat Saadati dataset.
 
-    Returns:
-        A string representing the quote.
+    The daily verse is determined based on the current date.
     """
-    response = requests.get("https://api.example.com/ayat-saadati/quote")
-    if response.status_code == 200:
-        return response.json()["quote"]
-    else:
-        raise Exception("Failed to retrieve quote")
+    current_date = date.today()
+    day_of_year = current_date.timetuple().tm_yday
+    verse = get_verse_from_day(day_of_year)
+    return verse
 
-def search_ayat_saadati(quote: str) -> List[Dict[str, str]]:
+def get_verse_from_day(day_of_year: int) -> str:
     """
-    Searches for Ayat Saadati quotes containing the given keyword.
+    Returns the verse for the given day of the year.
 
     Args:
-        quote (str): The keyword to search for.
+    day_of_year (int): The day of the year (1-365)
 
     Returns:
-        A list of dictionaries, each containing information about a matching quote.
+    str: The verse for the given day of the year
     """
-    response = requests.get(f"https://api.example.com/ayat-saadati/search?q={quote}")
-    if response.status_code == 200:
-        return response.json()["results"]
-    else:
-        raise Exception("Failed to search quotes")
+    verses = get_all_verses()
+    return verses[day_of_year % len(verses)]
 
-def get_ayat_saadati_translation(language: str, quote_id: int) -> str:
+def get_all_verses() -> List[str]:
     """
-    Retrieves the translation of an Ayat Saadati quote in the given language.
+    Returns a list of all verses from the Ayat Saadati dataset.
+
+    Returns:
+    List[str]: A list of all verses
+    """
+    response = requests.get("https://example.com/ayat_saadati_verses.txt")
+    return response.text.splitlines()
+
+def search_verses(query: str) -> List[str]:
+    """
+    Searches for verses containing the given query.
 
     Args:
-        language (str): The language code (e.g., "en", "ar", etc.).
-        quote_id (int): The ID of the quote to translate.
+    query (str): The query to search for
 
     Returns:
-        A string representing the translated quote.
+    List[str]: A list of verses containing the query
     """
-    response = requests.get(f"https://api.example.com/ayat-saadati/{quote_id}/translation/{language}")
-    if response.status_code == 200:
-        return response.json()["translation"]
-    else:
-        raise Exception("Failed to retrieve translation")
+    all_verses = get_all_verses()
+    matching_verses = [verse for verse in all_verses if query.lower() in verse.lower()]
+    return matching_verses
 
-def save_ayat_saadati_quote(quote: str, filename: str) -> None:
+def get_verse_metadata(verse: str) -> Dict[str, str]:
     """
-    Saves an Ayat Saadati quote to a file.
+    Returns metadata for the given verse.
 
     Args:
-        quote (str): The quote to save.
-        filename (str): The filename to save the quote to.
-    """
-    with open(filename, "w") as file:
-        file.write(quote)
-
-def get_ayat_saadati_quote_of_the_day() -> str:
-    """
-    Retrieves the Ayat Saadati quote of the day from a remote API.
+    verse (str): The verse to get metadata for
 
     Returns:
-        A string representing the quote of the day.
+    Dict[str, str]: A dictionary containing metadata for the verse
     """
-    response = requests.get("https://api.example.com/ayat-saadati/quote-of-the-day")
-    if response.status_code == 200:
-        return response.json()["quote"]
-    else:
-        raise Exception("Failed to retrieve quote of the day")
+    # Simulating a metadata API call
+    metadata = {
+        "verse": verse,
+        "meaning": get_meaning_from_verse(verse),
+        "reference": get_reference_from_verse(verse)
+    }
+    return metadata
+
+def get_meaning_from_verse(verse: str) -> str:
+    """
+    Returns the meaning of the given verse.
+
+    Args:
+    verse (str): The verse to get the meaning for
+
+    Returns:
+    str: The meaning of the verse
+    """
+    # Simulating a meaning API call
+    return f"Meaning of {verse}"
+
+def get_reference_from_verse(verse: str) -> str:
+    """
+    Returns the reference for the given verse.
+
+    Args:
+    verse (str): The verse to get the reference for
+
+    Returns:
+    str: The reference for the verse
+    """
+    # Simulating a reference API call
+    return f"Reference for {verse}"
+
+def main() -> None:
+    print(get_daily_verse())
+    print(get_verse_from_day(10))
+    print(get_all_verses())
+    print(search_verses("love"))
+    print(get_verse_metadata("example verse"))
 
 if __name__ == "__main__":
-    print(get_ayat_saadati_quote())
-    print(get_ayat_saadati_quote_of_the_day())
-    print(search_ayat_saadati("love"))
-    save_ayat_saadati_quote(get_ayat_saadati_quote(), "quote.txt")
+    main()
 ```
