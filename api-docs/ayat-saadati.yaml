@@ -2,39 +2,48 @@
 openapi: 3.0.0
 info:
   title: Ayat Saadati API
-  description: |
-    API for managing inspirational quotes and "ayat" (verses/signs), providing comprehensive CRUD operations
-    and convenient retrieval methods like getting a random quote.
-    This service aims to store, categorize, and serve meaningful text snippets.
-
-    **Note on Server URL:** The URL `https://dev.to/ayat_saadat` appears to be a blog or personal page rather than an API endpoint.
-    The server URLs provided below are hypothetical API endpoints typical for such a service.
+  description: API for managing personal entries, thoughts, and reflections. "Ayat Saadati" translates to "My Verses of Happiness" or "My Chapters of Felicity," suggesting a personal journaling or content management system.
   version: 1.0.0
 servers:
-  - url: https://api.ayatsaadati.com/v1
-    description: Production API server
-  - url: https://dev.ayatsaadati.com/v1
-    description: Development API server
+  - url: https://dev.to/ayat_saadat
+    description: Development server for Ayat Saadati
 tags:
-  - name: Quotes
-    description: Operations related to managing inspirational quotes and "ayat".
+  - name: Entries
+    description: Operations related to personal journal entries.
+  - name: Categories
+    description: Management of entry categories.
 paths:
-  /quotes:
+  /entries:
     get:
-      summary: Retrieve a list of all quotes
-      operationId: getAllQuotes
+      summary: Get all journal entries
+      description: Retrieves a list of all personal journal entries, optionally paginated.
       tags:
-        - Quotes
-      description: Fetches all available quotes from the database. Results can be paginated or filtered in future versions.
+        - Entries
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: Maximum number of entries to return.
+          example: 10
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            minimum: 0
+          description: The number of entries to skip before starting to collect the result set.
+          example: 0
       responses:
         '200':
-          description: A successful response returning a list of quotes.
+          description: A list of journal entries.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Quote'
+                  $ref: '#/components/schemas/Entry'
         '500':
           description: Internal server error.
           content:
@@ -42,27 +51,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      summary: Add a new quote
-      operationId: createQuote
+      summary: Create a new journal entry
+      description: Adds a new personal journal entry to the system.
       tags:
-        - Quotes
-      description: Creates and stores a new quote with its text, author, and optional details.
+        - Entries
       requestBody:
-        description: Quote object to be added to the collection.
+        description: Entry object to be created.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewQuote'
+              $ref: '#/components/schemas/NewEntry'
       responses:
         '201':
-          description: Quote created successfully. Returns the newly created quote with its assigned ID.
+          description: Entry created successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Quote'
+                $ref: '#/components/schemas/Entry'
         '400':
-          description: Invalid request payload. Missing required fields or incorrect data types.
+          description: Invalid input provided.
           content:
             application/json:
               schema:
@@ -73,30 +81,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /quotes/{quoteId}:
-    parameters:
-      - in: path
-        name: quoteId
-        schema:
-          type: string
-          format: uuid
-        required: true
-        description: Unique identifier (UUID) of the quote to retrieve, update, or delete.
+
+  /entries/{entryId}:
     get:
-      summary: Retrieve a single quote by ID
-      operationId: getQuoteById
+      summary: Get a journal entry by ID
+      description: Retrieves a single journal entry based on its unique identifier.
       tags:
-        - Quotes
-      description: Fetches a specific quote using its unique identifier.
+        - Entries
+      parameters:
+        - in: path
+          name: entryId
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: Unique identifier of the entry to retrieve.
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
       responses:
         '200':
-          description: Quote found and returned successfully.
+          description: The requested journal entry.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Quote'
+                $ref: '#/components/schemas/Entry'
         '404':
-          description: Quote not found for the given ID.
+          description: Entry not found.
           content:
             application/json:
               schema:
@@ -108,33 +117,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
-      summary: Update an existing quote
-      operationId: updateQuote
+      summary: Update a journal entry by ID
+      description: Updates an existing personal journal entry identified by its ID.
       tags:
-        - Quotes
-      description: Updates the details of an existing quote identified by its ID.
+        - Entries
+      parameters:
+        - in: path
+          name: entryId
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: Unique identifier of the entry to update.
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
       requestBody:
-        description: Quote object with the fields to be updated.
+        description: Entry object with updated fields.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewQuote' # Assumes all fields of NewQuote are updatable
+              $ref: '#/components/schemas/UpdateEntry'
       responses:
         '200':
-          description: Quote updated successfully. Returns the updated quote.
+          description: Entry updated successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Quote'
+                $ref: '#/components/schemas/Entry'
         '400':
-          description: Invalid request payload or ID mismatch.
+          description: Invalid input provided.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '404':
-          description: Quote not found for the given ID.
+          description: Entry not found.
           content:
             application/json:
               schema:
@@ -146,16 +163,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
-      summary: Delete a quote by ID
-      operationId: deleteQuote
+      summary: Delete a journal entry by ID
+      description: Deletes a personal journal entry from the system.
       tags:
-        - Quotes
-      description: Permanently deletes a quote from the database using its unique identifier.
+        - Entries
+      parameters:
+        - in: path
+          name: entryId
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: Unique identifier of the entry to delete.
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
       responses:
         '204':
-          description: Quote deleted successfully. No content returned.
+          description: Entry deleted successfully, no content to return.
         '404':
-          description: Quote not found for the given ID.
+          description: Entry not found.
           content:
             application/json:
               schema:
@@ -166,24 +191,180 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /quotes/random:
+
+  /categories:
     get:
-      summary: Retrieve a random quote
-      operationId: getRandomQuote
+      summary: Get all categories
+      description: Retrieves a list of all defined categories for entries.
       tags:
-        - Quotes
-      description: Fetches a single random quote from the collection. Useful for daily inspiration.
+        - Categories
       responses:
         '200':
-          description: A random quote successfully retrieved.
+          description: A list of categories.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Quote'
-        '404':
-          description: No quotes available in the database to retrieve.
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Create a new category
+      description: Adds a new category for organizing entries.
+      tags:
+        - Categories
+      requestBody:
+        description: Category object to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: The name of the new category.
+                  example: Personal Reflections
+      responses:
+        '201':
+          description: Category created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '400':
+          description: Invalid input provided.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Entry:
+      type: object
+      required:
+        - id
+        - title
+        - content
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the entry.
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        title:
+          type: string
+          description: The title of the journal entry.
+          minLength: 1
+          maxLength: 255
+          example: My First Thought of the Day
+        content:
+          type: string
+          description: The main content/body of the journal entry.
+          example: Today was a beautiful day, full of new opportunities and challenges...
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Optional identifier for the category this entry belongs to.
+          example: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when the entry was created.
+          example: '2023-10-27T10:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: The timestamp when the entry was last updated.
+          example: '2023-10-27T10:30:00Z'
+    NewEntry:
+      type: object
+      required:
+        - title
+        - content
+      properties:
+        title:
+          type: string
+          description: The title of the journal entry.
+          minLength: 1
+          maxLength: 255
+          example: A New Reflection
+        content:
+          type: string
+          description: The main content/body of the journal entry.
+          example: Reflecting on the past week, I found myself grateful for...
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Optional identifier for the category this entry belongs to.
+          example: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d
+    UpdateEntry:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The updated title of the journal entry.
+          minLength: 1
+          maxLength: 255
+          example: Updated Reflection on Gratitude
+        content:
+          type: string
+          description: The updated main content/body of the journal entry.
+          example: I've expanded my thoughts on gratitude and added new insights.
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Optional updated identifier for the category. Can be set to null to remove category.
+          example: null
+    Category:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the category.
+          example: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d
+        name:
+          type: string
+          description: The name of the category.
+          minLength: 1
+          maxLength: 100
+          example: Daily Thoughts
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: HTTP status code.
+          example: 400
+        message:
+          type: string
+          description: A human-readable error message.
+          example: Invalid request parameters.
+```
