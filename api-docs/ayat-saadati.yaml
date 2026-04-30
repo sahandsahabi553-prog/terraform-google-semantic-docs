@@ -1,370 +1,212 @@
-```yaml
+```yml
 openapi: 3.0.0
 info:
   title: Ayat Saadati API
-  description: API for managing personal entries, thoughts, and reflections. "Ayat Saadati" translates to "My Verses of Happiness" or "My Chapters of Felicity," suggesting a personal journaling or content management system.
+  description: API documentation for Ayat Saadati service
   version: 1.0.0
 servers:
   - url: https://dev.to/ayat_saadat
-    description: Development server for Ayat Saadati
+    description: Development server
 tags:
-  - name: Entries
-    description: Operations related to personal journal entries.
-  - name: Categories
-    description: Management of entry categories.
+  - name: users
+    description: User management
+  - name: posts
+    description: Post management
 paths:
-  /entries:
+  /users:
     get:
-      summary: Get all journal entries
-      description: Retrieves a list of all personal journal entries, optionally paginated.
       tags:
-        - Entries
-      parameters:
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
-          description: Maximum number of entries to return.
-          example: 10
-        - in: query
-          name: offset
-          schema:
-            type: integer
-            minimum: 0
-          description: The number of entries to skip before starting to collect the result set.
-          example: 0
+        - users
+      summary: Get all users
+      description: Retrieve a list of all users
       responses:
         '200':
-          description: A list of journal entries.
+          description: Successful response
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Entry'
+                  $ref: '#/components/schemas/User'
         '500':
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Internal server error
     post:
-      summary: Create a new journal entry
-      description: Adds a new personal journal entry to the system.
       tags:
-        - Entries
+        - users
+      summary: Create a new user
+      description: Create a new user
       requestBody:
-        description: Entry object to be created.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewEntry'
+              $ref: '#/components/schemas/User'
       responses:
         '201':
-          description: Entry created successfully.
+          description: User created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Entry'
+                $ref: '#/components/schemas/User'
         '400':
-          description: Invalid input provided.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /entries/{entryId}:
+          description: Invalid request
+  /users/{userId}:
     get:
-      summary: Get a journal entry by ID
-      description: Retrieves a single journal entry based on its unique identifier.
       tags:
-        - Entries
+        - users
+      summary: Get user by ID
+      description: Retrieve a user by ID
       parameters:
         - in: path
-          name: entryId
+          name: userId
           schema:
-            type: string
-            format: uuid
+            type: integer
           required: true
-          description: Unique identifier of the entry to retrieve.
-          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+          description: User ID
       responses:
         '200':
-          description: The requested journal entry.
+          description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Entry'
+                $ref: '#/components/schemas/User'
         '404':
-          description: Entry not found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: User not found
     put:
-      summary: Update a journal entry by ID
-      description: Updates an existing personal journal entry identified by its ID.
       tags:
-        - Entries
+        - users
+      summary: Update a user
+      description: Update a user
       parameters:
         - in: path
-          name: entryId
+          name: userId
           schema:
-            type: string
-            format: uuid
+            type: integer
           required: true
-          description: Unique identifier of the entry to update.
-          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+          description: User ID
       requestBody:
-        description: Entry object with updated fields.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateEntry'
+              $ref: '#/components/schemas/User'
       responses:
         '200':
-          description: Entry updated successfully.
+          description: User updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Entry'
+                $ref: '#/components/schemas/User'
         '400':
-          description: Invalid input provided.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Entry not found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Invalid request
     delete:
-      summary: Delete a journal entry by ID
-      description: Deletes a personal journal entry from the system.
       tags:
-        - Entries
+        - users
+      summary: Delete a user
+      description: Delete a user
       parameters:
         - in: path
-          name: entryId
+          name: userId
           schema:
-            type: string
-            format: uuid
+            type: integer
           required: true
-          description: Unique identifier of the entry to delete.
-          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+          description: User ID
       responses:
         '204':
-          description: Entry deleted successfully, no content to return.
+          description: User deleted successfully
         '404':
-          description: Entry not found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /categories:
+          description: User not found
+  /posts:
     get:
-      summary: Get all categories
-      description: Retrieves a list of all defined categories for entries.
       tags:
-        - Categories
+        - posts
+      summary: Get all posts
+      description: Retrieve a list of all posts
       responses:
         '200':
-          description: A list of categories.
+          description: Successful response
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Category'
+                  $ref: '#/components/schemas/Post'
         '500':
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Internal server error
     post:
-      summary: Create a new category
-      description: Adds a new category for organizing entries.
       tags:
-        - Categories
+        - posts
+      summary: Create a new post
+      description: Create a new post
       requestBody:
-        description: Category object to be created.
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - name
-              properties:
-                name:
-                  type: string
-                  description: The name of the new category.
-                  example: Personal Reflections
+              $ref: '#/components/schemas/Post'
       responses:
         '201':
-          description: Category created successfully.
+          description: Post created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Category'
+                $ref: '#/components/schemas/Post'
         '400':
-          description: Invalid input provided.
+          description: Invalid request
+  /posts/{postId}:
+    get:
+      tags:
+        - posts
+      summary: Get post by ID
+      description: Retrieve a post by ID
+      parameters:
+        - in: path
+          name: postId
+          schema:
+            type: integer
+          required: true
+          description: Post ID
+      responses:
+        '200':
+          description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: Post not found
 components:
   schemas:
-    Entry:
+    User:
       type: object
-      required:
-        - id
-        - title
-        - content
-        - createdAt
-        - updatedAt
       properties:
         id:
+          type: integer
+          description: User ID
+        name:
           type: string
-          format: uuid
-          description: Unique identifier for the entry.
-          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
-        title:
+          description: User name
+        email:
           type: string
-          description: The title of the journal entry.
-          minLength: 1
-          maxLength: 255
-          example: My First Thought of the Day
-        content:
-          type: string
-          description: The main content/body of the journal entry.
-          example: Today was a beautiful day, full of new opportunities and challenges...
-        categoryId:
-          type: string
-          format: uuid
-          nullable: true
-          description: Optional identifier for the category this entry belongs to.
-          example: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d
-        createdAt:
-          type: string
-          format: date-time
-          description: The timestamp when the entry was created.
-          example: '2023-10-27T10:00:00Z'
-        updatedAt:
-          type: string
-          format: date-time
-          description: The timestamp when the entry was last updated.
-          example: '2023-10-27T10:30:00Z'
-    NewEntry:
-      type: object
-      required:
-        - title
-        - content
-      properties:
-        title:
-          type: string
-          description: The title of the journal entry.
-          minLength: 1
-          maxLength: 255
-          example: A New Reflection
-        content:
-          type: string
-          description: The main content/body of the journal entry.
-          example: Reflecting on the past week, I found myself grateful for...
-        categoryId:
-          type: string
-          format: uuid
-          nullable: true
-          description: Optional identifier for the category this entry belongs to.
-          example: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d
-    UpdateEntry:
-      type: object
-      properties:
-        title:
-          type: string
-          description: The updated title of the journal entry.
-          minLength: 1
-          maxLength: 255
-          example: Updated Reflection on Gratitude
-        content:
-          type: string
-          description: The updated main content/body of the journal entry.
-          example: I've expanded my thoughts on gratitude and added new insights.
-        categoryId:
-          type: string
-          format: uuid
-          nullable: true
-          description: Optional updated identifier for the category. Can be set to null to remove category.
-          example: null
-    Category:
-      type: object
+          description: User email
       required:
         - id
         - name
+        - email
+    Post:
+      type: object
       properties:
         id:
-          type: string
-          format: uuid
-          description: Unique identifier for the category.
-          example: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d
-        name:
-          type: string
-          description: The name of the category.
-          minLength: 1
-          maxLength: 100
-          example: Daily Thoughts
-    Error:
-      type: object
-      required:
-        - code
-        - message
-      properties:
-        code:
           type: integer
-          format: int32
-          description: HTTP status code.
-          example: 400
-        message:
+          description: Post ID
+        title:
           type: string
-          description: A human-readable error message.
-          example: Invalid request parameters.
+          description: Post title
+        content:
+          type: string
+          description: Post content
+      required:
+        - id
+        - title
+        - content
 ```
