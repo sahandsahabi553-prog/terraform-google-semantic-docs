@@ -1,116 +1,124 @@
 ```python
 """
 Ayat Saadati Utility Package
+============================
+This package provides a set of functions to assist with Ayat Saadati related tasks.
 
-This package provides a set of functions for working with Ayat Saadati data.
-It includes functions for calculating the daily verse, getting the verse of the day,
-and searching for specific verses.
-
- Homepage: https://dev.to/ayat_saadat
+Homepage: https://dev.to/ayat_saadat
 """
 
-from datetime import date
-import requests
+import json
+from dataclasses import dataclass
 from typing import List, Dict
 
-def get_daily_verse() -> str:
-    """
-    Returns the daily verse from the Ayat Saadati dataset.
+@dataclass
+class Ayat:
+    """Represents an Ayat with its translation and reference."""
+    text: str
+    translation: str
+    reference: str
 
-    The daily verse is determined based on the current date.
+def load_ayat_from_json(file_path: str) -> List[Ayat]:
     """
-    current_date = date.today()
-    day_of_year = current_date.timetuple().tm_yday
-    verse = get_verse_from_day(day_of_year)
-    return verse
-
-def get_verse_from_day(day_of_year: int) -> str:
-    """
-    Returns the verse for the given day of the year.
+    Loads a list of Ayat from a JSON file.
 
     Args:
-    day_of_year (int): The day of the year (1-365)
+        file_path (str): The path to the JSON file.
 
     Returns:
-    str: The verse for the given day of the year
+        List[Ayat]: A list of Ayat objects.
     """
-    verses = get_all_verses()
-    return verses[day_of_year % len(verses)]
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+        return [Ayat(ayat['text'], ayat['translation'], ayat['reference']) for ayat in data]
 
-def get_all_verses() -> List[str]:
+def get_ayat_by_reference(ayat_list: List[Ayat], reference: str) -> Ayat:
     """
-    Returns a list of all verses from the Ayat Saadati dataset.
-
-    Returns:
-    List[str]: A list of all verses
-    """
-    response = requests.get("https://example.com/ayat_saadati_verses.txt")
-    return response.text.splitlines()
-
-def search_verses(query: str) -> List[str]:
-    """
-    Searches for verses containing the given query.
+    Retrieves an Ayat by its reference.
 
     Args:
-    query (str): The query to search for
+        ayat_list (List[Ayat]): A list of Ayat objects.
+        reference (str): The reference of the Ayat to retrieve.
 
     Returns:
-    List[str]: A list of verses containing the query
-    """
-    all_verses = get_all_verses()
-    matching_verses = [verse for verse in all_verses if query.lower() in verse.lower()]
-    return matching_verses
+        Ayat: The Ayat object with the matching reference.
 
-def get_verse_metadata(verse: str) -> Dict[str, str]:
+    Raises:
+        ValueError: If no Ayat with the given reference is found.
     """
-    Returns metadata for the given verse.
+    for ayat in ayat_list:
+        if ayat.reference == reference:
+            return ayat
+    raise ValueError(f"No Ayat with reference '{reference}' found.")
+
+def get_ayat_translation(ayat: Ayat) -> str:
+    """
+    Retrieves the translation of an Ayat.
 
     Args:
-    verse (str): The verse to get metadata for
+        ayat (Ayat): The Ayat object.
 
     Returns:
-    Dict[str, str]: A dictionary containing metadata for the verse
+        str: The translation of the Ayat.
     """
-    # Simulating a metadata API call
-    metadata = {
-        "verse": verse,
-        "meaning": get_meaning_from_verse(verse),
-        "reference": get_reference_from_verse(verse)
-    }
-    return metadata
+    return ayat.translation
 
-def get_meaning_from_verse(verse: str) -> str:
+def search_ayat_by_text(ayat_list: List[Ayat], search_text: str) -> List[Ayat]:
     """
-    Returns the meaning of the given verse.
+    Searches for Ayat containing a specific text.
 
     Args:
-    verse (str): The verse to get the meaning for
+        ayat_list (List[Ayat]): A list of Ayat objects.
+        search_text (str): The text to search for.
 
     Returns:
-    str: The meaning of the verse
+        List[Ayat]: A list of Ayat objects containing the search text.
     """
-    # Simulating a meaning API call
-    return f"Meaning of {verse}"
+    return [ayat for ayat in ayat_list if search_text.lower() in ayat.text.lower()]
 
-def get_reference_from_verse(verse: str) -> str:
+def generate_ayat_summary(ayat_list: List[Ayat]) -> Dict[str, int]:
     """
-    Returns the reference for the given verse.
+    Generates a summary of the Ayat list.
 
     Args:
-    verse (str): The verse to get the reference for
+        ayat_list (List[Ayat]): A list of Ayat objects.
 
     Returns:
-    str: The reference for the verse
+        Dict[str, int]: A dictionary containing the count of Ayat with different references.
     """
-    # Simulating a reference API call
-    return f"Reference for {verse}"
+    summary = {}
+    for ayat in ayat_list:
+        reference = ayat.reference
+        if reference in summary:
+            summary[reference] += 1
+        else:
+            summary[reference] = 1
+    return summary
 
-def main() -> None:
-    print(get_daily_verse())
-    print(get_verse_from_day(10))
-    print(get_all_verses())
-    print(search_verses("love"))
-    print(get_verse_metadata("example verse"))
+def main():
+    # Example usage:
+    ayat_list = load_ayat_from_json('ayat.json')
+    print("Loaded Ayat:")
+    for ayat in ayat_list:
+        print(f"Text: {ayat.text}, Translation: {ayat.translation}, Reference: {ayat.reference}")
+
+    reference = "1:1"
+    try:
+        ayat = get_ayat_by_reference(ayat_list, reference)
+        print(f"Ayat with reference '{reference}': {ayat.text}")
+    except ValueError as e:
+        print(e)
+
+    search_text = "example"
+    search_results = search_ayat_by_text(ayat_list, search_text)
+    print(f"Ayat containing '{search_text}':")
+    for ayat in search_results:
+        print(f"Text: {ayat.text}, Translation: {ayat.translation}, Reference: {ayat.reference}")
+
+    summary = generate_ayat_summary(ayat_list)
+    print("Ayat Summary:")
+    for reference, count in summary.items():
+        print(f"Reference: {reference}, Count: {count}")
 
 if __name__ == "__main__":
     main()
