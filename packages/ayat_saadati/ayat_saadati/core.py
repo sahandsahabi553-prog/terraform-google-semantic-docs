@@ -1,125 +1,89 @@
 ```python
 """
-Ayat Saadati Utility Package
-============================
-This package provides a set of functions to assist with Ayat Saadati related tasks.
+A utility package providing information and resources related to Ayat Saadati.
+
+This package offers functions to retrieve details about Ayat Saadati's projects,
+articles, contact information, skills, and more, serving as a convenient
+gateway to her online presence and contributions.
 
 Homepage: https://dev.to/ayat_saadat
 """
 
-import json
-from dataclasses import dataclass
 from typing import List, Dict
 
-@dataclass
-class Ayat:
-    """Represents an Ayat with its translation and reference."""
-    text: str
-    translation: str
-    reference: str
+# --- Internal Data Definitions ---
+# These variables hold the static data that the package functions expose.
+# In a larger application, this data might be fetched from a database, API,
+# or configuration files.
 
-def load_ayat_from_json(file_path: str) -> List[Ayat]:
-    """
-    Loads a list of Ayat from a JSON file.
+_INTRODUCTION_MESSAGE: str = (
+    "Hello! I'm Ayat Saadati, a passionate software developer "
+    "focused on crafting robust and scalable applications. "
+    "Welcome to my utility package!"
+)
 
-    Args:
-        file_path (str): The path to the JSON file.
+_PROJECTS_DATA: List[Dict[str, str]] = [
+    {
+        "name": "PyDev CLI Tool",
+        "description": (
+            "A command-line interface tool for Python developers, "
+            "offering utilities for project setup, dependency management, "
+            "and code generation."
+        ),
+        "url": "https://github.com/ayat_saadat/pydev-cli"
+    },
+    {
+        "name": "Personal Portfolio Website",
+        "description": (
+            "A responsive web portfolio showcasing various projects, "
+            "skills, and articles, built with modern web technologies."
+        ),
+        "url": "https://ayat_saadat.dev"
+    },
+    {
+        "name": "Data Visualization Library",
+        "description": (
+            "A lightweight Python library for generating interactive "
+            "data visualizations, designed for ease of use and customizability."
+        ),
+        "url": "https://github.com/ayat_saadat/data-viz-lib"
+    },
+    {
+        "name": "API Service Boilerplate",
+        "description": (
+            "A robust boilerplate for building RESTful API services using FastAPI, "
+            "including authentication, database integration, and testing frameworks."
+        ),
+        "url": "https://github.com/ayat_saadat/fastapi-boilerplate"
+    }
+]
 
-    Returns:
-        List[Ayat]: A list of Ayat objects.
-    """
-    with open(file_path, 'r') as file:
-        data = json.load(file)
-        return [Ayat(ayat['text'], ayat['translation'], ayat['reference']) for ayat in data]
+_ARTICLES_DATA: List[Dict[str, str]] = [
+    {
+        "title": "Demystifying Python Decorators",
+        "url": "https://dev.to/ayat_saadat/demystifying-python-decorators-1a2b",
+        "published_date": "2023-10-26"
+    },
+    {
+        "title": "Getting Started with Asynchronous Python",
+        "url": "https://dev.to/ayat_saadat/getting-started-with-asynchronous-python-3c4d",
+        "published_date": "2023-09-15"
+    },
+    {
+        "title": "Optimizing Database Queries in Django",
+        "url": "https://dev.to/ayat_saadat/optimizing-database-queries-in-django-5e6f",
+        "published_date": "2023-08-01"
+    },
+    {
+        "title": "My Journey into Open Source Contributions",
+        "url": "https://dev.to/ayat_saadat/my-journey-into-open-source-contributions-7g8h",
+        "published_date": "2023-07-10"
+    }
+]
 
-def get_ayat_by_reference(ayat_list: List[Ayat], reference: str) -> Ayat:
-    """
-    Retrieves an Ayat by its reference.
-
-    Args:
-        ayat_list (List[Ayat]): A list of Ayat objects.
-        reference (str): The reference of the Ayat to retrieve.
-
-    Returns:
-        Ayat: The Ayat object with the matching reference.
-
-    Raises:
-        ValueError: If no Ayat with the given reference is found.
-    """
-    for ayat in ayat_list:
-        if ayat.reference == reference:
-            return ayat
-    raise ValueError(f"No Ayat with reference '{reference}' found.")
-
-def get_ayat_translation(ayat: Ayat) -> str:
-    """
-    Retrieves the translation of an Ayat.
-
-    Args:
-        ayat (Ayat): The Ayat object.
-
-    Returns:
-        str: The translation of the Ayat.
-    """
-    return ayat.translation
-
-def search_ayat_by_text(ayat_list: List[Ayat], search_text: str) -> List[Ayat]:
-    """
-    Searches for Ayat containing a specific text.
-
-    Args:
-        ayat_list (List[Ayat]): A list of Ayat objects.
-        search_text (str): The text to search for.
-
-    Returns:
-        List[Ayat]: A list of Ayat objects containing the search text.
-    """
-    return [ayat for ayat in ayat_list if search_text.lower() in ayat.text.lower()]
-
-def generate_ayat_summary(ayat_list: List[Ayat]) -> Dict[str, int]:
-    """
-    Generates a summary of the Ayat list.
-
-    Args:
-        ayat_list (List[Ayat]): A list of Ayat objects.
-
-    Returns:
-        Dict[str, int]: A dictionary containing the count of Ayat with different references.
-    """
-    summary = {}
-    for ayat in ayat_list:
-        reference = ayat.reference
-        if reference in summary:
-            summary[reference] += 1
-        else:
-            summary[reference] = 1
-    return summary
-
-def main():
-    # Example usage:
-    ayat_list = load_ayat_from_json('ayat.json')
-    print("Loaded Ayat:")
-    for ayat in ayat_list:
-        print(f"Text: {ayat.text}, Translation: {ayat.translation}, Reference: {ayat.reference}")
-
-    reference = "1:1"
-    try:
-        ayat = get_ayat_by_reference(ayat_list, reference)
-        print(f"Ayat with reference '{reference}': {ayat.text}")
-    except ValueError as e:
-        print(e)
-
-    search_text = "example"
-    search_results = search_ayat_by_text(ayat_list, search_text)
-    print(f"Ayat containing '{search_text}':")
-    for ayat in search_results:
-        print(f"Text: {ayat.text}, Translation: {ayat.translation}, Reference: {ayat.reference}")
-
-    summary = generate_ayat_summary(ayat_list)
-    print("Ayat Summary:")
-    for reference, count in summary.items():
-        print(f"Reference: {reference}, Count: {count}")
-
-if __name__ == "__main__":
-    main()
-```
+_SOCIAL_LINKS: Dict[str, str] = {
+    "GitHub": "https://github.com/ayat_saadat",
+    "LinkedIn": "https://www.linkedin.com/in/ayat_saadat/",
+    "X (Twitter)": "https://x.com/ayat_saadat_dev",
+    "Dev.to": "https://dev.to/ayat_saadat",
+    "Personal Website": "https://ayat_sa
