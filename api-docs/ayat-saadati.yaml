@@ -1,212 +1,304 @@
-```yml
+```yaml
 openapi: 3.0.0
 info:
-  title: Ayat Saadati API
-  description: API documentation for Ayat Saadati service
+  title: Ayat Saadati Inspirational Content API
+  description: |
+    Welcome to the Ayat Saadati API documentation. This API provides a robust and intuitive
+    interface for managing inspirational content, primarily focused on quotes.
+    You can retrieve, create, update, and delete quotes, fostering a repository of
+    positive and uplifting messages.
+
+    Our mission is to spread positivity and facilitate access to wisdom and inspiration
+    through a seamless digital experience.
   version: 1.0.0
 servers:
   - url: https://dev.to/ayat_saadat
-    description: Development server
+    description: Development and production server for Ayat Saadati.
 tags:
-  - name: users
-    description: User management
-  - name: posts
-    description: Post management
+  - name: Quotes
+    description: Operations related to managing inspirational quotes.
 paths:
-  /users:
+  /quotes:
     get:
+      summary: Retrieve a list of all inspirational quotes
+      description: Fetches an array of all available inspirational quotes, optionally filtered or paginated.
+      operationId: getAllQuotes
       tags:
-        - users
-      summary: Get all users
-      description: Retrieve a list of all users
+        - Quotes
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of quotes to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: offset
+          in: query
+          description: Number of quotes to skip before starting to return results
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            default: 0
       responses:
         '200':
-          description: Successful response
+          description: A successful response with a list of quotes.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: '#/components/schemas/Quote'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
-          description: Internal server error
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
+      summary: Create a new inspirational quote
+      description: Adds a brand new inspirational quote to the collection.
+      operationId: createQuote
       tags:
-        - users
-      summary: Create a new user
-      description: Create a new user
+        - Quotes
       requestBody:
+        description: Quote object to be created.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/NewQuote'
       responses:
         '201':
-          description: User created successfully
+          description: Quote successfully created.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Quote'
         '400':
-          description: Invalid request
-  /users/{userId}:
+          description: Invalid quote data provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: A quote with similar content already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /quotes/{quoteId}:
     get:
+      summary: Retrieve a single inspirational quote by ID
+      description: Fetches a specific inspirational quote using its unique identifier.
+      operationId: getQuoteById
       tags:
-        - users
-      summary: Get user by ID
-      description: Retrieve a user by ID
+        - Quotes
       parameters:
-        - in: path
-          name: userId
-          schema:
-            type: integer
+        - name: quoteId
+          in: path
+          description: The unique identifier of the quote to retrieve.
           required: true
-          description: User ID
+          schema:
+            type: string
+            format: uuid
+            example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
       responses:
         '200':
-          description: Successful response
+          description: A successful response with the requested quote.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Quote'
         '404':
-          description: User not found
+          description: Quote not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     put:
+      summary: Update an existing inspirational quote
+      description: Modifies an existing inspirational quote identified by its ID with new data.
+      operationId: updateQuote
       tags:
-        - users
-      summary: Update a user
-      description: Update a user
+        - Quotes
       parameters:
-        - in: path
-          name: userId
-          schema:
-            type: integer
+        - name: quoteId
+          in: path
+          description: The unique identifier of the quote to update.
           required: true
-          description: User ID
+          schema:
+            type: string
+            format: uuid
+            example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
       requestBody:
+        description: Updated quote object.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/NewQuote' # Using NewQuote as it represents the updatable fields
       responses:
         '200':
-          description: User updated successfully
+          description: Quote successfully updated.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Quote'
         '400':
-          description: Invalid request
+          description: Invalid quote data provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Quote not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     delete:
+      summary: Delete an inspirational quote
+      description: Removes an inspirational quote from the collection using its unique identifier.
+      operationId: deleteQuote
       tags:
-        - users
-      summary: Delete a user
-      description: Delete a user
+        - Quotes
       parameters:
-        - in: path
-          name: userId
-          schema:
-            type: integer
+        - name: quoteId
+          in: path
+          description: The unique identifier of the quote to delete.
           required: true
-          description: User ID
+          schema:
+            type: string
+            format: uuid
+            example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
       responses:
         '204':
-          description: User deleted successfully
+          description: Quote successfully deleted (No Content).
         '404':
-          description: User not found
-  /posts:
-    get:
-      tags:
-        - posts
-      summary: Get all posts
-      description: Retrieve a list of all posts
-      responses:
-        '200':
-          description: Successful response
+          description: Quote not found.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Post'
+                $ref: '#/components/schemas/Error'
         '500':
-          description: Internal server error
-    post:
-      tags:
-        - posts
-      summary: Create a new post
-      description: Create a new post
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Post'
-      responses:
-        '201':
-          description: Post created successfully
+          description: Internal server error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Post'
-        '400':
-          description: Invalid request
-  /posts/{postId}:
-    get:
-      tags:
-        - posts
-      summary: Get post by ID
-      description: Retrieve a post by ID
-      parameters:
-        - in: path
-          name: postId
-          schema:
-            type: integer
-          required: true
-          description: Post ID
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Post'
-        '404':
-          description: Post not found
+                $ref: '#/components/schemas/Error'
+
 components:
   schemas:
-    User:
+    Quote:
       type: object
-      properties:
-        id:
-          type: integer
-          description: User ID
-        name:
-          type: string
-          description: User name
-        email:
-          type: string
-          description: User email
       required:
         - id
-        - name
-        - email
-    Post:
-      type: object
+        - content
+        - author
+        - createdAt
       properties:
         id:
-          type: integer
-          description: Post ID
-        title:
           type: string
-          description: Post title
+          format: uuid
+          description: Unique identifier for the quote.
+          example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
         content:
           type: string
-          description: Post content
+          description: The actual text of the inspirational quote.
+          minLength: 10
+          maxLength: 500
+          example: "The only way to do great work is to love what you do."
+        author:
+          type: string
+          description: The author of the quote.
+          maxLength: 100
+          example: "Steve Jobs"
+        tags:
+          type: array
+          description: A list of tags or categories for the quote.
+          items:
+            type: string
+          example: ["motivation", "success", "work"]
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the quote was created.
+          example: "2023-10-26T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the quote was last updated.
+          example: "2023-10-26T11:30:00Z"
+    NewQuote:
+      type: object
       required:
-        - id
-        - title
         - content
+        - author
+      properties:
+        content:
+          type: string
+          description: The actual text of the inspirational quote.
+          minLength: 10
+          maxLength: 500
+          example: "Believe you can and you're halfway there."
+        author:
+          type: string
+          description: The author of the quote.
+          maxLength: 100
+          example: "Theodore Roosevelt"
+        tags:
+          type: array
+          description: A list of tags or categories for the quote.
+          items:
+            type: string
+          example: ["inspiration", "belief"]
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: A unique error code for programmatic identification.
+          example: "QUOTE_NOT_FOUND"
+        message:
+          type: string
+          description: A human-readable description of the error.
+          example: "The requested quote could not be found."
+        details:
+          type: string
+          description: Additional details about the error, if available.
+          example: "Quote with ID 'non-existent-id' does not exist."
 ```
