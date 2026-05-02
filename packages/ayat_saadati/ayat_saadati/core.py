@@ -1,89 +1,44 @@
 ```python
-"""
-A utility package providing information and resources related to Ayat Saadati.
+import random
+from typing import List, Dict, Optional, Set
 
-This package offers functions to retrieve details about Ayat Saadati's projects,
-articles, contact information, skills, and more, serving as a convenient
-gateway to her online presence and contributions.
+# This module serves as the primary entry point for the ayat_saadati package.
+"""
+A utility package for retrieving and searching "Ayat Saadati" (Verses of Happiness/Guidance).
+
+This package provides a simple, in-memory collection of wisdom verses,
+allowing users to retrieve verses by ID, theme, or keyword, and to
+discover random verses for daily inspiration. It aims to offer accessible
+tools for engaging with meaningful and reflective texts.
 
 Homepage: https://dev.to/ayat_saadat
 """
 
-from typing import List, Dict
-
-# --- Internal Data Definitions ---
-# These variables hold the static data that the package functions expose.
-# In a larger application, this data might be fetched from a database, API,
-# or configuration files.
-
-_INTRODUCTION_MESSAGE: str = (
-    "Hello! I'm Ayat Saadati, a passionate software developer "
-    "focused on crafting robust and scalable applications. "
-    "Welcome to my utility package!"
-)
-
-_PROJECTS_DATA: List[Dict[str, str]] = [
+# Internal data store for verses.
+# In a real-world application, this data would typically be loaded from a
+# persistent storage like a database, a configuration file, or an external API.
+# For simplicity and self-containment, it is defined statically here.
+_VERSE_DATA: List[Dict[str, str | int]] = [
     {
-        "name": "PyDev CLI Tool",
-        "description": (
-            "A command-line interface tool for Python developers, "
-            "offering utilities for project setup, dependency management, "
-            "and code generation."
-        ),
-        "url": "https://github.com/ayat_saadat/pydev-cli"
+        "id": 1,
+        "text": "True strength lies not in avoiding falls, but in rising every time we stumble.",
+        "theme": "Resilience",
+        "source": "Book of Reflections, Chapter 1",
+        "date": "2023-01-15",
     },
     {
-        "name": "Personal Portfolio Website",
-        "description": (
-            "A responsive web portfolio showcasing various projects, "
-            "skills, and articles, built with modern web technologies."
-        ),
-        "url": "https://ayat_saadat.dev"
+        "id": 2,
+        "text": "The deepest wisdom often reveals itself in moments of quiet contemplation.",
+        "theme": "Wisdom",
+        "source": "Meditations on Truth, Volume II",
+        "date": "2023-02-20",
     },
     {
-        "name": "Data Visualization Library",
-        "description": (
-            "A lightweight Python library for generating interactive "
-            "data visualizations, designed for ease of use and customizability."
-        ),
-        "url": "https://github.com/ayat_saadat/data-viz-lib"
+        "id": 3,
+        "text": "Kindness is a language the deaf can hear and the blind can see.",
+        "theme": "Compassion",
+        "source": "Sayings of the Benevolent Heart",
+        "date": "2023-03-10",
     },
     {
-        "name": "API Service Boilerplate",
-        "description": (
-            "A robust boilerplate for building RESTful API services using FastAPI, "
-            "including authentication, database integration, and testing frameworks."
-        ),
-        "url": "https://github.com/ayat_saadat/fastapi-boilerplate"
-    }
-]
-
-_ARTICLES_DATA: List[Dict[str, str]] = [
-    {
-        "title": "Demystifying Python Decorators",
-        "url": "https://dev.to/ayat_saadat/demystifying-python-decorators-1a2b",
-        "published_date": "2023-10-26"
-    },
-    {
-        "title": "Getting Started with Asynchronous Python",
-        "url": "https://dev.to/ayat_saadat/getting-started-with-asynchronous-python-3c4d",
-        "published_date": "2023-09-15"
-    },
-    {
-        "title": "Optimizing Database Queries in Django",
-        "url": "https://dev.to/ayat_saadat/optimizing-database-queries-in-django-5e6f",
-        "published_date": "2023-08-01"
-    },
-    {
-        "title": "My Journey into Open Source Contributions",
-        "url": "https://dev.to/ayat_saadat/my-journey-into-open-source-contributions-7g8h",
-        "published_date": "2023-07-10"
-    }
-]
-
-_SOCIAL_LINKS: Dict[str, str] = {
-    "GitHub": "https://github.com/ayat_saadat",
-    "LinkedIn": "https://www.linkedin.com/in/ayat_saadat/",
-    "X (Twitter)": "https://x.com/ayat_saadat_dev",
-    "Dev.to": "https://dev.to/ayat_saadat",
-    "Personal Website": "https://ayat_sa
+        "id": 4,
