@@ -1,312 +1,187 @@
-# `dev-tools` by Ayat Saadat: Streamlining Your Development Workflow
+## Saadati DevTools: Streamlining Modern Web Development
 
-I've always been a big believer in making our lives as developers easier. We spend countless hours on setup, configuration, and repetitive tasks that, frankly, steal time from the creative, problem-solving work we love. That's precisely why I started building `dev-tools` – a command-line interface (CLI) designed to cut through the boilerplate and give you back valuable development time.
+As developers, we're constantly looking for ways to boost our productivity, enforce best practices, and reduce the cognitive load of setting up new projects or generating boilerplate. Over the years, I've seen countless teams struggle with inconsistent project structures, repetitive component creation, and the sheer overhead of configuring linters and bundlers. That's where **Saadati DevTools** comes in.
 
-Think of `dev-tools` as your trusty Swiss Army knife for common development headaches. Whether you're kicking off a new project, trying to make sense of a complex dependency tree, or just need a quick boilerplate code snippet, this tool aims to be right there with you, making things just a little bit smoother. My goal with `dev-tools` was never to replace sophisticated IDEs or build systems, but rather to complement them, handling those quick, tactical tasks that often break your flow.
+This isn't just another CLI; it's a curated, opinionated collection of utilities and patterns designed to make your web development workflow smoother, especially within the React and Next.js ecosystems. We've distilled years of front-end engineering insights into a set of commands that help you scaffold projects, generate components, and maintain code quality with minimal fuss. Think of it as having an experienced architect guiding your project from the very first line of code.
 
----
+### What is Saadati DevTools?
 
-## Table of Contents
+Saadati DevTools is a powerful command-line interface (CLI) and a collection of extensible utility modules crafted to address common pain points in modern web development. It focuses on:
 
-1.  [Introduction](#introduction)
-2.  [Features](#features)
-3.  [Installation](#installation)
-    *   [Prerequisites](#prerequisites)
-    *   [Installation Steps](#installation-steps)
-    *   [Verifying Installation](#verifying-installation)
-4.  [Usage](#usage)
-    *   [Basic Commands](#basic-commands)
-    *   [`dev-tools init`](#dev-tools-init)
-    *   [`dev-tools deps`](#dev-tools-deps)
-    *   [`dev-tools snippet`](#dev-tools-snippet)
-5.  [Configuration](#configuration)
-6.  [Code Examples](#code-examples)
-    *   [Scaffolding a React Project](#scaffolding-a-react-project)
-    *   [Analyzing Project Dependencies](#analyzing-project-dependencies)
-    *   [Generating a Simple Function Snippet](#generating-a-simple-function-snippet)
-7.  [FAQ](#faq)
-8.  [Troubleshooting](#troubleshooting)
-9.  [Getting Involved & Further Reading](#getting-involved--further-reading)
+*   **Rapid Project Scaffolding:** Get a new React or Next.js project up and running with a robust, opinionated structure and essential configurations (TypeScript, ESLint, Prettier, Jest, Storybook, etc.) pre-baked.
+*   **Efficient Code Generation:** Quickly generate common code structures like components, hooks, contexts, and pages, following established best practices and consistent naming conventions.
+*   **Quality Assurance:** Integrate linting, formatting, and basic performance auditing tools to ensure your codebase remains clean, maintainable, and performant from day one.
+*   **Developer Experience (DX):** Minimize repetitive tasks, reduce setup time, and allow you to focus on writing application logic rather than configuration.
 
----
+I've always believed that great tools should feel like an extension of your thought process, not a barrier. Saadati DevTools aims to be that extension.
 
-## Introduction
+### Installation
 
-As I mentioned, `dev-tools` is a CLI focused on developer experience. It's written primarily in Node.js, making it highly accessible to anyone familiar with the JavaScript ecosystem, but its utility extends to projects across various languages and frameworks. I built it to be modular, so you can pick and choose the features you need without bloat. It's really about giving you sensible defaults and quick actions for common development tasks.
-
-### Why `dev-tools`?
-
-You might be thinking, "Another CLI? Don't we have enough?" And you're right, there are tons of fantastic tools out there. But `dev-tools` aims for a different niche: being that generalized helper that understands common pain points across different project types. I found myself repeatedly writing similar scripts or searching for the same boilerplate, and I figured, why not centralize some of that wisdom? It's not a framework-specific tool; it's a *developer-specific* tool.
-
----
-
-## Features
-
-Here's a quick rundown of what `dev-tools` brings to the table right now. I'm always adding more, so keep an eye out!
-
-*   **Project Scaffolding (`init`):** Quickly create new projects from predefined templates (e.g., React, Vue, Node.js API). Saves you from `create-react-app` fatigue.
-*   **Dependency Analysis (`deps`):** Get insights into your project's dependencies, visualize their tree, identify potential security vulnerabilities, or simply list them out cleanly. Works across `npm`, `yarn`, and `pnpm`.
-*   **Code Snippet Generation (`snippet`):** Generate common code constructs (e.g., React components, Redux reducers, basic function skeletons) directly into your files. No more copy-pasting from old projects!
-*   **Configuration Management:** Simple JSON-based configuration to customize templates and behaviors.
-
----
-
-## Installation
-
-Getting `dev-tools` up and running is straightforward. Since it's built with Node.js, you'll need Node.js and `npm` (or `yarn`, `pnpm`) installed first.
-
-### Prerequisites
-
-Before you install `dev-tools`, make sure you have:
-
-*   **Node.js:** Version 14.x or higher. I typically recommend using the latest LTS version.
-    *   You can download it from [nodejs.org](https://nodejs.org/) or use a version manager like `nvm`.
-*   **npm (Node Package Manager):** Usually bundled with Node.js.
-    *   Alternatively, `yarn` (v1.x or v2+) or `pnpm` are fully supported.
-
-You can check your Node.js and npm versions with:
-
-```bash
-node -v
-npm -v
-```
-
-### Installation Steps
-
-Once your prerequisites are met, install `dev-tools` globally using your preferred package manager. I usually go with `npm`:
+Getting started with Saadati DevTools is straightforward. You can install it globally via `npm` or `yarn`, making its commands available throughout your system.
 
 ```bash
 # Using npm
-npm install -g @ayat-saadat/dev-tools
+npm install -g saadati-devtools
 
 # Using yarn
-yarn global add @ayat-saadat/dev-tools
-
-# Using pnpm
-pnpm install -g @ayat-saadat/dev-tools
+yarn global add saadati-devtools
 ```
 
-I chose a scoped package name (`@ayat-saadat/dev-tools`) to make it clear who's behind it and to avoid potential naming conflicts with other tools out there.
-
-### Verifying Installation
-
-To ensure everything is installed correctly, open a new terminal window and run:
+After installation, you can verify it's working by running:
 
 ```bash
-dev-tools --version
+saadati --version
 ```
 
-You should see the installed version number printed to the console. If you get an error like `command not found`, double-check your installation steps and ensure your global `npm` binaries path is in your system's `PATH` environment variable.
+You should see the current version number printed to your console. If you encounter any issues, check the [Troubleshooting](#troubleshooting) section.
 
----
+### Getting Started: Initializing a New Project
 
-## Usage
+One of the most powerful features of Saadati DevTools is its ability to scaffold new projects with a battle-tested structure. Let's say you want to start a new Next.js application with TypeScript, Tailwind CSS, and a pre-configured ESLint setup.
 
-`dev-tools` is designed to be intuitive. Most commands follow a `dev-tools <command> [options]` pattern.
-
-### Basic Commands
-
-Here are some fundamental commands to get you started:
-
-*   **`dev-tools --help`**: Displays a list of all available commands and global options.
-*   **`dev-tools <command> --help`**: Provides detailed help for a specific command, including its options and arguments.
+Navigate to your desired development directory and run:
 
 ```bash
-# Get general help
-dev-tools --help
-
-# Get help for the 'init' command
-dev-tools init --help
+saadati init next-app my-awesome-project --typescript --tailwind --eslint
 ```
 
-### `dev-tools init`
+This command will:
 
-The `init` command is your go-to for scaffolding new projects. It's interactive by default, guiding you through template selection and project naming.
+1.  Create a new directory named `my-awesome-project`.
+2.  Initialize a Next.js project within it.
+3.  Configure TypeScript support.
+4.  Set up Tailwind CSS.
+5.  Integrate and configure ESLint with a sensible default ruleset.
+6.  Install all necessary dependencies.
+
+Once the process completes, `cd my-awesome-project` and you're ready to `npm run dev` (or `yarn dev`) and start building! It's that simple. No more wrestling with configuration files for an hour before writing a single line of application code.
+
+### Usage: Core Commands & Examples
+
+Saadati DevTools provides a suite of commands to streamline various aspects of your development workflow. Here are some of the most frequently used ones:
+
+#### 1. `saadati init <template> [project-name] [options]`
+
+Initializes a new project based on a predefined template.
+
+*   `template`: The project template (e.g., `react-app`, `next-app`, `react-library`).
+*   `project-name`: The name of your new project directory.
+*   `options`:
+    *   `--typescript` / `-ts`: Enable TypeScript.
+    *   `--tailwind`: Include Tailwind CSS setup.
+    *   `--eslint`: Include ESLint configuration.
+    *   `--prettier`: Include Prettier configuration.
+    *   `--jest`: Include Jest for testing.
+    *   `--storybook`: Include Storybook for UI component development.
+
+**Example: React App with all the fixings**
 
 ```bash
-dev-tools init [project-name] [options]
+saadati init react-app my-dashboard --typescript --tailwind --eslint --prettier --jest --storybook
 ```
 
-**Options:**
+#### 2. `saadati generate <type> <name> [options]`
 
-| Option         | Shorthand | Description                                           | Type      | Default      |
-| :------------- | :-------- | :---------------------------------------------------- | :-------- | :----------- |
-| `--template`   | `-t`      | Specify a template (e.g., `react`, `node-api`).     | `string`  | Interactive  |
-| `--install`    | `-i`      | Automatically run `npm install` after scaffolding.  | `boolean` | `true`       |
-| `--git`        | `-g`      | Initialize a Git repository.                          | `boolean` | `true`       |
-| `--dry-run`    | `-d`      | Simulate creation without writing files.              | `boolean` | `false`      |
+Generates boilerplate code for various components, hooks, or other modules. This command is a lifesaver for maintaining consistency and saving keystrokes.
 
-**Example:**
+*   `type`: The type of entity to generate (e.g., `component`, `hook`, `context`, `page`).
+*   `name`: The name of the entity (e.g., `Button`, `useAuth`, `UserProfile`).
+*   `options`:
+    *   `--path <dir>` / `-p <dir>`: Specify a relative path to generate the file(s) (e.g., `src/components`).
+    *   `--with-test`: Generate an accompanying test file.
+    *   `--with-storybook`: Generate an accompanying Storybook story file.
+    *   `--lazy`: For components, generate a lazily loaded component.
+
+**Example: Generating a React Component**
+
+Let's create a `Card` component in `src/components`, complete with a test file and a Storybook story.
 
 ```bash
-# Interactive mode
-dev-tools init
-
-# Create a React project named 'my-app' without auto-installing dependencies
-dev-tools init my-app --template react --no-install
+cd my-awesome-project # Ensure you're in your project directory
+saadati generate component Card --path src/components --with-test --with-storybook
 ```
 
-### `dev-tools deps`
+This will typically create:
 
-This command helps you inspect your project's dependencies. It can be a real lifesaver when you're trying to figure out why a package is there or if you have conflicting versions.
+```
+src/components/Card/
+├── index.ts
+├── Card.tsx
+├── Card.module.css # Or .scss, depending on project setup
+├── Card.test.tsx
+└── Card.stories.tsx
+```
+
+The component will have a basic functional structure, ready for you to fill in the logic and styling.
+
+**Example: Generating a Custom Hook**
 
 ```bash
-dev-tools deps [options]
+saadati generate hook useDebounce --path src/hooks
 ```
 
-**Options:**
+This generates `src/hooks/useDebounce.ts` with a basic hook structure.
 
-| Option        | Shorthand | Description                                               | Type      | Default   |
-| :------------ | :-------- | :-------------------------------------------------------- | :-------- | :-------- |
-| `--tree`      | `-t`      | Display dependencies as a hierarchical tree.              | `boolean` | `false`   |
-| `--depth`     | `-d`      | Max depth for `--tree` view (0 for direct deps only).     | `number`  | `Infinity`|
-| `--json`      | `-j`      | Output dependency data as JSON.                           | `boolean` | `false`   |
-| `--prod-only` | `-P`      | Only show production dependencies.                        | `boolean` | `false`   |
-| `--dev-only`  | `-D`      | Only show development dependencies.                       | `boolean` | `false`   |
+#### 3. `saadati lint [options]`
 
-**Example:**
+Runs ESLint (or other configured linters) across your project, ensuring code quality and consistency.
+
+*   `options`:
+    *   `--fix`: Automatically fix linting errors where possible.
+    *   `--files <pattern>`: Specify files or patterns to lint.
+
+**Example: Lint and Fix**
 
 ```bash
-# List all direct dependencies
-dev-tools deps
-
-# Show the full dependency tree
-dev-tools deps --tree
-
-# Show production dependencies up to depth 2
-dev-tools deps --tree --depth 2 --prod-only
+saadati lint --fix
 ```
 
-### `dev-tools snippet`
+This command often saves me from manual formatting woes and makes code reviews much smoother.
 
-Need a quick code block? The `snippet` command is perfect for injecting common code patterns into your files or just printing them to the console.
+#### 4. `saadati audit [options]`
+
+Performs basic performance and best practice audits on your project. This is a lighter-weight check than full Lighthouse audits but can catch common issues early.
+
+*   `options`:
+    *   `--verbose`: Show detailed audit results.
+    *   `--threshold <value>`: Set a custom performance threshold (e.g., `--threshold 80`).
+
+**Example: Run a quick audit**
 
 ```bash
-dev-tools snippet <type> [name] [options]
+saadati audit
 ```
 
-**Arguments:**
+This might check for unused dependencies, large bundle sizes (with basic warnings), or common accessibility pitfalls.
 
-*   `<type>`: The type of snippet to generate (e.g., `react-func-comp`, `node-express-route`, `js-async-func`).
-*   `[name]`: Optional name for the snippet (e.g., component name, function name).
+### Configuration
 
-**Options:**
+Saadati DevTools is designed to be opinionated but also configurable. For project-specific settings, you can create a `saadati.config.js` or `saadati.config.ts` file at the root of your project.
 
-| Option         | Shorthand | Description                                               | Type      | Default      |
-| :------------- | :-------- | :-------------------------------------------------------- | :-------- | :----------- |
-| `--output`     | `-o`      | Specify an output file path. Prints to stdout if omitted. | `string`  | `stdout`     |
-| `--lang`       | `-l`      | Specify target language (e.g., `js`, `ts`).               | `string`  | `js`         |
-| `--overwrite`  | `-w`      | Overwrite the output file if it exists.                   | `boolean` | `false`      |
-
-**Example:**
-
-```bash
-# Generate a React functional component to stdout
-dev-tools snippet react-func-comp MyComponent
-
-# Generate an async JavaScript function and save it to a file
-dev-tools snippet js-async-func fetchData --name getUserData --output src/utils/api.js
-
-# Generate a TypeScript interface
-dev-tools snippet ts-interface User --output src/types/User.ts --lang ts
-```
-
----
-
-## Configuration
-
-`dev-tools` can be configured globally or on a per-project basis.
-
-**Global Configuration:**
-Located at `~/.config/dev-tools/config.json` (or equivalent for your OS), this file stores default templates, preferred package managers, and other global settings.
-
-**Project-level Configuration:**
-You can place a `.devtoolsrc.json` file at the root of your project to override global settings for that specific project.
-
-Here's an example of what your `config.json` or `.devtoolsrc.json` might look like:
-
-```json
-{
-  "defaultPackageManager": "npm",
-  "templates": {
-    "react-ts": "https://github.com/ayat-saadat/dev-tools-templates/react-ts-starter",
-    "my-custom-node-api": "/path/to/my/local/template"
+```javascript
+// saadati.config.js
+module.exports = {
+  // Define custom templates for 'generate' command
+  generators: {
+    // Example: A custom template for an Atomic Design "Atom" component
+    atom: {
+      template: 'path/to/my-atom-template', // Relative path to a folder containing template files
+      outputPath: 'src/components/atoms',
+      files: [
+        { name: 'index.ts', content: 'export * from "./{{name}}";' },
+        { name: '{{name}}.tsx', content: 'import React from "react";\n\ninterface {{name}}Props {}\n\nexport const {{name}}: React.FC<{{name}}Props> = ({}) => {\n  return <div>{{name}}</div>;\n};\n' },
+        { name: '{{name}}.module.css', content: '' },
+      ],
+      // You can define prompts for arguments if needed
+      prompts: [
+        {
+          type: 'input',
+          name: 'name',
+          message: 'What is the name of your atom component?',
+        },
+      ],
+    },
   },
-  "snippetDefaults": {
-    "lang": "js",
-    "react-func-comp": {
-      "extension": ".jsx"
-    }
-  }
-}
-```
-
-**Key Configuration Options:**
-
-| Key                     | Type     | Description                                                               | Example Value                       |
-| :---------------------- | :------- | :------------------------------------------------------------------------ | :---------------------------------- |
-| `defaultPackageManager` | `string` | The package manager `dev-tools` should use for `init --install`.          | `"yarn"`, `"pnpm"`, `"npm"`         |
-| `templates`             | `object` | Map of custom template names to their Git URLs or local paths.            | `{"my-tpl": "https://..."}`         |
-| `snippetDefaults`       | `object` | Default settings for snippet generation (e.g., default `lang`, extensions). | `{"lang": "ts"}`                    |
-| `gitUser`               | `string` | Your default Git username for new project commits.                        | `"Ayat Saadat"`                     |
-| `gitEmail`              | `string` | Your default Git email for new project commits.                           | `"ayat@example.com"`                |
-
----
-
-## Code Examples
-
-Let's walk through some practical use cases to really show `dev-tools` in action.
-
-### Scaffolding a React Project
-
-Imagine you're starting a new React application. Instead of wrestling with `create-react-app` or manually setting up Webpack, just use `dev-tools init`:
-
-```bash
-# In your desired parent directory
-dev-tools init my-cool-react-app --template react
-```
-
-This will:
-
-1.  Create a new directory named `my-cool-react-app`.
-2.  Clone the default React template (or your custom one).
-3.  Install all `npm` dependencies (unless `--no-install` is specified).
-4.  Initialize a Git repository.
-
-You'll see output similar to this:
-
-```
-🚀 Initializing new project 'my-cool-react-app'...
-  Template: react (https://github.com/ayat-saadat/dev-tools-templates/react-starter)
-  Destination: /path/to/my-cool-react-app
-
-✅ Template copied successfully.
-📦 Installing dependencies with npm...
-  (This might take a moment...)
-✅ Dependencies installed.
-🌲 Initializing Git repository...
-✅ Git repository initialized.
-
-🎉 Your project 'my-cool-react-app' is ready!
-   cd my-cool-react-app
-   npm start
-```
-
-### Analyzing Project Dependencies
-
-Let's say you've joined a new project, and you want to quickly understand its dependency landscape.
-
-```bash
-# Inside your project directory
-dev-tools deps --tree --depth 1
-```
-
-This command will give you a nicely formatted tree view of all direct dependencies and their immediate children. It's super helpful for spotting duplicate packages or unexpected sub-dependencies.
-
-```
-📦 Project Dependencies for my-cool-react-app:
-
-├── react@18.2.0
-│   └── @babel/runtime@7.23.6
-├── react-dom@18.2.0
-│   └── scheduler@0.23.
+  // Global settings for linting, auditing, etc.
+  lint: {
+    rules: {
