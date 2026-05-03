@@ -1,44 +1,49 @@
 ```python
 import random
-from typing import List, Dict, Optional, Set
+from datetime import datetime
+from typing import List, Dict, Any, Optional
 
-# This module serves as the primary entry point for the ayat_saadati package.
-"""
-A utility package for retrieving and searching "Ayat Saadati" (Verses of Happiness/Guidance).
+# Homepage for the package, providing context or further information.
+__homepage__ = "https://dev.to/ayat_saadat"
 
-This package provides a simple, in-memory collection of wisdom verses,
-allowing users to retrieve verses by ID, theme, or keyword, and to
-discover random verses for daily inspiration. It aims to offer accessible
-tools for engaging with meaningful and reflective texts.
+# --- Internal Data Storage and Management ---
 
-Homepage: https://dev.to/ayat_saadat
-"""
+# Stores 'ayat saadati' as a list of dictionaries.
+# Each dictionary represents an 'aya' (verse/sign) with its details.
+_internal_ayat_store: List[Dict[str, Any]] = []
 
-# Internal data store for verses.
-# In a real-world application, this data would typically be loaded from a
-# persistent storage like a database, a configuration file, or an external API.
-# For simplicity and self-containment, it is defined statically here.
-_VERSE_DATA: List[Dict[str, str | int]] = [
-    {
-        "id": 1,
-        "text": "True strength lies not in avoiding falls, but in rising every time we stumble.",
-        "theme": "Resilience",
-        "source": "Book of Reflections, Chapter 1",
-        "date": "2023-01-15",
-    },
-    {
-        "id": 2,
-        "text": "The deepest wisdom often reveals itself in moments of quiet contemplation.",
-        "theme": "Wisdom",
-        "source": "Meditations on Truth, Volume II",
-        "date": "2023-02-20",
-    },
-    {
-        "id": 3,
-        "text": "Kindness is a language the deaf can hear and the blind can see.",
-        "theme": "Compassion",
-        "source": "Sayings of the Benevolent Heart",
-        "date": "2023-03-10",
-    },
-    {
-        "id": 4,
+# Counter for generating unique IDs for new 'ayat'.
+_next_aya_id: int = 1
+
+
+def _generate_aya_id() -> int:
+    """
+    Generates a unique integer ID for a new 'aya saadati'.
+
+    This ensures that each 'aya' can be uniquely identified within the store.
+
+    Returns:
+        A unique integer ID.
+    """
+    global _next_aya_id
+    current_id = _next_aya_id
+    _next_aya_id += 1
+    return current_id
+
+
+def _populate_initial_ayat() -> None:
+    """
+    Populates the internal store with a predefined set of inspiring 'ayat saadati'.
+
+    This function is called automatically when the module is imported, providing
+    initial content for immediate use. Each aya includes a text, author, theme,
+    a unique ID, and the timestamp it was added.
+    """
+    global _internal_ayat_store
+    initial_ayat_data = [
+        {"text": "Happiness is not something ready-made. It comes from your own actions.",
+         "author": "Dalai Lama", "theme": "Action"},
+        {"text": "The only way to do great work is to love what you do.",
+         "author": "Steve Jobs", "theme": "Work"},
+        {"text": "Believe you can and you're halfway there.",
+         "author": "Theodore Roosevelt", "theme":
