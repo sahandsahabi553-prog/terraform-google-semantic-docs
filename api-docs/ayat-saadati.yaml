@@ -1,172 +1,126 @@
 ```yaml
 openapi: 3.0.0
 info:
-  title: Ayat Saadati API
+  title: Ayat Saadati Service API
   description: |
-    Welcome to the Ayat Saadati API documentation!
-    This API provides a robust set of endpoints for managing and retrieving 'Saadats' (blessings, inspirations, or posts).
-    It allows users to perform CRUD (Create, Read, Update, Delete) operations on inspirational content,
-    making it easy to share and manage positive affirmations or insightful articles.
+    Welcome to the Ayat Saadati Service API documentation!
+
+    This API provides a comprehensive set of endpoints to manage posts, articles, and other content related to Ayat Saadati's platform. You can create, read, update, and delete posts, interact with user profiles, and manage comments.
+
+    Explore the endpoints below to integrate with our service.
   version: 1.0.0
 servers:
   - url: https://dev.to/ayat_saadat
-    description: Development server for Ayat Saadati API
+    description: Production server for Ayat Saadati Service
+tags:
+  - name: Posts
+    description: Operations related to blog posts and articles.
+  - name: Users
+    description: Operations related to user profiles.
+  - name: Comments
+    description: Operations related to post comments.
 paths:
-  /saadats:
+  /posts:
     get:
-      summary: Retrieve a list of all Saadats
-      description: |
-        Fetches a comprehensive list of all 'Saadats' (inspirational posts or blessings) available in the system.
-        Results can be paginated or filtered in a more advanced implementation (not shown here).
-      operationId: getAllSaadats
       tags:
-        - Saadats
+        - Posts
+      summary: Get all posts
+      description: Retrieves a paginated list of all available posts on the platform.
+      operationId: getAllPosts
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of posts to retrieve.
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 10
+        - name: offset
+          in: query
+          description: The number of posts to skip before starting to collect the result set.
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            default: 0
       responses:
         '200':
-          description: A successful response returning an array of Saadat objects.
+          description: A list of posts.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Saadat'
-              examples:
-                successList:
-                  summary: Example of a successful list of Saadats
-                  value:
-                    - id: 101
-                      title: "The Power of Gratitude"
-                      content: "Cultivate an attitude of gratitude, and watch your world transform. Every challenge is an opportunity."
-                      author: "Ayat Saadati"
-                      createdAt: "2023-01-15T08:00:00Z"
-                      updatedAt: "2023-01-15T08:00:00Z"
-                    - id: 102
-                      title: "Embrace the Journey"
-                      content: "Life is a journey, not a destination. Enjoy the process, learn from every step, and grow."
-                      author: "Guest Contributor"
-                      createdAt: "2023-02-20T14:30:00Z"
-                      updatedAt: "2023-02-20T14:30:00Z"
+                  $ref: '#/components/schemas/Post'
         '500':
           description: Internal server error.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-              examples:
-                internalError:
-                  summary: Example of an internal server error
-                  value:
-                    code: 500
-                    message: "An unexpected error occurred on the server."
     post:
-      summary: Create a new Saadat
-      description: |
-        Adds a new 'Saadat' entry to the system. The request body should contain
-        the title, content, and author for the new Saadat.
-      operationId: createSaadat
       tags:
-        - Saadats
+        - Posts
+      summary: Create a new post
+      description: Creates a new post with the provided details.
+      operationId: createPost
       requestBody:
-        description: Saadat object to be created.
+        description: Post object to be created.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewSaadat'
-            examples:
-              newSaadatRequest:
-                summary: Example request for creating a new Saadat
-                value:
-                  title: "Mindfulness in Daily Life"
-                  content: "Practice being present in every moment. It reduces stress and enhances appreciation."
-                  author: "Ayat Saadati"
+              $ref: '#/components/schemas/NewPost'
       responses:
         '201':
-          description: Saadat created successfully. Returns the newly created Saadat object with its assigned ID.
+          description: Post created successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Saadat'
-              examples:
-                createdSaadat:
-                  summary: Example of a newly created Saadat
-                  value:
-                    id: 103
-                    title: "Mindfulness in Daily Life"
-                    content: "Practice being present in every moment. It reduces stress and enhances appreciation."
-                    author: "Ayat Saadati"
-                    createdAt: "2023-10-27T10:00:00Z"
-                    updatedAt: "2023-10-27T10:00:00Z"
+                $ref: '#/components/schemas/Post'
         '400':
-          description: Invalid input provided (e.g., missing required fields).
+          description: Invalid input provided.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-              examples:
-                invalidInput:
-                  summary: Example of invalid input error
-                  value:
-                    code: 400
-                    message: "Validation Error: 'title' and 'content' are required."
         '500':
           description: Internal server error.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    
-  /saadats/{saadatId}:
-    parameters:
-      - name: saadatId
-        in: path
-        description: Unique identifier of the Saadat to retrieve, update, or delete.
-        required: true
-        schema:
-          type: integer
-          format: int64
-          minimum: 1
-        examples:
-          existingId:
-            value: 101
-          nonExistentId:
-            value: 999
+  /posts/{postId}:
     get:
-      summary: Retrieve a single Saadat by ID
-      description: |
-        Fetches the details of a specific 'Saadat' using its unique identifier.
-      operationId: getSaadatById
       tags:
-        - Saadats
+        - Posts
+      summary: Get a post by ID
+      description: Retrieves a single post by its unique identifier.
+      operationId: getPostById
+      parameters:
+        - name: postId
+          in: path
+          description: ID of the post to retrieve.
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
-          description: The requested Saadat object.
+          description: Post found successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Saadat'
-              examples:
-                singleSaadat:
-                  summary: Example of a single Saadat retrieved by ID
-                  value:
-                    id: 101
-                    title: "The Power of Gratitude"
-                    content: "Cultivate an attitude of gratitude, and watch your world transform. Every challenge is an opportunity."
-                    author: "Ayat Saadati"
-                    createdAt: "2023-01-15T08:00:00Z"
-                    updatedAt: "2023-01-15T08:00:00Z"
+                $ref: '#/components/schemas/Post'
         '404':
-          description: Saadat not found with the provided ID.
+          description: Post not found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-              examples:
-                notFound:
-                  summary: Example of Saadat not found error
-                  value:
-                    code: 404
-                    message: "Saadat with ID 999 not found."
         '500':
           description: Internal server error.
           content:
@@ -174,43 +128,33 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
-      summary: Update an existing Saadat
-      description: |
-        Updates the details of an existing 'Saadat' identified by its ID.
-        Only provided fields will be updated.
-      operationId: updateSaadat
       tags:
-        - Saadats
+        - Posts
+      summary: Update an existing post
+      description: Updates the details of an existing post identified by its ID.
+      operationId: updatePost
+      parameters:
+        - name: postId
+          in: path
+          description: ID of the post to update.
+          required: true
+          schema:
+            type: integer
+            format: int64
       requestBody:
-        description: Saadat object with updated fields.
+        description: Post object with updated fields.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateSaadat'
-            examples:
-              updateSaadatRequest:
-                summary: Example request for updating a Saadat
-                value:
-                  title: "The Enduring Power of Gratitude"
-                  author: "Ayat Saadati Team"
+              $ref: '#/components/schemas/UpdatePost'
       responses:
         '200':
-          description: Saadat updated successfully. Returns the updated Saadat object.
+          description: Post updated successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Saadat'
-              examples:
-                updatedSaadat:
-                  summary: Example of a successfully updated Saadat
-                  value:
-                    id: 101
-                    title: "The Enduring Power of Gratitude"
-                    content: "Cultivate an attitude of gratitude, and watch your world transform. Every challenge is an opportunity."
-                    author: "Ayat Saadati Team"
-                    createdAt: "2023-01-15T08:00:00Z"
-                    updatedAt: "2023-10-27T11:30:00Z"
+                $ref: '#/components/schemas/Post'
         '400':
           description: Invalid input provided.
           content:
@@ -218,7 +162,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '404':
-          description: Saadat not found.
+          description: Post not found.
           content:
             application/json:
               schema:
@@ -230,6 +174,273 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
-      summary: Delete a Saadat
-      description: |
-        Removes a 'Saadat' from the system using its
+      tags:
+        - Posts
+      summary: Delete a post
+      description: Deletes a post identified by its unique ID.
+      operationId: deletePost
+      parameters:
+        - name: postId
+          in: path
+          description: ID of the post to delete.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Post deleted successfully, no content.
+        '404':
+          description: Post not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get user profile by ID
+      description: Retrieves a user's profile information by their unique identifier.
+      operationId: getUserById
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user to retrieve.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: User profile found successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /posts/{postId}/comments:
+    post:
+      tags:
+        - Comments
+      summary: Add a comment to a post
+      description: Adds a new comment to a specified post.
+      operationId: addCommentToPost
+      parameters:
+        - name: postId
+          in: path
+          description: ID of the post to add a comment to.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Comment object to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewComment'
+      responses:
+        '201':
+          description: Comment created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Invalid input provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Post not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Post:
+      type: object
+      required:
+        - id
+        - title
+        - content
+        - authorId
+        - createdAt
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the post.
+          example: 101
+        title:
+          type: string
+          description: Title of the post.
+          example: My First Blog Post
+        content:
+          type: string
+          description: Full content of the post, can include markdown or HTML.
+          example: This is the detailed content of my very first post. It's exciting!
+        authorId:
+          type: integer
+          format: int64
+          description: ID of the user who authored the post.
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the post was created.
+          example: '2023-10-27T10:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the post was last updated.
+          example: '2023-10-27T11:30:00Z'
+    NewPost:
+      type: object
+      required:
+        - title
+        - content
+        - authorId
+      properties:
+        title:
+          type: string
+          description: Title of the new post.
+          example: Exciting New Project Announcement
+        content:
+          type: string
+          description: The main body content of the new post.
+          example: We are thrilled to announce our latest project, focusing on...
+        authorId:
+          type: integer
+          format: int64
+          description: The ID of the author creating this post.
+          example: 1
+    UpdatePost:
+      type: object
+      properties:
+        title:
+          type: string
+          description: New title for the post.
+          example: Updated Project Announcement
+        content:
+          type: string
+          description: New content for the post.
+          example: The project has been updated with new features...
+    User:
+      type: object
+      required:
+        - id
+        - username
+        - email
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the user.
+          example: 1
+        username:
+          type: string
+          description: User's chosen username.
+          example: ayat_saadati
+        email:
+          type: string
+          format: email
+          description: User's email address.
+          example: ayat.saadati@example.com
+        bio:
+          type: string
+          nullable: true
+          description: Short biography of the user.
+          example: Passionate about tech and writing.
+    Comment:
+      type: object
+      required:
+        - id
+        - postId
+        - authorId
+        - content
+        - createdAt
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the comment.
+          example: 1001
+        postId:
+          type: integer
+          format: int64
+          description: The ID of the post this comment belongs to.
+          example: 101
+        authorId:
+          type: integer
+          format: int64
+          description: The ID of the user who made the comment.
+          example: 2
+        content:
+          type: string
+          description: The text content of the comment.
+          example: This is a great post! Very insightful.
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the comment was created.
+          example: '2023-10-27T12:05:00Z'
+    NewComment:
+      type: object
+      required:
+        - authorId
+        - content
+      properties:
+        authorId:
+          type: integer
+          format: int64
+          description: The ID of the user making the comment.
+          example: 2
+        content:
+          type: string
+          description: The text content of the new comment.
+          example: I really enjoyed reading this article!
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: Error code.
+          example: 400
+        message:
+          type: string
+          description: A human-readable description of the error.
+          example: Invalid input parameters.
+```
