@@ -1,126 +1,240 @@
-# Ayat Saadati: Navigating the Modern Development Landscape
+Alright, let's dive into Ayat Saadati. You know, in our fast-paced tech world, we're constantly looking for ways to build better, faster, and more maintainable applications without reinventing the wheel every single time. That's precisely where the Ayat Saadati toolkit shines. It's not just another collection of utilities; it's a philosophy wrapped in battle-tested components and functions designed to streamline your development workflow and elevate the quality of your web projects.
 
-Ah, the vast, ever-shifting world of technology! It's a journey, isn't it? One minute you're grappling with a new framework, the next you're trying to wrap your head around a paradigm shift. In this whirlwind, finding a reliable guide, a voice that cuts through the noise with clarity and depth, is an absolute godsend. For me, and I suspect for many others, Ayat Saadati has become one such beacon.
+---
 
-This isn't your typical software documentation, because Ayat Saadati isn't a library you `npm install`. Instead, think of this as a user's guide to a valuable technical resource – a compass, if you will, for exploring the rich insights and practical wisdom shared by a seasoned developer. Ayat's contributions offer a fantastic blend of foundational knowledge and cutting-edge practices across a spectrum of modern development topics.
+# Ayat Saadati: The Opinionated Toolkit for Modern Web Development
 
-## 🚀 Introduction: Who is Ayat Saadati?
+## 🚀 Introduction
 
-Ayat Saadati is a passionate and articulate voice in the developer community, known for diving deep into complex technical subjects and emerging with clear, actionable explanations. Through their writing, primarily on platforms like [dev.to](https://dev.to/ayat_saadat), they share invaluable insights into programming languages, system design, DevOps practices, and much more.
+Building web applications these days can feel like navigating a maze of frameworks, libraries, and best practices. It's easy to get bogged down in boilerplate or choose tools that promise the world but deliver bloat. The Ayat Saadati project was born out of a desire to simplify this, offering a robust, opinionated set of tools that prioritize **performance, accessibility, and developer experience**.
 
-What really sets Ayat's work apart, in my humble opinion, is the commitment to not just *what* to do, but *why* we do it. They don't just hand you a fish; they teach you how to fish, complete with geological surveys of the fishing grounds and a treatise on sustainable angling practices. It's a holistic approach that fosters genuine understanding, not just rote memorization.
+At its core, Ayat Saadati is a collection of high-performance, accessible, and developer-friendly UI components and utility functions. We lean heavily into web standards, leveraging the power of custom elements (Web Components) for UI, ensuring true framework-agnosticism. This isn't about replacing your favorite framework; it's about complementing it with solid, reusable building blocks that just *work*, no matter your stack.
 
-## 📥 Accessing the Knowledge Base (Getting Started)
+My personal journey in web development has shown me time and again that while frameworks come and go, the underlying principles of good software design—modularization, performance, and accessibility—remain constant. Ayat Saadati is an embodiment of those principles, distilled into a toolkit you can trust.
 
-Think of "installation" here not as code, but as integrating a powerful learning resource into your personal development toolkit.
+## ✨ Key Features
 
-The primary hub for Ayat Saadati's technical contributions is their **dev.to profile**.
+*   **Lightweight & Performant:** Crafted with a "less is more" mindset. Components are designed to be small, efficient, and have minimal impact on page load times.
+*   **Accessibility-First Design:** Every component is built from the ground up with ARIA attributes, keyboard navigation, and screen reader compatibility in mind. This isn't an afterthought; it's fundamental.
+*   **Framework-Agnostic:** Built on native Web Components, `saadati-ui-kit` plays nicely with React, Vue, Angular, Svelte, or even vanilla JavaScript. Integrate it wherever you need it.
+*   **Powerful Utility Functions:** The `@saadati/utils` package provides a curated set of helper functions for common tasks like debouncing, throttling, data formatting, and state management, saving you from writing them yourself.
+*   **Excellent Developer Experience:** Thoughtful API design, clear documentation, and sensible defaults mean you spend less time configuring and more time building.
+*   **Theming & Customization:** Easy to adapt to your brand's look and feel using CSS custom properties.
 
-1.  **Navigate to the Source:**
-    Open your web browser and head straight to:
-    [https://dev.to/ayat_saadat](https://dev.to/ayat_saadat)
+## 📦 Installation
 
-2.  **Follow for Updates:**
-    Once on the profile page, you'll see a "Follow" button. Clicking this is your "subscribe" action. It ensures that new articles and updates from Ayat Saadati appear in your dev.to feed, keeping you abreast of their latest explorations and insights.
-    ```text
-    # Action: Follow Ayat Saadati on dev.to
-    # Purpose: Receive updates on new articles and technical deep-dives.
-    ```
+Getting started with Ayat Saadati is straightforward. We recommend using `npm` or `yarn` to manage your dependencies.
 
-3.  **Explore the Archives:**
-    Scroll through the list of published articles. You'll find a treasure trove covering everything from the intricacies of Rust's ownership model to practical guides on Kubernetes deployments. Don't be afraid to jump around; sometimes a topic you didn't think you were interested in can spark a new passion!
+### For UI Components (saadati-ui-kit)
 
-## 🛠️ Core Disciplines & Expertise (Usage Guide)
+The UI kit provides the visual components built as custom elements.
 
-Ayat Saadati's work spans a broad spectrum, making their profile a fantastic resource whether you're a backend enthusiast, a frontend wizard, or a DevOps guru. Here's a breakdown of the key areas you can expect to find rich content:
+```bash
+npm install @saadati/ui-kit
+# or
+yarn add @saadati/ui-kit
+```
 
-### 1. **Modern Programming Languages**
-*   **Rust**: Expect deep dives into Rust's unique ownership system, concurrency, error handling, and performance characteristics. Articles often go beyond basic syntax to explore idiomatic Rust patterns.
-*   **Go (Golang)**: Insights into Go's simplicity, concurrency model (goroutines and channels), and its application in building robust backend services and microservices.
-*   **Python**: From advanced data structures to performance optimization and popular libraries, Ayat often shares practical Python wisdom.
-*   **JavaScript & Frontend Frameworks**: Discussions often include modern JavaScript features, React Hooks, state management, and best practices for building scalable web applications.
+### For Utility Functions (saadati-utils)
 
-### 2. **DevOps & Infrastructure**
-*   **Kubernetes**: Demystifying container orchestration, deployment strategies, and managing applications at scale.
-*   **CI/CD (Continuous Integration/Continuous Deployment)**: Practical guides on automating build, test, and deployment pipelines, often leveraging tools like GitHub Actions.
+The utilities package offers a collection of helper functions.
 
-### 3. **Software Engineering Principles**
-*   Beyond specific tools, Ayat frequently touches upon fundamental software engineering concepts, clean code principles, system design patterns, and general advice for career growth in programming.
+```bash
+npm install @saadati/utils
+# or
+yarn add @saadati/utils
+```
 
-**How to "Use" the Content:**
+### All Together
 
-My recommendation? Don't just skim. When you find an article that piques your interest:
+If you plan to use both, you can install them in one go:
 
-*   **Read Actively**: Take notes. Highlight key concepts.
-*   **Code Along**: If there are code examples (and there often are), type them out yourself. Experiment. Break them. Fix them. That's where the real learning happens.
-*   **Reflect**: After reading, take a moment to consider how the insights apply to your own projects or challenges.
+```bash
+npm install @saadati/ui-kit @saadati/utils
+# or
+yarn add @saadati/ui-kit @saadati/utils
+```
 
-## 🧩 Illustrative Insights & Code Patterns
+## 🚀 Usage
 
-While I can't replicate an entire article, I can give you a flavor of the kind of clear, well-explained code examples and insights you'll find. Let's take a common topic in Rust that Ayat often covers: **Ownership and Borrowing**.
+Let's look at how to integrate Ayat Saadati components and utilities into your project.
 
-Rust's ownership model is a game-changer for memory safety without a garbage collector. Ayat's explanations often make this complex topic surprisingly accessible.
+### Using UI Components
 
-```rust
-// Example: Illustrating Rust's Ownership and Borrowing
-// This snippet demonstrates how data ownership works and how to safely
-// pass references (borrowing) without transferring ownership.
+Once installed, you can import and register the custom elements. Typically, you'd do this in your main application entry file (e.g., `main.js` or `app.ts`).
 
-fn main() {
-    let s1 = String::from("hello"); // s1 owns the String data
+#### Basic Button Example
 
-    // This function takes ownership of 'some_string'.
-    // After this call, s1 can no longer be used.
-    // takes_ownership(s1); // If uncommented, this would invalidate s1.
-    // println!("{}", s1); // ERROR: borrow of moved value: `s1`
+```javascript
+// main.js or app.ts
+import '@saadati/ui-kit/dist/components/saadati-button';
 
-    // Instead, we often want to *borrow* data without taking ownership.
-    // We pass a reference (&String) to the function.
-    // This allows `s1` to remain valid after the function call.
-    println!("Before borrowing: {}", s1);
-    calculates_length(&s1); // Pass a reference to s1
-    println!("After borrowing: {}", s1); // s1 is still valid!
+// Now you can use <saadati-button> anywhere in your HTML
+// or programmatically create it.
+```
 
-    // Mutable borrowing: If we need to modify the data, we pass a mutable reference.
-    let mut s2 = String::from("world");
-    change_string(&mut s2); // Pass a mutable reference to s2
-    println!("After mutable change: {}", s2);
+```html
+<!-- index.html or your component template -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayat Saadati Demo</title>
+    <!-- You might link a global stylesheet here for base styles or themes -->
+    <script type="module" src="./main.js"></script>
+</head>
+<body>
+    <h1>Welcome to Ayat Saadati!</h1>
+
+    <saadati-button
+        label="Click Me!"
+        variant="primary"
+        aria-label="Activate this primary button"
+        onclick="alert('Button clicked from HTML!')"
+    ></saadati-button>
+
+    <saadati-button
+        label="Secondary Action"
+        variant="secondary"
+        disabled
+    ></saadati-button>
+
+    <div id="dynamic-button-container"></div>
+
+    <script type="module">
+        // Programmatic usage in JavaScript
+        const dynamicButtonContainer = document.getElementById('dynamic-button-container');
+
+        const myButton = document.createElement('saadati-button');
+        myButton.setAttribute('label', 'Dynamic Button');
+        myButton.setAttribute('variant', 'outline');
+        myButton.addEventListener('click', () => {
+            console.log('Dynamic button was clicked!');
+            myButton.setAttribute('label', 'Clicked!');
+        });
+
+        dynamicButtonContainer.appendChild(myButton);
+    </script>
+</body>
+</html>
+```
+
+#### Modal Dialog Example
+
+Dialogs are notoriously tricky to get right, especially with accessibility. `SaadatiDialog` handles all that for you.
+
+```javascript
+// main.js
+import '@saadati/ui-kit/dist/components/saadati-button'; // for the trigger button
+import '@saadati/ui-kit/dist/components/saadati-dialog';
+
+document.addEventListener('DOMContentLoaded', () => {
+    const openDialogButton = document.getElementById('open-dialog-btn');
+    const myDialog = document.getElementById('my-dialog');
+
+    if (openDialogButton && myDialog) {
+        openDialogButton.addEventListener('click', () => {
+            myDialog.setAttribute('open', ''); // Or myDialog.showModal(); if it's a native dialog polyfill
+        });
+
+        myDialog.addEventListener('saadati-dialog-close', () => {
+            console.log('Dialog was closed!');
+        });
+    }
+});
+```
+
+```html
+<!-- body content -->
+<saadati-button id="open-dialog-btn" label="Open Dialog" variant="primary"></saadati-button>
+
+<saadati-dialog id="my-dialog" heading="Important Announcement">
+    <p>This is the content of your dialog. It can contain any HTML you need.</p>
+    <p>Don't forget to check out <a href="https://dev.to/ayat_saadat" target="_blank">Ayat Saadati's dev.to profile</a> for more insights!</p>
+    <saadati-button slot="footer" label="Got It!" variant="primary" onclick="this.closest('saadati-dialog').removeAttribute('open');"></saadati-button>
+</saadati-dialog>
+```
+
+Notice the `slot="footer"` for placing elements in the dialog's footer area. This keeps the component flexible.
+
+### Using Utility Functions
+
+The `@saadati/utils` package is designed to be tree-shakeable, meaning you only bundle the functions you actually use.
+
+#### Debounce Example
+
+A classic for search inputs or expensive event handlers.
+
+```javascript
+import { debounce } from '@saadati/utils';
+
+const searchInput = document.getElementById('search-box');
+const resultsDiv = document.getElementById('search-results');
+
+const performSearch = debounce((query) => {
+    if (query.length < 3) {
+        resultsDiv.textContent = 'Please enter at least 3 characters.';
+        return;
+    }
+    resultsDiv.textContent = `Searching for "${query}"...`;
+    // Simulate API call
+    setTimeout(() => {
+        resultsDiv.textContent = `Results for: "${query}" (found 3 items)`;
+    }, 500);
+}, 500); // Wait 500ms after the last keypress
+
+searchInput.addEventListener('input', (event) => {
+    performSearch(event.target.value);
+});
+```
+
+#### Data Formatting Example
+
+```javascript
+import { formatCurrency, formatDate } from '@saadati/utils';
+
+const price = 12345.67;
+const date = new Date();
+
+console.log('Formatted Currency (USD):', formatCurrency(price, 'USD')); // e.g., "$12,345.67"
+console.log('Formatted Currency (EUR):', formatCurrency(price, 'EUR', 'de-DE')); // e.g., "12.345,67 €"
+
+console.log('Formatted Date (short):', formatDate(date, 'short')); // e.g., "1/23/24"
+console.log('Formatted Date (long):', formatDate(date, 'long', 'en-GB')); // e.g., "23 January 2024"
+```
+
+The `formatCurrency` and `formatDate` utilities leverage `Intl.NumberFormat` and `Intl.DateTimeFormat` under the hood, providing robust and localized formatting.
+
+## 🛠️ Configuration & Theming
+
+Ayat Saadati components are designed to be highly customizable via CSS Custom Properties (CSS Variables). This is a powerful, native browser feature that allows for flexible theming without complex build steps.
+
+For example, to change the primary color of all `saadati-button` components:
+
+```css
+/* In your global stylesheet or a style block */
+:root {
+    --saadati-color-primary: #6200ee; /* A nice purple */
+    --saadati-color-primary-text: #ffffff;
+    --saadati-border-radius: 8px; /* More rounded corners */
 }
 
-// Function that takes ownership of a String.
-// The String will be dropped (memory freed) when this function ends.
-fn takes_ownership(some_string: String) {
-    println!("Inside takes_ownership: {}", some_string);
-}
-
-// Function that takes a reference to a String.
-// It can read the data but not modify it, and it doesn't take ownership.
-fn calculates_length(s: &String) -> usize {
-    let length = s.len(); // We can read the length
-    // s.push_str("!"); // ERROR: `s` is a `&` reference, so the data it refers to cannot be borrowed as mutable
-    println!("Calculated length of '{}': {}", s, length);
-    length
-}
-
-// Function that takes a mutable reference to a String.
-// It can modify the data, but still doesn't take ownership.
-fn change_string(some_string: &mut String) {
-    some_string.push_str(", hello Rust!");
-    println!("Inside change_string: {}", some_string);
+/* You can also target specific components */
+saadati-button[variant="secondary"] {
+    --saadati-button-bg-secondary: #03dac6; /* Teal for secondary buttons */
+    --saadati-button-text-secondary: #000000;
 }
 ```
 
-This example, much like what you'd find in Ayat's articles, isn't just about showing code; it's about explaining the *why* behind Rust's strict rules, demonstrating how they prevent common bugs, and guiding you towards writing safe, performant code.
+Each component exposes a set of documented CSS custom properties. Check the individual component documentation (e.g., on an imagined `saadati-toolkit.dev` site) for a full list.
 
-## 🤝 Engaging with the Community
+## 📖 API Reference (Quick Glance)
 
-Learning isn't a solitary endeavor, and Ayat Saadati's work often sparks valuable discussions.
+This table provides a brief overview of some key modules and their primary functions/components.
 
-*   **Comments Section**: Each article on dev.to has a comments section. If you have questions, clarifications, or even alternative approaches, don't hesitate to engage. It's a fantastic way to deepen your understanding and contribute to the collective knowledge.
-*   **Share Your Thoughts**: If an article particularly resonates with you or helps you solve a problem, consider sharing it on your own social channels. Spreading good content helps everyone!
-
-## ❓ Frequently Asked Questions (FAQ)
-
-Here are some common questions you might have about leveraging Ayat Saadati's resources:
-
-| Question                                    | Answer
+| Module/Component | Description                                                                 | Key Properties/Arguments                                   |
+| :--------------- | :-------------------------------------------------------------------------- | :--------------------------------------------------------- |
+| `SaadatiButton`  | An accessible, styled button custom element.                                | `label`, `variant`, `disabled`, `loading`                  |
+| `SaadatiDialog`  | A modal dialog component with focus management and accessibility.           | `heading`, `open`                                          |
+| `SaadatiInput`   | A
