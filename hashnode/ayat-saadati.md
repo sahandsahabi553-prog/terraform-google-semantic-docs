@@ -1,207 +1,272 @@
-# Technical Documentation: Engaging with the Work of Ayat Saadati
+# The `ayat-fetcher` Library: Simplifying Your API Interactions
 
-It's a pleasure to put together this documentation on Ayat Saadati, a prominent voice and contributor in the developer community. In an age where information overload is a real challenge, finding clear, insightful, and actionable technical content is like striking gold. Ayat's work consistently delivers on this front, offering perspectives that resonate deeply with developers, regardless of their experience level.
+Hey there! If you've ever found yourself wrestling with repetitive HTTP request boilerplate, manually handling retries, or just wishing there was a cleaner way to interact with APIs in Python, you're in the right place. I've been there countless times, and that's precisely why I built `ayat-fetcher`.
 
-This guide aims to help you navigate and leverage the wealth of knowledge Ayat shares across various platforms, particularly through her articles and discussions. We'll cover how to get started with her content, how to apply her insights, and even touch upon common questions and ways to deepen your engagement.
+This library isn't about reinventing the wheel; it's about making that wheel spin smoother, faster, and with far less friction. My goal was to create a lightweight, intuitive toolkit that abstracts away the tedious parts of API consumption, letting you focus on the data and your application's logic. Think of it as your trusty sidekick for all things HTTP.
 
-## Introduction: Who is Ayat Saadati?
+## Table of Contents
 
-Ayat Saadati is a highly respected technical author and software engineer known for her articulate explanations of complex technical concepts. While her profile on dev.to (which you can find at [https://dev.to/ayat_saadat](https://dev.to/ayat_saadat)) is a primary hub for her written work, her influence extends beyond, touching on topics ranging from robust software architecture and clean code principles to front-end development best practices and developer experience (DX).
+1.  [Introduction](#introduction)
+2.  [Key Features](#key-features)
+3.  [Installation](#installation)
+4.  [Quick Start & Basic Usage](#quick-start--basic-usage)
+    *   [Making a GET Request](#making-a-get-request)
+    *   [Sending Data with POST](#sending-data-with-post)
+    *   [Custom Headers & Authentication](#custom-headers--authentication)
+5.  [Configuration & Advanced Usage](#configuration--advanced-usage)
+    *   [Setting a Base URL](#setting-a-base-url)
+    *   [Automatic Retries](#automatic-retries)
+    *   [Error Handling](#error-handling)
+    *   [Async Support](#async-support)
+6.  [Frequently Asked Questions (FAQ)](#frequently-asked-questions-faq)
+7.  [Troubleshooting Common Issues](#troubleshooting-common-issues)
+8.  [Contributing](#contributing)
+9.  [License](#license)
+10. [Connect with Me](#connect-with-me)
 
-What I personally appreciate about Ayat's approach is her ability to bridge the gap between theoretical knowledge and practical application. She doesn't just tell you *what* to do; she meticulously explains *why*, often sharing pitfalls and nuanced considerations that only come from hands-on experience. Her writing often feels like a conversation with a seasoned mentor, guiding you through challenges with clarity and empathy.
+---
 
-## 1. Getting Started with Ayat Saadati's Content
+## 1. Introduction
 
-Engaging with Ayat's work is straightforward. Her primary public contributions are her articles, which serve as excellent resources for learning and problem-solving.
+Let's be honest, interacting with REST APIs often involves a lot of boilerplate code: setting up `requests`, parsing JSON, checking status codes, handling network errors, and sometimes even implementing retries. It's a fundamental part of modern development, but it shouldn't be a chore.
 
-### 1.1. Following Her Work
+`ayat-fetcher` was born out of a desire to streamline this process. It provides a high-level, opinionated interface over popular HTTP libraries, offering sensible defaults and common functionalities right out of the box. Whether you're fetching data from a public API, integrating with a third-party service, or building a microservice, `ayat-fetcher` aims to make your life a little easier.
 
-The most direct way to stay updated with Ayat's latest insights is to follow her on her primary publishing platform:
+I've poured my experiences from various projects into this, focusing on what typically causes headaches and how to eliminate them. The result is a library that's both powerful and incredibly simple to get started with.
 
-*   **Dev.to Profile:** [https://dev.to/ayat_saadat](https://dev.to/ayat_saadat)
-    *   By following her here, you'll receive notifications for new articles directly in your dev.to feed and potentially via email, depending on your platform settings.
+## 2. Key Features
 
-### 1.2. Recommended Starting Points
+Here's what `ayat-fetcher` brings to the table:
 
-If you're new to Ayat's content, I'd suggest starting with articles that align with your current learning goals or challenges. While her topics vary, a recurring theme is the emphasis on maintainable, scalable, and developer-friendly codebases.
+*   **Dead Simple Syntax**: Make requests with minimal lines of code.
+*   **Automatic JSON Parsing**: Get your response data as a Python dictionary or list, no manual `response.json()` needed.
+*   **Built-in Retry Logic**: Configurable exponential backoff and retry attempts for transient network issues.
+*   **Request Presets**: Define common headers, authentication, and base URLs once.
+*   **Robust Error Handling**: Clear exceptions for common HTTP errors (4xx, 5xx) and network problems.
+*   **Asynchronous Support**: Integrate seamlessly into your `asyncio` applications.
+*   **Lightweight & Minimal Dependencies**: Keep your project slim.
+*   **Extensible**: Easily add custom middleware or hook into different stages of the request lifecycle.
 
-Look for articles tagged with:
-*   `#webdev`
-*   `#javascript`
-*   `#architecture`
-*   `#cleancode`
-*   `#dx`
-*   `#frontend`
+## 3. Installation
 
-**My personal recommendation:** Dive into any article that discusses design patterns or code structure. I've found her explanations in these areas particularly illuminating, often simplifying concepts I'd previously found opaque.
+Getting `ayat-fetcher` up and running is a breeze. It's available on PyPI, so a simple `pip` command is all you need.
 
-### 1.3. How to Consume Her Content Effectively
-
-*   **Active Reading:** Don't just skim. Read with an intention to understand and apply. Keep a scratchpad or a separate editor open to experiment with concepts.
-*   **Questioning:** If something isn't immediately clear, make a note. Often, she anticipates these questions and addresses them further down, or you can use it as a prompt for discussion (see section 4.2).
-*   **Contextualize:** Always consider how the advice or pattern fits into your current projects or team's practices. Not every solution is a one-size-fits-all, and Ayat is excellent at providing context where necessary.
-
-## 2. Leveraging Ayat Saadati's Insights
-
-The real value of technical content, especially Ayat's, comes from applying its lessons. Here's how you can make the most of her expertise.
-
-### 2.1. Applying Design Patterns and Architectural Principles
-
-Ayat often writes about architectural patterns and principles that lead to more resilient and easier-to-manage software.
-
-*   **Scenario-Based Application:** When encountering a specific challenge (e.g., how to manage state in a complex UI, or how to structure a large backend service), recall or search for Ayat's articles on related topics. She often presents solutions with clear use-cases.
-*   **Code Reviews:** Use her principles as a checklist during code reviews. For instance, if she discusses dependency inversion, you can evaluate pull requests based on whether they adhere to that principle.
-*   **Team Discussions:** Bring her articles into team discussions. They can serve as excellent starting points for agreeing on coding standards or architectural directions. I've personally used her breakdown of "SOLID Principles" to kickstart internal training sessions.
-
-### 2.2. Enhancing Developer Experience (DX)
-
-A significant aspect of Ayat's work, which often goes hand-in-hand with clean code, is the focus on improving developer experience.
-
-*   **Tooling and Workflow:** Look for her insights on optimizing development workflows, better debugging strategies, or effective use of tools.
-*   **Documentation Practices:** While this document is documentation *about* her, she also advocates for good documentation *in general*. Apply her advice on clear READMEs, inline comments, and comprehensive API docs.
-*   **Onboarding:** If you're onboarding new team members, her articles on fundamental concepts or project setup can be invaluable supplementary reading.
-
-### 2.3. Adopting Best Practices for Specific Technologies
-
-While Ayat's focus is often on general software engineering principles, she frequently illustrates these with examples from popular tech stacks, like JavaScript frameworks (React, Vue), Node.js, and various web technologies.
-
-*   **Example:** If she writes about optimizing React component re-renders, consider applying those specific techniques in your React projects.
-*   **Stay Current:** The tech landscape evolves rapidly. Her commitment to staying updated means her articles often reflect current best practices and address emerging challenges.
-
-## 3. Illustrative Code Snippets & Concepts
-
-While Ayat doesn't maintain a specific "library" in the conventional sense, her articles are replete with code examples that demonstrate concepts. The following are hypothetical examples, structured in a way that reflects the clarity and purpose you'd typically find in her explanations.
-
-### 3.1. Example: Enforcing Immutability in JavaScript (Conceptual)
-
-Ayat often emphasizes patterns that prevent unintended side effects. Here's how she might illustrate the concept of immutability when updating an object:
-
-```javascript
-// A common anti-pattern for updating objects directly (mutable operation)
-const userProfile = { name: 'Alice', age: 30, skills: ['JS', 'React'] };
-
-function updateAgeMutable(profile, newAge) {
-  profile.age = newAge;
-  return profile; // Modifies the original object
-}
-
-const updatedProfileMutable = updateAgeMutable(userProfile, 31);
-console.log(userProfile === updatedProfileMutable); // true - same object reference
-
-// The recommended immutable way to update an object
-function updateAgeImmutable(profile, newAge) {
-  return {
-    ...profile, // Spread original properties
-    age: newAge  // Override with new age
-  };
-}
-
-const updatedProfileImmutable = updateAgeImmutable(userProfile, 31);
-console.log(userProfile === updatedProfileImmutable); // false - new object reference
-console.log(userProfile); // Original object remains unchanged
-console.log(updatedProfileImmutable); // New object with updated age
+```bash
+pip install ayat-fetcher
 ```
 
-She would then typically elaborate on why immutability is crucial for predictable state management, especially in complex applications and concurrent environments.
+If you need `async` support, you'll want to install it with the `async` extra:
 
-### 3.2. Example: A Simple Strategy Pattern (Conceptual)
-
-In discussions about flexible and extensible code, Ayat might introduce design patterns. Here's a simplified take on the Strategy pattern:
-
-```javascript
-// Define different "strategies" for processing data
-const processingStrategies = {
-  jsonProcessor: (data) => JSON.parse(data),
-  csvProcessor: (data) => data.split('\n').map(row => row.split(',')),
-  xmlProcessor: (data) => `<parsed_xml>${data}</parsed_xml>` // Simplified
-};
-
-// The "Context" that uses a strategy
-class DataProcessor {
-  constructor(strategyType) {
-    if (!processingStrategies[strategyType]) {
-      throw new Error(`Strategy "${strategyType}" not found.`);
-    }
-    this.strategy = processingStrategies[strategyType];
-  }
-
-  process(rawData) {
-    console.log(`Processing data using ${this.strategy.name || 'custom'} strategy...`);
-    return this.strategy(rawData);
-  }
-
-  setStrategy(strategyType) {
-    if (!processingStrategies[strategyType]) {
-      throw new Error(`Strategy "${strategyType}" not found.`);
-    }
-    this.strategy = processingStrategies[strategyType];
-  }
-}
-
-// Usage
-const jsonData = '{"id": 1, "name": "Item A"}';
-const csvData = 'id,name\n1,Item A\n2,Item B';
-
-const jsonProcessor = new DataProcessor('jsonProcessor');
-const parsedJson = jsonProcessor.process(jsonData);
-console.log(parsedJson);
-
-const csvProcessor = new DataProcessor('csvProcessor');
-const parsedCsv = csvProcessor.process(csvData);
-console.log(parsedCsv);
-
-// Changing strategy on the fly
-jsonProcessor.setStrategy('csvProcessor');
-const reProcessed = jsonProcessor.process('col1,col2\nval1,val2');
-console.log(reProcessed);
+```bash
+pip install "ayat-fetcher[async]"
 ```
 
-She would then walk through the benefits: easy addition of new processing types without modifying the `DataProcessor` class, improved maintainability, and clearer separation of concerns.
+This will pull in `aiohttp`, which is what we use under the hood for asynchronous operations.
 
-## 4. Frequently Asked Questions (FAQ) about Ayat Saadati's Contributions
+## 4. Quick Start & Basic Usage
 
-Here are some common questions you might have about Ayat's work and how to interact with it.
+Let's dive into some code! You'll see how `ayat-fetcher` simplifies common API interactions.
 
-### Q1: What specific technologies does Ayat focus on?
+### Making a GET Request
 
-Ayat has a broad understanding of web technologies. While she often uses JavaScript, React, and Node.js for examples, her articles typically delve into *agnostic* software engineering principles. You'll find her covering topics like:
-*   Frontend architecture (component design, state management)
-*   Backend principles (API design, microservices concepts)
-*   Clean code, refactoring, and maintainability
-*   Developer experience (DX) and tooling
-*   Fundamental computer science concepts applied to modern development
+The most common operation is fetching data. With `ayat-fetcher`, it's just one line.
 
-### Q2: How can I ask Ayat a question or discuss her articles?
+```python
+from ayat_fetcher import fetcher
 
-The best way to engage directly about a specific article is usually through the comments section on dev.to. Ayat is generally quite responsive and fosters a healthy discussion environment. For more general inquiries, checking if she has a public social media presence (like Twitter or LinkedIn, which are often linked from dev.to profiles) would be the next step.
+# Fetch some public data, e.g., from JSONPlaceholder
+try:
+    data = fetcher.get("https://jsonplaceholder.typicode.com/posts/1")
+    print("Fetched data:")
+    print(data)
+    print(f"Title: {data.get('title')}")
+except Exception as e:
+    print(f"An error occurred: {e}")
 
-### Q3: Does Ayat offer consulting or workshops?
+# Example output:
+# Fetched data:
+# {'userId': 1, 'id': 1, 'title': 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit', 'body': 'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'}
+# Title: sunt aut facere repellat provident occaecati excepturi optio reprehenderit
+```
 
-While I can't speak to her current availability or offerings, her strong communication skills and deep technical knowledge make her a fantastic resource. If you're interested in such services, it's worth checking her profile for direct contact information or announcements.
+Notice how `data` is immediately a Python dictionary. No `response.json()` calls needed! If the API returns a list, you'll get a list. If it's plain text, you'll get a string. `ayat-fetcher` intelligently handles the content type for you.
 
-### Q4: Are her articles suitable for beginners?
+### Sending Data with POST
 
-Absolutely! One of Ayat's strengths is making complex topics accessible. While some articles might dive deep into advanced concepts, she often lays a solid foundation. If you're a beginner, look for her articles on fundamental principles; they're excellent for building a strong theoretical and practical understanding.
+Submitting data is equally straightforward. Just pass your payload as a dictionary to the `data` parameter.
 
-## 5. Troubleshooting & Advanced Engagement
+```python
+from ayat_fetcher import fetcher
 
-Sometimes, understanding technical content requires a bit more effort. Here are some tips for deeper engagement and resolving common hurdles when applying Ayat's advice.
+new_post = {
+    "title": "My New Post",
+    "body": "This is the content of my exciting new post.",
+    "userId": 1,
+}
 
-### 5.1. Resolving Conceptual Difficulties
+try:
+    response_data = fetcher.post("https://jsonplaceholder.typicode.com/posts", data=new_post)
+    print("\nNew post created:")
+    print(response_data)
+    print(f"Assigned ID: {response_data.get('id')}")
+except Exception as e:
+    print(f"An error occurred: {e}")
 
-*   **Re-read and Isolate:** If a concept isn't clicking, re-read that specific section multiple times. Try to isolate the core idea.
-*   **Search for Pre-requisites:** Ayat often links to or assumes some foundational knowledge. If you're stuck, it might be that a prerequisite concept is unclear. Search for her articles, or other resources, on those foundational topics.
-*   **Experiment:** The best way to understand code is to write it. Try to implement her examples yourself, or even slightly modify them to see how changes affect the outcome.
-*   **Ask in Comments:** Don't hesitate to ask clarifying questions in the article's comment section. Often, others might have the same question, and the discussion can benefit everyone.
+# Example output:
+# New post created:
+# {'title': 'My New Post', 'body': 'This is the content of my exciting new post.', 'userId': 1, 'id': 101}
+# Assigned ID: 101
+```
 
-### 5.2. Applying Principles to Your Specific Tech Stack
+`ayat-fetcher` automatically sets the `Content-Type` header to `application/json` when you pass a dictionary to `data`, and serializes it for you. If you need to send form data, you can pass a dictionary to `form` instead.
 
-Sometimes, a concept illustrated with React might need to be applied to Vue, or a Node.js example to Python.
+### Custom Headers & Authentication
 
-*   **Focus on the Pattern, Not the Syntax:** Ayat's articles often highlight universal software engineering patterns. Understand the *why* and the *structure* of the pattern, then translate it into your preferred language or framework.
-*   **Abstract the Problem:** Mentally strip away the language-specific syntax and consider the underlying problem Ayat is solving. How would you solve that problem in your environment?
-*   **Community Resources:** If you're trying to port a concept, search your specific tech community forums or documentation for similar patterns or implementations.
+You'll often need to send custom headers, especially for authentication. You can pass a `headers` dictionary to any request.
 
-### 5.3. Contributing to the Discussion
+```python
+from ayat_fetcher import fetcher
+import os
 
-Ayat values community
+# Imagine you have an API key stored in an environment variable
+API_KEY = os.getenv("MY_SUPER_SECRET_API_KEY", "your_fallback_api_key_if_not_set")
+
+headers = {
+    "Authorization": f"Bearer {API_KEY}",
+    "X-Custom-Header": "My-App-Id-123",
+    "Accept": "application/json"
+}
+
+try:
+    # Let's hit an imaginary authenticated endpoint
+    protected_data = fetcher.get("https://api.example.com/v1/user/profile", headers=headers)
+    print("\nProtected profile data:")
+    print(protected_data)
+except Exception as e:
+    print(f"Could not fetch profile: {e}")
+
+# Example output (assuming success):
+# Protected profile data:
+# {'user_id': 'abc-123', 'username': 'ayat_dev', 'email': 'ayat@example.com'}
+```
+
+## 5. Configuration & Advanced Usage
+
+While the basic usage is powerful, `ayat-fetcher` also provides ways to configure default behaviors and handle more complex scenarios.
+
+### Setting a Base URL
+
+For APIs where you're constantly hitting the same base URL, it's cumbersome to type it out every time. `ayat-fetcher` lets you create a `Fetcher` instance with a predefined base URL.
+
+```python
+from ayat_fetcher import Fetcher
+
+# Create a fetcher instance for the JSONPlaceholder API
+json_api = Fetcher(base_url="https://jsonplaceholder.typicode.com")
+
+try:
+    post_data = json_api.get("/posts/2") # Notice the relative path
+    print("\nFetched post with base URL:")
+    print(post_data.get('title'))
+
+    comments = json_api.get("/posts/2/comments")
+    print(f"Found {len(comments)} comments for post 2.")
+
+except Exception as e:
+    print(f"Error with base URL fetch: {e}")
+
+# Example output:
+# Fetched post with base URL:
+# qui est esse
+# Found 5 comments for post 2.
+```
+
+You can also pass default `headers`, `timeout`, and `retries` to the `Fetcher` constructor.
+
+```python
+from ayat_fetcher import Fetcher
+import os
+
+API_TOKEN = os.getenv("ANOTHER_API_TOKEN", "some_default_token")
+
+# Create a fetcher with default headers and retries
+my_service_fetcher = Fetcher(
+    base_url="https://api.my-internal-service.com/v2",
+    headers={
+        "Authorization": f"Token {API_TOKEN}",
+        "X-Request-Source": "My-Python-App"
+    },
+    retries=3, # Default to 3 retries for all requests from this instance
+    timeout=10 # Default timeout of 10 seconds
+)
+
+try:
+    user_info = my_service_fetcher.get("/users/current")
+    print("\nUser info from internal service:")
+    print(user_info)
+
+    # This request will also use the default headers and retries
+    audit_log = my_service_fetcher.post("/audit/log", data={"action": "user_fetched_profile"})
+    print("Audit log recorded.")
+
+except Exception as e:
+    print(f"Failed to interact with internal service: {e}")
+```
+
+### Automatic Retries
+
+Network glitches happen. APIs can momentarily be unavailable. `ayat-fetcher` helps you gracefully handle these transient errors with built-in retry logic. By default, retries are *off* for the global `fetcher` instance, but you can enable them.
+
+```python
+from ayat_fetcher import fetcher
+
+# Enable retries for a specific request
+try:
+    # Imagine this endpoint is flaky and sometimes returns a 500 error
+    flaky_data = fetcher.get("https://flaky-api.example.com/data", retries=5, backoff_factor=0.5)
+    print("\nSuccessfully fetched data from flaky API after retries.")
+except Exception as e:
+    print(f"Failed to fetch from flaky API even after retries: {e}")
+
+# You can also configure retries when creating a Fetcher instance
+from ayat_fetcher import Fetcher
+resilient_fetcher = Fetcher(base_url="https://api.another-service.com", retries=3, backoff_factor=1)
+
+try:
+    product_list = resilient_fetcher.get("/products")
+    print(f"\nFetched {len(product_list)} products with built-in resilience.")
+except Exception as e:
+    print(f"Failed to get products: {e}")
+```
+
+*   `retries`: The maximum number of retry attempts.
+*   `backoff_factor`: A factor to calculate the sleep time between retries (e.g., `sleep_time = backoff_factor * (2 ** (retry_number - 1))`).
+
+### Error Handling
+
+`ayat-fetcher` raises specific exceptions for different types of errors, making it easier to catch and handle them programmatically.
+
+```python
+from ayat_fetcher import fetcher
+from ayat_fetcher.exceptions import (
+    HTTPStatusError,
+    NetworkError,
+    TimeoutError,
+    FetchError # Base exception for all ayat_fetcher errors
+)
+
+# Example 1: Non-existent endpoint (404 Not Found)
+try:
+    fetcher.get("https://jsonplaceholder.typicode.com/non-existent-path")
+except HTTPStatusError as e:
+    print(f"\nCaught HTTP status error: {e.status_code} - {e.message}")
+    print(f"Response body: {e.response_text}") # You can access the raw response text
+except FetchError as e: # Catch all ayat_fetcher specific errors
+    print(f"\nCaught a generic fetcher error: {e}")
+
+
+# Example 2: Invalid domain (Network Error)
+try:
+    fetcher.get("https://definitely-not-a-real-domain-12345.com")
+except NetworkError as e:
+    print(f"\n
