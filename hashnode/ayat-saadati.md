@@ -1,272 +1,331 @@
-# The `ayat-fetcher` Library: Simplifying Your API Interactions
+# `saadati-cli`: Your Everyday Development Accelerator
 
-Hey there! If you've ever found yourself wrestling with repetitive HTTP request boilerplate, manually handling retries, or just wishing there was a cleaner way to interact with APIs in Python, you're in the right place. I've been there countless times, and that's precisely why I built `ayat-fetcher`.
+## Introduction
 
-This library isn't about reinventing the wheel; it's about making that wheel spin smoother, faster, and with far less friction. My goal was to create a lightweight, intuitive toolkit that abstracts away the tedious parts of API consumption, letting you focus on the data and your application's logic. Think of it as your trusty sidekick for all things HTTP.
+Hey folks! As developers, we're constantly juggling boilerplate, setting up new projects, ensuring code quality, and just generally trying to keep our workflows smooth. I've been there, staring at a blank directory, wondering which `Makefile` to copy, or which linter configuration to tweak *this* time. It's a real time sink, isn't it?
 
-## Table of Contents
+That frustration was the genesis of `saadati-cli`. I wanted a single, opinionated, yet flexible command-line tool that could handle those repetitive setup tasks, enforce some sanity in our codebase, and just generally get out of our way so we can focus on writing actual features. Think of it as your digital Swiss Army knife for common development headaches. It's built to be fast, extensible, and, most importantly, helpful.
 
-1.  [Introduction](#introduction)
-2.  [Key Features](#key-features)
-3.  [Installation](#installation)
-4.  [Quick Start & Basic Usage](#quick-start--basic-usage)
-    *   [Making a GET Request](#making-a-get-request)
-    *   [Sending Data with POST](#sending-data-with-post)
-    *   [Custom Headers & Authentication](#custom-headers--authentication)
-5.  [Configuration & Advanced Usage](#configuration--advanced-usage)
-    *   [Setting a Base URL](#setting-a-base-url)
-    *   [Automatic Retries](#automatic-retries)
-    *   [Error Handling](#error-handling)
-    *   [Async Support](#async-support)
-6.  [Frequently Asked Questions (FAQ)](#frequently-asked-questions-faq)
-7.  [Troubleshooting Common Issues](#troubleshooting-common-issues)
-8.  [Contributing](#contributing)
-9.  [License](#license)
-10. [Connect with Me](#connect-with-me)
+My aim with `saadati-cli` was to distill years of project setup and maintenance into something you can fire up with a single command. No more copy-pasting `.gitignore` files or wrestling with intricate linting setups from scratch every single time. Let's make development a bit less tedious, shall we?
 
----
+## Features
 
-## 1. Introduction
+`saadati-cli` comes packed with a few core functionalities I find myself reaching for constantly:
 
-Let's be honest, interacting with REST APIs often involves a lot of boilerplate code: setting up `requests`, parsing JSON, checking status codes, handling network errors, and sometimes even implementing retries. It's a fundamental part of modern development, but it shouldn't be a chore.
+*   **Project Scaffolding:** Quickly spin up new projects with predefined templates for various languages and frameworks (e.g., Python web app, Node.js API, generic library). Saves a ton of initial setup time.
+*   **Configuration Management:** Centralize and manage project-specific settings directly from the CLI.
+*   **Code Quality Checks:** Integrate with popular linters and formatters to ensure consistent code standards across your team or personal projects.
+*   **Documentation Generation Hooks:** While `saadati-cli` doesn't *write* your docs, it provides handy commands to trigger your preferred documentation tools, like Sphinx or JSDoc, right from your project root.
+*   **Extensibility:** Designed to be easily extended with custom templates and plugins, so you can tailor it to your unique development needs.
 
-`ayat-fetcher` was born out of a desire to streamline this process. It provides a high-level, opinionated interface over popular HTTP libraries, offering sensible defaults and common functionalities right out of the box. Whether you're fetching data from a public API, integrating with a third-party service, or building a microservice, `ayat-fetcher` aims to make your life a little easier.
+## Installation
 
-I've poured my experiences from various projects into this, focusing on what typically causes headaches and how to eliminate them. The result is a library that's both powerful and incredibly simple to get started with.
+Getting `saadati-cli` up and running on your system is pretty straightforward. I've built it with Python, primarily because of its ubiquity and the excellent package management ecosystem, which means most of you likely already have Python installed.
 
-## 2. Key Features
+### Prerequisites
 
-Here's what `ayat-fetcher` brings to the table:
+You'll need Python 3.7 or newer installed on your system. If you don't have it, I highly recommend using `pyenv` or your system's package manager (like `apt` on Debian/Ubuntu, `brew` on macOS) to get it.
 
-*   **Dead Simple Syntax**: Make requests with minimal lines of code.
-*   **Automatic JSON Parsing**: Get your response data as a Python dictionary or list, no manual `response.json()` needed.
-*   **Built-in Retry Logic**: Configurable exponential backoff and retry attempts for transient network issues.
-*   **Request Presets**: Define common headers, authentication, and base URLs once.
-*   **Robust Error Handling**: Clear exceptions for common HTTP errors (4xx, 5xx) and network problems.
-*   **Asynchronous Support**: Integrate seamlessly into your `asyncio` applications.
-*   **Lightweight & Minimal Dependencies**: Keep your project slim.
-*   **Extensible**: Easily add custom middleware or hook into different stages of the request lifecycle.
-
-## 3. Installation
-
-Getting `ayat-fetcher` up and running is a breeze. It's available on PyPI, so a simple `pip` command is all you need.
+To check your Python version, just open your terminal and type:
 
 ```bash
-pip install ayat-fetcher
+python3 --version
 ```
 
-If you need `async` support, you'll want to install it with the `async` extra:
+You should see something like `Python 3.9.7` or similar.
+
+### Installing via pip
+
+Once Python is sorted, you can install `saadati-cli` globally using `pip`:
 
 ```bash
-pip install "ayat-fetcher[async]"
+pip install saadati-cli
 ```
 
-This will pull in `aiohttp`, which is what we use under the hood for asynchronous operations.
+I usually recommend installing CLI tools in an isolated virtual environment or globally if you manage your Python environments carefully. If you encounter permission errors, you might need to use `sudo` (though I generally advise against global `sudo pip` installs) or configure your `pip` user base directory. A safer alternative for global tools is often `pipx`:
 
-## 4. Quick Start & Basic Usage
-
-Let's dive into some code! You'll see how `ayat-fetcher` simplifies common API interactions.
-
-### Making a GET Request
-
-The most common operation is fetching data. With `ayat-fetcher`, it's just one line.
-
-```python
-from ayat_fetcher import fetcher
-
-# Fetch some public data, e.g., from JSONPlaceholder
-try:
-    data = fetcher.get("https://jsonplaceholder.typicode.com/posts/1")
-    print("Fetched data:")
-    print(data)
-    print(f"Title: {data.get('title')}")
-except Exception as e:
-    print(f"An error occurred: {e}")
-
-# Example output:
-# Fetched data:
-# {'userId': 1, 'id': 1, 'title': 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit', 'body': 'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'}
-# Title: sunt aut facere repellat provident occaecati excepturi optio reprehenderit
+```bash
+pip install pipx
+pipx install saadati-cli
 ```
 
-Notice how `data` is immediately a Python dictionary. No `response.json()` calls needed! If the API returns a list, you'll get a list. If it's plain text, you'll get a string. `ayat-fetcher` intelligently handles the content type for you.
+`pipx` installs applications in isolated environments but makes them available globally, which is a fantastic compromise.
 
-### Sending Data with POST
+### Verifying Installation
 
-Submitting data is equally straightforward. Just pass your payload as a dictionary to the `data` parameter.
+After installation, run the following command to make sure everything's set up correctly:
 
-```python
-from ayat_fetcher import fetcher
-
-new_post = {
-    "title": "My New Post",
-    "body": "This is the content of my exciting new post.",
-    "userId": 1,
-}
-
-try:
-    response_data = fetcher.post("https://jsonplaceholder.typicode.com/posts", data=new_post)
-    print("\nNew post created:")
-    print(response_data)
-    print(f"Assigned ID: {response_data.get('id')}")
-except Exception as e:
-    print(f"An error occurred: {e}")
-
-# Example output:
-# New post created:
-# {'title': 'My New Post', 'body': 'This is the content of my exciting new post.', 'userId': 1, 'id': 101}
-# Assigned ID: 101
+```bash
+saadati --version
 ```
 
-`ayat-fetcher` automatically sets the `Content-Type` header to `application/json` when you pass a dictionary to `data`, and serializes it for you. If you need to send form data, you can pass a dictionary to `form` instead.
+You should see the installed version number, something like `saadati-cli, version 0.7.2`. If you get a "command not found" error, double-check your `PATH` environment variable to ensure `pip`'s install location is included.
 
-### Custom Headers & Authentication
+## Usage
 
-You'll often need to send custom headers, especially for authentication. You can pass a `headers` dictionary to any request.
+Using `saadati-cli` is designed to be intuitive. Most commands follow a `saadati <command> [options]` pattern. Here's a rundown of the core functionalities.
 
-```python
-from ayat_fetcher import fetcher
-import os
+### Global Help
 
-# Imagine you have an API key stored in an environment variable
-API_KEY = os.getenv("MY_SUPER_SECRET_API_KEY", "your_fallback_api_key_if_not_set")
+If you ever get stuck, just ask for help:
 
-headers = {
-    "Authorization": f"Bearer {API_KEY}",
-    "X-Custom-Header": "My-App-Id-123",
-    "Accept": "application/json"
-}
-
-try:
-    # Let's hit an imaginary authenticated endpoint
-    protected_data = fetcher.get("https://api.example.com/v1/user/profile", headers=headers)
-    print("\nProtected profile data:")
-    print(protected_data)
-except Exception as e:
-    print(f"Could not fetch profile: {e}")
-
-# Example output (assuming success):
-# Protected profile data:
-# {'user_id': 'abc-123', 'username': 'ayat_dev', 'email': 'ayat@example.com'}
+```bash
+saadati --help
+# Or for a specific command:
+saadati init --help
 ```
 
-## 5. Configuration & Advanced Usage
+### Initializing a New Project
 
-While the basic usage is powerful, `ayat-fetcher` also provides ways to configure default behaviors and handle more complex scenarios.
+This is probably where you'll start. The `init` command scaffolds a new project based on a chosen template.
 
-### Setting a Base URL
-
-For APIs where you're constantly hitting the same base URL, it's cumbersome to type it out every time. `ayat-fetcher` lets you create a `Fetcher` instance with a predefined base URL.
-
-```python
-from ayat_fetcher import Fetcher
-
-# Create a fetcher instance for the JSONPlaceholder API
-json_api = Fetcher(base_url="https://jsonplaceholder.typicode.com")
-
-try:
-    post_data = json_api.get("/posts/2") # Notice the relative path
-    print("\nFetched post with base URL:")
-    print(post_data.get('title'))
-
-    comments = json_api.get("/posts/2/comments")
-    print(f"Found {len(comments)} comments for post 2.")
-
-except Exception as e:
-    print(f"Error with base URL fetch: {e}")
-
-# Example output:
-# Fetched post with base URL:
-# qui est esse
-# Found 5 comments for post 2.
+```bash
+saadati init
 ```
 
-You can also pass default `headers`, `timeout`, and `retries` to the `Fetcher` constructor.
+Running this without arguments will prompt you to choose a template from a list and then ask for your project name. It's pretty interactive and guides you through the process.
 
-```python
-from ayat_fetcher import Fetcher
-import os
+**Example: Creating a Python Web API project**
 
-API_TOKEN = os.getenv("ANOTHER_API_TOKEN", "some_default_token")
+Let's say you want to kick off a new Python API using FastAPI.
 
-# Create a fetcher with default headers and retries
-my_service_fetcher = Fetcher(
-    base_url="https://api.my-internal-service.com/v2",
-    headers={
-        "Authorization": f"Token {API_TOKEN}",
-        "X-Request-Source": "My-Python-App"
-    },
-    retries=3, # Default to 3 retries for all requests from this instance
-    timeout=10 # Default timeout of 10 seconds
-)
-
-try:
-    user_info = my_service_fetcher.get("/users/current")
-    print("\nUser info from internal service:")
-    print(user_info)
-
-    # This request will also use the default headers and retries
-    audit_log = my_service_fetcher.post("/audit/log", data={"action": "user_fetched_profile"})
-    print("Audit log recorded.")
-
-except Exception as e:
-    print(f"Failed to interact with internal service: {e}")
+```bash
+saadati init python-fastapi my_awesome_api
 ```
 
-### Automatic Retries
+This command will:
 
-Network glitches happen. APIs can momentarily be unavailable. `ayat-fetcher` helps you gracefully handle these transient errors with built-in retry logic. By default, retries are *off* for the global `fetcher` instance, but you can enable them.
+1.  Create a directory named `my_awesome_api`.
+2.  Inside it, set up a basic FastAPI project structure.
+3.  Include a `requirements.txt`, `.gitignore`, and a basic `main.py`.
+4.  Optionally, it might even initialize a Git repository for you (depending on the template).
 
-```python
-from ayat_fetcher import fetcher
+Here's what a typical `init` process might look like in your terminal:
 
-# Enable retries for a specific request
-try:
-    # Imagine this endpoint is flaky and sometimes returns a 500 error
-    flaky_data = fetcher.get("https://flaky-api.example.com/data", retries=5, backoff_factor=0.5)
-    print("\nSuccessfully fetched data from flaky API after retries.")
-except Exception as e:
-    print(f"Failed to fetch from flaky API even after retries: {e}")
-
-# You can also configure retries when creating a Fetcher instance
-from ayat_fetcher import Fetcher
-resilient_fetcher = Fetcher(base_url="https://api.another-service.com", retries=3, backoff_factor=1)
-
-try:
-    product_list = resilient_fetcher.get("/products")
-    print(f"\nFetched {len(product_list)} products with built-in resilience.")
-except Exception as e:
-    print(f"Failed to get products: {e}")
+```bash
+$ saadati init
+? Choose a project template: (Use arrow keys)
+> Python FastAPI
+  Node.js Express
+  Generic Library (Python)
+  Static Site (Jekyll)
+  Empty Project
 ```
 
-*   `retries`: The maximum number of retry attempts.
-*   `backoff_factor`: A factor to calculate the sleep time between retries (e.g., `sleep_time = backoff_factor * (2 ** (retry_number - 1))`).
+Once you select, it'll ask for the name:
 
-### Error Handling
+```bash
+? Enter your project name: my-super-app
+✨ Initializing new project 'my-super-app' using template 'Python FastAPI'...
+✅ Project 'my-super-app' created successfully!
+🚀 Now, `cd my-super-app` and happy coding!
+```
 
-`ayat-fetcher` raises specific exceptions for different types of errors, making it easier to catch and handle them programmatically.
+### Managing Configuration
 
-```python
-from ayat_fetcher import fetcher
-from ayat_fetcher.exceptions import (
-    HTTPStatusError,
-    NetworkError,
-    TimeoutError,
-    FetchError # Base exception for all ayat_fetcher errors
-)
+`saadati-cli` allows you to store and retrieve key-value configurations for your projects or global settings. This is super handy for things like API keys (though be careful with sensitive data!), preferred linters, or deployment targets.
 
-# Example 1: Non-existent endpoint (404 Not Found)
-try:
-    fetcher.get("https://jsonplaceholder.typicode.com/non-existent-path")
-except HTTPStatusError as e:
-    print(f"\nCaught HTTP status error: {e.status_code} - {e.message}")
-    print(f"Response body: {e.response_text}") # You can access the raw response text
-except FetchError as e: # Catch all ayat_fetcher specific errors
-    print(f"\nCaught a generic fetcher error: {e}")
+```bash
+# Set a global configuration value
+saadati config set editor vscode --global
+
+# Set a project-specific value (run this from your project root)
+saadati config set linter black
+
+# Get a configuration value
+saadati config get editor
+
+# Get all configurations
+saadati config list
+```
+
+### Running Code Quality Checks
+
+I'm a huge proponent of code quality, and `saadati-cli` tries to make it easier to enforce. The `check` command can integrate with various tools.
+
+**Example: Running Black and Flake8 on a Python project**
+
+If your project is set up with a Python template, `saadati check` might automatically detect and run `black` for formatting and `flake8` for linting.
+
+```bash
+# From your Python project root
+saadati check
+```
+
+Output might look something like this:
+
+```bash
+$ saadati check
+🔍 Running code quality checks...
+
+➡️ Running Black formatter...
+All done! ✨ 💅 🎨
+1 file would be reformatted, 1 file would be left unchanged.
+
+➡️ Running Flake8 linter...
+./my_project/main.py:10:5: E303 too many blank lines (3)
+✅ Code quality checks completed with minor warnings.
+```
+
+If you just want to *fix* issues that can be automatically fixed (like formatting), you can often use a `--fix` flag (if the underlying tool supports it):
+
+```bash
+saadati check --fix
+```
+
+### Building Documentation
+
+While `saadati-cli` doesn't *write* your documentation (that's on you!), it can provide a unified command to trigger your chosen documentation builder. This is especially useful in CI/CD pipelines.
+
+```bash
+# Assuming your project uses Sphinx for Python docs
+saadati docs build
+
+# Or JSDoc for Node.js projects
+saadati docs build --tool jsdoc
+```
+
+This command would typically execute `make html` (for Sphinx) or `jsdoc -c conf.json` (for JSDoc) in the background, based on your project's configuration and type.
+
+## Code Examples
+
+Let's look at a quick flow to get a Flask API project up and running, adding a custom configuration, and then checking it.
+
+1.  **Start a new Flask project:**
+
+    ```bash
+    saadati init python-flask my-flask-app
+    cd my-flask-app
+    ```
+
+    You'll now have a basic Flask structure, likely with a `app.py`, `requirements.txt`, etc.
+
+2.  **Add a custom configuration for a secret key (locally):**
+
+    ```bash
+    saadati config set FLASK_SECRET_KEY "supersecretdevkey"
+    ```
+
+    Now, within your `app.py` or a dedicated config file, you could potentially load this value using a `saadati-cli` helper function (if the template provides one) or just know it's stored.
+
+3.  **Make a small, intentional linting error in `app.py`:**
+
+    Open `app.py` and add some extra blank lines or an unused import.
+
+    ```python
+    # my-flask-app/app.py
+    from flask import Flask
 
 
-# Example 2: Invalid domain (Network Error)
-try:
-    fetcher.get("https://definitely-not-a-real-domain-12345.com")
-except NetworkError as e:
-    print(f"\n
+    # Intentionally add too many blank lines here ^^^
+
+
+    app = Flask(__name__)
+
+    @app.route('/')
+    def hello_world():
+        return 'Hello, World!'
+    ```
+
+4.  **Run code quality checks:**
+
+    ```bash
+    saadati check
+    ```
+
+    You should see output from `flake8` (or similar) pointing out the extra blank lines:
+
+    ```bash
+    $ saadati check
+    🔍 Running code quality checks...
+
+    ➡️ Running Black formatter...
+    All done! ✨ 💅 🎨
+    2 files would be reformatted, 1 file would be left unchanged.
+
+    ➡️ Running Flake8 linter...
+    ./app.py:4:1: E303 too many blank lines (3)
+    ❌ Code quality checks failed. Please fix the identified issues.
+    ```
+
+5.  **Fix automatically:**
+
+    ```bash
+    saadati check --fix
+    ```
+
+    This will run `black` (which will fix the blank lines and formatting) and then re-run `flake8`.
+
+    ```bash
+    $ saadati check --fix
+    🔍 Running code quality checks...
+
+    ➡️ Running Black formatter...
+    Reformatted ./app.py
+    All done! ✨ 💅 🎨
+    1 file reformatted.
+
+    ➡️ Running Flake8 linter...
+    ✅ Code quality checks completed successfully.
+    ```
+
+    Your `app.py` is now neatly formatted and lint-free!
+
+## Advanced Topics
+
+### Custom Templates
+
+The real power of `saadati-cli` often comes from its extensibility. You can create your own project templates! This is a lifesaver for organizations with specific boilerplate or compliance requirements.
+
+Templates are essentially directories containing a predefined structure, often with placeholders that `saadati-cli` replaces during initialization.
+
+1.  **Create a template directory:** Let's say you want a custom template for a Django project.
+
+    ```bash
+    mkdir -p ~/.saadati/templates/my-django-template
+    ```
+
+2.  **Add your project structure:** Populate `my-django-template` with your desired Django project layout. You can use Jinja2-like syntax for placeholders.
+
+    Example `my-django-template/__project_name__/settings.py`:
+
+    ```python
+    # ...
+    SECRET_KEY = '{{ saadati.random_secret }}' # saadati-cli can generate this!
+    ALLOWED_HOSTS = ['{{ project_name }}.com']
+    # ...
+    ```
+
+3.  **Register your template (optional, `saadati-cli` usually finds them):**
+
+    `saadati config set template_path ~/.saadati/templates`
+
+Now, when you run `saadati init`, `my-django-template` will appear as an option. You can even pass arguments to your templates.
+
+### Plugin Architecture (Planned)
+
+While not fully mature, the vision for `saadati-cli` includes a robust plugin system. Imagine being able to `saadati install-plugin aws-deploy` to add new deployment commands, or `saadati install-plugin gcp-cloud-functions` to scaffold serverless functions. This is definitely on the roadmap for future releases, focusing on allowing community contributions to extend its capabilities far beyond my initial scope.
+
+## Contributing
+
+I'm a firm believer in open source, and `saadati-cli` thrives on community input. If you've got ideas, bug reports, or even better, pull requests, I'd love to see them!
+
+*   **Bug Reports:** If something's broken, please open an issue on the GitHub repository (I'll set one up soon!). Provide clear steps to reproduce and any relevant error messages.
+*   **Feature Requests:** Have an idea for a new template or a useful command? Open an issue and describe your vision.
+*   **Code Contributions:**
+    1.  Fork the repository.
+    2.  Create a new branch (`git checkout -b feature/my-new-feature`).
+    3.  Make your changes, ensuring tests pass (or add new ones!).
+    4.  Commit your changes (`git commit -am 'Add new feature X'`).
+    5.  Push to the branch (`git push origin feature/my-new-feature`).
+    6.  Open a Pull Request.
+
+I try to review PRs as quickly as possible. Don't be shy!
+
+## FAQ
+
+**Q: Is `saadati-cli` opinionated?**
+A: Yes, absolutely! I've baked in defaults that I've found to work well across many projects. However, it's designed to be flexible enough that you can override most of those opinions with your own configurations or custom templates. It tries to strike a balance between providing a quick start and allowing full customization.
+
+**Q: What languages/frameworks does it support out-of-the-box?**
+A: Currently, the official templates primarily focus on Python (Flask, FastAPI, generic library) and some basic Node.js (Express, generic API). The goal is to grow this library of templates, and custom templates are the easiest way to add support for anything
