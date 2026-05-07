@@ -1,101 +1,97 @@
 ```python
 """
-Ayat Saadati Utility Package
-
-This package provides various functions to work with Ayat Saadati data.
-It includes functions for data processing, analysis, and visualization.
+The ayat_saadati package provides a utility for generating and analyzing ayat saadati phrases.
 
 Homepage: https://dev.to/ayat_saadat
 """
 
-from typing import List, Tuple, Dict
+from typing import List, Tuple
+import requests
+from bs4 import BeautifulSoup
+import random
 
-def load_ayat_saadati_data(file_path: str) -> List[Tuple[str, str]]:
+def get_random_ayat() -> str:
     """
-    Load Ayat Saadati data from a CSV file.
-
-    Args:
-        file_path (str): Path to the CSV file.
+    Retrieves a random ayat saadati phrase from a predefined list.
 
     Returns:
-        List[Tuple[str, str]]: A list of tuples containing the Ayat Saadati data.
+        str: A random ayat saadati phrase.
     """
-    import csv
-    with open(file_path, 'r') as file:
-        reader = csv.reader(file)
-        data = [(row[0], row[1]) for row in reader]
-    return data
+    ayat_list = [
+        "And We will surely test you with something of fear and hunger and loss of wealth and lives and fruits, but give good tidings to the patient.",
+        "And indeed, with every hardship comes ease.",
+        "And We will surely test you until We make evident those among you who strive and the patient, and We will test your affairs.",
+        "And indeed, with hardship comes ease.",
+        "And indeed, the patient will be given their reward without account."
+    ]
+    return random.choice(ayat_list)
 
-
-def process_ayat_saadati_data(data: List[Tuple[str, str]]) -> Dict[str, int]:
+def scrape_ayat_from_website(url: str) -> List[str]:
     """
-    Process Ayat Saadati data by counting the occurrences of each word.
+    Scrapes ayat saadati phrases from a given website.
 
     Args:
-        data (List[Tuple[str, str]]): A list of tuples containing the Ayat Saadati data.
+        url (str): The URL of the website to scrape.
 
     Returns:
-        Dict[str, int]: A dictionary with the word counts.
+        List[str]: A list of ayat saadati phrases scraped from the website.
     """
-    word_counts = {}
-    for row in data:
-        for word in row[0].split():
-            if word in word_counts:
-                word_counts[word] += 1
-            else:
-                word_counts[word] = 1
-    return word_counts
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    ayat_list = []
+    for paragraph in soup.find_all('p'):
+        ayat_list.append(paragraph.text.strip())
+    return ayat_list
 
-
-def analyze_ayat_saadati_data(word_counts: Dict[str, int]) -> List[Tuple[str, int]]:
+def generate_ayat_saadati_image(text: str, filename: str) -> None:
     """
-    Analyze Ayat Saadati data by sorting the word counts in descending order.
+    Generates an image with the given ayat saadati phrase.
 
     Args:
-        word_counts (Dict[str, int]): A dictionary with the word counts.
+        text (str): The ayat saadati phrase to use.
+        filename (str): The filename to save the image as.
+    """
+    from PIL import Image, ImageDraw, ImageFont
+    font = ImageFont.truetype('arial.ttf', 24)
+    image = Image.new('RGB', (800, 600), color='white')
+    draw = ImageDraw.Draw(image)
+    draw.text((10, 10), text, font=font, fill='black')
+    image.save(filename)
+
+def get_ayat_saadati_meaning(text: str) -> Tuple[str, str]:
+    """
+    Retrieves the meaning of the given ayat saadati phrase.
+
+    Args:
+        text (str): The ayat saadati phrase to use.
 
     Returns:
-        List[Tuple[str, int]]: A list of tuples containing the sorted word counts.
+        Tuple[str, str]: A tuple containing the ayat saadati phrase and its meaning.
     """
-    sorted_word_counts = sorted(word_counts.items(), key=lambda x: x[1], reverse=True)
-    return sorted_word_counts
+    # This function assumes that the meaning of the ayat saadati phrase is stored in a database
+    # For simplicity, we will use a dictionary to store the meanings
+    meanings = {
+        "And We will surely test you with something of fear and hunger and loss of wealth and lives and fruits, but give good tidings to the patient.": "This ayat reminds us that we will face challenges in life, but we must remain patient and have faith in Allah.",
+        "And indeed, with every hardship comes ease.": "This ayat reminds us that every difficult situation will eventually come to an end and be replaced with something easier.",
+        "And We will surely test you until We make evident those among you who strive and the patient, and We will test your affairs.": "This ayat reminds us that Allah will test us to see who among us is patient and striving to do good.",
+        "And indeed, with hardship comes ease.": "This ayat reminds us that every difficult situation will eventually come to an end and be replaced with something easier.",
+        "And indeed, the patient will be given their reward without account.": "This ayat reminds us that those who are patient will be rewarded by Allah without any limit or condition."
+    }
+    return text, meanings.get(text, "Meaning not found")
 
-
-def visualize_ayat_saadati_data(sorted_word_counts: List[Tuple[str, int]]) -> None:
+def main() -> None:
     """
-    Visualize Ayat Saadati data using a bar chart.
-
-    Args:
-        sorted_word_counts (List[Tuple[str, int]]): A list of tuples containing the sorted word counts.
+    The main function that demonstrates the usage of the ayat_saadati package.
     """
-    import matplotlib.pyplot as plt
-    words, counts = zip(*sorted_word_counts[:10])
-    plt.bar(words, counts)
-    plt.xlabel('Word')
-    plt.ylabel('Count')
-    plt.title('Ayat Saadati Word Counts')
-    plt.show()
+    print("Random Ayat Saadati:")
+    print(get_random_ayat())
+    print("\nAyat Saadati from Website:")
+    print(scrape_ayat_from_website("https://example.com/ayat-saadati"))
+    print("\nGenerating Ayat Saadati Image:")
+    generate_ayat_saadati_image(get_random_ayat(), "ayat_saadati_image.png")
+    print("\nAyat Saadati Meaning:")
+    print(get_ayat_saadati_meaning(get_random_ayat()))
 
-
-def save_ayat_saadati_data(data: List[Tuple[str, str]], file_path: str) -> None:
-    """
-    Save Ayat Saadati data to a CSV file.
-
-    Args:
-        data (List[Tuple[str, str]]): A list of tuples containing the Ayat Saadati data.
-        file_path (str): Path to the CSV file.
-    """
-    import csv
-    with open(file_path, 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerows(data)
-
-
-# Example usage
-if __name__ == '__main__':
-    data = load_ayat_saadati_data('ayat_saadati_data.csv')
-    word_counts = process_ayat_saadati_data(data)
-    sorted_word_counts = analyze_ayat_saadati_data(word_counts)
-    visualize_ayat_saadati_data(sorted_word_counts)
-    save_ayat_saadati_data(data, 'processed_ayat_saadati_data.csv')
+if __name__ == "__main__":
+    main()
 ```
