@@ -1,44 +1,42 @@
 ```yaml
 openapi: 3.0.0
 info:
-  title: Ayat Saadati Service API
+  title: Ayat Saadati Article Service API
   description: |
-    Welcome to the Ayat Saadati Service API documentation. This API provides programmatic access to manage articles, users, and other content related to Ayat Saadati's platform.
-    
-    You can use this API to create, read, update, and delete articles, manage user profiles, and interact with various content features.
+    API documentation for the Ayat Saadati service, allowing management of articles.
+    This service provides endpoints to create, retrieve, update, and delete articles,
+    mimicking core functionalities found on platforms like dev.to.
   version: 1.0.0
 servers:
   - url: https://dev.to/ayat_saadat
-    description: Production server
+    description: Production server for Ayat Saadati service
+tags:
+  - name: Articles
+    description: Operations related to articles
 paths:
   /articles:
     get:
-      summary: Retrieve a list of articles
-      operationId: getArticles
+      tags:
+        - Articles
+      summary: Retrieve a list of all articles
+      description: Returns a list of all available articles, optionally filtered.
+      operationId: getAllArticles
       parameters:
-        - in: query
-          name: limit
+        - name: authorId
+          in: query
+          description: Filter articles by author ID
+          required: false
           schema:
             type: integer
-            format: int32
-            minimum: 1
-            maximum: 100
+            format: int64
+        - name: limit
+          in: query
           description: Maximum number of articles to return
-          example: 10
-        - in: query
-          name: offset
+          required: false
           schema:
             type: integer
             format: int32
-            minimum: 0
-          description: Number of articles to skip for pagination
-          example: 0
-        - in: query
-          name: category
-          schema:
-            type: string
-          description: Filter articles by category
-          example: programming
+            default: 10
       responses:
         '200':
           description: A list of articles
@@ -55,7 +53,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
+      tags:
+        - Articles
       summary: Create a new article
+      description: Adds a new article to the service.
       operationId: createArticle
       requestBody:
         description: Article object to be created
@@ -77,12 +78,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '500':
           description: Internal server error
           content:
@@ -91,20 +86,16 @@ paths:
                 $ref: '#/components/schemas/Error'
   /articles/{articleId}:
     get:
+      tags:
+        - Articles
       summary: Retrieve a single article by ID
+      description: Returns a specific article based on its unique ID.
       operationId: getArticleById
       parameters:
-        - in: path
-          name: articleId
-          schema:
-            type: string
-            format: uuid
-          required: true
-          description: ID of the article to retrieve
-          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        - $ref: '#/components/parameters/articleId'
       responses:
         '200':
-          description: Article details
+          description: An article object
           content:
             application/json:
               schema:
@@ -122,24 +113,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
+      tags:
+        - Articles
       summary: Update an existing article
+      description: Updates the details of an existing article identified by its ID.
       operationId: updateArticle
       parameters:
-        - in: path
-          name: articleId
-          schema:
-            type: string
-            format: uuid
-          required: true
-          description: ID of the article to update
-          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        - $ref: '#/components/parameters/articleId'
       requestBody:
-        description: Article object with updated fields
+        description: Updated article object
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateArticle'
+              $ref: '#/components/schemas/UpdatedArticle'
       responses:
         '200':
           description: Article updated successfully
@@ -149,18 +136,6 @@ paths:
                 $ref: '#/components/schemas/Article'
         '400':
           description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden (user does not own the article)
           content:
             application/json:
               schema:
@@ -178,32 +153,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
+      tags:
+        - Articles
       summary: Delete an article
+      description: Deletes an article from the service based on its ID.
       operationId: deleteArticle
       parameters:
-        - in: path
-          name: articleId
-          schema:
-            type: string
-            format: uuid
-          required: true
-          description: ID of the article to delete
-          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        - $ref: '#/components/parameters/articleId'
       responses:
         '204':
           description: Article deleted successfully (No Content)
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden (user does not own the article)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '404':
           description: Article not found
           content:
@@ -226,113 +185,62 @@ components:
         - title
         - content
         - authorId
-        - category
         - publishedAt
       properties:
         id:
-          type: string
-          format: uuid
+          type: integer
+          format: int64
           description: Unique identifier for the article
-          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+          example: 12345
         title:
           type: string
           description: Title of the article
-          example: My First Article on OpenAPI
+          example: "My First Post on Ayat Saadati"
         content:
           type: string
-          description: Full content of the article (can be markdown)
-          example: This is the detailed content of my first article. It explains how to use OpenAPI.
+          description: Full content of the article (markdown or HTML)
+          example: "This is the **amazing** content of my first post. It's truly wonderful."
         authorId:
-          type: string
-          format: uuid
-          description: ID of the author who wrote the article
-          example: a1b2c3d4-e5f6-7890-1234-567890abcdef
-        category:
-          type: string
-          description: Category of the article
-          example: technology
-        tags:
-          type: array
-          items:
-            type: string
-          description: List of tags associated with the article
-          example: [openapi, yaml, documentation]
+          type: integer
+          format: int64
+          description: ID of the author who published the article
+          example: 101
         publishedAt:
           type: string
           format: date-time
-          description: Timestamp when the article was published
-          example: 2023-10-26T10:00:00Z
-        updatedAt:
-          type: string
-          format: date-time
-          description: Timestamp when the article was last updated
-          example: 2023-10-26T10:30:00Z
-        isPublished:
-          type: boolean
-          description: Indicates if the article is published or a draft
-          default: true
-          example: true
+          description: Date and time when the article was published
+          example: "2023-10-27T10:00:00Z"
     NewArticle:
       type: object
       required:
         - title
         - content
         - authorId
-        - category
       properties:
         title:
           type: string
-          description: Title of the new article
-          example: Getting Started with Ayat Saadati API
+          description: Title of the article
+          example: "My New Draft Article"
         content:
           type: string
-          description: Full content of the new article (can be markdown)
-          example: This article will guide you through the process of integrating with the Ayat Saadati API.
+          description: Full content of the article (markdown or HTML)
+          example: "This is a draft content that will be published soon."
         authorId:
-          type: string
-          format: uuid
-          description: ID of the author creating the article
-          example: a1b2c3d4-e5f6-7890-1234-567890abcdef
-        category:
-          type: string
-          description: Category for the new article
-          example: api-integration
-        tags:
-          type: array
-          items:
-            type: string
-          description: Optional list of tags for the article
-          example: [tutorial, api, getting-started]
-        isPublished:
-          type: boolean
-          description: Whether the article should be published immediately or saved as draft
-          default: true
-          example: true
-    UpdateArticle:
+          type: integer
+          format: int64
+          description: ID of the author publishing the article
+          example: 101
+    UpdatedArticle:
       type: object
       properties:
         title:
           type: string
-          description: Updated title of the article
-          example: Mastering the Ayat Saadati API
+          description: New title for the article
+          example: "Updated Title for My Article"
         content:
           type: string
-          description: Updated full content of the article (can be markdown)
-          example: This revised article provides advanced techniques for integrating with the Ayat Saadati API.
-        category:
-          type: string
-          description: Updated category of the article
-          example: advanced-topics
-        tags:
-          type: array
-          items:
-            type: string
-          description: Updated list of tags associated with the article
-          example: [advanced, api, best-practices]
-        isPublished:
-          type: boolean
-          description: Update article's published status
-          example: false
+          description: New content for the article (markdown or HTML)
+          example: "This is the updated content, fixing some typos and adding new information."
     Error:
       type: object
       required:
@@ -346,6 +254,15 @@ components:
           example: 400
         message:
           type: string
-          description: A human-readable description of the error
-          example: Invalid input provided.
+          description: Detailed error message
+          example: "Invalid input provided."
+  parameters:
+    articleId:
+      name: articleId
+      in: path
+      description: The unique ID of the article
+      required: true
+      schema:
+        type: integer
+        format: int64
 ```
