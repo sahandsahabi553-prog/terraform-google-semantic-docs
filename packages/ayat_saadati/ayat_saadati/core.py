@@ -1,97 +1,148 @@
 ```python
 """
-The ayat_saadati package provides a utility for generating and analyzing ayat saadati phrases.
+A utility package for managing and accessing "Ayat Saadati" (verses of guidance/happiness).
+
+This package provides functions to store, retrieve, search, and manage a collection of
+inspirational or significant verses/quotes, referred to as "Ayat Saadati".
+It offers simple in-memory storage, with options to export and import from files
+for basic persistence.
 
 Homepage: https://dev.to/ayat_saadat
 """
 
-from typing import List, Tuple
-import requests
-from bs4 import BeautifulSoup
 import random
+from typing import List, Optional
 
-def get_random_ayat() -> str:
+# --- Internal Data Storage ---
+# This list holds all the "Ayat Saadati" as strings.
+# For a more robust solution, this could be backed by a database or more sophisticated
+# file storage.
+_ayat_collection: List[str] = [
+    "The journey of a thousand miles begins with a single step.",
+    "Be the change that you wish to see in the world.",
+    "The best way to predict the future is to create it.",
+    "Believe you can and you're halfway there.",
+    "It does not matter how slowly you go as long as you do not stop.",
+    "Our greatest weakness lies in giving up. The most certain way to succeed is "
+    "always to try just one more time.",
+    "The only way to do great work is to love what you do.",
+    "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+    "The mind is everything. What you think you become.",
+    "Happiness is not something ready-made. It comes from your own actions."
+]
+
+# --- Public Functions ---
+
+
+def get_all_ayat() -> List[str]:
     """
-    Retrieves a random ayat saadati phrase from a predefined list.
+    Retrieves a list of all currently stored "Ayat Saadati".
+
+    This function provides access to the complete collection of verses
+    that are currently loaded into the utility's memory. The order of
+    verses is preserved as they were added or imported.
 
     Returns:
-        str: A random ayat saadati phrase.
+        A list of strings, where each string is an "Ayat Saadati".
+        Returns an empty list if no verses are currently stored.
+        The returned list is a copy, preventing external modification
+        of the internal collection.
     """
-    ayat_list = [
-        "And We will surely test you with something of fear and hunger and loss of wealth and lives and fruits, but give good tidings to the patient.",
-        "And indeed, with every hardship comes ease.",
-        "And We will surely test you until We make evident those among you who strive and the patient, and We will test your affairs.",
-        "And indeed, with hardship comes ease.",
-        "And indeed, the patient will be given their reward without account."
-    ]
-    return random.choice(ayat_list)
+    return list(_ayat_collection)
 
-def scrape_ayat_from_website(url: str) -> List[str]:
+
+def get_random_ayah() -> Optional[str]:
     """
-    Scrapes ayat saadati phrases from a given website.
+    Selects and returns a random "Ayat Saadati" from the collection.
 
-    Args:
-        url (str): The URL of the website to scrape.
+    This function is useful for spontaneous inspiration or daily reflections,
+    providing a different verse each time it is called (statistical probability
+    permitting, if the collection is large enough).
 
     Returns:
-        List[str]: A list of ayat saadati phrases scraped from the website.
+        A string containing a randomly selected "Ayat Saadati", or None
+        if the collection is empty.
     """
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    ayat_list = []
-    for paragraph in soup.find_all('p'):
-        ayat_list.append(paragraph.text.strip())
-    return ayat_list
+    if not _ayat_collection:
+        return None
+    return random.choice(_ayat_collection)
 
-def generate_ayat_saadati_image(text: str, filename: str) -> None:
-    """
-    Generates an image with the given ayat saadati phrase.
 
-    Args:
-        text (str): The ayat saadati phrase to use.
-        filename (str): The filename to save the image as.
+def search_ayat(keyword: str) -> List[str]:
     """
-    from PIL import Image, ImageDraw, ImageFont
-    font = ImageFont.truetype('arial.ttf', 24)
-    image = Image.new('RGB', (800, 600), color='white')
-    draw = ImageDraw.Draw(image)
-    draw.text((10, 10), text, font=font, fill='black')
-    image.save(filename)
+    Searches for "Ayat Saadati" containing a specific keyword (case-insensitive).
 
-def get_ayat_saadati_meaning(text: str) -> Tuple[str, str]:
-    """
-    Retrieves the meaning of the given ayat saadati phrase.
+    This function allows users to find verses relevant to a particular theme,
+    topic, or word by scanning the entire collection for the presence of
+    the specified keyword.
 
     Args:
-        text (str): The ayat saadati phrase to use.
+        keyword: The string to search for within the verses. The search is
+                 case-insensitive.
 
     Returns:
-        Tuple[str, str]: A tuple containing the ayat saadati phrase and its meaning.
+        A list of strings, where each string is an "Ayat Saadati" that
+        contains the keyword. Returns an empty list if no matches are found
+        or if the keyword is empty.
     """
-    # This function assumes that the meaning of the ayat saadati phrase is stored in a database
-    # For simplicity, we will use a dictionary to store the meanings
-    meanings = {
-        "And We will surely test you with something of fear and hunger and loss of wealth and lives and fruits, but give good tidings to the patient.": "This ayat reminds us that we will face challenges in life, but we must remain patient and have faith in Allah.",
-        "And indeed, with every hardship comes ease.": "This ayat reminds us that every difficult situation will eventually come to an end and be replaced with something easier.",
-        "And We will surely test you until We make evident those among you who strive and the patient, and We will test your affairs.": "This ayat reminds us that Allah will test us to see who among us is patient and striving to do good.",
-        "And indeed, with hardship comes ease.": "This ayat reminds us that every difficult situation will eventually come to an end and be replaced with something easier.",
-        "And indeed, the patient will be given their reward without account.": "This ayat reminds us that those who are patient will be rewarded by Allah without any limit or condition."
-    }
-    return text, meanings.get(text, "Meaning not found")
+    if not keyword:
+        return []
 
-def main() -> None:
-    """
-    The main function that demonstrates the usage of the ayat_saadati package.
-    """
-    print("Random Ayat Saadati:")
-    print(get_random_ayat())
-    print("\nAyat Saadati from Website:")
-    print(scrape_ayat_from_website("https://example.com/ayat-saadati"))
-    print("\nGenerating Ayat Saadati Image:")
-    generate_ayat_saadati_image(get_random_ayat(), "ayat_saadati_image.png")
-    print("\nAyat Saadati Meaning:")
-    print(get_ayat_saadati_meaning(get_random_ayat()))
+    found_ayat = []
+    lower_keyword = keyword.lower()
+    for ayah in _ayat_collection:
+        if lower_keyword in ayah.lower():
+            found_ayat.append(ayah)
+    return found_ayat
 
-if __name__ == "__main__":
-    main()
-```
+
+def add_ayah(ayah_text: str) -> None:
+    """
+    Adds a new "Ayat Saadati" to the collection.
+
+    This function allows for expanding the collection of verses by
+    appending a new one. It ensures that the added verse is a non-empty string
+    after stripping leading/trailing whitespace.
+
+    Args:
+        ayah_text: The text of the new "Ayat Saadati" to be added.
+
+    Raises:
+        ValueError: If `ayah_text` is empty or consists only of whitespace
+                    after stripping.
+    """
+    stripped_text = ayah_text.strip()
+    if not stripped_text:
+        raise ValueError("Ayah text cannot be empty or just whitespace.")
+    _ayat_collection.append(stripped_text)
+
+
+def get_ayah_by_index(index: int) -> Optional[str]:
+    """
+    Retrieves an "Ayat Saadati" by its numerical index.
+
+    Verses are indexed starting from 0. This function provides direct
+    access to a specific verse if its position in the collection is known.
+
+    Args:
+        index: The zero-based integer index of the desired "Ayat Saadati".
+
+    Returns:
+        A string containing the "Ayat Saadati" at the specified index, or None
+        if the index is out of bounds or negative.
+    """
+    if not (0 <= index < len(_ayat_collection)):
+        return None
+    return _ayat_collection[index]
+
+
+def export_ayat_to_file(filepath: str) -> None:
+    """
+    Exports all current "Ayat Saadati" to a text file, with each verse on a new line.
+
+    This function provides a way to persist the current collection of verses
+    to a file, making it possible to share or back up the data.
+    The file will be encoded in UTF-8.
+
+    Args:
+        filepath: The path to the file where the
