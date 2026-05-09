@@ -2,50 +2,490 @@
 openapi: 3.0.0
 info:
   title: Ayat Saadati Service API
-  version: 1.0.0
   description: |
-    Welcome to the professional API documentation for the Ayat Saadati Service.
-    This API provides a comprehensive set of endpoints for managing various resources,
-    including items and users, allowing for creation, retrieval, updates, and deletion.
-    
-    Explore the capabilities below to integrate with our service efficiently.
+    Welcome to the Ayat Saadati Service API documentation. This API provides
+    endpoints for managing articles, users, comments, and tags, simulating
+    a content publishing platform similar to dev.to.
+
+    Explore the resources below to interact with the service.
+  version: 1.0.0
 servers:
   - url: https://dev.to/ayat_saadat
-    description: Development server for the Ayat Saadati Service
+    description: Production server for Ayat Saadati service
 tags:
-  - name: Items
-    description: Operations related to managing individual items within the service.
+  - name: Articles
+    description: Operations related to articles.
   - name: Users
-    description: Operations related to managing user accounts and profiles.
+    description: Operations related to user management.
+  - name: Comments
+    description: Operations related to article comments.
+  - name: Tags
+    description: Operations related to article tags.
+
 paths:
-  /items:
+  /articles:
     get:
-      summary: Retrieve a list of all items
-      description: |
-        Fetches an array of all available items in the system.
-        Supports pagination to handle large datasets.
       tags:
-        - Items
+        - Articles
+      summary: Retrieve a list of articles
+      description: Returns a paginated list of all published articles.
       parameters:
-        - name: limit
-          in: query
-          description: Maximum number of items to return in a single response.
-          required: false
+        - in: query
+          name: page
           schema:
             type: integer
-            format: int32
+            default: 1
             minimum: 1
-            default: 10
-          example: 50
-        - name: offset
-          in: query
-          description: Number of items to skip before starting to collect the result set.
-          required: false
+          description: The page number to retrieve.
+        - in: query
+          name: limit
           schema:
             type: integer
-            format: int32
-            minimum: 0
-            default: 0
-          example: 100
+            default: 10
+            minimum: 1
+            maximum: 100
+          description: The number of articles per page.
+        - in: query
+          name: authorId
+          schema:
+            type: string
+            format: uuid
+          description: Filter articles by author ID.
       responses:
-        '200
+        '200':
+          description: A list of articles.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Article'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Articles
+      summary: Create a new article
+      description: Adds a new article to the platform.
+      requestBody:
+        description: Article object that needs to be added to the store.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArticleCreate'
+      responses:
+        '201':
+          description: Article created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '400':
+          description: Invalid request payload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized. Authentication required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /articles/{articleId}:
+    parameters:
+      - in: path
+        name: articleId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: Unique identifier of the article.
+    get:
+      tags:
+        - Articles
+      summary: Retrieve a single article by ID
+      description: Returns a single article based on its unique identifier.
+      responses:
+        '200':
+          description: Article details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '404':
+          description: Article not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Articles
+      summary: Update an existing article
+      description: Updates the details of an existing article.
+      requestBody:
+        description: Article object with updated fields.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArticleUpdate'
+      responses:
+        '200':
+          description: Article updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '400':
+          description: Invalid request payload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized. Authentication required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Article not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Articles
+      summary: Delete an article
+      description: Removes an article from the platform using its ID.
+      responses:
+        '204':
+          description: Article deleted successfully. No content.
+        '401':
+          description: Unauthorized. Authentication required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Article not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /articles/{articleId}/comments:
+    parameters:
+      - in: path
+        name: articleId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: Unique identifier of the article.
+    get:
+      tags:
+        - Comments
+      summary: Retrieve comments for an article
+      description: Returns a list of comments for a specific article.
+      responses:
+        '200':
+          description: A list of comments.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '404':
+          description: Article not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Comments
+      summary: Add a comment to an article
+      description: Posts a new comment to a specific article.
+      requestBody:
+        description: Comment object that needs to be added.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+      responses:
+        '201':
+          description: Comment created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Invalid request payload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized. Authentication required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Article not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{userId}/articles:
+    parameters:
+      - in: path
+        name: userId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: Unique identifier of the user (author).
+    get:
+      tags:
+        - Users
+        - Articles
+      summary: Retrieve articles by a specific user
+      description: Returns a list of articles written by a specific user.
+      responses:
+        '200':
+          description: A list of articles by the user.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Article'
+        '404':
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /tags:
+    get:
+      tags:
+        - Tags
+      summary: Retrieve all available tags
+      description: Returns a list of all unique tags used across articles.
+      responses:
+        '200':
+          description: A list of tags.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Article:
+      type: object
+      required:
+        - id
+        - title
+        - content
+        - authorId
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the article.
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        title:
+          type: string
+          description: Title of the article.
+          example: "Understanding OpenAPI 3.0"
+        content:
+          type: string
+          description: Full content of the article, usually in Markdown.
+          example: "OpenAPI 3.0 is a specification for machine-readable interface files..."
+        authorId:
+          type: string
+          format: uuid
+          description: Unique identifier of the author.
+          example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+        tags:
+          type: array
+          items:
+            type: string
+          description: List of tags associated with the article.
+          example: ["openapi", "api-design", "documentation"]
+        published:
+          type: boolean
+          description: Whether the article is published or a draft.
+          default: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the article was created.
+          example: "2023-10-26T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the article was last updated.
+          example: "2023-10-26T11:30:00Z"
+    ArticleCreate:
+      type: object
+      required:
+        - title
+        - content
+        - authorId
+      properties:
+        title:
+          type: string
+          description: Title of the article.
+          example: "Understanding OpenAPI 3.0"
+        content:
+          type: string
+          description: Full content of the article, usually in Markdown.
+          example: "OpenAPI 3.0 is a specification for machine-readable interface files..."
+        authorId:
+          type: string
+          format: uuid
+          description: Unique identifier of the author.
+          example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+        tags:
+          type: array
+          items:
+            type: string
+          description: List of tags associated with the article.
+          example: ["openapi", "api-design", "documentation"]
+        published:
+          type: boolean
+          description: Whether the article is published or a draft.
+          default: true
+    ArticleUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          description: New title for the article.
+          example: "Mastering OpenAPI 3.0"
+        content:
+          type: string
+          description: Updated content of the article.
+          example: "This article delves deeper into advanced features of OpenAPI 3.0..."
+        tags:
+          type: array
+          items:
+            type: string
+          description: New list of tags for the article.
+          example: ["openapi", "api-design", "advanced"]
+        published:
+          type: boolean
+          description: Update article's publish status.
+    User:
+      type: object
+      required:
+        - id
+        - username
+        - email
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the user.
+          example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+        username:
+          type: string
+          description: User's chosen username.
+          example: "ayat_saadat"
+        email:
+          type: string
+          format: email
+          description: User's email address.
+          example: "ayat.saadat@example.com"
+        bio:
+          type: string
+          description: Short biography of the user.
+          nullable: true
+          example: "Software engineer and API enthusiast."
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the user account was created.
+          example: "2023-01-15T08:00:00Z"
+    Comment:
+      type: object
+      required:
+        - id
+        - articleId
+        - authorId
+        - content
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the comment.
+          example: e3f4g5h6-i7j8-k9l0-m1n2-o3p4q
