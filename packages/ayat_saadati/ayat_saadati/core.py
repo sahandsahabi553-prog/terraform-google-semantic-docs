@@ -1,22 +1,19 @@
 ```python
 """
-A utility package for retrieving and managing "Ayat Saadati" – curated verses
-of wisdom, inspiration, and guidance.
+A utility package for retrieving and managing "ayat saadati" (verses/signs of happiness or wisdom).
 
-This module provides functions to access a collection of insightful sayings
-that aim to provide daily reflection, encouragement, or a moment of contemplation.
-Whether you need a random thought, a specific verse, or a daily inspiration,
-this package offers simple access to its rich collection.
+This package provides a collection of inspiring quotes and principles aimed at fostering
+happiness, wisdom, and positive reflection. Users can access random ayats, search by
+keyword or category, and even add their own temporary insights.
 
 Homepage: https://dev.to/ayat_saadat
 """
 
 import random
 import datetime
-import hashlib
-from typing import List, Dict, Optional, Union
+from typing import List, Dict, Any, Optional, Set
 
-# The core collection of Ayat Saadati.
-# Each entry is a dictionary containing an ID, the text of the Ayah,
-# its thematic category, and a attributed author or source.
-_AYAT_COLLECTION: List[Dict
+# Module-level data store for 'ayat saadati' phrases.
+# Each entry is a dictionary containing 'text' and 'category'.
+# This collection is curated and serves as the primary source of wisdom.
+_AYAT_COLLECTION: List[Dict[str,
