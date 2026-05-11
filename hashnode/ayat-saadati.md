@@ -1,235 +1,290 @@
-Okay, let's dive into some technical documentation. When folks ask about "Ayat Saadati," they're often interested in the patterns, principles, and robust approaches she champions in software development, particularly in the realm of backend systems, cloud architecture, and distributed services. While "Ayat Saadati" isn't a *tool* you install, I've seen her influence in various projects that embody her approach to building resilient, scalable, and maintainable systems.
+# Saadat Connect: An Opinionated API Gateway & BFF Framework
 
-So, let's imagine a hypothetical but entirely plausible open-source library, let's call it the **Saadati Distributed Service Kit (SDSK)**. This library would encapsulate many of the best practices and utilities that someone with Ayat's experience would advocate for, especially when dealing with the complexities of microservices and cloud-native applications. It's a thought exercise, really, to illustrate how her technical philosophy translates into actionable code.
+Alright, let's talk about building robust, developer-friendly API layers. Over the years, I've seen countless teams wrestle with the complexities of managing API gateways, especially when dealing with a sprawling microservices landscape or simply trying to provide a tailored experience for different client applications. That's precisely why I started to formalize a set of patterns and tools that eventually coalesced into **Saadat Connect**.
 
----
+At its heart, Saadat Connect is a lightweight, opinionated framework designed to simplify the creation of API gateways and Backend-for-Frontend (BFF) services. My primary goal here was to bake in best practices for observability, security, and maintainability right from the start, all while keeping the developer experience (DX) front and center. Because let's be honest, if it's not a joy to use, it won't get used properly.
 
-# Saadati Distributed Service Kit (SDSK)
+## 🚀 Core Philosophy & Why It Matters
 
-The **Saadati Distributed Service Kit (SDSK)** is a lightweight, opinionated Python library designed to streamline the development and operation of robust distributed services. Drawing from years of hands-on experience in building scalable backend systems, SDSK provides essential utilities for common distributed system challenges such as service discovery, resilient communication patterns, and effective distributed tracing.
+You might be thinking, "Another API gateway framework? Really?" And that's a fair question. The truth is, while there are many excellent tools out there, many are either overly complex for typical use cases, or they leave too much boilerplate for the developer to figure out. Saadat Connect aims to strike a balance.
 
-## Table of Contents
+My philosophy with Saadat Connect boils down to a few key principles:
 
-1.  [Introduction](#introduction)
-2.  [Why SDSK?](#why-sdsk)
-3.  [Installation](#installation)
-4.  [Core Concepts](#core-concepts)
-5.  [Usage Examples](#usage-examples)
-    *   [Service Discovery Client](#service-discovery-client)
-    *   [Resilient HTTP Client (Retry & Circuit Breaker)](#resilient-http-client-retry--circuit-breaker)
-    *   [Distributed Trace Context Propagation](#distributed-trace-context-propagation)
-6.  [Configuration](#configuration)
-7.  [API Reference (Key Modules)](#api-reference-key-modules)
-8.  [Contributing](#contributing)
-9.  [FAQ](#faq)
-10. [Troubleshooting](#troubleshooting)
-11. [Further Reading & Author's Insights](#further-reading--authors-insights)
+1.  **Opinionated Defaults for Best Practices:** I've baked in sensible defaults for things like request logging, error handling, and security headers. You can override them, of course, but the idea is to guide you towards a secure and observable API without endless configuration.
+2.  **Focus on Developer Experience (DX):** Configuration should be intuitive, and development loops should be fast. I want you to spend more time building features and less time fighting the framework.
+3.  **Extensible & Modular:** While opinionated, it's not a black box. You can easily plug in your own middleware, integrate with various service discovery mechanisms, and extend its functionality to fit your specific needs.
+4.  **Performance & Reliability:** Built on battle-tested HTTP server foundations, Saadat Connect is designed to be performant and resilient, handling high loads with grace. We're not reinventing the wheel on the networking side; we're just making it easier to drive.
+5.  **Observability First:** Good APIs aren't just about functionality; they're about understanding what's happening under the hood. Saadat Connect provides built-in mechanisms for logging, tracing, and metrics, making it easier to debug and monitor your services.
 
----
+## 📦 Installation
 
-## 1. Introduction
+Getting Saadat Connect up and running is pretty straightforward. We're primarily targeting Node.js environments, but there's also a Docker option for quick deployment.
 
-Building distributed systems is hard. Period. You're dealing with network latency, transient failures, eventual consistency, and a whole host of "known unknowns." The **SDSK** aims to abstract away some of these common headaches, allowing developers to focus on business logic rather than boilerplate infrastructure concerns. It provides battle-tested patterns and sensible defaults, making it easier to integrate essential capabilities into your microservices.
+### Prerequisites
 
-## 2. Why SDSK?
+Before you start, make sure you have:
 
-"Why yet another library?" Good question. My take is that while there are many excellent individual tools out there, SDSK brings together a curated set of features under one roof, guided by a coherent philosophy rooted in practical backend engineering.
+*   **Node.js (v16.x or later):** Saadat Connect is built with modern JavaScript features in mind.
+*   **npm or yarn:** For package management.
+*   **Docker (Optional):** If you prefer containerized deployments.
 
-*   **Opinionated Defaults:** We've picked sensible defaults for things like retry intervals and circuit breaker thresholds, saving you configuration fatigue.
-*   **Reduced Boilerplate:** Common patterns are encapsulated, meaning less repetitive code in your services.
-*   **Pythonic & Simple:** Designed to feel natural for Python developers, prioritizing clarity and ease of use.
-*   **Focus on Resiliency:** Emphasizes building services that can withstand failures and gracefully degrade.
-*   **Traceability First:** Integrates with OpenTelemetry for straightforward distributed tracing, because if you can't observe it, you can't fix it.
+### Installing with npm/yarn
 
-Ultimately, SDSK is for engineers who appreciate robust design patterns and want to bake them into their services without reinventing the wheel every time.
+The easiest way to get started is to create a new project and add `saadat-connect` as a dependency.
 
-## 3. Installation
+1.  **Create a new project directory:**
 
-SDSK is available on PyPI. It's designed to be straightforward to get up and running.
+    ```bash
+    mkdir my-saadat-gateway
+    cd my-saadat-gateway
+    ```
+
+2.  **Initialize your project:**
+
+    ```bash
+    npm init -y
+    # or
+    yarn init -y
+    ```
+
+3.  **Install Saadat Connect:**
+
+    ```bash
+    npm install saadat-connect
+    # or
+    yarn add saadat-connect
+    ```
+
+### Setting up a new Saadat Connect Project
+
+Once installed, you can use the `saadat` CLI to scaffold a basic project structure. This gives you a great starting point with sensible defaults.
 
 ```bash
-pip install sds-kit
+npx saadat init # or yarn saadat init
 ```
 
-### Requirements
+This command will create a basic `src/` directory, an `index.js` entry point, and a `config.js` file, pre-configured with a simple gateway setup.
 
-*   Python 3.8+
-*   `requests` (for the HTTP client)
-*   `opentelemetry-api`, `opentelemetry-sdk` (for tracing)
-*   `tenacity` (for retries)
-*   `pybreaker` (for circuit breakers)
+### Docker Deployment (Experimental)
 
-These dependencies are automatically installed with the `pip install` command.
+For those who prefer containerization from the get-go, we provide a base Docker image.
 
-## 4. Core Concepts
+1.  **Create your `gateway.js` (or `index.js`) file:** Define your gateway logic as you would normally.
+2.  **Create a `Dockerfile`:**
 
-At its heart, SDSK revolves around a few key ideas:
+    ```dockerfile
+    # Use a lightweight Node.js base image
+    FROM node:18-alpine
 
-*   **Service Registrar:** A pluggable interface for discovering service endpoints (e.g., Consul, Kubernetes DNS, static configs).
-*   **Resilient Client:** An HTTP client wrapper that incorporates retry logic, circuit breakers, and timeouts to handle network flakiness.
-*   **Trace Context:** Mechanisms to propagate OpenTelemetry trace contexts across service boundaries, crucial for understanding request flows.
+    WORKDIR /app
 
-These components are designed to be used independently or together, depending on your service's needs.
+    # Copy package.json and package-lock.json first to leverage Docker cache
+    COPY package*.json ./
 
-## 5. Usage Examples
+    # Install dependencies
+    RUN npm install --production
 
-Let's look at how you'd typically use SDSK in a Python service.
+    # Copy your application code
+    COPY . .
 
-### Service Discovery Client
+    # Expose the port your gateway listens on (default 3000)
+    EXPOSE 3000
 
-Assuming you have a service discovery mechanism (e.g., Consul running at `localhost:8500`), you can use `ServiceRegistrar` to find service addresses.
+    # Command to run your gateway
+    CMD ["node", "index.js"]
+    ```
 
-```python
-from sds_kit.discovery import ConsulServiceRegistrar
-from sds_kit.config import SDSKConfig
+3.  **Build and run your Docker image:**
 
-# Configure SDSK (e.g., for Consul)
-config = SDSKConfig(
-    discovery_backend="consul",
-    consul_host="localhost",
-    consul_port=8500
-)
+    ```bash
+    docker build -t my-saadat-gateway .
+    docker run -p 80:3000 my-saadat-gateway
+    ```
 
-# Initialize the registrar
-registrar = ConsulServiceRegistrar(config)
+## 🛠️ Usage
 
-# Discover instances of a service named 'user-service'
-try:
-    user_service_url = registrar.get_service_url("user-service")
-    print(f"User service found at: {user_service_url}")
-    # Example: http://192.168.1.5:8080
-except Exception as e:
-    print(f"Error discovering user-service: {e}")
+Let's dive into how you actually define your gateway logic with Saadat Connect.
 
-# If using a static configuration (e.g., in development)
-static_config = SDSKConfig(
-    discovery_backend="static",
-    static_service_map={
-        "payment-service": "http://localhost:8081",
-        "inventory-service": "http://localhost:8082"
+### Defining Your Gateway
+
+The core of Saadat Connect revolves around a central `Gateway` instance where you register your routes and middleware.
+
+Here's a minimal example (`index.js`):
+
+```javascript
+const { Gateway } = require('saadat-connect');
+const config = require('./config'); // Assuming you have a config file
+
+async function startGateway() {
+  const gateway = new Gateway(config);
+
+  // Define a simple proxy route
+  gateway.route('/users/:id')
+    .get('http://user-service:8080/api/users/:id')
+    .post('http://user-service:8080/api/users')
+    .put('http://user-service:8080/api/users/:id');
+
+  // Define a route that aggregates data or transforms
+  gateway.route('/dashboard/:userId')
+    .get(async (req, res) => {
+      try {
+        // Example: Fetch data from multiple services
+        const userData = await fetch(`http://user-service:8080/api/users/${req.params.userId}`).then(r => r.json());
+        const ordersData = await fetch(`http://order-service:8081/api/orders/user/${req.params.userId}`).then(r => r.json());
+
+        res.json({
+          user: userData,
+          recentOrders: ordersData.slice(0, 5) // Just take the latest 5 orders
+        });
+      } catch (error) {
+        console.error('Dashboard aggregation failed:', error.message);
+        res.status(500).json({ error: 'Failed to retrieve dashboard data' });
+      }
+    });
+
+  // Start the gateway server
+  await gateway.start();
+  console.log(`Saadat Connect Gateway running on port ${config.port}`);
+}
+
+startGateway().catch(console.error);
+```
+
+### Configuration
+
+Your `config.js` file will typically hold settings for the server, logging, and potentially upstream service details.
+
+```javascript
+// config.js
+module.exports = {
+  port: process.env.PORT || 3000,
+  logLevel: process.env.LOG_LEVEL || 'info',
+  // You can define upstream service base URLs here for easier management
+  services: {
+    userService: 'http://localhost:8080',
+    orderService: 'http://localhost:8081'
+  },
+  // Global middleware configuration
+  middleware: {
+    // Example: Rate limiting
+    rateLimit: {
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100 // limit each IP to 100 requests per windowMs
+    },
+    // CORS settings
+    cors: {
+      origin: '*', // Be specific in production!
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      allowedHeaders: ['Content-Type', 'Authorization']
     }
-)
-static_registrar = static_config.get_service_registrar() # Helper method
-print(f"Payment service (static): {static_registrar.get_service_url('payment-service')}")
+  }
+};
 ```
 
-### Resilient HTTP Client (Retry & Circuit Breaker)
+### Middleware: The Real Powerhouse
 
-This is where SDSK really shines for talking to other services. It wraps the `requests` library with built-in resilience.
+This is where Saadat Connect really shines. You can apply middleware globally, to specific routes, or even to specific HTTP methods on a route. Middleware can handle authentication, logging, rate limiting, data transformation, and much more.
 
-```python
-import time
-from sds_kit.http_client import ResilientHttpClient
-from sds_kit.config import SDSKConfig
+```javascript
+const { Gateway, Middleware } = require('saadat-connect');
+const config = require('./config');
+const jwt = require('jsonwebtoken'); // Example for authentication
 
-# Default config provides sensible retry and circuit breaker settings
-# You can override these in SDSKConfig if needed.
-config = SDSKConfig()
-client = ResilientHttpClient(config)
+// Custom authentication middleware
+const authenticate = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Authentication required' });
+  }
 
-# Example: A faulty endpoint that sometimes fails
-faulty_endpoint = "http://localhost:9999/sometimes-fails"
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'supersecretkey');
+    req.user = decoded; // Attach user info to request
+    next();
+  } catch (err) {
+    return res.status(403).json({ message: 'Invalid or expired token' });
+  }
+};
 
-print("Attempting to call a potentially faulty service...")
+async function startGateway() {
+  const gateway = new Gateway(config);
 
-for i in range(5):
-    try:
-        print(f"\n--- Call attempt {i+1} ---")
-        response = client.get(faulty_endpoint)
-        response.raise_for_status() # Raise an exception for bad status codes
-        print(f"Success! Response: {response.json()}")
-        break # Exit loop on success
-    except Exception as e:
-        print(f"Failed to call service: {e}")
-        time.sleep(1) # Wait a bit before next attempt, though retry handles some of this
+  // Apply a global rate limit middleware (if configured)
+  gateway.use(Middleware.rateLimit(config.middleware.rateLimit));
+  // Apply global CORS settings
+  gateway.use(Middleware.cors(config.middleware.cors));
+  // Apply global request logging
+  gateway.use(Middleware.requestLogger());
 
-print("\nDemonstrating Circuit Breaker behavior (after enough failures)")
-# Simulate more failures to trip the circuit breaker
-for _ in range(10):
-    try:
-        client.get(faulty_endpoint)
-    except Exception as e:
-        # The circuit breaker will raise a CircuitBreakerError if tripped
-        print(f"  Failure during circuit breaker test: {type(e).__name__}")
-        time.sleep(0.1) # Short sleep to allow the breaker to observe failures
+  // A public route
+  gateway.route('/health')
+    .get((req, res) => res.status(200).send('OK'));
 
-# After enough failures, subsequent calls might immediately raise CircuitBreakerError
-try:
-    print("\nAttempting call when circuit is likely open...")
-    client.get(faulty_endpoint)
-except Exception as e:
-    print(f"Call immediately failed due to: {type(e).__name__}. Circuit breaker likely open.")
+  // A protected route
+  gateway.route('/profile')
+    .use(authenticate) // Apply authentication only to this route
+    .get('http://user-service:8080/api/profile');
+
+  // Another protected route, but with specific permissions check
+  gateway.route('/admin/users')
+    .use(authenticate)
+    .use((req, res, next) => { // Custom authorization middleware
+      if (req.user && req.user.roles.includes('admin')) {
+        next();
+      } else {
+        res.status(403).json({ message: 'Admin access required' });
+      }
+    })
+    .get('http://user-service:8080/api/admin/users');
+
+  await gateway.start();
+  console.log(`Saadat Connect Gateway running on port ${config.port}`);
+}
+
+startGateway().catch(console.error);
 ```
 
-*To run the circuit breaker example, you'd need a simple Flask/FastAPI app that randomly returns 500s or timeouts.*
+### Error Handling
 
-### Distributed Trace Context Propagation
+Saadat Connect comes with sensible default error handling, but you can also define custom error handling middleware. Any `next(error)` call in your middleware chain will be caught by the error handler.
 
-SDSK integrates with OpenTelemetry to automatically inject and extract trace context from HTTP headers. This is crucial for end-to-end visibility.
-
-```python
-from opentelemetry import trace
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
-from sds_kit.http_client import ResilientHttpClient
-from sds_kit.config import SDSKConfig
-
-# --- OpenTelemetry setup (usually done once at service startup) ---
-# For demonstration, we'll export spans to console
-provider = TracerProvider()
-processor = SimpleSpanProcessor(ConsoleSpanExporter())
-provider.add_span_processor(processor)
-trace.set_tracer_provider(provider)
-tracer = trace.get_tracer(__name__)
-# -----------------------------------------------------------------
-
-config = SDSKConfig()
-client = ResilientHttpClient(config)
-
-target_service_url = "http://localhost:5000/api/data" # Another service endpoint
-
-with tracer.start_as_current_span("parent-request"):
-    print("Starting a parent span...")
-    # The client automatically injects trace headers
-    try:
-        response = client.get(target_service_url)
-        print(f"Response from {target_service_url}: {response.status_code}")
-    except Exception as e:
-        print(f"Error calling {target_service_url}: {e}")
-
-# On the receiving service (e.g., a Flask app), you'd use OpenTelemetry
-# auto-instrumentation or manually extract the context.
-# Example receiver (Flask):
-"""
-from flask import Flask, request
-from opentelemetry import trace
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
-from opentelemetry.propagate import extract, set_global_textmap
-from opentelemetry.propagators.b3 import B3MultiPropagator # Or W3CTraceContextPropagator
-
-# OpenTelemetry setup (same as above, but also for context extraction)
-provider = TracerProvider()
-processor = SimpleSpanProcessor(ConsoleSpanExporter())
-provider.add_span_processor(processor)
-trace.set_tracer_provider(provider)
-set_global_textmap(B3MultiPropagator()) # Use B3 or W3C for propagation
-
-app = Flask(__name__)
-tracer = trace.get_tracer(__name__)
-
-@app.route('/api/data')
-def get_data():
-    # Extract trace context from incoming request headers
-    context = extract(request.headers)
-    with tracer.start_as_current_span("child-operation", context=context):
-        print("Received request with trace context!")
-        # Perform some work...
-        return {"message": "Data from service B"}, 200
-
-if __name__ == '__main__':
-    app.run(port=5000, debug=True)
-"""
+```javascript
+// In your gateway setup
+gateway.use((err, req, res, next) => {
+  console.error('Caught error:', err.message, err.stack);
+  if (res.headersSent) {
+    return next(err); // Delegate to default Express error handler if headers already sent
+  }
+  res.status(err.statusCode || 500).json({
+    error: {
+      message: err.message || 'An unexpected error occurred.',
+      code: err.code || 'INTERNAL_SERVER_ERROR'
+    }
+  });
+});
 ```
 
-This ensures that when
+## 📖 Configuration Reference
+
+Saadat Connect's configuration is designed to be flexible yet straightforward. Here's a table of common configuration options you'll find in your `config.js` or `process.env`.
+
+| Option             | Type     | Default         | Description                                                                                             |
+| :----------------- | :------- | :-------------- | :------------------------------------------------------------------------------------------------------ |
+| `port`             | `number` | `3000`          | The port on which the gateway server will listen.                                                       |
+| `logLevel`         | `string` | `'info'`        | Minimum log level for console output (`debug`, `info`, `warn`, `error`).                              |
+| `env`              | `string` | `'development'` | Environment mode (`development`, `production`, `test`). Affects error detail verbosity.                 |
+| `jsonBodyLimit`    | `string` | `'100kb'`       | Maximum request body size for JSON payloads.                                                            |
+| `urlEncodedLimit`  | `string` | `'100kb'`       | Maximum request body size for URL-encoded payloads.                                                     |
+| `middleware.cors`  | `object` | `{}`            | CORS configuration options (e.g., `origin`, `methods`, `allowedHeaders`). Passed directly to `cors` lib. |
+| `middleware.rateLimit` | `object` | `{}`        | Rate limiting options (e.g., `windowMs`, `max`). Passed directly to `express-rate-limit` lib.         |
+| `errorHandling`    | `object` | `{}`            | Custom error handling settings. E.g., `showStackTrace: false` in production.                            |
+| `services`         | `object` | `{}`            | A map of service names to their base URLs, useful for cleaner route definitions.                        |
+
+## ❓ FAQ
+
+### Why should I use Saadat Connect over other API gateways like Nginx, Kong, or even a custom Express server?
+
+Great question! Saadat Connect isn't trying to replace a full-blown enterprise-grade gateway like Kong or Apache APISIX, especially if you need advanced features like protocol translation, caching across heterogeneous systems, or deep analytics out-of-the-box.
+
+Where Saadat Connect shines is when you need a **lightweight, code-first, developer-centric gateway or BFF layer** that's easily integrated into your existing Node
