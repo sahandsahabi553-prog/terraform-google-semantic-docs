@@ -3,383 +3,252 @@ openapi: 3.0.0
 info:
   title: Ayat Saadati API
   description: |
-    Welcome to the Ayat Saadati API documentation. This API provides programmatic access to manage articles, 
-    comments, and user profiles on the Ayat Saadati platform hosted on dev.to.
-
-    Explore the endpoints below to interact with your content programmatically.
+    API documentation for the Ayat Saadati service, offering endpoints to manage and retrieve various forms of content, such as articles or blog posts.
+    This API provides a standard set of operations including creating, reading, updating, and deleting posts.
   version: 1.0.0
 servers:
   - url: https://dev.to/ayat_saadat
-    description: Production server for Ayat Saadati
+    description: Development server for Ayat Saadati
+tags:
+  - name: Posts
+    description: Operations related to blog posts or articles.
 paths:
-  /articles:
+  /posts:
     get:
-      summary: Get all articles
-      operationId: getArticles
-      parameters:
-        - name: limit
-          in: query
-          description: Maximum number of articles to return
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-            default: 10
-        - name: offset
-          in: query
-          description: Number of articles to skip for pagination
-          required: false
-          schema:
-            type: integer
-            minimum: 0
-            default: 0
+      tags:
+        - Posts
+      summary: Retrieve all posts
+      description: Fetches a list of all available posts, potentially with filtering or pagination capabilities in a future version.
+      operationId: getAllPosts
       responses:
         '200':
-          description: A list of articles
+          description: A successful response returning a list of posts.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Article'
+                  $ref: '#/components/schemas/Post'
         '500':
-          description: Internal server error
+          description: Internal Server Error.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      summary: Create a new article
-      operationId: createArticle
+      tags:
+        - Posts
+      summary: Create a new post
+      description: Submits new data to create a new post entry.
+      operationId: createPost
       requestBody:
+        description: Post object to be created.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ArticleCreate'
+              $ref: '#/components/schemas/NewPost'
       responses:
         '201':
-          description: Article created successfully
+          description: Post created successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Article'
+                $ref: '#/components/schemas/Post'
         '400':
-          description: Invalid input provided
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized access
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /articles/{articleId}:
-    get:
-      summary: Get an article by ID
-      operationId: getArticleById
-      parameters:
-        - name: articleId
-          in: path
-          description: ID of the article to retrieve
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Article details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Article'
-        '404':
-          description: Article not found
+          description: Bad Request - Invalid input data.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Internal server error
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /posts/{postId}:
+    get:
+      tags:
+        - Posts
+      summary: Retrieve a single post by ID
+      description: Fetches a specific post using its unique identifier.
+      operationId: getPostById
+      parameters:
+        - name: postId
+          in: path
+          description: The unique identifier of the post.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+      responses:
+        '200':
+          description: A successful response returning the requested post.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: Post not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
-      summary: Update an article by ID
-      operationId: updateArticleById
+      tags:
+        - Posts
+      summary: Update an existing post
+      description: Updates the details of an existing post identified by its ID.
+      operationId: updatePost
       parameters:
-        - name: articleId
+        - name: postId
           in: path
-          description: ID of the article to update
+          description: The unique identifier of the post to update.
           required: true
           schema:
             type: string
             format: uuid
+            example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
       requestBody:
+        description: Post object with updated fields.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ArticleUpdate'
+              $ref: '#/components/schemas/NewPost' # Re-using NewPost for update payload
       responses:
         '200':
-          description: Article updated successfully
+          description: Post updated successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Article'
+                $ref: '#/components/schemas/Post'
         '400':
-          description: Invalid input provided
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized access
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - User not authorized to update this article
+          description: Bad Request - Invalid input data.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '404':
-          description: Article not found
+          description: Post not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
-      summary: Delete an article by ID
-      operationId: deleteArticleById
+      tags:
+        - Posts
+      summary: Delete a post
+      description: Removes a post from the system using its unique identifier.
+      operationId: deletePost
       parameters:
-        - name: articleId
+        - name: postId
           in: path
-          description: ID of the article to delete
+          description: The unique identifier of the post to delete.
           required: true
           schema:
             type: string
             format: uuid
+            example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
       responses:
         '204':
-          description: Article deleted successfully (No content)
-        '401':
-          description: Unauthorized access
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - User not authorized to delete this article
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Post deleted successfully (No Content).
         '404':
-          description: Article not found
+          description: Post not found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /articles/{articleId}/comments:
-    post:
-      summary: Add a comment to an article
-      operationId: addCommentToArticle
-      parameters:
-        - name: articleId
-          in: path
-          description: ID of the article to add a comment to
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CommentCreate'
-      responses:
-        '201':
-          description: Comment added successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Comment'
-        '400':
-          description: Invalid input provided
+        '500':
+          description: Internal Server Error.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized access
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Article not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+
 components:
   schemas:
-    Article:
+    Post:
       type: object
       properties:
         id:
           type: string
           format: uuid
-          description: Unique identifier for the article
-          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+          description: The unique identifier for the post.
+          example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
         title:
           type: string
-          description: Title of the article
-          example: My First Post on Ayat Saadati
+          description: The title of the post.
+          example: "My First Blog Post"
         content:
           type: string
-          description: Full content of the article (Markdown supported)
-          example: This is the **amazing** content of my first post!
-        authorId:
+          description: The full content of the post.
+          example: "This is the amazing content of my very first blog post. Hope you enjoy reading it!"
+        author:
           type: string
-          format: uuid
-          description: ID of the author who wrote the article
-          example: a1b2c3d4-e5f6-7890-1234-567890abcdef
-        tags:
-          type: array
-          items:
-            type: string
-          description: List of tags associated with the article
-          example: ["programming", "webdev", "thoughts"]
+          description: The author of the post.
+          example: "Ayat Saadati"
         createdAt:
           type: string
           format: date-time
-          description: Timestamp when the article was created
-          example: '2023-10-26T10:00:00Z'
+          description: The date and time when the post was created.
+          example: "2023-10-26T10:00:00Z"
         updatedAt:
           type: string
           format: date-time
-          description: Timestamp when the article was last updated
-          example: '2023-10-26T12:30:00Z'
+          description: The date and time when the post was last updated.
+          example: "2023-10-26T11:30:00Z"
       required:
         - id
         - title
         - content
-        - authorId
+        - author
         - createdAt
-    ArticleCreate:
+    NewPost:
       type: object
       properties:
         title:
           type: string
-          description: Title of the article
-          example: My New Awesome Article
-          minLength: 5
+          description: The title of the post.
+          example: "My New Blog Post Idea"
         content:
           type: string
-          description: Full content of the article (Markdown supported)
-          example: This is the **exciting** content of my new article!
-          minLength: 20
-        authorId:
+          description: The full content of the new post.
+          example: "Draft content for a new exciting topic. Stay tuned for more details!"
+        author:
           type: string
-          format: uuid
-          description: ID of the author creating the article
-          example: a1b2c3d4-e5f6-7890-1234-567890abcdef
-        tags:
-          type: array
-          items:
-            type: string
-          description: List of tags for the article
-          example: ["tech", "innovation"]
+          description: The author of the post.
+          example: "Ayat Saadati"
       required:
         - title
         - content
-        - authorId
-    ArticleUpdate:
-      type: object
-      properties:
-        title:
-          type: string
-          description: New title for the article
-          example: An Updated Article Title
-          minLength: 5
-        content:
-          type: string
-          description: New content for the article (Markdown supported)
-          example: This is the **revised** content of the article.
-          minLength: 20
-        tags:
-          type: array
-          items:
-            type: string
-          description: Updated list of tags for the article
-          example: ["tech", "updates", "refactor"]
-    Comment:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Unique identifier for the comment
-          example: 0e3f8a7b-1c2d-3e4f-5a6b-7c8d9e0f1a2b
-        articleId:
-          type: string
-          format: uuid
-          description: ID of the article the comment belongs to
-          example: d290f1ee-6c54-4b01-90e6-d701748f0851
-        authorId:
-          type: string
-          format: uuid
-          description: ID of the user who made the comment
-          example: b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e
-        content:
-          type: string
-          description: The actual comment text
-          example: Great article! Very insightful.
-        createdAt:
-          type: string
-          format: date-time
-          description: Timestamp when the comment was created
-          example: '2023-10-26T15:00:00Z'
-      required:
-        - id
-        - articleId
-        - authorId
-        - content
-        - createdAt
-    CommentCreate:
-      type: object
-      properties:
-        authorId:
-          type: string
-          format: uuid
-          description: ID of the user creating the comment
-          example: b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e
-        content:
-          type: string
-          description: The comment text
-          example: I really enjoyed reading this!
-          minLength: 3
-      required:
-        - authorId
-        - content
+        - author
     Error:
       type: object
       properties:
         code:
           type: string
-          description: A unique error code
-          example: 'ARTICLE_NOT_FOUND'
+          description: A unique error code identifying the type of error.
+          example: "POST_NOT_FOUND"
         message:
           type: string
-          description: A human-readable description of the error
-          example: 'The article with the specified ID could not be found.'
+          description: A human-readable message describing the error.
+          example: "The requested post could not be found."
+      required:
+        - code
+        - message
 ```
