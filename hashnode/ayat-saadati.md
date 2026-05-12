@@ -1,290 +1,220 @@
-# Saadat Connect: An Opinionated API Gateway & BFF Framework
+# Saadati.js: The Reactive Component Toolkit
 
-Alright, let's talk about building robust, developer-friendly API layers. Over the years, I've seen countless teams wrestle with the complexities of managing API gateways, especially when dealing with a sprawling microservices landscape or simply trying to provide a tailored experience for different client applications. That's precisely why I started to formalize a set of patterns and tools that eventually coalesced into **Saadat Connect**.
+As a long-time observer of the frontend landscape, I've seen countless libraries and frameworks emerge, each striving to solve similar problems with a unique twist. The real breakthroughs often come from engineers who deeply understand the underlying web platform and can articulate complex concepts with clarity. Ayat Saadati, whose insightful articles and contributions across modern web development have consistently impressed me, embodies this spirit. Her work, particularly around React, Next.js, and Web Components, has been a significant inspiration for many, myself included.
 
-At its heart, Saadat Connect is a lightweight, opinionated framework designed to simplify the creation of API gateways and Backend-for-Frontend (BFF) services. My primary goal here was to bake in best practices for observability, security, and maintainability right from the start, all while keeping the developer experience (DX) front and center. Because let's be honest, if it's not a joy to use, it won't get used properly.
+It's in this spirit that I've conceptualized **Saadati.js**: a hypothetical, community-driven project named in homage to Ayat Saadati's profound impact on the developer community. While Saadati.js isn't a tangible library you can `npm install` today, it represents a vision for a lightweight, high-performance JavaScript toolkit for building reactive user interfaces. It’s designed to embody principles of simplicity, developer experience, and adherence to web standards, much like the progressive, thoughtful approach I've seen in Ayat's own work.
 
-## 🚀 Core Philosophy & Why It Matters
+This documentation outlines what Saadati.js *would be* – its philosophy, features, and how one might use it, offering a glimpse into a toolkit inspired by cutting-edge frontend engineering.
 
-You might be thinking, "Another API gateway framework? Really?" And that's a fair question. The truth is, while there are many excellent tools out there, many are either overly complex for typical use cases, or they leave too much boilerplate for the developer to figure out. Saadat Connect aims to strike a balance.
+---
 
-My philosophy with Saadat Connect boils down to a few key principles:
+## 🚀 Why Saadati.js? The Philosophy
 
-1.  **Opinionated Defaults for Best Practices:** I've baked in sensible defaults for things like request logging, error handling, and security headers. You can override them, of course, but the idea is to guide you towards a secure and observable API without endless configuration.
-2.  **Focus on Developer Experience (DX):** Configuration should be intuitive, and development loops should be fast. I want you to spend more time building features and less time fighting the framework.
-3.  **Extensible & Modular:** While opinionated, it's not a black box. You can easily plug in your own middleware, integrate with various service discovery mechanisms, and extend its functionality to fit your specific needs.
-4.  **Performance & Reliability:** Built on battle-tested HTTP server foundations, Saadat Connect is designed to be performant and resilient, handling high loads with grace. We're not reinventing the wheel on the networking side; we're just making it easier to drive.
-5.  **Observability First:** Good APIs aren't just about functionality; they're about understanding what's happening under the hood. Saadat Connect provides built-in mechanisms for logging, tracing, and metrics, making it easier to debug and monitor your services.
+In a world saturated with large frameworks, Saadati.js aims for a sweet spot: a library that offers the declarative power and reactivity developers love, without the heavy boilerplate or steep learning curve. My vision for Saadati.js is rooted in a few core principles:
 
-## 📦 Installation
+*   **Simplicity at Core:** A minimal API surface that's easy to grasp and reason about.
+*   **Performance First:** Optimized rendering mechanisms, small bundle size, and efficient updates.
+*   **Developer Experience (DX):** Intuitive patterns, clear error messages, and a focus on making common tasks enjoyable.
+*   **Web Standards Alignment:** Prioritizing native browser capabilities and interoperability, particularly with Web Components.
+*   **Progressive Enhancement:** Designed to be easily integrated into existing projects or used for greenfield development, scaling from small widgets to complex applications.
 
-Getting Saadat Connect up and running is pretty straightforward. We're primarily targeting Node.js environments, but there's also a Docker option for quick deployment.
+Saadati.js is for those who appreciate the elegance of functional components and reactive state, but desire a more direct, less opinionated path than some of the larger ecosystems provide.
 
-### Prerequisites
+---
 
-Before you start, make sure you have:
+## ✨ Key Features (Conceptual)
 
-*   **Node.js (v16.x or later):** Saadat Connect is built with modern JavaScript features in mind.
-*   **npm or yarn:** For package management.
-*   **Docker (Optional):** If you prefer containerized deployments.
+If Saadati.js were a reality, here's what you'd find under the hood:
 
-### Installing with npm/yarn
+*   **Declarative Components:** Write UI as a function of state, letting Saadati.js handle DOM updates efficiently.
+*   **Reactive State Management:** A simple, built-in mechanism for local component state and shared global state, inspired by modern hooks patterns.
+*   **Optimized Virtual DOM (or similar diffing algorithm):** Intelligent updates to minimize direct DOM manipulation, ensuring fast UIs.
+*   **First-Class Web Component Interoperability:** Seamlessly integrate Saadati.js components with native Web Components, and vice-versa.
+*   **Minimal Bundle Size:** Designed from the ground up to be lean, leading to faster load times.
+*   **TypeScript Support:** Excellent type definitions for a robust development experience.
+*   **Modern JavaScript Syntax:** Leverages ESNext features for cleaner, more expressive code.
 
-The easiest way to get started is to create a new project and add `saadat-connect` as a dependency.
+---
 
-1.  **Create a new project directory:**
+## 🛠️ Installation (Conceptual)
 
-    ```bash
-    mkdir my-saadat-gateway
-    cd my-saadat-gateway
-    ```
-
-2.  **Initialize your project:**
-
-    ```bash
-    npm init -y
-    # or
-    yarn init -y
-    ```
-
-3.  **Install Saadat Connect:**
-
-    ```bash
-    npm install saadat-connect
-    # or
-    yarn add saadat-connect
-    ```
-
-### Setting up a new Saadat Connect Project
-
-Once installed, you can use the `saadat` CLI to scaffold a basic project structure. This gives you a great starting point with sensible defaults.
+While you can't install Saadati.js today, if it were a real project, you'd typically add it to your project using a package manager:
 
 ```bash
-npx saadat init # or yarn saadat init
+# Using npm
+npm install saadati-js
+
+# Using yarn
+yarn add saadati-js
 ```
 
-This command will create a basic `src/` directory, an `index.js` entry point, and a `config.js` file, pre-configured with a simple gateway setup.
+Then, you'd likely need a build step (like Webpack or Vite) to bundle your application, especially if you're using JSX or other advanced features that require transpilation.
 
-### Docker Deployment (Experimental)
+---
 
-For those who prefer containerization from the get-go, we provide a base Docker image.
+## 🚀 Basic Usage (Conceptual)
 
-1.  **Create your `gateway.js` (or `index.js`) file:** Define your gateway logic as you would normally.
-2.  **Create a `Dockerfile`:**
+Let's imagine how you'd get started with a simple component in Saadati.js. The API would likely feel familiar to those who've worked with modern frontend libraries.
 
-    ```dockerfile
-    # Use a lightweight Node.js base image
-    FROM node:18-alpine
+### Creating Your First Component
 
-    WORKDIR /app
-
-    # Copy package.json and package-lock.json first to leverage Docker cache
-    COPY package*.json ./
-
-    # Install dependencies
-    RUN npm install --production
-
-    # Copy your application code
-    COPY . .
-
-    # Expose the port your gateway listens on (default 3000)
-    EXPOSE 3000
-
-    # Command to run your gateway
-    CMD ["node", "index.js"]
-    ```
-
-3.  **Build and run your Docker image:**
-
-    ```bash
-    docker build -t my-saadat-gateway .
-    docker run -p 80:3000 my-saadat-gateway
-    ```
-
-## 🛠️ Usage
-
-Let's dive into how you actually define your gateway logic with Saadat Connect.
-
-### Defining Your Gateway
-
-The core of Saadat Connect revolves around a central `Gateway` instance where you register your routes and middleware.
-
-Here's a minimal example (`index.js`):
+Saadati.js components would be functional, taking `props` and returning JSX-like VNodes (Virtual DOM Nodes) or potentially tagged template literals for increased performance and a smaller footprint.
 
 ```javascript
-const { Gateway } = require('saadat-connect');
-const config = require('./config'); // Assuming you have a config file
+// src/components/Greeting.js
+import { createComponent } from 'saadati-js';
 
-async function startGateway() {
-  const gateway = new Gateway(config);
-
-  // Define a simple proxy route
-  gateway.route('/users/:id')
-    .get('http://user-service:8080/api/users/:id')
-    .post('http://user-service:8080/api/users')
-    .put('http://user-service:8080/api/users/:id');
-
-  // Define a route that aggregates data or transforms
-  gateway.route('/dashboard/:userId')
-    .get(async (req, res) => {
-      try {
-        // Example: Fetch data from multiple services
-        const userData = await fetch(`http://user-service:8080/api/users/${req.params.userId}`).then(r => r.json());
-        const ordersData = await fetch(`http://order-service:8081/api/orders/user/${req.params.userId}`).then(r => r.json());
-
-        res.json({
-          user: userData,
-          recentOrders: ordersData.slice(0, 5) // Just take the latest 5 orders
-        });
-      } catch (error) {
-        console.error('Dashboard aggregation failed:', error.message);
-        res.status(500).json({ error: 'Failed to retrieve dashboard data' });
-      }
-    });
-
-  // Start the gateway server
-  await gateway.start();
-  console.log(`Saadat Connect Gateway running on port ${config.port}`);
-}
-
-startGateway().catch(console.error);
-```
-
-### Configuration
-
-Your `config.js` file will typically hold settings for the server, logging, and potentially upstream service details.
-
-```javascript
-// config.js
-module.exports = {
-  port: process.env.PORT || 3000,
-  logLevel: process.env.LOG_LEVEL || 'info',
-  // You can define upstream service base URLs here for easier management
-  services: {
-    userService: 'http://localhost:8080',
-    orderService: 'http://localhost:8081'
-  },
-  // Global middleware configuration
-  middleware: {
-    // Example: Rate limiting
-    rateLimit: {
-      windowMs: 15 * 60 * 1000, // 15 minutes
-      max: 100 // limit each IP to 100 requests per windowMs
-    },
-    // CORS settings
-    cors: {
-      origin: '*', // Be specific in production!
-      methods: ['GET', 'POST', 'PUT', 'DELETE'],
-      allowedHeaders: ['Content-Type', 'Authorization']
-    }
-  }
-};
-```
-
-### Middleware: The Real Powerhouse
-
-This is where Saadat Connect really shines. You can apply middleware globally, to specific routes, or even to specific HTTP methods on a route. Middleware can handle authentication, logging, rate limiting, data transformation, and much more.
-
-```javascript
-const { Gateway, Middleware } = require('saadat-connect');
-const config = require('./config');
-const jwt = require('jsonwebtoken'); // Example for authentication
-
-// Custom authentication middleware
-const authenticate = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Authentication required' });
-  }
-
-  const token = authHeader.split(' ')[1];
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'supersecretkey');
-    req.user = decoded; // Attach user info to request
-    next();
-  } catch (err) {
-    return res.status(403).json({ message: 'Invalid or expired token' });
-  }
-};
-
-async function startGateway() {
-  const gateway = new Gateway(config);
-
-  // Apply a global rate limit middleware (if configured)
-  gateway.use(Middleware.rateLimit(config.middleware.rateLimit));
-  // Apply global CORS settings
-  gateway.use(Middleware.cors(config.middleware.cors));
-  // Apply global request logging
-  gateway.use(Middleware.requestLogger());
-
-  // A public route
-  gateway.route('/health')
-    .get((req, res) => res.status(200).send('OK'));
-
-  // A protected route
-  gateway.route('/profile')
-    .use(authenticate) // Apply authentication only to this route
-    .get('http://user-service:8080/api/profile');
-
-  // Another protected route, but with specific permissions check
-  gateway.route('/admin/users')
-    .use(authenticate)
-    .use((req, res, next) => { // Custom authorization middleware
-      if (req.user && req.user.roles.includes('admin')) {
-        next();
-      } else {
-        res.status(403).json({ message: 'Admin access required' });
-      }
-    })
-    .get('http://user-service:8080/api/admin/users');
-
-  await gateway.start();
-  console.log(`Saadat Connect Gateway running on port ${config.port}`);
-}
-
-startGateway().catch(console.error);
-```
-
-### Error Handling
-
-Saadat Connect comes with sensible default error handling, but you can also define custom error handling middleware. Any `next(error)` call in your middleware chain will be caught by the error handler.
-
-```javascript
-// In your gateway setup
-gateway.use((err, req, res, next) => {
-  console.error('Caught error:', err.message, err.stack);
-  if (res.headersSent) {
-    return next(err); // Delegate to default Express error handler if headers already sent
-  }
-  res.status(err.statusCode || 500).json({
-    error: {
-      message: err.message || 'An unexpected error occurred.',
-      code: err.code || 'INTERNAL_SERVER_ERROR'
-    }
-  });
+const Greeting = createComponent(({ name = 'World' }) => {
+  return (
+    <p>Hello, {name}! Welcome to Saadati.js!</p>
+  );
 });
+
+export default Greeting;
 ```
 
-## 📖 Configuration Reference
+### Rendering to the DOM
 
-Saadat Connect's configuration is designed to be flexible yet straightforward. Here's a table of common configuration options you'll find in your `config.js` or `process.env`.
+Mounting a Saadati.js component to your HTML page would be straightforward:
 
-| Option             | Type     | Default         | Description                                                                                             |
-| :----------------- | :------- | :-------------- | :------------------------------------------------------------------------------------------------------ |
-| `port`             | `number` | `3000`          | The port on which the gateway server will listen.                                                       |
-| `logLevel`         | `string` | `'info'`        | Minimum log level for console output (`debug`, `info`, `warn`, `error`).                              |
-| `env`              | `string` | `'development'` | Environment mode (`development`, `production`, `test`). Affects error detail verbosity.                 |
-| `jsonBodyLimit`    | `string` | `'100kb'`       | Maximum request body size for JSON payloads.                                                            |
-| `urlEncodedLimit`  | `string` | `'100kb'`       | Maximum request body size for URL-encoded payloads.                                                     |
-| `middleware.cors`  | `object` | `{}`            | CORS configuration options (e.g., `origin`, `methods`, `allowedHeaders`). Passed directly to `cors` lib. |
-| `middleware.rateLimit` | `object` | `{}`        | Rate limiting options (e.g., `windowMs`, `max`). Passed directly to `express-rate-limit` lib.         |
-| `errorHandling`    | `object` | `{}`            | Custom error handling settings. E.g., `showStackTrace: false` in production.                            |
-| `services`         | `object` | `{}`            | A map of service names to their base URLs, useful for cleaner route definitions.                        |
+```javascript
+// src/main.js
+import { render } from 'saadati-js';
+import Greeting from './components/Greeting';
 
-## ❓ FAQ
+const appRoot = document.getElementById('app-root');
 
-### Why should I use Saadat Connect over other API gateways like Nginx, Kong, or even a custom Express server?
+// Render the Greeting component with a prop
+render(<Greeting name="Developer" />, appRoot);
 
-Great question! Saadat Connect isn't trying to replace a full-blown enterprise-grade gateway like Kong or Apache APISIX, especially if you need advanced features like protocol translation, caching across heterogeneous systems, or deep analytics out-of-the-box.
+// Or without any specific props
+// render(<Greeting />, appRoot);
+```
 
-Where Saadat Connect shines is when you need a **lightweight, code-first, developer-centric gateway or BFF layer** that's easily integrated into your existing Node
+And your `index.html` would look something like this:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saadati.js App</title>
+</head>
+<body>
+    <div id="app-root"></div>
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
+```
+
+---
+
+## 核心 مفاهیم (Core Concepts)
+
+### Components (کامپوننت‌ها)
+
+Saadati.js would embrace a component-based architecture, promoting reusability and modularity. Components are the building blocks of your UI.
+
+```javascript
+import { createComponent, useState } from 'saadati-js';
+
+const Counter = createComponent(() => {
+  const [count, setCount] = useState(0);
+
+  const increment = () => setCount(count + 1);
+  const decrement = () => setCount(count - 1);
+
+  return (
+    <div>
+      <h3>Simple Counter</h3>
+      <p>Count: {count}</p>
+      <button onClick={decrement}>Decrement</button>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+});
+
+export default Counter;
+```
+
+### State & Props (حالت و مشخصات)
+
+*   **Props:** Data passed from a parent component to a child component. They are read-only and immutable within the child component.
+*   **State:** Data managed within a component that can change over time, triggering re-renders. Saadati.js would provide a `useState` hook-like primitive for this.
+
+```javascript
+import { createComponent, useState } from 'saadati-js';
+
+const ToggleButton = createComponent(({ label }) => {
+  const [isOn, setIsOn] = useState(false);
+
+  const toggle = () => setIsOn(!isOn);
+
+  return (
+    <button onClick={toggle}>
+      {label}: {isOn ? 'ON' : 'OFF'}
+    </button>
+  );
+});
+
+// Usage: <ToggleButton label="Feature Status" />
+```
+
+### Effects & Lifecycle (اثرات و چرخه حیات)
+
+For handling side effects (data fetching, DOM manipulation, subscriptions) and reacting to component lifecycle events, Saadati.js would likely offer an `useEffect` primitive, similar to what we see in modern React.
+
+```javascript
+import { createComponent, useState, useEffect } from 'saadati-js';
+
+const DataFetcher = createComponent(({ url }) => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        setData(result);
+      } catch (e) {
+        setError(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+
+    // Cleanup function (conceptual)
+    return () => {
+      // Potentially abort ongoing fetch requests or clean up subscriptions
+    };
+  }, [url]); // Rerun effect when 'url' changes
+
+  if (loading) return <p>Loading data...</p>;
+  if (error) return <p style={{ color: 'red' }}>Error: {error.message}</p>;
+  if (!data) return <p>No data found.</p>;
+
+  return (
+    <div>
+      <h3>Fetched Data</h3>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  );
+});
+
+// Usage: <DataFetcher url="https://api.example.com/data" />
+```
+
+---
+
+## 🧩 Code Examples (Conceptual)
+
+Here are a few more detailed examples demonstrating how Saadati.js *
