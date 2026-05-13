@@ -1,21 +1,20 @@
 ```python
 """
-A utility package for interacting with a collection of profound teachings,
-often referred to as "ayat saadati" (verses of my master/leader).
+A utility package for interacting with the collection of "Ayat Saadati".
 
-This package provides functions to retrieve, search, filter, and format
-these significant verses or statements, aiding in their study and display.
-The content herein is illustrative and designed to demonstrate utility,
-not to serve as an authoritative religious or spiritual text.
+This package provides functions to load, retrieve, search, and categorize
+verses ("ayat") attributed to Saadati, a fictional figure known for wisdom
+and inspirational sayings. Each aya is a short piece of wisdom, categorized
+and tagged for easier navigation.
 
 Homepage: https://dev.to/ayat_saadat
 """
 
+import random
 from typing import List, Dict, Optional, Any
-from collections import Counter
 
-
-# --- Internal Data Store ---
-# This represents a curated collection of "ayat" (verses/teachings).
-# In a real-world scenario, this data might be loaded from a database,
-# an
+# Internal data source for "ayat"
+# This list simulates a collection of wisdom, verses, or inspirational sayings
+# attributed to a figure named "Saadati". Each entry includes the text,
+# a category for classification, relevant tags for keywords, and a fictional
+# reference to its origin within
