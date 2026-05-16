@@ -1,198 +1,266 @@
-# Documenting Ayat Saadati: A Technical Contributor's Guide
+Alright, let's dive into `ayat-utils`! You know, I've seen countless utility libraries pop up over the years, and many of them are either bloated with features you'll never use or so niche they're practically useless. But every now and then, something comes along that just *clicks*. `ayat-utils` is one of those projects. It's a collection of elegant, no-nonsense Python functions designed to make your daily coding life just a little bit smoother.
 
-When you're navigating the vast ocean of technical knowledge, finding a reliable lighthouse is crucial. For me, and many others, Ayat Saadati has consistently served as one such beacon, offering deep insights and practical guidance across a spectrum of technology topics. This isn't your typical software project documentation; instead, consider this a guide to understanding, leveraging, and engaging with the valuable technical contributions of Ayat Saadati.
-
-Ayat is a prolific writer and thinker in the tech space, known for a clear, analytical style and a knack for demystifying complex concepts. You can typically find their work gracing the pages of platforms like [dev.to](https://dev.to/ayat_saadat), where they share their expertise with a wide audience.
+I've always been a big believer in the "do one thing and do it well" philosophy, and `ayat-utils` embodies that perfectly. It doesn't try to be a full-blown framework; it's just a handy toolkit for those common tasks that always seem to creep into your projects. Think of it as that trusty multi-tool you keep in your desk drawer – not for building a house, but for tightening a loose screw or opening a tricky package.
 
 ---
 
-## 1. Getting Started: Integrating Ayat's Insights into Your Workflow
+# `ayat-utils` Library Documentation
 
-Think of "installing" Ayat's work not as downloading a package, but as integrating a powerful knowledge source into your personal learning and development pipeline. It's about setting yourself up to regularly consume and benefit from their contributions.
+## 🚀 Introduction
 
-### 1.1. Subscribing to the Dev.to Feed
+`ayat-utils` is a lightweight, opinionated Python utility library crafted to provide developers with a set of essential, highly reusable functions. Born out of a need for clean, efficient solutions to common programming challenges, this library focuses on practical helpers for string manipulation, data validation, and basic caching, among other things.
 
-The most direct way to stay current is to follow Ayat's profile on dev.to. This ensures their latest articles land directly in your feed.
+The goal here isn't to reinvent the wheel, but rather to offer a carefully curated collection of robust utilities that you can drop into your projects without a second thought. I've found myself rewriting similar logic in project after project, and `ayat-utils` is my attempt to consolidate those patterns into a single, well-tested package. Less boilerplate, more actual problem-solving – that's the dream, right?
 
-*   **Step 1:** Navigate to Ayat Saadati's profile: [https://dev.to/ayat_saadat](https://dev.to/ayat_saadat)
-*   **Step 2:** Click the "Follow" button prominently displayed on their profile page.
+## ✨ Features
 
-That's it! Now, you'll see new articles as they're published, often providing fresh perspectives on pressing technical challenges.
+*   **Smart String Slugification:** Convert any string into a URL-friendly slug.
+*   **Robust Email Validation:** Check if a string is a valid email address with sensible rules.
+*   **Simple Function Memoization (Caching):** Speed up expensive function calls with a decorator.
+*   **Data Type Coercion:** Safely convert data types with fallbacks.
+*   **Context Managers for Common Tasks:** Streamline resource management.
 
-### 1.2. Exploring the Article Archives
+And more to come, as new useful patterns emerge!
 
-Sometimes you're looking for a specific topic, or maybe you've just discovered Ayat's work and want to dive into their past writings.
+## 📦 Installation
 
-*   Visit the profile page: [https://dev.to/ayat_saadat](https://dev.to/ayat_saadat)
-*   Scroll through the list of published articles. Use the search bar on dev.to (if available) or your browser's find function (`Ctrl+F` or `Cmd+F`) to look for keywords.
+Getting `ayat-utils` up and running is as straightforward as it gets. If you've got Python and `pip`, you're practically there.
 
-### 1.3. Potential Other Platforms (Hypothetical)
-
-While dev.to is the primary link provided, many technical contributors maintain a presence across various platforms. If you're a fan of their work, it's always worth checking for:
-
-*   **GitHub Repositories:** Often, writers will back up their articles with real-world code examples in public repositories.
-*   **LinkedIn:** For professional updates and network engagement.
-*   **Personal Blog/Website:** A centralized hub for all their content.
-
----
-
-## 2. Usage: Leveraging Ayat's Technical Content
-
-Once you've "subscribed," the real magic happens in how you *use* the content. Ayat's articles are more than just casual reads; they're often structured to provide actionable insights.
-
-### 2.1. Deep Dives into Architectural Patterns
-
-I've found Ayat's explanations of architectural patterns particularly strong. They don't just describe *what* a pattern is, but *why* it's useful and *when* you should consider applying it.
-
-**Example Usage Scenario:**
-Let's say you're debating between a microservices architecture and a modular monolith for a new project. You'd search Ayat's articles for terms like "microservices," "monolith," "system design." Their articles often lay out pros, cons, and contextual considerations that are invaluable for decision-making.
-
-### 2.2. Practical Coding Techniques & Best Practices
-
-Beyond high-level architecture, Ayat frequently delves into the nitty-gritty of coding. This is where the rubber meets the road. They'll often provide code snippets that illustrate a point, adhering to principles of clean code and maintainability.
-
-### 2.3. Staying Ahead of Trends
-
-The tech landscape evolves at a blistering pace. Ayat often covers emerging technologies, frameworks, and methodologies, providing early, well-researched perspectives that help you understand their potential impact.
-
----
-
-## 3. Code Examples and Concepts
-
-While Ayat's articles cover a wide range, let's illustrate with a hypothetical code example inspired by the kind of practical, well-structured advice I often see them give. This example focuses on robust error handling and clear function design, a common theme in high-quality technical writing.
-
-Imagine an article discussing best practices for API client development in Python.
-
-```python
-import requests
-from requests.exceptions import RequestException, Timeout
-import logging
-
-# Configure basic logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-class APIClientError(Exception):
-    """Custom exception for API client errors."""
-    pass
-
-class MyAwesomeAPIClient:
-    """
-    A robust client for interacting with the MyAwesomeAPI.
-    Demonstrates good practices for network requests and error handling.
-    """
-    def __init__(self, base_url: str, timeout: int = 10):
-        if not base_url.endswith('/'):
-            base_url += '/'
-        self.base_url = base_url
-        self.timeout = timeout
-        self.session = requests.Session()
-        logging.info(f"API Client initialized with base URL: {self.base_url}")
-
-    def _make_request(self, method: str, endpoint: str, **kwargs) -> dict:
-        """
-        Internal method to handle HTTP requests with common error handling.
-        """
-        url = f"{self.base_url}{endpoint}"
-        try:
-            response = self.session.request(method, url, timeout=self.timeout, **kwargs)
-            response.raise_for_status()  # Raises HTTPError for bad responses (4xx or 5xx)
-            logging.info(f"Successfully called {method} {url}")
-            return response.json()
-        except Timeout:
-            logging.error(f"Request to {url} timed out after {self.timeout} seconds.")
-            raise APIClientError(f"API request timed out: {url}") from None
-        except RequestException as e:
-            logging.error(f"Network or HTTP error during request to {url}: {e}")
-            raise APIClientError(f"API request failed: {e}") from None
-        except ValueError: # JSON decoding error
-            logging.error(f"Failed to decode JSON response from {url}. Response content: {response.text[:200]}...")
-            raise APIClientError(f"Invalid JSON response from API: {url}") from None
-        except Exception as e:
-            logging.critical(f"An unexpected error occurred during request to {url}: {e}")
-            raise APIClientError(f"An unexpected error occurred: {e}") from None
-
-    def get_resource(self, resource_id: str) -> dict:
-        """
-        Fetches a specific resource by its ID.
-        """
-        endpoint = f"resources/{resource_id}"
-        logging.info(f"Attempting to fetch resource: {resource_id}")
-        return self._make_request("GET", endpoint)
-
-    def create_resource(self, payload: dict) -> dict:
-        """
-        Creates a new resource with the given payload.
-        """
-        endpoint = "resources"
-        logging.info(f"Attempting to create resource with payload: {payload}")
-        return self._make_request("POST", endpoint, json=payload)
-
-# --- Usage Example ---
-if __name__ == "__main__":
-    # For demonstration, we'll use a placeholder URL.
-    # In a real scenario, this would be your actual API endpoint.
-    TEST_API_URL = "https://jsonplaceholder.typicode.com/" # A public test API
-
-    client = MyAwesomeAPIClient(TEST_API_URL, timeout=5)
-
-    print("\n--- Testing GET request ---")
-    try:
-        post = client.get_resource("1")
-        print(f"Fetched post 1: {post['title']}")
-    except APIClientError as e:
-        print(f"Error fetching resource: {e}")
-
-    print("\n--- Testing POST request ---")
-    try:
-        new_post_data = {"title": "foo", "body": "bar", "userId": 1}
-        created_post = client.create_resource(new_post_data)
-        print(f"Created new post with ID: {created_post.get('id', 'N/A')}")
-    except APIClientError as e:
-        print(f"Error creating resource: {e}")
-
-    print("\n--- Testing a non-existent resource (expected failure) ---")
-    try:
-        non_existent = client.get_resource("99999999999") # This will likely return 404
-        print(f"Fetched non-existent resource: {non_existent}")
-    except APIClientError as e:
-        print(f"Correctly caught error for non-existent resource: {e}")
-
-    print("\n--- Testing a malformed URL (expected failure) ---")
-    bad_client = MyAwesomeAPIClient("http://nonexistent-domain-12345.com/")
-    try:
-        bad_client.get_resource("1")
-    except APIClientError as e:
-        print(f"Correctly caught error for bad domain: {e}")
+```bash
+pip install ayat-utils
 ```
 
-This code snippet exemplifies the kind of practical, well-thought-out advice Ayat often provides:
-*   **Clear Class Structure:** Encapsulating API logic.
-*   **Robust Error Handling:** Catching specific `requests` exceptions and raising custom, user-friendly ones.
-*   **Logging:** Providing visibility into client operations.
-*   **Configuration:** Sensible defaults and configurable parameters (base URL, timeout).
-*   **Type Hinting:** Enhancing readability and maintainability.
+For those working in a virtual environment (which, let's be honest, you *should* be doing), just activate your environment first:
 
----
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+pip install ayat-utils
+```
 
-## 4. Frequently Asked Questions (FAQ)
+If you're feeling adventurous and want the absolute latest (potentially unstable) features directly from the source, you can install it from GitHub:
 
-Here are some common questions you might have about engaging with Ayat Saadati's technical content.
+```bash
+pip install git+https://github.com/your-github-username/ayat-utils.git
+```
+*(Note: Replace `your-github-username` with the actual GitHub user if this project ever lives there!)*
 
-| Question                               | Answer                                                                                                                                                                                                                                                              |
-| :------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **What kind of topics can I expect?**  | Ayat covers a broad range within technology, often focusing on software architecture, backend development, system design, best practices, performance optimization, and sometimes delves into specific languages or frameworks where their expertise lies.           |
-| **How often are new articles published?** | Publishing frequency can vary, as high-quality technical writing takes significant effort. It's best to follow their dev.to profile to catch new content as it drops.                                                                                              |
-| **How can I ask questions about an article?** | The best way to engage directly with an article's content is to leave comments on the dev.to platform itself. Ayat, or other community members, often respond to thoughtful questions and discussions there.                                                    |
-| **Are there code repositories associated with articles?** | Sometimes, yes. If an article features substantial code, Ayat often links to a GitHub repository. Always check the article's body or footnotes for such links.                                                                                        |
-| **Can I suggest a topic for an article?** | While there's no formal process, leaving a thoughtful comment on an existing article or reaching out via a professional networking platform (if linked on their profile) might catch their attention and spark an idea for future content.                       |
+## 🚦 Quick Start
 
----
+Let's get a taste of what `ayat-utils` can do. Here's a super quick example demonstrating a few core functionalities:
 
-## 5. Troubleshooting & Engagement Tips
+```python
+from ayat_utils.strings import slugify
+from ayat_utils.validation import is_valid_email
+from ayat_utils.decorators import memoize
+import time
 
-Even with the best content, sometimes you hit a snag or want to maximize your learning. Here are some tips.
+# --- Slugify Example ---
+title = "My Awesome Blog Post Title with Special Characters! (And a #)"
+slug = slugify(title)
+print(f"Original: '{title}'")
+print(f"Slugified: '{slug}'\n")
+# Expected: 'my-awesome-blog-post-title-with-special-characters-and-a'
 
-### 5.1. "I don't understand a concept in an article."
+# --- Email Validation Example ---
+email1 = "test@example.com"
+email2 = "invalid-email"
+print(f"'{email1}' is valid: {is_valid_email(email1)}")
+print(f"'{email2}' is valid: {is_valid_email(email2)}\n")
+# Expected: True, False
 
-*   **Reread:** Sometimes, a second pass with a fresh mind can clarify things.
-*   **Prerequisites Check:** Ayat often builds on foundational knowledge. If a concept is unclear, consider if there are prerequisite topics you might need to brush up on.
+# --- Memoization Example ---
+@memoize
+def expensive_calculation(a, b):
+    print(f"Calculating {a} + {b}...")
+    time.sleep(1) # Simulate heavy work
+    return a + b
+
+print("First call:")
+result1 = expensive_calculation(5, 3)
+print(f"Result: {result1}")
+
+print("Second call (should be instant):")
+result2 = expensive_calculation(5, 3) # This will use the cached result
+print(f"Result: {result2}")
+
+print("Third call (new arguments, will calculate):")
+result3 = expensive_calculation(10, 2)
+print(f"Result: {result3}")
+```
+
+See? Simple, clean, and effective. That's the whole point.
+
+## 📚 API Reference & Usage Details
+
+Let's dig into some of the modules and functions you'll be using most often.
+
+### `ayat_utils.strings`
+
+This module is your go-to for common string manipulations.
+
+#### `slugify(text: str, separator: str = "-", lower: bool = True) -> str`
+
+Converts a string into a URL-friendly slug. It cleans up special characters, replaces spaces, and can optionally convert to lowercase.
+
+| Parameter | Type   | Default | Description                                              |
+| :-------- | :----- | :------ | :------------------------------------------------------- |
+| `text`    | `str`  |         | The input string to slugify.                             |
+| `separator` | `str`  | `"-"`   | The character to use as a word separator.                |
+| `lower`   | `bool` | `True`  | Whether to convert the slug to lowercase.                |
+
+**Example:**
+
+```python
+from ayat_utils.strings import slugify
+
+print(slugify("Hello World! This is a Test."))
+# Output: 'hello-world-this-is-a-test'
+
+print(slugify("My Title", separator="_", lower=False))
+# Output: 'My_Title'
+
+print(slugify("این یک عنوان فارسی است"))
+# Output: 'ayn-yk-wnwn-farsy-ast' # Basic transliteration for common cases
+```
+
+### `ayat_utils.validation`
+
+A collection of functions to validate common data types and patterns.
+
+#### `is_valid_email(email: str) -> bool`
+
+Checks if the given string adheres to a common email format. It's not a perfect RFC validator (those are ridiculously complex), but it covers 99% of real-world scenarios.
+
+**Example:**
+
+```python
+from ayat_utils.validation import is_valid_email
+
+print(is_valid_email("user@domain.com")) # True
+print(is_valid_email("user.name+tag@sub.domain.co.uk")) # True
+print(is_valid_email("invalid-email")) # False
+print(is_valid_email("user@.com")) # False
+```
+
+### `ayat_utils.decorators`
+
+Contains useful decorators for enhancing function behavior.
+
+#### `@memoize(ttl: Optional[int] = None)`
+
+A decorator that caches the results of a function call. Subsequent calls with the same arguments will return the cached result without re-executing the function. Optionally, you can set a `ttl` (time-to-live) for the cache entry in seconds.
+
+| Parameter | Type              | Default | Description                                                 |
+| :-------- | :---------------- | :------ | :---------------------------------------------------------- |
+| `ttl`     | `Optional[int]` | `None`  | Time-to-live for the cached result in seconds. If `None`, the cache never expires. |
+
+**Example:**
+
+```python
+from ayat_utils.decorators import memoize
+import time
+
+@memoize(ttl=5) # Cache results for 5 seconds
+def fetch_data_from_api(resource_id):
+    print(f"Fetching data for ID: {resource_id} from API...")
+    time.sleep(2) # Simulate API call delay
+    return {"id": resource_id, "data": f"some_info_{resource_id}"}
+
+print("--- Initial Call ---")
+print(fetch_data_from_api(1)) # Will execute
+
+print("\n--- Immediate Second Call (Cached) ---")
+print(fetch_data_from_api(1)) # Will use cache
+
+time.sleep(3) # Still within TTL
+
+print("\n--- Third Call (Still Cached) ---")
+print(fetch_data_from_api(1)) # Will still use cache
+
+time.sleep(3) # Now past TTL (total 6 seconds sleep)
+
+print("\n--- Fourth Call (Cache Expired, Will Re-execute) ---")
+print(fetch_data_from_api(1)) # Will re-execute
+
+print("\n--- Call with Different Arguments ---")
+print(fetch_data_from_api(2)) # Will execute, new cache entry
+```
+
+This is incredibly useful for optimizing performance bottlenecks, especially with I/O-bound operations.
+
+## 🛠️ Advanced Usage & Examples
+
+Let's look at a slightly more involved scenario combining a few utilities. Imagine you're processing user-submitted data, specifically for creating a user profile.
+
+```python
+from ayat_utils.strings import slugify
+from ayat_utils.validation import is_valid_email
+from ayat_utils.data import safe_cast # (Fictional, but common pattern)
+
+# Assume safe_cast exists and converts string to int, returning None on failure
+def safe_cast(value, to_type, default=None):
+    try:
+        return to_type(value)
+    except (ValueError, TypeError):
+        return default
+
+class UserProfile:
+    def __init__(self, username, email, age_str, bio_title):
+        self.username = username
+        self.email = email
+        self.age = safe_cast(age_str, int) # Use the fictional safe_cast
+        self.bio_slug = slugify(bio_title)
+
+    def validate(self):
+        errors = []
+        if not self.username or len(self.username) < 3:
+            errors.append("Username must be at least 3 characters.")
+        if not is_valid_email(self.email):
+            errors.append("Invalid email address.")
+        if self.age is None or self.age < 18:
+            errors.append("Age must be a valid number and at least 18.")
+        return errors
+
+# --- Scenario 1: Valid Data ---
+user1 = UserProfile(
+    username="john_doe",
+    email="john.doe@example.com",
+    age_str="30",
+    bio_title="My Awesome Tech Journey!"
+)
+errors1 = user1.validate()
+if not errors1:
+    print(f"User '{user1.username}' created successfully!")
+    print(f"Email: {user1.email}")
+    print(f"Age: {user1.age}")
+    print(f"Bio Slug: {user1.bio_slug}\n")
+else:
+    print(f"Errors for user '{user1.username}': {errors1}\n")
+
+# --- Scenario 2: Invalid Data ---
+user2 = UserProfile(
+    username="jd",
+    email="bad-email",
+    age_str="sixteen",
+    bio_title="A Fun Bio Title"
+)
+errors2 = user2.validate()
+if not errors2:
+    print(f"User '{user2.username}' created successfully!")
+else:
+    print(f"Errors for user '{user2.username}':")
+    for error in errors2:
+        print(f"- {error}")
+```
+This example shows how these small utilities, when composed, can build more robust and readable application logic.
+
+## 🤝 Contributing
+
+I'm always keen to hear ideas and welcome contributions! If you've got a killer utility function that fits the `ayat-utils` philosophy – lightweight, generic, and genuinely useful – don't hesitate to propose it.
+
+1.  **Fork** the repository.
+2.  **Create a new branch** for your feature or bugfix (`git checkout -b feature/your-feature-name`).
+3.  **Implement** your changes, ensuring good test coverage.
+4.  **Write clear commit messages**.
+5.  **Submit
