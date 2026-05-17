@@ -1,332 +1,403 @@
 ```yaml
 openapi: 3.0.0
 info:
-  title: Ayat Saadati API
+  title: Ayat Saadati Service API
   description: |
-    Welcome to the professional API documentation for the "Ayat Saadati" service.
-    This API provides a comprehensive set of endpoints for managing users and related resources.
-    It supports standard CRUD operations (Create, Read, Update, Delete) for various entities,
-    ensuring a robust and scalable interaction model.
-
-    Explore the available endpoints to interact with the Ayat Saadati platform.
+    Welcome to the Ayat Saadati Service API documentation.
+    This API provides a comprehensive set of endpoints to manage articles,
+    comments, and user interactions on the Ayat Saadati platform.
+    It supports creating, reading, updating, and deleting content,
+    allowing developers to integrate seamlessly with the platform's features.
   version: 1.0.0
-  contact:
-    name: Ayat Saadati
-    url: https://dev.to/ayat_saadat
-    email: ayat.saadat@example.com # Placeholder email
 servers:
   - url: https://dev.to/ayat_saadat
-    description: Development Server
-tags:
-  - name: Users
-    description: Operations related to user management.
-  - name: Products
-    description: Operations related to product catalog.
-
+    description: Production server for Ayat Saadati service.
 paths:
-  /users:
+  /articles:
     get:
-      summary: Retrieve a list of all users
-      operationId: getAllUsers
-      tags:
-        - Users
+      summary: Get all articles
+      description: Retrieve a paginated list of articles, optionally filtered by tags or author.
+      operationId: getAllArticles
       parameters:
-        - name: limit
-          in: query
-          description: How many users to return at one time (max 100)
-          required: false
+        - in: query
+          name: limit
           schema:
             type: integer
             format: int32
+            minimum: 1
             maximum: 100
-            default: 20
-        - name: offset
-          in: query
-          description: The number of items to skip before starting to collect the result set
-          required: false
+            default: 10
+          description: Maximum number of articles to return.
+        - in: query
+          name: offset
           schema:
             type: integer
             format: int32
+            minimum: 0
             default: 0
+          description: Number of articles to skip before starting to return results.
+        - in: query
+          name: tag
+          schema:
+            type: string
+          description: Filter articles by a specific tag.
+        - in: query
+          name: authorId
+          schema:
+            type: string
+            format: uuid
+          description: Filter articles by author ID.
       responses:
         '200':
-          description: A list of users.
+          description: A list of articles.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: '#/components/schemas/Article'
         '500':
           description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
-      summary: Create a new user
-      operationId: createUser
-      tags:
-        - Users
+      summary: Create a new article
+      description: Submit a new article to the platform.
+      operationId: createArticle
       requestBody:
-        description: User object to be created
+        description: Article object to be created.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewUser'
+              $ref: '#/components/schemas/ArticleCreate'
       responses:
         '201':
-          description: User created successfully.
+          description: Article created successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Article'
         '400':
-          description: Invalid input or user already exists.
+          description: Invalid input provided.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
           description: Internal server error.
-
-  /users/{userId}:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /articles/{articleId}:
     get:
-      summary: Retrieve a single user by ID
-      operationId: getUserById
-      tags:
-        - Users
+      summary: Get an article by ID
+      description: Retrieve a single article's details by its unique identifier.
+      operationId: getArticleById
       parameters:
-        - name: userId
-          in: path
-          description: ID of the user to retrieve
-          required: true
+        - in: path
+          name: articleId
           schema:
             type: string
             format: uuid
-            example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+          required: true
+          description: Unique identifier of the article.
       responses:
         '200':
-          description: User data.
+          description: Article found.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Article'
         '404':
-          description: User not found.
+          description: Article not found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
           description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     put:
-      summary: Update an existing user
-      operationId: updateUser
-      tags:
-        - Users
+      summary: Update an article by ID
+      description: Update the content or metadata of an existing article.
+      operationId: updateArticleById
       parameters:
-        - name: userId
-          in: path
-          description: ID of the user to update
-          required: true
+        - in: path
+          name: articleId
           schema:
             type: string
             format: uuid
-            example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+          required: true
+          description: Unique identifier of the article to update.
       requestBody:
-        description: User object with fields to update
+        description: Article object with fields to update.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateUser'
+              $ref: '#/components/schemas/ArticleUpdate'
       responses:
         '200':
-          description: User updated successfully.
+          description: Article updated successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Article'
         '400':
-          description: Invalid input or no fields to update.
+          description: Invalid input provided.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '440':
-          description: User not found.
+        '404':
+          description: Article not found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
           description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     delete:
-      summary: Delete a user by ID
-      operationId: deleteUser
-      tags:
-        - Users
+      summary: Delete an article by ID
+      description: Permanently remove an article from the platform.
+      operationId: deleteArticleById
       parameters:
-        - name: userId
-          in: path
-          description: ID of the user to delete
-          required: true
+        - in: path
+          name: articleId
           schema:
             type: string
             format: uuid
-            example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+          required: true
+          description: Unique identifier of the article to delete.
       responses:
         '204':
-          description: User deleted successfully. (No content)
+          description: Article deleted successfully (No Content).
         '404':
-          description: User not found.
+          description: Article not found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
           description: Internal server error.
-
-  /products:
-    get:
-      summary: Retrieve a list of all products
-      operationId: getAllProducts
-      tags:
-        - Products
-      parameters:
-        - name: category
-          in: query
-          description: Filter products by category
-          required: false
-          schema:
-            type: string
-            enum: [electronics, books, home, clothing]
-        - name: maxPrice
-          in: query
-          description: Maximum price of products to return
-          required: false
-          schema:
-            type: number
-            format: float
-            minimum: 0
-      responses:
-        '200':
-          description: A list of products.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Product'
-        '500':
-          description: Internal server error.
+                $ref: '#/components/schemas/Error'
+  /articles/{articleId}/comments:
     post:
-      summary: Add a new product to the catalog
-      operationId: createProduct
-      tags:
-        - Products
+      summary: Add a comment to an article
+      description: Post a new comment to a specific article.
+      operationId: addCommentToArticle
+      parameters:
+        - in: path
+          name: articleId
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: Unique identifier of the article to comment on.
       requestBody:
-        description: Product object to be added
+        description: Comment object to be created.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewProduct'
+              $ref: '#/components/schemas/CommentCreate'
       responses:
         '201':
-          description: Product added successfully.
+          description: Comment added successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
+                $ref: '#/components/schemas/Comment'
         '400':
-          description: Invalid product data provided.
+          description: Invalid input provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Article not found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
           description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
   schemas:
-    User:
+    Article:
       type: object
       required:
         - id
-        - username
-        - email
+        - title
+        - content
+        - authorId
+        - createdAt
       properties:
         id:
           type: string
           format: uuid
-          description: Unique identifier for the user.
-          example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
-        username:
+          description: Unique identifier for the article.
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        title:
           type: string
-          description: User's chosen username.
-          example: "ayat_saadat"
-        email:
+          description: The title of the article.
+          example: My First Article on Ayat Saadati
+        content:
           type: string
-          format: email
-          description: User's email address.
-          example: "ayat.saadat@example.com"
-        firstName:
+          description: The main content body of the article.
+          example: This is the detailed content of my very first article. It's quite informative.
+        authorId:
           type: string
-          description: User's first name.
-          example: "Ayat"
-        lastName:
-          type: string
-          description: User's last name.
-          example: "Saadat"
+          format: uuid
+          description: The unique identifier of the author.
+          example: b290f1ee-6c54-4b01-90e6-d701748f0852
+        tags:
+          type: array
+          items:
+            type: string
+          description: A list of tags associated with the article.
+          example: ["programming", "webdev", "tutorial"]
         createdAt:
           type: string
           format: date-time
-          description: Timestamp when the user account was created.
-          example: "2023-10-27T10:00:00Z"
+          description: The timestamp when the article was created.
+          example: '2023-10-27T10:00:00Z'
         updatedAt:
           type: string
           format: date-time
-          description: Timestamp when the user account was last updated.
-          example: "2023-10-27T10:30:00Z"
-    NewUser:
+          description: The timestamp when the article was last updated.
+          example: '2023-10-27T11:30:00Z'
+    ArticleCreate:
       type: object
       required:
-        - username
-        - email
-        - password
+        - title
+        - content
+        - authorId
       properties:
-        username:
+        title:
           type: string
-          description: User's desired username.
-          example: "new_user_123"
-        email:
+          description: The title of the article.
+          example: My New Blog Post
+          minLength: 5
+          maxLength: 200
+        content:
           type: string
-          format: email
-          description: User's email address.
-          example: "new.user@example.com"
-        password:
+          description: The main content body of the article.
+          example: This is the insightful content of my new blog post.
+          minLength: 50
+        authorId:
           type: string
-          format: password
-          description: User's password.
-          example: "SecurePassword123!"
-        firstName:
-          type: string
-          description: User's first name.
-          example: "New"
-        lastName:
-          type: string
-          description: User's last name.
-          example: "User"
-    UpdateUser:
+          format: uuid
+          description: The unique identifier of the author creating the article.
+          example: b290f1ee-6c54-4b01-90e6-d701748f0852
+        tags:
+          type: array
+          items:
+            type: string
+          description: A list of tags to categorize the article.
+          example: ["tech", "ai", "future"]
+    ArticleUpdate:
       type: object
-      description: Fields that can be updated for an existing user.
-      minProperties: 1
       properties:
-        username:
+        title:
           type: string
-          description: New username for the user.
-          example: "updated_ayat"
-        email:
+          description: The new title for the article.
+          example: An Updated Title for My Blog Post
+          minLength: 5
+          maxLength: 200
+        content:
           type: string
-          format: email
-          description: New email address for the user.
-          example: "updated.
+          description: The new content body for the article.
+          example: The content has been significantly updated with new information.
+          minLength: 50
+        tags:
+          type: array
+          items:
+            type: string
+          description: The new list of tags for the article (replaces existing tags).
+          example: ["tech", "updates", "ai"]
+    Comment:
+      type: object
+      required:
+        - id
+        - articleId
+        - authorId
+        - content
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the comment.
+          example: e123f1ee-6c54-4b01-90e6-d701748f0853
+        articleId:
+          type: string
+          format: uuid
+          description: The ID of the article this comment belongs to.
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        authorId:
+          type: string
+          format: uuid
+          description: The unique identifier of the comment's author.
+          example: b290f1ee-6c54-4b01-90e6-d701748f0852
+        content:
+          type: string
+          description: The text content of the comment.
+          example: This is a great article, very insightful!
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when the comment was created.
+          example: '2023-10-27T12:00:00Z'
+    CommentCreate:
+      type: object
+      required:
+        - authorId
+        - content
+      properties:
+        authorId:
+          type: string
+          format: uuid
+          description: The unique identifier of the user posting the comment.
+          example: b290f1ee-6c54-4b01-90e6-d701748f0852
+        content:
+          type: string
+          description: The text content of the comment.
+          example: I found this article extremely helpful, thank you!
+          minLength: 10
+          maxLength: 500
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: A unique error code.
+          example: 4001
+        message:
+          type: string
+          description: A human-readable description of the error.
+          example: Invalid input for article title.
+```
