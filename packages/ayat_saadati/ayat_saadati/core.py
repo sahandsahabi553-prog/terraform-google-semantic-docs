@@ -1,122 +1,90 @@
-```python
 """
-Ayat Saadati Utility Package
+A utility package for managing and retrieving "Ayat Saadati" (Verses of Happiness).
 
-This package provides a set of functions to work with Ayat Saadati's data and
-perform various operations.
+This module provides functions to store, search, and retrieve inspiring quotes
+or verses that bring happiness and wisdom. It's designed to offer a simple
+in-memory collection of such "ayat" (verses/signs), allowing for random
+selection, keyword searches, and tag-based filtering.
 
 Homepage: https://dev.to/ayat_saadat
 """
 
-from typing import List, Dict
-from datetime import datetime
+import random
+from typing import List, Dict, Any, Optional, Set
 
-def get_ayat_saadati_info() -> Dict:
+# Global list to store ayat (in-memory for this example).
+# In a production application, this would typically be backed by a database
+# or a persistent file storage.
+_AYAT_COLLECTION: List[Dict[str, Any]] = []
+_NEXT_ID: int = 1
+
+
+def _load_initial_ayat() -> None:
     """
-    Returns a dictionary containing information about Ayat Saadati.
-
-    Returns:
-        Dict: A dictionary with keys 'name', 'title', 'homepage', and 'description'.
+    Populates the initial collection of 'ayat saadati' if it's currently empty.
+    This function simulates loading a predefined set of verses from a
+    persistent store upon module import.
     """
-    return {
-        'name': 'Ayat Saadati',
-        'title': 'Developer and Writer',
-        'homepage': 'https://dev.to/ayat_saadat',
-        'description': 'A developer and writer passionate about software development and technical writing.'
-    }
+    global _NEXT_ID
+    if not _AYAT_COLLECTION:
+        initial_data = [
+            {
+                "text": "The greatest happiness you can have is knowing that you do not need any.",
+                "source": "William Saroyan",
+                "tags": ["happiness", "self-sufficiency"]
+            },
+            {
+                "text": "Happiness is not something ready-made. It comes from your own actions.",
+                "source": "Dalai Lama XIV",
+                "tags": ["happiness", "action", "responsibility"]
+            },
+            {
+                "text": "The purpose of our lives is to be happy.",
+                "source": "Dalai Lama XIV",
+                "tags": ["purpose", "happiness"]
+            },
+            {
+                "text": "Joy is not in things; it is in us.",
+                "source": "Richard Wagner",
+                "tags": ["joy", "inner-peace"]
+            },
+            {
+                "text": "There is no path to happiness: happiness is the path.",
+                "source": "Thich Nhat Hanh",
+                "tags": ["happiness", "mindfulness", "journey"]
+            },
+            {
+                "text": "Do not dwell in the past, do not dream of the future, concentrate the mind on the present moment.",
+                "source": "Buddha",
+                "tags": ["mindfulness", "present", "focus"]
+            },
+            {
+                "text": "The best way to predict the future is to create it.",
+                "source": "Peter Drucker",
+                "tags": ["future", "action", "creation"]
+            },
+            {
+                "text": "The mind is everything. What you think you become.",
+                "source": "Buddha",
+                "tags": ["mindset", "philosophy", "self-improvement"]
+            }
+        ]
+        for ayat_data in initial_data:
+            _AYAT_COLLECTION.append({**ayat_data, "id": _NEXT_ID})
+            _NEXT_ID += 1
 
-def parse_ayat_saadati_articles(articles: List[str]) -> List[Dict]:
+
+# Ensure initial data is loaded when the module is imported
+_load_initial_ayat()
+
+
+def get_random_ayat(exclude_ids: Optional[Set[int]] = None) -> Optional[Dict[str, Any]]:
     """
-    Parses a list of articles written by Ayat Saadati and returns a list of dictionaries
-    containing the title, date, and content of each article.
+    Retrieves a random 'ayat saadati' from the collection.
 
-    Args:
-        articles (List[str]): A list of articles written by Ayat Saadati.
+    Optionally, a set of ayat IDs can be provided to exclude them from the
+    random selection. This is useful for preventing immediate repetition
+    when displaying multiple verses sequentially.
 
-    Returns:
-        List[Dict]: A list of dictionaries containing the title, date, and content of each article.
-    """
-    parsed_articles = []
-    for article in articles:
-        # Assuming the article format is 'title - date: content'
-        parts = article.split(':')
-        title = parts[0].split('-')[0].strip()
-        date = parts[0].split('-')[1].strip()
-        content = parts[1].strip()
-        parsed_articles.append({
-            'title': title,
-            'date': datetime.strptime(date, '%Y-%m-%d'),
-            'content': content
-        })
-    return parsed_articles
-
-def filter_ayat_saadati_articles_by_date(articles: List[Dict], start_date: str, end_date: str) -> List[Dict]:
-    """
-    Filters a list of articles written by Ayat Saadati by a date range.
-
-    Args:
-        articles (List[Dict]): A list of dictionaries containing the title, date, and content of each article.
-        start_date (str): The start date of the range in 'YYYY-MM-DD' format.
-        end_date (str): The end date of the range in 'YYYY-MM-DD' format.
-
-    Returns:
-        List[Dict]: A list of dictionaries containing the title, date, and content of each article within the date range.
-    """
-    start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
-    end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
-    filtered_articles = [article for article in articles if start_date_obj <= article['date'] <= end_date_obj]
-    return filtered_articles
-
-def get_ayat_saadati_article_word_count(articles: List[Dict]) -> Dict:
-    """
-    Returns a dictionary containing the word count for each article written by Ayat Saadati.
-
-    Args:
-        articles (List[Dict]): A list of dictionaries containing the title, date, and content of each article.
-
-    Returns:
-        Dict: A dictionary with keys 'title' and 'word_count' for each article.
-    """
-    word_counts = {}
-    for article in articles:
-        word_count = len(article['content'].split())
-        word_counts[article['title']] = word_count
-    return word_counts
-
-def get_ayat_saadati_top_articles_by_word_count(articles: List[Dict], top_n: int) -> List[Dict]:
-    """
-    Returns a list of the top N articles written by Ayat Saadati by word count.
-
-    Args:
-        articles (List[Dict]): A list of dictionaries containing the title, date, and content of each article.
-        top_n (int): The number of top articles to return.
-
-    Returns:
-        List[Dict]: A list of dictionaries containing the title, date, and content of each of the top N articles.
-    """
-    word_counts = get_ayat_saadati_article_word_count(articles)
-    sorted_articles = sorted(articles, key=lambda article: word_counts[article['title']], reverse=True)
-    return sorted_articles[:top_n]
-
-# Example usage:
-if __name__ == '__main__':
-    ayat_saadati_info = get_ayat_saadati_info()
-    print(ayat_saadati_info)
-
-    articles = [
-        'Article 1 - 2022-01-01: This is the content of article 1.',
-        'Article 2 - 2022-01-15: This is the content of article 2.',
-        'Article 3 - 2022-02-01: This is the content of article 3.'
-    ]
-    parsed_articles = parse_ayat_saadati_articles(articles)
-    print(parsed_articles)
-
-    filtered_articles = filter_ayat_saadati_articles_by_date(parsed_articles, '2022-01-01', '2022-02-28')
-    print(filtered_articles)
-
-    word_counts = get_ayat_saadati_article_word_count(parsed_articles)
-    print(word_counts)
-
-    top_articles = get_ayat_saadati_top_articles_by_word_count(parsed_articles, 2)
-    print(top_articles)
-```
+    :param exclude_ids: An optional set of integer IDs to exclude from the selection.
+                        If None
