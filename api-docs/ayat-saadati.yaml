@@ -1,46 +1,158 @@
-```yaml
+```yml
 openapi: 3.0.0
 info:
-  title: Ayat Saadati API
-  description: |
-    API for managing content, posts, and user interactions for the Ayat Saadati platform.
-    This API provides endpoints to create, retrieve, update, and delete posts, as well as manage comments on these posts.
+  title: Ayat Saadati Service
+  description: API documentation for Ayat Saadati service
   version: 1.0.0
+  contact:
+    name: Ayat Saadati
+    url: https://dev.to/ayat_saadat
+    email: ayat.saadat@example.com
 servers:
   - url: https://dev.to/ayat_saadat
-    description: Development server for Ayat Saadati
 tags:
-  - name: Posts
-    description: Operations related to blog posts or content items.
-  - name: Comments
-    description: Operations related to comments on posts.
+  - name: users
+    description: User management endpoints
+  - name: posts
+    description: Post management endpoints
 paths:
+  /users:
+    get:
+      tags:
+        - users
+      summary: Retrieves a list of all users
+      description: Returns a list of all registered users
+      operationId: getUsers
+      responses:
+        '200':
+          description: A list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - users
+      summary: Creates a new user
+      description: Creates a new user with the provided details
+      operationId: createUser
+      requestBody:
+        description: User details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/{userId}:
+    get:
+      tags:
+        - users
+      summary: Retrieves a user by ID
+      description: Returns a user with the specified ID
+      operationId: getUserById
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: User ID
+      responses:
+        '200':
+          description: A user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - users
+      summary: Updates a user
+      description: Updates a user with the provided details
+      operationId: updateUser
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: User ID
+      requestBody:
+        description: User details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - users
+      summary: Deletes a user
+      description: Deletes a user with the specified ID
+      operationId: deleteUser
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: User ID
+      responses:
+        '204':
+          description: User deleted successfully
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /posts:
     get:
-      summary: Retrieve a list of all posts
-      operationId: getPosts
       tags:
-        - Posts
-      parameters:
-        - name: limit
-          in: query
-          description: How many posts to return at one time (max 100)
-          required: false
-          schema:
-            type: integer
-            format: int32
-            minimum: 1
-            maximum: 100
-            default: 20
-        - name: offset
-          in: query
-          description: Offset for pagination
-          required: false
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-            default: 0
+        - posts
+      summary: Retrieves a list of all posts
+      description: Returns a list of all published posts
+      operationId: getPosts
       responses:
         '200':
           description: A list of posts
@@ -57,17 +169,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      summary: Create a new post
-      operationId: createPost
       tags:
-        - Posts
+        - posts
+      summary: Creates a new post
+      description: Creates a new post with the provided details
+      operationId: createPost
       requestBody:
-        description: Post object to be created
-        required: true
+        description: Post details
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewPost'
+              $ref: '#/components/schemas/Post'
+        required: true
       responses:
         '201':
           description: Post created successfully
@@ -76,34 +189,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/Post'
         '400':
-          description: Invalid input provided
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal server error
+          description: Invalid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
   /posts/{postId}:
     get:
-      summary: Retrieve a specific post by ID
+      tags:
+        - posts
+      summary: Retrieves a post by ID
+      description: Returns a post with the specified ID
       operationId: getPostById
-      tags:
-        - Posts
       parameters:
-        - name: postId
-          in: path
-          description: ID of the post to retrieve
-          required: true
+        - in: path
+          name: postId
           schema:
-            type: string
-            format: uuid
+            type: integer
+          required: true
+          description: Post ID
       responses:
         '200':
-          description: The requested post
+          description: A post
           content:
             application/json:
               schema:
@@ -114,135 +221,51 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    put:
-      summary: Update an existing post
-      operationId: updatePost
-      tags:
-        - Posts
-      parameters:
-        - name: postId
-          in: path
-          description: ID of the post to update
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        description: Post object with updated fields
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdatePost'
-      responses:
-        '200':
-          description: Post updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Post'
-        '400':
-          description: Invalid input provided
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Post not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    delete:
-      summary: Delete a post
-      operationId: deletePost
-      tags:
-        - Posts
-      parameters:
-        - name: postId
-          in: path
-          description: ID of the post to delete
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '204':
-          description: Post deleted successfully (No Content)
-        '404':
-          description: Post not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /posts/{postId}/comments:
-    post:
-      summary: Add a comment to a specific post
-      operationId: addCommentToPost
-      tags:
-        - Comments
-      parameters:
-        - name: postId
-          in: path
-          description: ID of the post to add a comment to
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        description: Comment object to be added
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NewComment'
-      responses:
-        '201':
-          description: Comment added successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Comment'
-        '400':
-          description: Invalid input provided
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Post not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
 components:
   schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: User ID
+        name:
+          type: string
+          description: User name
+        email:
+          type: string
+          format: email
+          description: User email
+      required:
+        - id
+        - name
+        - email
     Post:
       type: object
       properties:
         id:
+          type: integer
+          description: Post ID
+        title:
+          type: string
+          description: Post title
+        content:
+          type: string
+          description: Post content
+      required:
+        - id
+        - title
+        - content
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Error code
+        message:
+          type: string
+          description: Error message
+      required:
+        - code
+        - message
+```
