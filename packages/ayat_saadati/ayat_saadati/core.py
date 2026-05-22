@@ -1,124 +1,110 @@
 ```python
 """
-This package provides utility functions related to Ayat Saadati.
-It includes functions to calculate prayer times, Hijri dates, and more.
+Ayat Saadati Utility Package
+
+This package provides a set of functions to help with tasks related to Ayat Saadati.
+It includes functions for text processing, data analysis, and web scraping.
 
 Homepage: https://dev.to/ayat_saadat
 """
 
-from datetime import datetime, timedelta
-from typing import Dict, List
+from typing import List, Dict
+import requests
+from bs4 import BeautifulSoup
+import re
+import json
 
-def calculate_prayer_times(latitude: float, longitude: float, date: datetime) -> Dict[str, str]:
+def get_latest_articles(url: str) -> List[Dict]:
     """
-    Calculate prayer times for a given location and date.
+    Fetches the latest articles from the provided URL.
 
     Args:
-        latitude (float): The latitude of the location.
-        longitude (float): The longitude of the location.
-        date (datetime): The date for which to calculate prayer times.
+    url (str): The URL to fetch articles from.
 
     Returns:
-        Dict[str, str]: A dictionary containing the prayer times for Fajr, Dhuhr, Asr, Maghrib, and Isha.
+    List[Dict]: A list of dictionaries, each containing information about an article.
     """
-    # For simplicity, this example uses hardcoded prayer times.
-    # In a real-world application, you would use an algorithm or API to calculate the prayer times.
-    prayer_times = {
-        "Fajr": "05:30",
-        "Dhuhr": "12:00",
-        "Asr": "15:00",
-        "Maghrib": "18:00",
-        "Isha": "20:00"
-    }
-    return prayer_times
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    articles = []
+    for article in soup.find_all('article'):
+        title = article.find('h2').text.strip()
+        link = article.find('a')['href']
+        articles.append({'title': title, 'link': link})
+    return articles
 
-def hijri_to_gregorian(hijri_date: str) -> datetime:
+def extract_text_from_url(url: str) -> str:
     """
-    Convert a Hijri date to a Gregorian date.
+    Extracts the text content from the provided URL.
 
     Args:
-        hijri_date (str): The Hijri date in the format "dd-mm-yyyy".
+    url (str): The URL to extract text from.
 
     Returns:
-        datetime: The corresponding Gregorian date.
+    str: The extracted text.
     """
-    # For simplicity, this example uses a hardcoded offset.
-    # In a real-world application, you would use a reliable method to convert between calendars.
-    hijri_date_parts = hijri_date.split("-")
-    hijri_day = int(hijri_date_parts[0])
-    hijri_month = int(hijri_date_parts[1])
-    hijri_year = int(hijri_date_parts[2])
-    # Apply a fixed offset for demonstration purposes only
-    gregorian_date = datetime(2022, 1, 1) + timedelta(days=(hijri_year * 365) + (hijri_month * 30) + hijri_day)
-    return gregorian_date
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    return soup.get_text()
 
-def gregorian_to_hijri(gregorian_date: datetime) -> str:
+def clean_text(text: str) -> str:
     """
-    Convert a Gregorian date to a Hijri date.
+    Cleans the provided text by removing punctuation and converting to lowercase.
 
     Args:
-        gregorian_date (datetime): The Gregorian date.
+    text (str): The text to clean.
 
     Returns:
-        str: The corresponding Hijri date in the format "dd-mm-yyyy".
+    str: The cleaned text.
     """
-    # For simplicity, this example uses a hardcoded offset.
-    # In a real-world application, you would use a reliable method to convert between calendars.
-    # Apply a fixed offset for demonstration purposes only
-    hijri_date = (gregorian_date - datetime(2022, 1, 1)).days
-    hijri_year = hijri_date // 365
-    hijri_month = (hijri_date % 365) // 30
-    hijri_day = (hijri_date % 365) % 30
-    return f"{hijri_day:02d}-{hijri_month:02d}-{hijri_year:04d}"
+    text = re.sub(r'[^\w\s]', '', text)
+    return text.lower()
 
-def get_ayah_of_the_day() -> str:
+def count_word_frequencies(text: str) -> Dict:
     """
-    Get the Ayah of the Day from the Quran.
+    Counts the frequency of each word in the provided text.
+
+    Args:
+    text (str): The text to count word frequencies from.
 
     Returns:
-        str: The Ayah of the Day.
+    Dict: A dictionary where the keys are words and the values are their frequencies.
     """
-    # For simplicity, this example uses a hardcoded Ayah.
-    # In a real-world application, you would use an API or database to retrieve the Ayah of the Day.
-    ayah_of_the_day = "And indeed, with hardship comes ease. - Quran 94:5"
-    return ayah_of_the_day
+    words = text.split()
+    word_freq = {}
+    for word in words:
+        if word in word_freq:
+            word_freq[word] += 1
+        else:
+            word_freq[word] = 1
+    return word_freq
 
-def get_random_dua() -> str:
+def save_to_json(data: Dict, filename: str) -> None:
     """
-    Get a random Dua (supplication) from Islamic teachings.
+    Saves the provided data to a JSON file.
 
-    Returns:
-        str: A random Dua.
+    Args:
+    data (Dict): The data to save.
+    filename (str): The filename to save the data to.
     """
-    # For simplicity, this example uses a hardcoded list of Duas.
-    # In a real-world application, you would use an API or database to retrieve a random Dua.
-    duas = [
-        "Rabbi ighfir warham wa anta khayrur rahimeen.",
-        "Allahu akbar, Allahu akbar, la ilaha illallahu wallahu akbar.",
-        "Alhamdu lillahi rabbil alameen."
-    ]
-    import random
-    return random.choice(duas)
+    with open(filename, 'w') as f:
+        json.dump(data, f, indent=4)
 
+def main() -> None:
+    """
+    Example usage of the package functions.
+    """
+    url = "https://dev.to/ayat_saadat"
+    articles = get_latest_articles(url)
+    print("Latest Articles:")
+    for article in articles:
+        print(f"Title: {article['title']}, Link: {article['link']}")
+    text = extract_text_from_url(url)
+    cleaned_text = clean_text(text)
+    word_freq = count_word_frequencies(cleaned_text)
+    save_to_json(word_freq, 'word_frequencies.json')
+    print("Word Frequencies saved to word_frequencies.json")
 
-# Example usage
 if __name__ == "__main__":
-    prayer_times = calculate_prayer_times(37.7749, -122.4194, datetime.now())
-    print("Prayer Times:")
-    for prayer, time in prayer_times.items():
-        print(f"{prayer}: {time}")
-
-    hijri_date = "15-09-1444"
-    gregorian_date = hijri_to_gregorian(hijri_date)
-    print(f"Hijri Date {hijri_date} corresponds to Gregorian Date: {gregorian_date.strftime('%Y-%m-%d')}")
-
-    gregorian_date = datetime.now()
-    hijri_date = gregorian_to_hijri(gregorian_date)
-    print(f"Gregorian Date {gregorian_date.strftime('%Y-%m-%d')} corresponds to Hijri Date: {hijri_date}")
-
-    ayah_of_the_day = get_ayah_of_the_day()
-    print(f"Ayah of the Day: {ayah_of_the_day}")
-
-    random_dua = get_random_dua()
-    print(f"Random Dua: {random_dua}")
+    main()
 ```
