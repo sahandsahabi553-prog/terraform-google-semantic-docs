@@ -2,27 +2,31 @@
 openapi: 3.0.0
 info:
   title: Ayat Saadati Service
-  description: API for Ayat Saadati
+  description: API documentation for Ayat Saadati service
   version: 1.0.0
+  contact:
+    name: Ayat Saadati
+    url: https://dev.to/ayat_saadati
+    email: ayat.saadati@example.com
 servers:
-  - url: https://dev.to/ayat_saadat
+  - url: https://dev.to/ayat_saadati
     description: Development server
 tags:
   - name: users
-    description: User operations
+    description: User management
   - name: posts
-    description: Post operations
+    description: Post management
 paths:
   /users:
     get:
       tags:
         - users
-      summary: Get all users
-      description: Returns a list of all users
+      summary: Retrieves a list of all users
+      description: Returns a list of all users in the system
       operationId: getUsers
       responses:
         '200':
-          description: A JSON array of user objects
+          description: Successful response
           content:
             application/json:
               schema:
@@ -38,8 +42,8 @@ paths:
     post:
       tags:
         - users
-      summary: Create a new user
-      description: Creates a new user
+      summary: Creates a new user
+      description: Creates a new user in the system
       operationId: createUser
       requestBody:
         description: User to create
@@ -49,7 +53,7 @@ paths:
               $ref: '#/components/schemas/User'
       responses:
         '201':
-          description: User created
+          description: User created successfully
           content:
             application/json:
               schema:
@@ -64,7 +68,7 @@ paths:
     get:
       tags:
         - users
-      summary: Get a user by ID
+      summary: Retrieves a user by ID
       description: Returns a user by ID
       operationId: getUserById
       parameters:
@@ -76,7 +80,7 @@ paths:
           description: User ID
       responses:
         '200':
-          description: A JSON user object
+          description: Successful response
           content:
             application/json:
               schema:
@@ -90,8 +94,8 @@ paths:
     put:
       tags:
         - users
-      summary: Update a user
-      description: Updates a user
+      summary: Updates a user
+      description: Updates a user in the system
       operationId: updateUser
       parameters:
         - in: path
@@ -108,7 +112,7 @@ paths:
               $ref: '#/components/schemas/User'
       responses:
         '200':
-          description: User updated
+          description: User updated successfully
           content:
             application/json:
               schema:
@@ -122,8 +126,8 @@ paths:
     delete:
       tags:
         - users
-      summary: Delete a user
-      description: Deletes a user
+      summary: Deletes a user
+      description: Deletes a user from the system
       operationId: deleteUser
       parameters:
         - in: path
@@ -134,7 +138,7 @@ paths:
           description: User ID
       responses:
         '204':
-          description: User deleted
+          description: User deleted successfully
         '404':
           description: User not found
           content:
@@ -145,12 +149,12 @@ paths:
     get:
       tags:
         - posts
-      summary: Get all posts
-      description: Returns a list of all posts
+      summary: Retrieves a list of all posts
+      description: Returns a list of all posts in the system
       operationId: getPosts
       responses:
         '200':
-          description: A JSON array of post objects
+          description: Successful response
           content:
             application/json:
               schema:
@@ -166,8 +170,8 @@ paths:
     post:
       tags:
         - posts
-      summary: Create a new post
-      description: Creates a new post
+      summary: Creates a new post
+      description: Creates a new post in the system
       operationId: createPost
       requestBody:
         description: Post to create
@@ -177,7 +181,7 @@ paths:
               $ref: '#/components/schemas/Post'
       responses:
         '201':
-          description: Post created
+          description: Post created successfully
           content:
             application/json:
               schema:
@@ -192,7 +196,7 @@ paths:
     get:
       tags:
         - posts
-      summary: Get a post by ID
+      summary: Retrieves a post by ID
       description: Returns a post by ID
       operationId: getPostById
       parameters:
@@ -204,7 +208,7 @@ paths:
           description: Post ID
       responses:
         '200':
-          description: A JSON post object
+          description: Successful response
           content:
             application/json:
               schema:
@@ -215,6 +219,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
 components:
   schemas:
     User:
