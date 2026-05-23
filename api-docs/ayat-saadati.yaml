@@ -1,269 +1,253 @@
-```yml
+```yaml
 openapi: 3.0.0
 info:
-  title: Ayat Saadati Service
-  description: API documentation for Ayat Saadati service
+  title: Ayat Saadati API
+  description: API for managing articles and content for Ayat Saadati's personal platform.
   version: 1.0.0
-  contact:
-    name: Ayat Saadati
-    url: https://dev.to/ayat_saadati
-    email: ayat.saadati@example.com
 servers:
-  - url: https://dev.to/ayat_saadati
-    description: Development server
-tags:
-  - name: users
-    description: User management
-  - name: posts
-    description: Post management
+  - url: https://dev.to/ayat_saadat
+    description: Development server for Ayat Saadati's platform
 paths:
-  /users:
+  /articles:
     get:
-      tags:
-        - users
-      summary: Retrieves a list of all users
-      description: Returns a list of all users in the system
-      operationId: getUsers
+      summary: Retrieve a list of all articles
+      description: Returns a list of all articles available on Ayat Saadati's platform, optionally filtered or paginated.
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of articles to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 10
+        - name: offset
+          in: query
+          description: Number of articles to skip before starting to return results
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            default: 0
       responses:
         '200':
-          description: Successful response
+          description: A list of articles
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: '#/components/schemas/Article'
         '500':
-          description: Internal server error
+          description: Internal Server Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      tags:
-        - users
-      summary: Creates a new user
-      description: Creates a new user in the system
-      operationId: createUser
+      summary: Create a new article
+      description: Adds a new article to Ayat Saadati's platform.
       requestBody:
-        description: User to create
+        description: Article object to be created
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/ArticleRequest'
       responses:
         '201':
-          description: User created successfully
+          description: Article created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Article'
         '400':
-          description: Invalid request
+          description: Invalid input
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /users/{userId}:
-    get:
-      tags:
-        - users
-      summary: Retrieves a user by ID
-      description: Returns a user by ID
-      operationId: getUserById
-      parameters:
-        - in: path
-          name: userId
-          schema:
-            type: integer
-          required: true
-          description: User ID
-      responses:
-        '200':
-          description: Successful response
+        '500':
+          description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Error'
+  /articles/{articleId}:
+    parameters:
+      - name: articleId
+        in: path
+        description: Unique identifier of the article
+        required: true
+        schema:
+          type: string
+          format: uuid
+          example: 87654321-abcd-ef01-2345-6789abcdef01
+    get:
+      summary: Retrieve a single article by ID
+      description: Returns a specific article identified by its ID.
+      responses:
+        '200':
+          description: The requested article
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
         '404':
-          description: User not found
+          description: Article not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
-      tags:
-        - users
-      summary: Updates a user
-      description: Updates a user in the system
-      operationId: updateUser
-      parameters:
-        - in: path
-          name: userId
-          schema:
-            type: integer
-          required: true
-          description: User ID
+      summary: Update an existing article
+      description: Updates the details of an existing article identified by its ID.
       requestBody:
-        description: User to update
+        description: Article object with updated fields
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/ArticleRequest'
       responses:
         '200':
-          description: User updated successfully
+          description: Article updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Article'
         '400':
-          description: Invalid request
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Article not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
-      tags:
-        - users
-      summary: Deletes a user
-      description: Deletes a user from the system
-      operationId: deleteUser
-      parameters:
-        - in: path
-          name: userId
-          schema:
-            type: integer
-          required: true
-          description: User ID
+      summary: Delete an article
+      description: Deletes a specific article by its ID.
       responses:
         '204':
-          description: User deleted successfully
+          description: Article deleted successfully (No Content)
         '404':
-          description: User not found
+          description: Article not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /posts:
-    get:
-      tags:
-        - posts
-      summary: Retrieves a list of all posts
-      description: Returns a list of all posts in the system
-      operationId: getPosts
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Post'
         '500':
-          description: Internal server error
+          description: Internal Server Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    post:
-      tags:
-        - posts
-      summary: Creates a new post
-      description: Creates a new post in the system
-      operationId: createPost
-      requestBody:
-        description: Post to create
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Post'
-      responses:
-        '201':
-          description: Post created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Post'
-        '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /posts/{postId}:
-    get:
-      tags:
-        - posts
-      summary: Retrieves a post by ID
-      description: Returns a post by ID
-      operationId: getPostById
-      parameters:
-        - in: path
-          name: postId
-          schema:
-            type: integer
-          required: true
-          description: Post ID
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Post'
-        '404':
-          description: Post not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
 components:
   schemas:
-    User:
+    Article:
       type: object
-      properties:
-        id:
-          type: integer
-          description: User ID
-        name:
-          type: string
-          description: User name
-        email:
-          type: string
-          description: User email
-      required:
-        - id
-        - name
-        - email
-    Post:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Post ID
-        title:
-          type: string
-          description: Post title
-        content:
-          type: string
-          description: Post content
       required:
         - id
         - title
         - content
+        - author
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the article
+          example: 12345678-abcd-ef01-2345-6789abcdef01
+        title:
+          type: string
+          description: Title of the article
+          example: My Journey into API Design
+        content:
+          type: string
+          description: Full content of the article
+          example: This is an exciting article about the challenges and rewards of designing robust APIs...
+        author:
+          type: string
+          description: Author of the article
+          example: Ayat Saadati
+        tags:
+          type: array
+          items:
+            type: string
+          description: List of tags associated with the article
+          example:
+            - programming
+            - apidesign
+            - webdev
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the article was created
+          example: 2023-10-27T10:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the article was last updated
+          example: 2023-10-27T10:30:00Z
+    ArticleRequest:
+      type: object
+      required:
+        - title
+        - content
+        - author
+      properties:
+        title:
+          type: string
+          description: Title of the article
+          example: My Journey into API Design
+        content:
+          type: string
+          description: Full content of the article
+          example: This is an exciting article about the challenges and rewards of designing robust APIs...
+        author:
+          type: string
+          description: Author of the article
+          example: Ayat Saadati
+        tags:
+          type: array
+          items:
+            type: string
+          description: List of tags associated with the article
+          example:
+            - programming
+            - apidesign
+            - webdev
     Error:
       type: object
-      properties:
-        code:
-          type: integer
-          description: Error code
-        message:
-          type: string
-          description: Error message
       required:
         - code
         - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: Error code
+          example: 404
+        message:
+          type: string
+          description: Description of the error
+          example: Article with ID '123' not found
 ```
