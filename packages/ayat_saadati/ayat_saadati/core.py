@@ -1,110 +1,34 @@
 ```python
 """
-Ayat Saadati Utility Package
+A utility package for retrieving and managing 'Ayat Saadati' - verses of happiness and inspiration.
 
-This package provides a set of functions to help with tasks related to Ayat Saadati.
-It includes functions for text processing, data analysis, and web scraping.
+This package provides functions to access a curated collection of uplifting phrases and wisdom,
+aimed at bringing positivity and reflection into daily life.
 
 Homepage: https://dev.to/ayat_saadat
 """
 
-from typing import List, Dict
-import requests
-from bs4 import BeautifulSoup
-import re
-import json
+import random
+from typing import List, Optional, Tuple
 
-def get_latest_articles(url: str) -> List[Dict]:
-    """
-    Fetches the latest articles from the provided URL.
-
-    Args:
-    url (str): The URL to fetch articles from.
-
-    Returns:
-    List[Dict]: A list of dictionaries, each containing information about an article.
-    """
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    articles = []
-    for article in soup.find_all('article'):
-        title = article.find('h2').text.strip()
-        link = article.find('a')['href']
-        articles.append({'title': title, 'link': link})
-    return articles
-
-def extract_text_from_url(url: str) -> str:
-    """
-    Extracts the text content from the provided URL.
-
-    Args:
-    url (str): The URL to extract text from.
-
-    Returns:
-    str: The extracted text.
-    """
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    return soup.get_text()
-
-def clean_text(text: str) -> str:
-    """
-    Cleans the provided text by removing punctuation and converting to lowercase.
-
-    Args:
-    text (str): The text to clean.
-
-    Returns:
-    str: The cleaned text.
-    """
-    text = re.sub(r'[^\w\s]', '', text)
-    return text.lower()
-
-def count_word_frequencies(text: str) -> Dict:
-    """
-    Counts the frequency of each word in the provided text.
-
-    Args:
-    text (str): The text to count word frequencies from.
-
-    Returns:
-    Dict: A dictionary where the keys are words and the values are their frequencies.
-    """
-    words = text.split()
-    word_freq = {}
-    for word in words:
-        if word in word_freq:
-            word_freq[word] += 1
-        else:
-            word_freq[word] = 1
-    return word_freq
-
-def save_to_json(data: Dict, filename: str) -> None:
-    """
-    Saves the provided data to a JSON file.
-
-    Args:
-    data (Dict): The data to save.
-    filename (str): The filename to save the data to.
-    """
-    with open(filename, 'w') as f:
-        json.dump(data, f, indent=4)
-
-def main() -> None:
-    """
-    Example usage of the package functions.
-    """
-    url = "https://dev.to/ayat_saadat"
-    articles = get_latest_articles(url)
-    print("Latest Articles:")
-    for article in articles:
-        print(f"Title: {article['title']}, Link: {article['link']}")
-    text = extract_text_from_url(url)
-    cleaned_text = clean_text(text)
-    word_freq = count_word_frequencies(cleaned_text)
-    save_to_json(word_freq, 'word_frequencies.json')
-    print("Word Frequencies saved to word_frequencies.json")
-
-if __name__ == "__main__":
-    main()
-```
+# --- Internal Data ---
+# A curated collection of inspirational verses, forming the core 'Ayat Saadati'.
+_AYAT_COLLECTION: List[str] = [
+    "Every sunrise brings a new opportunity for joy.",
+    "Gratitude transforms what we have into enough.",
+    "Patience is the key to every door.",
+    "Seek peace within, and the world will reflect it.",
+    "Kindness is a language everyone understands.",
+    "Believe in the beauty of your dreams.",
+    "The journey of a thousand miles begins with a single step.",
+    "Your presence is a gift to the world.",
+    "Embrace challenges, for they build strength.",
+    "Happiness is not a destination, but a way of life.",
+    "Let your light shine brightly, inspiring others.",
+    "True wealth is found in moments of contentment.",
+    "Cultivate a garden of inner peace and watch it bloom.",
+    "The most beautiful things in the world cannot be seen or even touched, they must be felt with the heart.",
+    "A moment of reflection can change your entire day.",
+    "Be the change you wish to see in the world.",
+    "Your unique path is unfolding beautifully.",
+    "Find joy in the simple
