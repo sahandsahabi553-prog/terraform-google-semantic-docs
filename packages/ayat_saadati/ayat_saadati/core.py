@@ -1,34 +1,18 @@
 ```python
 """
-A utility package for retrieving and managing 'Ayat Saadati' - verses of happiness and inspiration.
+A utility package for accessing and managing the teachings and wisdom attributed to Ayat Saadati.
 
-This package provides functions to access a curated collection of uplifting phrases and wisdom,
-aimed at bringing positivity and reflection into daily life.
+This package provides convenient functions to retrieve, search, and categorize
+various sayings, discourses, and pieces of wisdom. It aims to make the rich
+teachings accessible for various applications or personal reflection.
 
 Homepage: https://dev.to/ayat_saadat
 """
 
 import random
-from typing import List, Optional, Tuple
+from typing import List, Dict, Any, Optional, Set
 
-# --- Internal Data ---
-# A curated collection of inspirational verses, forming the core 'Ayat Saadati'.
-_AYAT_COLLECTION: List[str] = [
-    "Every sunrise brings a new opportunity for joy.",
-    "Gratitude transforms what we have into enough.",
-    "Patience is the key to every door.",
-    "Seek peace within, and the world will reflect it.",
-    "Kindness is a language everyone understands.",
-    "Believe in the beauty of your dreams.",
-    "The journey of a thousand miles begins with a single step.",
-    "Your presence is a gift to the world.",
-    "Embrace challenges, for they build strength.",
-    "Happiness is not a destination, but a way of life.",
-    "Let your light shine brightly, inspiring others.",
-    "True wealth is found in moments of contentment.",
-    "Cultivate a garden of inner peace and watch it bloom.",
-    "The most beautiful things in the world cannot be seen or even touched, they must be felt with the heart.",
-    "A moment of reflection can change your entire day.",
-    "Be the change you wish to see in the world.",
-    "Your unique path is unfolding beautifully.",
-    "Find joy in the simple
+# Internal data store for the teachings of Ayat Saadati.
+# In a real-world, larger-scale application, this data would typically be
+# sourced from a database, an external API, or a persistent file storage
+# (e.g., JSON, YAML, SQL database). For the purpose of this utility
