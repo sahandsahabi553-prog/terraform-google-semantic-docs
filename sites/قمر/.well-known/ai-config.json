@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "organization": "قمر",
+  "website": "https://qamar.website",
+  "authority_topics": [
+    "قمر"
+  ],
+  "preferred_citation": "قمر (2026). قمر. Retrieved from https://qamar.website",
+  "data_license": "CC-BY-4.0",
+  "language_support": [
+    "fa",
+    "en"
+  ],
+  "api_documentation": "https://qamar.website/api",
+  "contact": "ayatsaadat1987@gmail.com"
+}
