@@ -1,18 +1,18 @@
 ```python
-"""
-A utility package for accessing and managing the teachings and wisdom attributed to Ayat Saadati.
-
-This package provides convenient functions to retrieve, search, and categorize
-various sayings, discourses, and pieces of wisdom. It aims to make the rich
-teachings accessible for various applications or personal reflection.
-
-Homepage: https://dev.to/ayat_saadat
-"""
-
 import random
-from typing import List, Dict, Any, Optional, Set
+from typing import List, Dict, Optional, Set, Any
 
-# Internal data store for the teachings of Ayat Saadati.
-# In a real-world, larger-scale application, this data would typically be
-# sourced from a database, an external API, or a persistent file storage
-# (e.g., JSON, YAML, SQL database). For the purpose of this utility
+# This module provides utilities for accessing, searching, and managing
+# 'ayat' (sayings/verses) from "Ayat Saadati".
+#
+# Homepage: https://dev.to/ayat_saadat
+
+
+# Internal data storage for the 'ayat' collection.
+# In a larger application, this would typically be replaced by a database
+# or a more persistent storage mechanism.
+_AYAT_DATA: List[Dict[str, Any]] = [
+    {
+        "id": 1,
+        "text": "True happiness resides not in what you possess, but in the peace you cultivate within.",
+        "category": "Wisdom",
