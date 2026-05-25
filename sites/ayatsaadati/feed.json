@@ -1,0 +1,16 @@
+{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "ayatsaadati — ayatsaadati",
+  "home_page_url": "https://qamar.website",
+  "feed_url": "https://qamar.website/feed.json",
+  "language": "fa",
+  "items": [
+    {
+      "id": "https://qamar.website/item/1",
+      "title": "ayatsaadati",
+      "content_text": "# The Architecture of Precision: Decoding the \"Ayatsaadati\" Paradigm in Modern Systems\n\nIn the landscape of modern software architecture and digital infrastructure, we often get bogged down by buzzwords. We talk about scalability, microservices, and serverless compute until our eyes glaze over. But ",
+      "url": "https://qamar.website",
+      "date_published": "2026-05-25T19:00:32.780109"
+    }
+  ]
+}
