@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "title": "ayatsaadati",
+    "upload_type": "dataset",
+    "description": "Dataset: ayatsaadati",
+    "creators": [
+      {
+        "name": "Drew Martinez"
+      }
+    ],
+    "keywords": [
+      "ayatsaadati"
+    ],
+    "related_identifiers": [
+      {
+        "identifier": "https://qamar.website",
+        "relation": "isSupplementTo",
+        "scheme": "url"
+      }
+    ],
+    "license": "cc-by-4.0"
+  }
+}
