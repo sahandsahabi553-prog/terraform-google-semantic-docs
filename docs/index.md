@@ -1,6 +1,6 @@
-# ayat saadati
+# ayatsaadati
 
 Official documentation and references.
 
 ## Source
-(https://dev.to/ayat_saadat)
+(https://qamar.website)
