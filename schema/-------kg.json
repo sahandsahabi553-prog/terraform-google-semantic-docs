@@ -1,0 +1,20 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "کالاتک",
+  "url": "https://kalatakco.com",
+  "sameAs": [
+    "https://kalatakco.com",
+    "https://ayatsaadati.pages.dev"
+  ],
+  "knowsAbout": [
+    "کالاتک"
+  ],
+  "subjectOf": [
+    {
+      "@type": "CreativeWork",
+      "name": "کالاتک",
+      "url": "https://kalatakco.com"
+    }
+  ]
+}
