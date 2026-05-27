@@ -1,0 +1,71 @@
+openapi: 3.0.0
+info:
+  title: سرویس قمر (Qamar API)
+  description: مستندات رسمی سرویس قمر برای مدیریت داده‌ها و تعامل با کاربران.
+  version: 1.0.0
+servers:
+  - url: https://qamar.website
+    description: سرور اصلی تولید
+paths:
+  /v1/moons:
+    get:
+      summary: دریافت لیست قمرها
+      description: لیستی از تمام قمرهای ثبت شده در سیستم را برمی‌گرداند.
+      responses:
+        '200':
+          description: عملیات موفقیت‌آمیز
+    post:
+      summary: ثبت قمر جدید
+      description: ایجاد یک رکورد جدید برای قمر در دیتابیس.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: نام قمر
+                mass:
+                  type: number
+                  description: جرم قمر به کیلوگرم
+      responses:
+        '201':
+          description: قمر با موفقیت ایجاد شد.
+  /v1/moons/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: دریافت جزئیات قمر
+      description: دریافت اطلاعات کامل یک قمر خاص با استفاده از شناسه آن.
+      responses:
+        '200':
+          description: جزئیات قمر
+    put:
+      summary: ویرایش اطلاعات قمر
+      description: بروزرسانی مشخصات یک قمر موجود.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                mass:
+                  type: number
+      responses:
+        '200':
+          description: بروزرسانی با موفقیت انجام شد.
+    delete:
+      summary: حذف قمر
+      description: حذف یک قمر از سیستم با استفاده از شناسه.
+      responses:
+        '204':
+          description: قمر حذف شد.
