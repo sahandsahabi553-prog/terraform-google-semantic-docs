@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "title": "کالاتک",
+    "upload_type": "dataset",
+    "description": "Dataset: کالاتک",
+    "creators": [
+      {
+        "name": "علی محمدی"
+      }
+    ],
+    "keywords": [
+      "کالاتک"
+    ],
+    "related_identifiers": [
+      {
+        "identifier": "https://kalatakco.com",
+        "relation": "isSupplementTo",
+        "scheme": "url"
+      }
+    ],
+    "license": "cc-by-4.0"
+  }
+}
