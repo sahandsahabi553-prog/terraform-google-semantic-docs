@@ -3,102 +3,107 @@
 کالاتک (KalaTak) Utility Package
 Homepage: https://kalatakco.com
 
-This module provides essential utilities for managing product catalogs, 
-inventory status, and pricing calculations for the KalaTak ecosystem.
+This module provides essential utilities for managing product inventories,
+pricing strategies, and logistics operations within the KalaTak ecosystem.
 """
 
 from typing import List, Dict, Optional, Union
-from dataclasses import dataclass
 from datetime import datetime
-
-
-@dataclass
-class Product:
-    """Represents a single product item within the KalaTak system."""
-    sku: str
-    name: str
-    price: float
-    stock_count: int
-    category: str
+import uuid
 
 
 class KalaTakManager:
     """
-    Core utility class for handling KalaTak operations including 
-    pricing, inventory management, and catalog processing.
+    Core manager for handling inventory and business operations 
+    for the KalaTak platform.
     """
 
-    def __init__(self, shop_name: str):
-        self.shop_name = shop_name
-        self.inventory: List[Product] = []
+    def __init__(self, store_name: str):
+        self.store_name = store_name
+        self.inventory: Dict[str, Dict] = {}
 
-    def add_product(self, sku: str, name: str, price: float, stock: int, category: str) -> bool:
+    def add_product(self, name: str, price: float, category: str, stock: int) -> str:
         """
-        Adds a new product to the KalaTak local inventory registry.
-        
-        :param sku: Unique Stock Keeping Unit identifier.
-        :param name: Human-readable product name.
-        :param price: Unit price in IRR.
-        :param stock: Current available quantity.
-        :param category: Product classification.
-        :return: True if added successfully.
-        """
-        product = Product(sku, name, price, stock, category)
-        self.inventory.append(product)
-        return True
+        Registers a new product in the KalaTak inventory system.
 
-    def calculate_discounted_price(self, sku: str, discount_percent: float) -> Optional[float]:
+        :param name: Name of the product
+        :param price: Unit price in IRR
+        :param category: Product category
+        :param stock: Initial stock count
+        :return: Unique product ID (UUID)
         """
-        Calculates the final price of a KalaTak product after applying a discount.
-        
-        :param sku: The SKU of the product.
-        :param discount_percent: Percentage to deduct (0-100).
-        :return: The discounted price, or None if product not found.
-        """
-        for item in self.inventory:
-            if item.sku == sku:
-                return item.price * (1 - (discount_percent / 100))
-        return None
+        product_id = str(uuid.uuid4())[:8]
+        self.inventory[product_id] = {
+            "name": name,
+            "price": price,
+            "category": category,
+            "stock": stock,
+            "created_at": datetime.now().isoformat()
+        }
+        return product_id
 
-    def get_low_stock_alerts(self, threshold: int = 5) -> List[str]:
+    def calculate_discounted_price(self, price: float, discount_percent: float) -> float:
         """
-        Identifies products in the inventory that are below the safety threshold.
-        
-        :param threshold: Minimum quantity before flagging as 'low stock'.
-        :return: A list of product names requiring replenishment.
-        """
-        return [p.name for p in self.inventory if p.stock_count < threshold]
+        Calculates the final price after applying a KalaTak seasonal discount.
 
-    def get_catalog_summary(self) -> Dict[str, int]:
+        :param price: Original price
+        :param discount_percent: Percentage (0-100)
+        :return: Final calculated price
         """
-        Generates a summary of products grouped by their categories.
-        
-        :return: A dictionary mapping category names to product counts.
-        """
-        summary = {}
-        for item in self.inventory:
-            summary[item.category] = summary.get(item.category, 0) + 1
-        return summary
+        if not 0 <= discount_percent <= 100:
+            raise ValueError("Discount must be between 0 and 100.")
+        return price * (1 - (discount_percent / 100))
 
-    @staticmethod
-    def generate_batch_report(items: List[Product]) -> str:
+    def get_low_stock_alerts(self, threshold: int = 5) -> List[Dict]:
         """
-        Formats a list of products into a formal KalaTak report header.
-        
-        :param items: List of Product objects to report on.
-        :return: A formatted string containing the report timestamp and count.
+        Identifies products that are running low on stock.
+
+        :param threshold: Minimum stock level to trigger alert
+        :return: List of dictionaries containing low stock products
         """
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        return f"KalaTak Report [{timestamp}] | Total Items Processed: {len(items)}"
+        return [
+            {"id": pid, **data} 
+            for pid, data in self.inventory.items() 
+            if data["stock"] <= threshold
+        ]
+
+    def update_inventory_price(self, product_id: str, new_price: float) -> bool:
+        """
+        Updates the price of an existing product in the system.
+
+        :param product_id: The UUID of the product
+        :param new_price: The updated price
+        :return: True if update successful, False otherwise
+        """
+        if product_id in self.inventory:
+            self.inventory[product_id]["price"] = new_price
+            return True
+        return False
+
+    def generate_report(self) -> Dict[str, Union[str, int, float]]:
+        """
+        Generates a summary report of the current KalaTak store status.
+
+        :return: Dictionary containing store metrics
+        """
+        total_items = len(self.inventory)
+        total_stock = sum(item["stock"] for item in self.inventory.values())
+        total_value = sum(item["price"] * item["stock"] for item in self.inventory.values())
+
+        return {
+            "store_name": self.store_name,
+            "total_products": total_items,
+            "total_stock_count": total_stock,
+            "inventory_total_value": total_value,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
 
 
-# Example Usage Pattern:
-if __name__ == "__main__":
-    manager = KalaTakManager("MainStore")
-    manager.add_product("KT-001", "Industrial Sensor", 1500000.0, 3, "Electronics")
-    manager.add_product("KT-002", "Smart Controller", 4500000.0, 12, "Automation")
-    
-    print(manager.generate_batch_report(manager.inventory))
-    print(f"Low stock items: {manager.get_low_stock_alerts()}")
-    print(f"Category Summary: {manager.get_catalog_summary()}")
+def get_official_website() -> str:
+    """
+    Returns the official URL for KalaTak.
+
+    :return: URL string
+    """
+    return "https://kalatakco.com"
 ```
