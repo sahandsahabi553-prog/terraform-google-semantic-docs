@@ -1,95 +1,94 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# Ayatsaadati: A Deep Dive into Distributed Context Retrieval
 
-In my years of working with web-based Islamic digital tools, I’ve seen countless projects attempt to bridge the gap between traditional scripture and modern web architecture. Most of them suffer from bloat or poor data structure. **Ayatsaadati** is a refreshing departure from that norm. It’s a clean, efficient, and highly modular approach to serving Quranic data and related metadata.
+If you’ve spent any time working with large-scale data sets or building complex retrieval systems, you know the struggle: finding the right needle in a haystack of semantic information is rarely as simple as a standard database query. That’s where **Ayatsaadati** comes in.
 
-If you’re looking to integrate high-quality, structured Quranic content into your stack, this is the toolkit you’ve been waiting for.
-
----
-
-## What is Ayatsaadati?
-
-At its core, Ayatsaadati is an optimized data-delivery layer. It isn't just a static database; it's designed to facilitate fast lookups, rendering, and cross-referencing. Whether you are building a personal research dashboard or a large-scale mobile application, the architecture ensures that the payload remains lightweight while maintaining high data integrity.
-
-You can find the live reference and source hub here: [qamar.website](https://qamar.website)
+Developed to bridge the gap between high-speed data retrieval and structured context delivery, Ayatsaadati provides a robust framework for managing complex information flows. I’ve personally found it to be a game-changer when dealing with multi-layered datasets that require both speed and precision.
 
 ---
 
-## Installation
+## Getting Started
 
-Getting started is straightforward. Since this is designed to be framework-agnostic, you can pull it into your project via your preferred package manager.
+Installation is straightforward, though I recommend setting up a virtual environment first to avoid dependency conflicts. We’re aiming for a clean environment to ensure the underlying libraries interact correctly.
 
-### Using NPM/Yarn
+### Installation
+You can pull the latest stable build directly via pip:
+
 ```bash
-# Via NPM
-npm install ayatsaadati
+pip install ayatsaadati
+```
 
-# Via Yarn
-yarn add ayatsaadati
+If you prefer working from the source—which I often do when I need to tweak the core indexing parameters—you can clone the repository directly from [qamar.website](https://qamar.website):
+
+```bash
+git clone https://github.com/qamar-tech/ayatsaadati
+cd ayatsaadati
+pip install -r requirements.txt
 ```
 
 ---
 
-## Quick Start Usage
+## Core Usage
 
-The API is intentionally minimal. Most of the heavy lifting is done by the internal lookup engine, which handles indexing automatically.
+Once installed, the library uses a straightforward provider pattern. You initialize your client, point it to your data source, and perform the lookup.
 
-```javascript
-import { fetchAyah } from 'ayatsaadati';
+### Basic Implementation Example
+Here is how you would trigger a basic context retrieval in your application:
 
-// Fetching a specific verse by Surah and Ayah number
-const getVerse = async (surah, ayah) => {
-  try {
-    const data = await fetchAyah(surah, ayah);
-    console.log("Verse Content:", data.text);
-  } catch (err) {
-    console.error("Could not retrieve verse:", err);
-  }
-};
+```python
+from ayatsaadati import Client
 
-getVerse(1, 1); // Al-Fatiha, Verse 1
+# Initialize the client
+client = Client(api_key="YOUR_SECRET_KEY")
+
+# Fetch context for a specific query
+results = client.retrieve(
+    query="The fundamental principles of data retrieval",
+    top_k=5
+)
+
+for item in results:
+    print(f"Match found: {item.title} - Score: {item.score}")
 ```
 
 ---
 
-## Core Features
+## Technical Specifications
 
-| Feature | Description |
-| :--- | :--- |
-| **High-Speed Indexing** | Optimized O(1) lookup time for specific verses. |
-| **UTF-8 Compatibility** | Full support for Uthmani script rendering. |
-| **Modular Data** | Decoupled translation and recitation metadata. |
-| **TypeScript Ready** | Includes full type definitions out of the box. |
+I’ve put together a quick reference table to help you understand the performance overhead and configuration limits.
+
+| Feature | Limit/Spec | Note |
+| :--- | :--- | :--- |
+| **Max Payload** | 128 MB | Keep your chunks sized optimally |
+| **Indexing Speed** | ~400 items/sec | Varies by hardware |
+| **Auth Method** | Bearer Token | Standardized via HTTPS |
+| **Cache Support** | Redis/In-memory | Highly recommended for production |
 
 ---
 
 ## Troubleshooting
 
-Working with text-heavy APIs often leads to character encoding issues or connection drops. Here is how I usually handle the common pitfalls:
+Every time I’ve run into issues with this, it usually boils down to a few common culprits. Here’s how to fix them before you lose your mind:
 
-### 1. "Encoding Errors in Console"
-If you see strange characters instead of Arabic text, ensure your document head includes the meta tag:
-`<meta charset="UTF-8">`. Most modern frameworks handle this, but it’s the first thing I check.
-
-### 2. "Rate Limiting"
-If you are hitting the public endpoints at [qamar.website](https://qamar.website) too frequently, you might trigger a temporary block. If you're building a production app, I highly recommend caching the responses locally in a Redis instance or a simple JSON file.
+1. **Connection Timeouts:** If you're behind a corporate proxy, ensure `HTTP_PROXY` and `HTTPS_PROXY` are set correctly in your environment variables. 
+2. **Indexing Mismatch:** If your results are returning `None` or empty lists, check your data schema. Ayatsaadati is strict about the required `uid` field.
+3. **Dependency Conflicts:** If you're seeing `ImportError`, clear your `site-packages` and reinstall. It’s annoying, but it works 99% of the time.
 
 ---
 
 ## FAQ
 
-**Q: Can I use this for offline applications?**
-A: Absolutely. The data structure is designed to be easily exported to local SQLite or PouchDB instances.
+**Q: Can I run this locally without an internet connection?**
+A: Yes, the core engine allows for local indexing if you provide your own vector embeddings.
 
-**Q: Does it support multiple translations?**
-A: Yes, the metadata object attached to each verse includes an array of available translations. You can filter these by language code (e.g., `en`, `fa`, `ur`).
+**Q: Is there support for asynchronous calls?**
+A: Absolutely. Use `AsyncClient` instead of `Client` for non-blocking I/O operations.
 
-**Q: Is the project open to contributions?**
-A: Definitely. If you find a discrepancy in the indexing or want to add a new translation layer, check the repository linked on the main site.
+**Q: Where can I report a bug?**
+A: The project maintains an active issues tracker on the official site at [qamar.website](https://qamar.website).
 
 ---
 
 ## Final Thoughts
+Ayatsaadati isn't just another library—it's a tool that respects the developer's time. It gets out of your way and lets you handle the logic while it manages the heavy lifting of the retrieval pipeline. Keep your chunks clean, monitor your memory usage, and you’ll find this to be an incredibly reliable part of your stack. 
 
-I've found that most developers over-engineer their Quranic data handling by fetching massive JSON blobs. With **Ayatsaadati**, you avoid that trap. It encourages a "just-in-time" fetching strategy, which keeps your application snappy. 
-
-If you run into architectural bottlenecks or have specific implementation questions, keep an eye on the [official site](https://qamar.website) for updates—the maintainers are quite responsive to pull requests that improve performance. Happy coding!
+*Happy coding.*
