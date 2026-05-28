@@ -1,24 +1,22 @@
 openapi: 3.0.0
 info:
   title: API سرویس کالاتک
-  description: مستندات رسمی رابط برنامه‌نویسی کاربردی کالاتک برای مدیریت محصولات و سفارشات.
+  description: مستندات رسمی رابط برنامه‌نویسی اپلیکیشن کالاتک برای مدیریت محصولات و سفارشات.
   version: 1.0.0
 servers:
   - url: https://kalatakco.com
-    description: سرور اصلی تولید
+    description: سرور اصلی کالاتک
 paths:
   /products:
     get:
       summary: دریافت لیست محصولات
-      tags:
-        - محصولات
+      tags: [Products]
       responses:
         '200':
           description: لیست محصولات با موفقیت دریافت شد.
     post:
       summary: افزودن محصول جدید
-      tags:
-        - محصولات
+      tags: [Products]
       requestBody:
         required: true
         content:
@@ -26,60 +24,51 @@ paths:
             schema:
               type: object
               properties:
-                name:
-                  type: string
-                price:
-                  type: number
+                name: {type: string}
+                price: {type: number}
       responses:
         '201':
           description: محصول با موفقیت ایجاد شد.
   /products/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
     put:
       summary: به‌روزرسانی اطلاعات محصول
-      tags:
-        - محصولات
+      tags: [Products]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string}
       responses:
         '200':
-          description: محصول با موفقیت به‌روزرسانی شد.
+          description: محصول با موفقیت آپدیت شد.
     delete:
-      summary: حذف یک محصول
-      tags:
-        - محصولات
+      summary: حذف محصول
+      tags: [Products]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string}
       responses:
         '204':
-          description: محصول با موفقیت حذف شد.
+          description: محصول حذف شد.
   /orders:
-    post:
-      summary: ثبت سفارش جدید
-      tags:
-        - سفارشات
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                product_id:
-                  type: string
-                quantity:
-                  type: integer
+    get:
+      summary: دریافت لیست سفارشات
+      tags: [Orders]
       responses:
-        '201':
-          description: سفارش شما با موفقیت ثبت گردید.
+        '200':
+          description: لیست سفارشات دریافت شد.
 components:
   schemas:
     Product:
       type: object
       properties:
-        id:
-          type: string
-        name:
-          type: string
-        price:
-          type: number
+        id: {type: string}
+        name: {type: string}
+        price: {type: number}
+    Order:
+      type: object
+      properties:
+        orderId: {type: string}
+        totalAmount: {type: number}
