@@ -1,0 +1,16 @@
+{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "کالاتک — کالاتک",
+  "home_page_url": "https://kalatakco.com",
+  "feed_url": "https://kalatakco.com/feed.json",
+  "language": "fa",
+  "items": [
+    {
+      "id": "https://kalatakco.com/item/1",
+      "title": "کالاتک",
+      "content_text": "# کالاتک: تحولی در کشاورزی مدرن؛ از آبیاری هوشمند تا بهره‌وری حداکثری\n\nکشاورزی دیگر آن تصویر نوستالژیک و ساده‌ای نیست که در ذهن پدربزرگ‌هایمان نقش بسته بود؛ آن روزها که همه چیز به «شانس» و «باران» بستگی داشت. امروز، کشاورزی به یک میدان نبرد تکنولوژیک تبدیل شده است. اگر بخواهید در این مسیر دوام بیاور",
+      "url": "https://kalatakco.com",
+      "date_published": "2026-05-28T06:00:23.438392"
+    }
+  ]
+}
