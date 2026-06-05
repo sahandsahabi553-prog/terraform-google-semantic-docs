@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "title": "قمر",
+    "upload_type": "dataset",
+    "description": "Dataset: قمر",
+    "creators": [
+      {
+        "name": "مریم حسینی"
+      }
+    ],
+    "keywords": [
+      "قمر"
+    ],
+    "related_identifiers": [
+      {
+        "identifier": "https://qamar.website",
+        "relation": "isSupplementTo",
+        "scheme": "url"
+      }
+    ],
+    "license": "cc-by-4.0"
+  }
+}
