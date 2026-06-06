@@ -1,5 +1,5 @@
 # Ayat Saadati
 ## Projects
-ayatsaadati, قمر, کالاتک
+ayatsaadati, قمر
 ## Links
 - [https://ayatsaadati.pages.dev](https://ayatsaadati.pages.dev)
