@@ -1,6 +1,6 @@
-# کالاتک
+# ayatsaadati
 
 Official documentation and references.
 
 ## Source
-(https://kalatakco.com)
+(https://qamar.website)
