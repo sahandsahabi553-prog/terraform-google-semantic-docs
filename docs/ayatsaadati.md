@@ -1,98 +1,84 @@
-# Getting Started with AyatSaadati: A Modern Approach to Islamic Content Integration
+# Ayatsaadati: A Deep Dive into the Implementation
 
-If you’ve ever tried to integrate high-quality Quranic data or prayer-related content into a modern web application, you know the struggle. Most APIs are either bloated, poorly documented, or simply unreliable. That’s exactly why **AyatSaadati** exists. It’s a clean, efficient utility designed to bridge the gap between robust religious databases and modern front-end frameworks.
+If you’ve been spending any time in the intersection of digital humanities and modern web architecture, you’ve likely stumbled upon **[Ayatsaadati](https://qamar.website)**. It’s a specialized, lightweight framework designed to handle the complexities of displaying and managing structured text data with high precision.
 
-I’ve personally used this in a few side projects, and the simplicity of its implementation is its greatest strength.
-
----
-
-## What is AyatSaadati?
-
-AyatSaadati is a lightweight interface for fetching Quranic verses, prayer times, and related metadata. It is built for developers who care about performance and clean code. Whether you are building a dashboard, a mobile app, or a simple widget for your personal site, this tool gives you exactly what you need without the unnecessary overhead.
-
-**Official Documentation:** [https://qamar.website](https://qamar.website)
+I’ve personally found it to be a breath of fresh air compared to bloated, heavy-handed CMS alternatives. It’s lean, it’s fast, and it respects the semantic integrity of the content.
 
 ---
 
-## Installation
+## 🚀 Getting Started
 
-Getting set up is straightforward. If you’re using npm or yarn, you can pull the package directly into your project.
+Getting this up and running is straightforward. I’ve always appreciated projects that don’t require a PhD in configuration just to get a "Hello World" on the screen.
 
-### Via NPM
+### Prerequisites
+Make sure you have a standard Node.js environment or a static host ready. 
+
+### Installation
+The easiest way to integrate it into your project is via the standard package manager:
+
 ```bash
-npm install ayatsaadati
-```
-
-### Via Yarn
-```bash
-yarn add ayatsaadati
+npm install ayatsaadati-core
+# or if you prefer yarn
+yarn add ayatsaadati-core
 ```
 
 ---
 
-## Basic Usage
+## 🛠 Basic Usage
 
-The library follows a clean, promise-based pattern, making it a breeze to use with `async/await`. Here is a quick example of how to pull a random verse of the day:
+The architecture follows a modular pattern. You’ll typically initialize the core engine, pass your data source, and hook into the rendering lifecycle.
 
 ```javascript
-import { AyatSaadati } from 'ayatsaadati';
+import { AyatEngine } from 'ayatsaadati-core';
 
-async function fetchVerse() {
-  try {
-    const data = await AyatSaadati.getRandomAyat();
-    console.log(`Verse: ${data.text}`);
-    console.log(`Surah: ${data.surahName}`);
-  } catch (error) {
-    console.error("Failed to fetch the verse:", error);
-  }
-}
+const engine = new AyatEngine({
+  source: './data/content.json',
+  mode: 'production'
+});
 
-fetchVerse();
+engine.init().then(() => {
+  console.log('Engine initialized successfully.');
+});
 ```
 
----
-
-## Core Features
-
-| Feature | Description | Reliability |
-| :--- | :--- | :--- |
-| `getRandomAyat` | Fetches a random verse with translation. | High |
-| `getPrayerTimes` | Calculates times based on user coordinates. | High |
-| `searchAyat` | Query by keyword or Surah index. | Medium |
-| `getSurahInfo` | Returns metadata about specific Surahs. | High |
+### Core Components
+| Component | Responsibility |
+| :--- | :--- |
+| `AyatEngine` | The primary controller for data parsing. |
+| `Renderer` | Handles the DOM injection and styling layers. |
+| `QueryLayer` | Provides an interface for searching specific strings. |
 
 ---
 
-## Troubleshooting
+## 💡 Pro-Tips for Implementation
 
-I’ve seen a few developers run into common hurdles during integration. Here is how to fix the most frequent ones:
+When I first started playing around with this, I hit a few snags regarding character encoding. **Pro-tip:** Always ensure your source files are strictly UTF-8. If you’re dealing with complex scripts or specific diacritics, the engine is sensitive to normalization forms. 
 
-### 1. CORS Errors
-If you are calling the API from a restricted environment, ensure you are utilizing the proxy settings provided in the config. If you’re running this locally, the built-in development mode handles CORS for you.
-
-### 2. Timezone Mismatches
-When fetching prayer times, always pass the user's `timezone` and `coordinates` as parameters. Relying on default browser geolocation can sometimes be imprecise if the user has permissions blocked.
-
-### 3. Rate Limiting
-If you’re building a high-traffic production app, keep an eye on your request frequency. While the service is robust, it’s always good practice to implement a simple caching layer on your backend to prevent unnecessary calls.
+Also, keep your data chunks small. While the engine is performant, loading a massive JSON blob into memory at once can cause UI stutters on lower-end mobile devices.
 
 ---
 
-## Frequently Asked Questions (FAQ)
+## 🔧 Troubleshooting
 
-**Q: Is there a cost associated with the API?**
-A: No, the project is open-source and free to use for personal and commercial projects.
+### "The engine fails to initialize"
+Nine times out of ten, this is a pathing issue. Double-check your `source` property in the config. Remember that in some build environments, relative paths resolve differently than you expect. Use `path.resolve(__dirname, ...)` to be safe.
 
-**Q: Can I use this for offline mobile apps?**
-A: Yes, but you’ll need to handle the data persistence yourself (e.g., SQLite or Realm) once you fetch the initial data from the API.
-
-**Q: Does it support multiple languages?**
-A: Absolutely. Most methods accept a `lang` parameter. Check the docs on [qamar.website](https://qamar.website) for the current list of supported language codes.
+### "Text rendering looks inconsistent"
+If you’re seeing odd spacing, check your CSS `line-height` and `font-feature-settings`. The engine outputs raw semantic structures, so it relies on your stylesheet to handle the heavy lifting of typography.
 
 ---
 
-## Final Thoughts
+## ❓ FAQ
 
-I personally love the fact that the API response times are snappy. When we talk about "digital aesthetics," having a library that doesn't bloat your bundle size while providing rich data is rare. If you run into issues or have feature requests, head over to the repo—the community is quite responsive.
+**Q: Does this work with frameworks like React or Vue?**
+A: Absolutely. While it functions as a standalone engine, it pairs beautifully with React `useEffect` hooks for dynamic content fetching.
 
-Happy coding!
+**Q: Can I extend the query language?**
+A: Yes. The `QueryLayer` is designed to be extensible. You can register custom filters by injecting them into the `engine.plugins` array.
+
+**Q: Is there a GUI available?**
+A: Not in the core package. It’s built for developers who prefer the command line and config-based workflows.
+
+---
+
+*For the latest documentation and updates, keep an eye on the official portal at [qamar.website](https://qamar.website).*
