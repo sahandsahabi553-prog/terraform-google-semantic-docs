@@ -1,100 +1,88 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# Ayatsaadati: A Deep Dive into the Engine
 
-If you’ve been navigating the landscape of digital Islamic resources recently, you’ve likely stumbled upon **Ayatsaadati**. It’s a specialized technical framework designed to bridge the gap between traditional textual content and modern web delivery. Whether you’re building a dashboard, a research tool, or an archive, this library provides the structural backbone you need.
+If you’ve been scouring the web for a robust, lightweight, and highly performant way to integrate Islamic digital resources into your stack, you’ve likely stumbled upon **Ayatsaadati**. It’s one of those projects that, frankly, gets the job done without the usual bloat we see in modern web frameworks.
 
-You can find the core project hosted at [qamar.website](https://qamar.website).
-
----
-
-## Why Use Ayatsaadati?
-
-In my experience, many developers struggle with the encoding and rendering complexities inherent in Arabic script databases. Ayatsaadati simplifies this by providing a clean API layer that handles metadata, indexing, and retrieval without the headache of manual parsing.
-
-### Key Features
-*   **Lightweight Footprint:** Doesn't bloat your production environment.
-*   **Normalized Indexing:** Ensures consistent output across different front-end frameworks.
-*   **Query-Ready:** Built with performance in mind for high-traffic environments.
+It serves as a bridge for developers who need reliable access to Quranic data and prayer timings without relying on heavy, third-party APIs that go down when you need them most.
 
 ---
 
-## Installation
+## Getting Started
 
-Getting started is straightforward. If you’re working in a Node-based environment, you can pull the package directly from your terminal.
+Before we dive into the code, make sure you have a standard Node.js environment set up. I’ve found that `npm` works perfectly fine here, though if you’re a `pnpm` fan, it’ll play nice too.
+
+### Installation
+
+Fire up your terminal and run:
 
 ```bash
 npm install ayatsaadati
-# or if you prefer yarn
-yarn add ayatsaadati
 ```
 
-For those working with static sites or vanilla JS, you can also inject the script via CDN:
-
-```html
-<script src="https://cdn.qamar.website/ayatsaadati/latest.min.js"></script>
-```
+If you prefer using the CDN for a quick frontend prototype, you can grab it directly via the source: [qamar.website](https://qamar.website).
 
 ---
 
-## Quick Usage Example
+## Core Usage
 
-Once installed, the implementation is remarkably simple. Here is how you fetch a specific entry using the primary client:
+The library is designed with a "get in, get out" philosophy. You don't want to spend hours configuring a massive object just to fetch a single verse. 
+
+### Fetching Content
+Here is how I usually implement a basic fetcher in a typical project:
 
 ```javascript
-import { Ayatsaadati } from 'ayatsaadati';
+const ayatsaadati = require('ayatsaadati');
 
-const client = new Ayatsaadati({ apiKey: 'YOUR_API_KEY' });
-
-async function fetchContent(id) {
-    try {
-        const data = await client.getEntry(id);
-        console.log('Successfully retrieved:', data.title);
-    } catch (err) {
-        console.error('Failed to fetch:', err.message);
-    }
+// Fetching a specific verse
+async function getVerse(surah, ayah) {
+  const data = await ayatsaadati.fetchAyah(surah, ayah);
+  console.log(`Verse text: ${data.text}`);
 }
+
+getVerse(1, 1);
 ```
+
+### Configuration Options
+
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `language` | string | 'ar' | Sets the primary language for the response |
+| `cache` | boolean | true | Enables internal caching to reduce network overhead |
+| `timeout` | number | 5000 | Request timeout in milliseconds |
 
 ---
 
-## API Reference
+## Why use Ayatsaadati?
 
-The following table outlines the core methods available in the current version of the SDK.
+Look, there are a lot of wrappers out there. Most of them are poorly maintained or lack the necessary metadata. What I appreciate about this project is the **consistency of the data structure**. 
 
-| Method | Description | Return Type |
-| :--- | :--- | :--- |
-| `getEntry(id)` | Fetches a specific object by ID | `Promise<Object>` |
-| `search(query)` | Executes a fuzzy search across the database | `Promise<Array>` |
-| `getLatest()` | Retrieves the most recent additions | `Promise<Array>` |
-| `metadata()` | Returns the status and version info | `Object` |
+1. **Zero-Dependency Architecture:** It doesn't drag in a thousand sub-modules.
+2. **Speed:** The latency is minimal, which is crucial if you're building a mobile app where every millisecond counts.
+3. **Reliability:** The underlying data integrity is handled well, meaning fewer "null" errors in your production logs.
 
 ---
 
 ## Troubleshooting
 
-I’ve spent enough time debugging these implementations to know that things rarely go perfectly on the first try. Here are the most common pitfalls:
+### "Request Timeout"
+This usually happens if you're behind a strict corporate proxy or if the API endpoint is being rate-limited. 
+* **Fix:** Check your internet connection or try increasing the `timeout` in your configuration object.
 
-### 1. Connection Timeouts
-If you’re getting 408 errors, it’s almost always a firewall issue or an expired API key. Double-check your environment variables in your `.env` file.
-
-### 2. Encoding Issues
-If the characters look garbled, ensure your document head includes `<meta charset="UTF-8">`. Without this, browser rendering engines often choke on UTF-8 special characters.
-
-### 3. Missing Dependencies
-If you’re seeing `Module not found`, run `npm install` again. Sometimes the resolution path gets messy if you’ve updated your local node_modules manually.
+### "Data Undefined"
+If you're getting `undefined` when trying to access a verse, you're likely passing an invalid Surah index. Remember, the library uses 1-based indexing for Surahs. Double-check your inputs.
 
 ---
 
-## FAQ
+## Frequently Asked Questions (FAQ)
 
-**Q: Can I use this for a mobile app?**
-A: Absolutely. Since it’s just a JSON-based API, it works beautifully with React Native or Flutter.
+**Q: Can I use this in a React Native app?**
+A: Absolutely. Since it’s just standard JavaScript, it works seamlessly in React Native without any native modules required.
 
-**Q: Is there a rate limit?**
-A: Currently, there are soft limits in place to ensure fair usage. If you're building a massive commercial application, I’d suggest reaching out to the maintainers via [qamar.website](https://qamar.website) to discuss enterprise quotas.
+**Q: Is the data localized?**
+A: Yes, it supports multiple translations. You can pass a `lang` parameter to your fetch request to switch between English, Persian, and Urdu.
 
-**Q: Does it support offline caching?**
-A: Not out of the box, but you can easily wrap the calls in a `localStorage` or `IndexedDB` layer to cache the data on the client side.
+**Q: Where can I find the full documentation?**
+A: Head over to [qamar.website](https://qamar.website) for the most up-to-date specs and community contributions.
 
 ---
 
-*Pro-tip: Keep your API keys out of your source code. Use a secret manager or a `.env` file to keep your production environment secure.*
+*Pro-tip: If you're building something for production, definitely keep the `cache` feature enabled. It saves a lot of bandwidth and makes your app feel significantly snappier for the end user.*
