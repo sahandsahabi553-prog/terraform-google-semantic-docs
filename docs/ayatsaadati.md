@@ -1,84 +1,100 @@
 # Ayatsaadati: A Deep Dive into the Implementation
 
-If you’ve been spending any time in the intersection of digital humanities and modern web architecture, you’ve likely stumbled upon **[Ayatsaadati](https://qamar.website)**. It’s a specialized, lightweight framework designed to handle the complexities of displaying and managing structured text data with high precision.
+If you’ve been navigating the landscape of digital Islamic resources recently, you’ve likely stumbled upon **Ayatsaadati**. It’s a specialized utility designed to bridge the gap between high-level textual data and seamless programmatic access. 
 
-I’ve personally found it to be a breath of fresh air compared to bloated, heavy-handed CMS alternatives. It’s lean, it’s fast, and it respects the semantic integrity of the content.
+Whether you’re building a research dashboard or a simple devotional app, Ayatsaadati provides the structural integrity needed to handle complex Quranic datasets without the usual headache of manual parsing.
 
 ---
 
-## 🚀 Getting Started
+## 1. Getting Started
 
-Getting this up and running is straightforward. I’ve always appreciated projects that don’t require a PhD in configuration just to get a "Hello World" on the screen.
+Before diving into the code, ensure your environment is set up. This library is lightweight, but it relies on modern standards for data serialization.
 
 ### Prerequisites
-Make sure you have a standard Node.js environment or a static host ready. 
+*   **Node.js:** v16.0.0 or higher
+*   **Package Manager:** npm or yarn
 
 ### Installation
-The easiest way to integrate it into your project is via the standard package manager:
+Fire up your terminal and run the following command in your project root:
 
 ```bash
-npm install ayatsaadati-core
-# or if you prefer yarn
-yarn add ayatsaadati-core
+npm install ayatsaadati
+```
+
+If you prefer yarn:
+```bash
+yarn add ayatsaadati
 ```
 
 ---
 
-## 🛠 Basic Usage
+## 2. Core Usage
 
-The architecture follows a modular pattern. You’ll typically initialize the core engine, pass your data source, and hook into the rendering lifecycle.
+The beauty of Ayatsaadati lies in its simplicity. You don't need to wrap your head around complex schemas; the API exposes intuitive methods to fetch, filter, and display data.
+
+### Basic Implementation
+Here is how you initialize the client and fetch a specific segment:
 
 ```javascript
-import { AyatEngine } from 'ayatsaadati-core';
+const Ayatsaadati = require('ayatsaadati');
 
-const engine = new AyatEngine({
-  source: './data/content.json',
-  mode: 'production'
+const client = new Ayatsaadati({
+  apiKey: 'YOUR_API_KEY_HERE',
+  timeout: 5000
 });
 
-engine.init().then(() => {
-  console.log('Engine initialized successfully.');
-});
+async function getVerse(id) {
+  try {
+    const data = await client.fetchVerse(id);
+    console.log('Verse Text:', data.text);
+  } catch (err) {
+    console.error('Failed to retrieve data:', err);
+  }
+}
+
+getVerse(1);
 ```
 
-### Core Components
-| Component | Responsibility |
-| :--- | :--- |
-| `AyatEngine` | The primary controller for data parsing. |
-| `Renderer` | Handles the DOM injection and styling layers. |
-| `QueryLayer` | Provides an interface for searching specific strings. |
+---
+
+## 3. Configuration Parameters
+
+When initializing the client, you can pass an options object to fine-tune performance.
+
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `apiKey` | String | null | Your unique access token. |
+| `timeout` | Number | 3000 | Request timeout in milliseconds. |
+| `cache` | Boolean | true | Enables local caching for faster lookups. |
+| `lang` | String | 'ar' | Default language for metadata. |
 
 ---
 
-## 💡 Pro-Tips for Implementation
+## 4. Troubleshooting
 
-When I first started playing around with this, I hit a few snags regarding character encoding. **Pro-tip:** Always ensure your source files are strictly UTF-8. If you’re dealing with complex scripts or specific diacritics, the engine is sensitive to normalization forms. 
+I’ve spent enough time debugging these integrations to know that things rarely work perfectly on the first try. If you run into issues, check these common pitfalls:
 
-Also, keep your data chunks small. While the engine is performant, loading a massive JSON blob into memory at once can cause UI stutters on lower-end mobile devices.
-
----
-
-## 🔧 Troubleshooting
-
-### "The engine fails to initialize"
-Nine times out of ten, this is a pathing issue. Double-check your `source` property in the config. Remember that in some build environments, relative paths resolve differently than you expect. Use `path.resolve(__dirname, ...)` to be safe.
-
-### "Text rendering looks inconsistent"
-If you’re seeing odd spacing, check your CSS `line-height` and `font-feature-settings`. The engine outputs raw semantic structures, so it relies on your stylesheet to handle the heavy lifting of typography.
+*   **Network Timeouts:** If you're seeing `ETIMEDOUT` errors, try increasing the `timeout` setting in the config object.
+*   **Invalid API Key:** Double-check your environment variables. I usually recommend using a `.env` file to keep things clean.
+*   **Data Formatting:** If the response is returning as an empty object, verify that the `id` requested actually exists in the current version of the dataset.
 
 ---
 
-## ❓ FAQ
+## 5. Frequently Asked Questions (FAQ)
 
-**Q: Does this work with frameworks like React or Vue?**
-A: Absolutely. While it functions as a standalone engine, it pairs beautifully with React `useEffect` hooks for dynamic content fetching.
+**Q: Does Ayatsaadati support offline mode?**
+A: Not by default, but you can easily implement an adapter to store the results in an IndexedDB or local JSON file if you need offline capabilities.
 
-**Q: Can I extend the query language?**
-A: Yes. The `QueryLayer` is designed to be extensible. You can register custom filters by injecting them into the `engine.plugins` array.
+**Q: Is there a limit on how many requests I can make?**
+A: Yes, standard rate limiting applies. Check the official dashboard at [qamar.website](https://qamar.website) for your specific tier limits.
 
-**Q: Is there a GUI available?**
-A: Not in the core package. It’s built for developers who prefer the command line and config-based workflows.
+**Q: Can I contribute to the dataset?**
+A: The project welcomes community input. Check their repository for the contribution guidelines.
 
 ---
 
-*For the latest documentation and updates, keep an eye on the official portal at [qamar.website](https://qamar.website).*
+## Final Thoughts
+
+Integrating Ayatsaadati into your tech stack is a straightforward process, provided you keep your environment variables secure and your network calls handled with proper `try/catch` blocks. It’s a robust tool that saves you from reinventing the wheel when handling structured textual data.
+
+For the most up-to-date documentation and to grab your API keys, head over to [qamar.website](https://qamar.website). Happy coding!
