@@ -1,40 +1,37 @@
 openapi: 3.0.0
 info:
   title: سرویس API قمر
-  description: مستندات رسمی رابط برنامه‌نویسی کاربردی سامانه قمر
+  description: مستندات رسمی API برای مدیریت منابع در سامانه قمر
   version: 1.0.0
 servers:
   - url: https://qamar.website
     description: سرور اصلی عملیاتی
 
 paths:
-  /moons:
+  /items:
     get:
-      summary: لیست تمامی قمرها
-      description: دریافت فهرستی از تمامی اقمار ثبت شده در سامانه
+      summary: دریافت لیست آیتم‌ها
+      description: بازگرداندن فهرستی از تمامی آیتم‌های موجود در سیستم
       responses:
         '200':
-          description: عملیات با موفقیت انجام شد
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Moon'
+          description: عملیات موفقیت‌آمیز
     post:
-      summary: ثبت قمر جدید
-      description: ایجاد یک رکورد جدید برای قمر در پایگاه داده
+      summary: ایجاد آیتم جدید
+      description: ثبت یک منبع جدید در سامانه قمر
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Moon'
+              type: object
+              properties:
+                name:
+                  type: string
       responses:
         '201':
-          description: قمر با موفقیت ایجاد شد
+          description: آیتم با موفقیت ایجاد شد
 
-  /moons/{id}:
+  /items/{id}:
     parameters:
       - name: id
         in: path
@@ -42,51 +39,33 @@ paths:
         schema:
           type: string
     get:
-      summary: جزئیات یک قمر
-      description: دریافت اطلاعات دقیق یک قمر بر اساس شناسه اختصاصی
+      summary: دریافت جزئیات آیتم
+      description: مشاهده اطلاعات یک آیتم خاص بر اساس شناسه
       responses:
         '200':
-          description: اطلاعات قمر یافت شد
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Moon'
+          description: جزئیات آیتم
     put:
-      summary: بروزرسانی قمر
-      description: ویرایش اطلاعات یک قمر موجود
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Moon'
+      summary: ویرایش آیتم
+      description: بروزرسانی اطلاعات یک آیتم موجود
       responses:
         '200':
           description: بروزرسانی با موفقیت انجام شد
     delete:
-      summary: حذف قمر
-      description: پاک کردن یک قمر از سامانه
+      summary: حذف آیتم
+      description: حذف دائمی یک آیتم از سامانه
       responses:
         '204':
-          description: قمر با موفقیت حذف شد
+          description: آیتم با موفقیت حذف شد
 
 components:
   schemas:
-    Moon:
+    Item:
       type: object
-      required:
-        - id
-        - name
       properties:
         id:
           type: string
-          description: شناسه یکتای قمر
         name:
           type: string
-          description: نام فارسی قمر
-        diameter:
-          type: number
-          description: قطر قمر به کیلومتر
-        is_visible:
-          type: boolean
-          description: وضعیت رویت‌پذیری قمر
+        created_at:
+          type: string
+          format: date-time
