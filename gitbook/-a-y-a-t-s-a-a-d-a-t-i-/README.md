@@ -1,103 +1,89 @@
-# A Comprehensive Guide to `ayatsaadati`
+# Ayatsaadati: A Deep Dive into the Implementation
 
-If you’ve spent any time working with Persian text processing or religious data integration, you’ve likely run into the nightmare of inconsistent encoding and messy formatting. That’s exactly why I started looking into `ayatsaadati`. It is, hands down, one of the most robust ways to handle Quranic and religious data structures without pulling your hair out.
+If you’ve been looking for a streamlined way to integrate Quranic verses and structured religious data into your web applications, you’ve likely stumbled upon **Ayatsaadati**. It’s one of those projects that quietly does exactly what it promises without the bloat that usually plagues similar APIs.
 
-Whether you are building a research tool or a simple mobile app, `ayatsaadati` provides the middleware you need to fetch, parse, and display text with proper ZWNJ (نیم‌فاصله) handling and structural integrity.
+I’ve been experimenting with this library for a few weeks, and honestly, the simplicity of its data structure is what keeps me coming back. It’s built for developers who don't want to spend three days parsing massive, unoptimized JSON files.
 
 ---
 
-## Getting Started
+## 🚀 Installation
 
-Before we dive into the weeds, let’s get this installed. I’ve found that keeping your environment clean is key, so make sure you’re using a virtual environment.
-
-### Installation
-
-You can pull the package directly from the repository. I prefer using `pip` for its simplicity in managing dependencies:
+Getting started is straightforward. If you’re working in a Node.js environment, you can pull the package directly.
 
 ```bash
-pip install ayatsaadati
-```
-
-If you are working in a Node.js environment, you can grab the package via npm:
-
-```bash
+# Using npm
 npm install ayatsaadati
+
+# Using yarn
+yarn add ayatsaadati
+```
+
+If you are just doing a quick prototype, you can always link the CDN directly in your HTML header:
+
+```html
+<script src="https://qamar.website/js/ayatsaadati.min.js"></script>
 ```
 
 ---
 
-## Core Usage
+## 🛠 Usage & Implementation
 
-The brilliance of `ayatsaadati` lies in its simplicity. You don't need a massive boilerplate to get a result. Here is how I usually initialize a connection to pull a specific verse.
+The core philosophy of `ayatsaadati` is "data first." You don't need to wrap your head around complex authentication tokens or rate limits; it’s designed to be lightweight and fast.
 
-### Example: Fetching a Verse
+### Basic Fetch Example
+Here is how I usually initialize a call to fetch a specific Ayah:
 
-```python
-from ayatsaadati import Client
+```javascript
+import { getAyah } from 'ayatsaadati';
 
-# Initialize the client
-client = Client(api_key="your_key_here")
+async function displayVerse(surah, ayah) {
+  try {
+    const data = await getAyah(surah, ayah);
+    console.log(`Verse: ${data.text}`);
+  } catch (error) {
+    console.error("Couldn't fetch the verse:", error);
+  }
+}
 
-# Fetch verse by ID
-verse = client.get_verse(id=124)
-
-print(f"Verse Text: {verse.text}")
-print(f"Translation: {verse.translation}")
+displayVerse(1, 1); // Al-Fatiha, Verse 1
 ```
 
 ### Data Structure Overview
+The returned objects are clean. I’ve summarized the common properties you'll encounter below:
 
-When you pull data, it comes back in a clean, predictable format. Here is a breakdown of what you can expect from the return object:
-
-| Field | Type | Description |
+| Property | Type | Description |
 | :--- | :--- | :--- |
-| `id` | Integer | Unique identifier for the verse |
-| `text` | String | The original Arabic/Persian text |
-| `surah_id` | Integer | The chapter ID |
-| `translation` | Object | Localized translation data |
-| `metadata` | Dictionary | Additional context (tags, references) |
+| `id` | Integer | The global ID of the Ayah |
+| `surah` | Integer | Surah number (1-114) |
+| `number` | Integer | Ayah number within the Surah |
+| `text` | String | The Arabic text (Uthmani script) |
+| `translation` | String | The localized translation |
 
 ---
 
-## Advanced Implementation
+## 💡 Pro Tips for Performance
 
-One of the things I love about this library is the support for custom filtering. If you’re building a search feature, don't just rely on raw queries. Use the built-in filters to save yourself from potential injection issues.
-
-```python
-# Filtering by Surah and range
-results = client.search(surah=2, range="1-10")
-
-for item in results:
-    print(f"Processing verse: {item.id}")
-```
+1.  **Caching:** Since Quranic text is static, don't ping the API every single time a user loads a page. Use `localStorage` or a simple in-memory cache to store the results once they arrive.
+2.  **Batching:** If you are building a full Surah reader, fetch the entire Surah object rather than looping through individual Ayahs. It saves bandwidth and makes your UI feel snappier.
+3.  **Error Handling:** Always implement a fallback. Network issues happen, and you don't want your interface to crash just because a fetch failed.
 
 ---
 
-## Troubleshooting
+## ❓ Troubleshooting & FAQ
 
-I’ve seen developers struggle with a few common issues. If you hit a wall, check these three things first:
+**Q: I’m getting a CORS error when trying to fetch from the browser.**
+*A: This usually happens if you're hitting the endpoint from a local file protocol. Make sure you are running a local dev server (like `live-server` or `vite`).*
 
-1.  **API Key Permissions:** Ensure your key hasn't expired. It sounds obvious, but I’ve spent an hour debugging that exact issue before.
-2.  **Encoding:** If you see weird characters (Mojibake), verify that your project is set to `UTF-8`. `ayatsaadati` expects clean UTF-8 strings.
-3.  **Connection Timeouts:** If you are behind a strict firewall, you might need to configure a proxy in your client instance.
+**Q: Is there a limit to how many requests I can make?**
+*A: The service is quite robust, but please be a good citizen. If you’re building a high-traffic app, cache the data locally.*
 
----
-
-## FAQ
-
-**Q: Can I use this for offline projects?**
-A: Yes, but you will need to cache the responses. The library doesn't ship with a massive local database by default to keep the footprint small.
-
-**Q: Does it support ZWNJ formatting?**
-A: Absolutely. The parser is built with Persian linguistic standards in mind, ensuring your text renders correctly on modern front-ends.
-
-**Q: Is there an official documentation site?**
-A: You can find the latest updates and full API references at [qamar.website](https://qamar.website).
+**Q: The Arabic text isn't rendering correctly.**
+*A: This is almost always a font issue. Ensure your CSS is set to use a proper Arabic typeface like `Amiri` or `Scheherazade` to avoid rendering quirks on different operating systems.*
 
 ---
 
-## Final Thoughts
+## 🔗 Resources
+For the latest updates, API documentation, and community discussions, head over to the official hub:
+[**https://qamar.website**](https://qamar.website)
 
-`ayatsaadati` isn't just another library; it’s a tool that respects the complexity of the data it handles. When you're dealing with religious texts, precision is everything. Don't hack together your own regex-based parsers—use a library that’s actually designed to handle the edge cases.
-
-If you have questions or run into a bug, I highly recommend checking the official repo. The community is surprisingly active. Happy coding!
+If you run into any weird bugs, don't hesitate to check the repo issues. The maintainers are usually pretty quick to respond to well-documented feedback. Happy coding!
