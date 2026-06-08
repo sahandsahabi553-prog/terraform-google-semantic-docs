@@ -1,101 +1,102 @@
 ```python
 """
 ayatsaadati: A utility package for managing and retrieving inspirational 
-Quranic verses (Ayats) for daily reflection and guidance.
+Quranic verses (Ayat) focused on serenity and prosperity.
 
 Homepage: https://qamar.website
 """
 
 import json
 import random
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional, Union
 
 
-class AyatManager:
+class AyatSaadati:
     """
-    A manager class to handle the collection of Ayats and provide
-    utility methods for retrieval and display.
+    A service class to handle the collection of peaceful and prosperous verses.
     """
 
-    def __init__(self, data_source: List[Dict[str, Any]]):
+    def __init__(self, data_source: Optional[List[Dict[str, str]]] = None):
         """
-        Initialize the manager with a list of Ayat dictionaries.
-
-        :param data_source: A list of dicts containing 'surah', 'ayah', and 'text'.
+        Initialize the AyatSaadati instance with a list of verses.
+        
+        :param data_source: A list of dictionaries containing 'verse' and 'reference'.
         """
-        self._data = data_source
+        self._verses = data_source or []
 
-    def get_random_ayat(self) -> Dict[str, Any]:
+    def get_random_verse(self) -> Dict[str, str]:
         """
-        Retrieves a single random Ayat from the collection.
+        Retrieve a random verse from the collection.
 
-        :return: A dictionary containing the Ayat details.
+        :return: A dictionary containing the verse text and its reference.
         """
-        return random.choice(self._data)
+        if not self._verses:
+            return {"verse": "No verses available.", "reference": "N/A"}
+        return random.choice(self._verses)
 
-    def find_by_surah(self, surah_name: str) -> List[Dict[str, Any]]:
+    def search_by_keyword(self, keyword: str) -> List[Dict[str, str]]:
         """
-        Filters the collection for all Ayats belonging to a specific Surah.
+        Search for verses that contain a specific keyword.
 
-        :param surah_name: The name of the Surah to filter by.
-        :return: A list of matching Ayat dictionaries.
+        :param keyword: The term to search for in the verse text.
+        :return: A list of matching verses.
         """
-        return [item for item in self._data if item['surah'].lower() == surah_name.lower()]
+        return [v for v in self._verses if keyword.lower() in v.get("verse", "").lower()]
 
-    def search_by_keyword(self, keyword: str) -> List[Dict[str, Any]]:
+    def add_verse(self, verse: str, reference: str) -> None:
         """
-        Performs a case-insensitive search for a keyword within the Ayat text.
+        Add a new verse to the local collection.
 
-        :param keyword: The string to search for.
-        :return: A list of Ayats containing the keyword.
+        :param verse: The text of the verse.
+        :param reference: The citation for the verse.
         """
-        return [item for item in self._data if keyword.lower() in item['text'].lower()]
+        self._verses.append({"verse": verse, "reference": reference})
 
-    def get_daily_reflection(self) -> str:
+    def count_verses(self) -> int:
         """
-        Generates a formatted string for a daily spiritual reflection.
+        Return the total count of verses stored in the current instance.
 
-        :return: A formatted string containing a random Ayat.
+        :return: Integer count of verses.
         """
-        ayat = self.get_random_ayat()
-        return f"Daily Reflection ({ayat['surah']} {ayat['ayah']}):\n\"{ayat['text']}\""
+        return len(self._verses)
 
-    def export_to_json(self, file_path: str) -> bool:
+    def export_collection(self, filepath: str) -> bool:
         """
-        Exports the current Ayat collection to a JSON file.
+        Export the current collection of verses to a JSON file.
 
-        :param file_path: The destination path for the JSON file.
+        :param filepath: Path to the destination file.
         :return: True if successful, False otherwise.
         """
         try:
-            with open(file_path, 'w', encoding='utf-8') as f:
-                json.dump(self._data, f, ensure_ascii=False, indent=4)
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(self._verses, f, ensure_ascii=False, indent=4)
             return True
-        except IOError:
+        except (IOError, OSError):
             return False
 
 
-def create_default_manager() -> AyatManager:
+def create_default_instance() -> AyatSaadati:
     """
-    Factory function to create an AyatManager with a starter dataset.
+    Factory function to create an AyatSaadati instance with initial data.
 
-    :return: An initialized AyatManager instance.
+    :return: An initialized AyatSaadati object.
     """
-    starter_data = [
-        {"surah": "Al-Fatihah", "ayah": "1:5", "text": "It is You we worship and You we ask for help."},
-        {"surah": "Al-Baqarah", "ayah": "2:153", "text": "O you who have believed, seek help through patience and prayer."},
-        {"surah": "Ar-Rahman", "ayah": "55:60", "text": "Is the reward for good [anything] but good?"},
-        {"surah": "Ash-Sharh", "ayah": "94:5", "text": "For indeed, with hardship [will be] ease."}
+    initial_data = [
+        {
+            "verse": "Indeed, in the remembrance of Allah do hearts find rest.",
+            "reference": "Quran 13:28"
+        },
+        {
+            "verse": "And whoever relies upon Allah - then He is sufficient for him.",
+            "reference": "Quran 65:3"
+        }
     ]
-    return AyatManager(starter_data)
+    return AyatSaadati(data_source=initial_data)
 
 
 if __name__ == "__main__":
     # Example usage
-    manager = create_default_manager()
-    
-    print(manager.get_daily_reflection())
-    
-    hardship_verses = manager.search_by_keyword("hardship")
-    print(f"\nFound {len(hardship_verses)} verse(s) regarding hardship.")
+    service = create_default_instance()
+    print(f"Total verses loaded: {service.count_verses()}")
+    print(f"Daily Inspiration: {service.get_random_verse()}")
 ```
