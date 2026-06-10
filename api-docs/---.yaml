@@ -1,73 +1,79 @@
 openapi: 3.0.0
 info:
   title: سرویس API قمر
-  description: مستندات رسمی رابط برنامه‌نویسی کاربردی (API) پلتفرم قمر
+  description: مستندات رسمی API برای مدیریت منابع در سامانه قمر
   version: 1.0.0
 servers:
   - url: https://qamar.website
     description: سرور اصلی عملیاتی
+
 paths:
-  /users:
+  /items:
     get:
-      summary: دریافت لیست کاربران
-      description: بازگرداندن لیستی از تمام کاربران فعال در سامانه
+      summary: دریافت لیست آیتم‌ها
+      description: بازگرداندن لیستی از تمام منابع موجود در سیستم قمر
       responses:
         '200':
-          description: موفقیت آمیز
+          description: عملیات موفقیت‌آمیز
     post:
-      summary: ثبت نام کاربر جدید
-      description: ایجاد یک حساب کاربری جدید در قمر
+      summary: ایجاد آیتم جدید
+      description: ثبت یک منبع جدید در سامانه
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                email:
-                  type: string
+              $ref: '#/components/schemas/Item'
       responses:
         '201':
-          description: کاربر با موفقیت ایجاد شد
-  /users/{id}:
-    put:
-      summary: ویرایش اطلاعات کاربر
-      description: به‌روزرسانی مشخصات یک کاربر بر اساس شناسه
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+          description: آیتم با موفقیت ایجاد شد
+
+  /items/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: دریافت جزئیات آیتم
+      description: دریافت اطلاعات یک آیتم خاص بر اساس شناسه
       responses:
         '200':
-          description: اطلاعات با موفقیت به‌روزرسانی شد
+          description: جزئیات آیتم
+    put:
+      summary: ویرایش آیتم
+      description: به‌روزرسانی اطلاعات یک آیتم موجود
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+      responses:
+        '200':
+          description: آیتم با موفقیت به‌روزرسانی شد
     delete:
-      summary: حذف کاربر
-      description: حذف دائمی یک کاربر از پایگاه داده قمر
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      summary: حذف آیتم
+      description: حذف یک منبع از سیستم قمر
       responses:
         '204':
-          description: کاربر با موفقیت حذف شد
-  /status:
-    get:
-      summary: بررسی وضعیت سلامت سرویس
-      description: بررسی آنلاین بودن و پایداری سرورهای قمر
-      responses:
-        '200':
-          description: سرویس در دسترس است
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: "online"
+          description: آیتم با موفقیت حذف شد
+
+components:
+  schemas:
+    Item:
+      type: object
+      required:
+        - title
+      properties:
+        id:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          description: عنوان آیتم در سامانه قمر
+        status:
+          type: string
+          enum: [active, inactive]
+          description: وضعیت فعالیت آیتم
