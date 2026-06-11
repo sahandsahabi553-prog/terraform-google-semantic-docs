@@ -1,79 +1,67 @@
 openapi: 3.0.0
 info:
-  title: سرویس API قمر
-  description: مستندات رسمی API برای مدیریت منابع در سامانه قمر
+  title: API سرویس قمر
+  description: مستندات رسمی رابط برنامه‌نویسی کاربردی سرویس قمر برای مدیریت منابع ماهواره‌ای و داده‌های نجومی.
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: سرور اصلی عملیاتی
-
+    description: سرور اصلی تولید
 paths:
-  /items:
+  /celestial-bodies:
     get:
-      summary: دریافت لیست آیتم‌ها
-      description: بازگرداندن لیستی از تمام منابع موجود در سیستم قمر
+      summary: دریافت لیست اجرام آسمانی
+      description: بازگرداندن لیستی از تمام اجرام ثبت شده در پایگاه داده قمر.
       responses:
         '200':
           description: عملیات موفقیت‌آمیز
     post:
-      summary: ایجاد آیتم جدید
-      description: ثبت یک منبع جدید در سامانه
+      summary: ثبت جرم آسمانی جدید
+      description: افزودن یک جرم آسمانی جدید به سیستم.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Item'
+              type: object
+              properties:
+                name:
+                  type: string
+                type:
+                  type: string
       responses:
         '201':
-          description: آیتم با موفقیت ایجاد شد
-
-  /items/{id}:
+          description: جرم با موفقیت ایجاد شد
+  /celestial-bodies/{id}:
     parameters:
       - name: id
         in: path
         required: true
         schema:
           type: string
-    get:
-      summary: دریافت جزئیات آیتم
-      description: دریافت اطلاعات یک آیتم خاص بر اساس شناسه
-      responses:
-        '200':
-          description: جزئیات آیتم
     put:
-      summary: ویرایش آیتم
-      description: به‌روزرسانی اطلاعات یک آیتم موجود
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Item'
+      summary: به‌روزرسانی اطلاعات جرم
+      description: اصلاح مشخصات یک جرم آسمانی موجود با شناسه مشخص.
       responses:
         '200':
-          description: آیتم با موفقیت به‌روزرسانی شد
+          description: به‌روزرسانی موفقیت‌آمیز
     delete:
-      summary: حذف آیتم
-      description: حذف یک منبع از سیستم قمر
+      summary: حذف جرم آسمانی
+      description: حذف دائمی یک جرم آسمانی از پایگاه داده.
       responses:
         '204':
-          description: آیتم با موفقیت حذف شد
-
-components:
-  schemas:
-    Item:
-      type: object
-      required:
-        - title
-      properties:
-        id:
-          type: string
-          readOnly: true
-        title:
-          type: string
-          description: عنوان آیتم در سامانه قمر
-        status:
-          type: string
-          enum: [active, inactive]
-          description: وضعیت فعالیت آیتم
+          description: حذف با موفقیت انجام شد
+  /status:
+    get:
+      summary: بررسی وضعیت سلامت سرویس
+      description: بازگرداندن وضعیت آنلاین بودن سرورهای شبکه قمر.
+      responses:
+        '200':
+          description: سرویس در دسترس است
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "operational"
