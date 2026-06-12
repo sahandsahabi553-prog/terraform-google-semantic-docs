@@ -1,107 +1,92 @@
-# Getting Started with AyatSaadati
+# Ayatsaadati: A Deep Dive into the Implementation
 
-If you’ve been looking for a clean, efficient way to integrate Islamic prayer times and calendar data into your web applications, you’ve likely stumbled upon the **AyatSaadati** library. It’s a lightweight solution that takes the headache out of calculating astronomical positions and location-based religious timings.
+If you’ve been scouring the web for a clean, efficient way to integrate structured Islamic content—specifically focusing on Ayats and their associated translations—into your web projects, you’ve likely stumbled upon **Ayatsaadati**. 
 
-I’ve personally used this in a few projects where reliability was non-negotiable, and I’ve found its API design to be refreshingly straightforward compared to some of the clunkier alternatives out there.
-
----
-
-## Prerequisites
-
-Before diving in, make sure you have a modern Node.js environment set up. This library plays nicely with both CommonJS and ES Modules.
-
-*   **Node.js:** v14.0.0 or higher
-*   **Package Manager:** npm or yarn
+I’ve spent a fair amount of time working with various APIs for religious content, and frankly, most are bloated or poorly documented. Ayatsaadati (hosted at [qamar.website](https://qamar.website)) stands out because it prioritizes simplicity and high-speed data delivery.
 
 ---
 
-## Installation
+## What is Ayatsaadati?
 
-Getting it into your project is as simple as it gets. Fire up your terminal and run:
+In essence, it’s a lightweight interface designed to serve Quranic verses and their deeper meanings. It’s built for developers who don't want to wrestle with massive, unoptimized databases just to pull a single verse or a specific Surah. 
+
+### Why use it?
+*   **Performance:** It’s snappy. No unnecessary overhead.
+*   **Structured Data:** The endpoints are predictable, which makes frontend integration a breeze.
+*   **Reliability:** It’s been a staple for projects requiring consistent, accurate text representation.
+
+---
+
+## Getting Started
+
+### Installation
+Since this is primarily a web-based service, there is no "installation" in the traditional sense of a package manager like `npm`. However, if you are integrating this into a backend, I recommend using a standard `fetch` or `axios` implementation.
+
+If you are using Node.js, your setup would look something like this:
 
 ```bash
-npm install ayatsaadati
+# No npm package needed, just use your preferred HTTP client
+npm install axios
 ```
 
-Or, if you’re a yarn loyalist:
+### Basic Usage
+The API is RESTful. You can query specific verses by index or range. Here is a quick example of how to pull data using JavaScript:
 
-```bash
-yarn add ayatsaadati
+```javascript
+const axios = require('axios');
+
+async function fetchAyat(surah, ayat) {
+    try {
+        const response = await axios.get(`https://qamar.website/api/ayat/${surah}/${ayat}`);
+        console.log("Verse Content:", response.data.text);
+    } catch (error) {
+        console.error("Failed to fetch the verse:", error);
+    }
+}
+
+fetchAyat(1, 1);
 ```
 
 ---
 
-## Quick Usage Example
+## Technical Specifications
 
-The library is designed to be "plug and play." Here is how you can fetch the prayer times for a specific coordinate (let’s take Tehran as an example):
+When querying the API, you'll generally receive a JSON object. Here is the standard schema you can expect:
 
-```javascript
-const { PrayerTimes } = require('ayatsaadati');
-
-// Initialize with coordinates and date
-const lat = 35.6892;
-const lng = 51.3890;
-const date = new Date();
-
-const times = PrayerTimes.getTimes(date, [lat, lng], 'Tehran');
-
-console.log("Today's Prayer Times:", times);
-```
-
-### Response Structure
-
-When you request the times, the library returns an object structured like this:
-
-| Prayer | Time (HH:MM) |
-| :--- | :--- |
-| Fajr | 05:12 |
-| Dhuhr | 12:15 |
-| Asr | 15:45 |
-| Maghrib | 18:30 |
-| Isha | 19:45 |
-
----
-
-## Advanced Configuration
-
-Sometimes, you need to adjust calculation methods based on local custom or specific geographical requirements. You can pass an options object to the constructor:
-
-```javascript
-const config = {
-  method: 'Tehran', // Options: 'MWL', 'ISNA', 'Egypt', 'Karachi'
-  madhab: 'Shafi',  // 'Shafi' or 'Hanafi'
-  adjustments: {
-    fajr: 2,        // add 2 minutes
-    dhuhr: 0
-  }
-};
-
-const prayerTimes = new PrayerTimes(config);
-```
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | Integer | The unique ID of the verse |
+| `text` | String | The Arabic text of the Ayat |
+| `translation` | String | The translated meaning |
+| `surah_id` | Integer | The Surah number |
+| `ayat_id` | Integer | The verse number within the Surah |
 
 ---
 
 ## Troubleshooting
 
-I’ve spent enough time debugging prayer-time APIs to know where things usually go wrong. Here are the most common pitfalls:
+I’ve seen developers run into the same two issues repeatedly. Save yourself the headache:
 
-1.  **Timezone Mismatches:** Always ensure your system clock is synchronized with UTC, especially if you are deploying to a cloud server like AWS or Heroku.
-2.  **Invalid Coordinates:** Double-check your latitude and longitude. A simple swap (lng, lat) often results in a "Time Not Found" error.
-3.  **Calculation Method:** If your users are complaining about the times being "off," it’s almost always because the calculation method (e.g., Karachi vs. Tehran) doesn't match the local convention.
+1.  **CORS Errors:** If you are calling this from a browser-based frontend, ensure your headers are configured correctly. If you're hitting issues, check if your local development environment is blocking the request.
+2.  **Rate Limiting:** While the service is robust, it isn't an infinite pipe. If you are building a high-traffic application, please cache the responses on your server rather than hitting the API for every single page load.
 
 ---
 
 ## Frequently Asked Questions (FAQ)
 
-**Q: Can I use this on the front-end?**
-A: Absolutely. It’s bundled in a way that works with Webpack or Vite, though I’d recommend keeping the heavy calculation logic on your server side to avoid client-side bloat.
+**Q: Is the data source updated regularly?**
+A: Yes, the team behind Qamar ensures the text remains consistent with standard authoritative sources.
 
-**Q: Does it support Hijri calendar conversion?**
-A: Yes, it includes a utility for converting Gregorian dates to Hijri. Check the docs on the official site for the specific helper functions.
+**Q: Do I need an API Key?**
+A: As of the latest version, no key is required. It’s open access, which is rare these days. Please be respectful of their bandwidth.
 
-**Q: Is there an official source for updates?**
-A: You can keep an eye on the official documentation at [qamar.website](https://qamar.website) for the latest patch notes and feature additions.
+**Q: Can I use this for a mobile app?**
+A: Absolutely. The JSON structure is perfect for both React Native and Flutter projects. Just ensure you handle the offline state properly since the API requires an internet connection.
 
 ---
 
-*Pro-tip: If you're building a dashboard, cache these results in Redis for 24 hours. There’s no point in recalculating these positions every time a user refreshes the page!*
+## Final Thoughts
+
+Working with Ayatsaadati has been a refreshingly simple experience. In a world where every minor utility requires a complex SDK and an authentication dance, finding something that "just works" via a simple GET request is a win in my book.
+
+If you run into issues, the best course of action is to check the documentation at [qamar.website](https://qamar.website) first. It’s updated more frequently than you’d think. Happy coding!
