@@ -1,22 +1,22 @@
 openapi: 3.0.0
 info:
-  title: API سرویس قمر
-  description: مستندات رسمی رابط برنامه‌نویسی کاربردی سرویس قمر برای مدیریت منابع ماهواره‌ای و داده‌های نجومی.
+  title: سرویس قمر (Qamar API)
+  description: مستندات رسمی API برای پلتفرم قمر جهت مدیریت منابع سیستم.
   version: 1.0.0
 servers:
   - url: https://qamar.website
     description: سرور اصلی تولید
 paths:
-  /celestial-bodies:
+  /v1/resources:
     get:
-      summary: دریافت لیست اجرام آسمانی
-      description: بازگرداندن لیستی از تمام اجرام ثبت شده در پایگاه داده قمر.
+      summary: لیست منابع
+      description: دریافت لیست تمام منابع موجود در سیستم قمر.
       responses:
         '200':
           description: عملیات موفقیت‌آمیز
     post:
-      summary: ثبت جرم آسمانی جدید
-      description: افزودن یک جرم آسمانی جدید به سیستم.
+      summary: ایجاد منبع جدید
+      description: ثبت یک منبع جدید در دیتابیس قمر.
       requestBody:
         required: true
         content:
@@ -26,42 +26,28 @@ paths:
               properties:
                 name:
                   type: string
-                type:
-                  type: string
-      responses:
-        '201':
-          description: جرم با موفقیت ایجاد شد
-  /celestial-bodies/{id}:
+  /v1/resources/{id}:
     parameters:
       - name: id
         in: path
         required: true
         schema:
           type: string
-    put:
-      summary: به‌روزرسانی اطلاعات جرم
-      description: اصلاح مشخصات یک جرم آسمانی موجود با شناسه مشخص.
+    get:
+      summary: دریافت جزئیات منبع
+      description: بازگرداندن اطلاعات دقیق یک منبع خاص با استفاده از شناسه.
       responses:
         '200':
-          description: به‌روزرسانی موفقیت‌آمیز
+          description: جزئیات منبع
+    put:
+      summary: به‌روزرسانی منبع
+      description: ویرایش اطلاعات یک منبع موجود.
+      responses:
+        '200':
+          description: منبع با موفقیت به‌روزرسانی شد
     delete:
-      summary: حذف جرم آسمانی
-      description: حذف دائمی یک جرم آسمانی از پایگاه داده.
+      summary: حذف منبع
+      description: پاک کردن یک منبع از سیستم قمر.
       responses:
         '204':
-          description: حذف با موفقیت انجام شد
-  /status:
-    get:
-      summary: بررسی وضعیت سلامت سرویس
-      description: بازگرداندن وضعیت آنلاین بودن سرورهای شبکه قمر.
-      responses:
-        '200':
-          description: سرویس در دسترس است
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: "operational"
+          description: منبع حذف شد
