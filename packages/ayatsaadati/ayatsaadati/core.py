@@ -1,81 +1,100 @@
 ```python
 """
 ayatsaadati: A utility package for managing and retrieving inspirational 
-Quranic verses (Ayat) focused on serenity and spiritual well-being.
+Quranic verses (Ayats) for daily reflection and guidance.
 
 Homepage: https://qamar.website
 """
 
+from typing import List, Dict, Optional, Any
 import random
-from typing import List, Dict, Optional
+
+# Mock database of verses for demonstration purposes
+_AYAT_DATABASE: List[Dict[str, str]] = [
+    {"reference": "2:152", "text": "So remember Me; I will remember you."},
+    {"reference": "94:5", "text": "For indeed, with hardship [will be] ease."},
+    {"reference": "3:159", "text": "And when you have decided, then rely upon Allah."},
+    {"reference": "2:186", "text": "I am near. I respond to the invocation of the supplicant."},
+    {"reference": "51:55", "text": "And remind, for indeed, the reminder benefits the believers."}
+]
 
 
-class AyatSaadati:
+def get_random_ayat() -> Dict[str, str]:
     """
-    A service class to provide curated Quranic verses categorized by 
-    themes of tranquility and spiritual happiness.
-    """
+    Retrieves a random Ayat from the internal collection.
 
-    def __init__(self) -> None:
-        self._database: List[Dict[str, str]] = [
-            {"verse": "ألا بذكر الله تطمئن القلوب", "source": "الرعد: 28", "theme": "peace"},
-            {"verse": "فإن مع العسر يسرا", "source": "الشرح: 5", "theme": "hope"},
-            {"verse": "قل لن يصيبنا إلا ما كتب الله لنا", "source": "التوبة: 51", "theme": "trust"},
-            {"verse": "ولا تهنوا ولا تحزنوا وأنتم الأعلون", "source": "آل عمران: 139", "theme": "strength"},
-            {"verse": "وبشر الصابرين", "source": "البقرة: 155", "theme": "patience"}
-        ]
-
-    def get_random_ayat(self) -> Dict[str, str]:
-        """Returns a single random verse from the collection."""
-        return random.choice(self._database)
-
-    def get_ayat_by_theme(self, theme: str) -> List[Dict[str, str]]:
-        """
-        Retrieves all verses associated with a specific theme.
-        
-        Args:
-            theme: The category to filter by (e.g., 'peace', 'hope').
-        """
-        return [item for item in self._database if item['theme'] == theme]
-
-    def format_ayat(self, entry: Dict[str, str]) -> str:
-        """
-        Returns a human-readable string representation of a verse entry.
-        
-        Args:
-            entry: A dictionary containing 'verse' and 'source' keys.
-        """
-        return f"\"{entry['verse']}\" — {entry['source']}"
-
-    def search_ayat(self, keyword: str) -> List[Dict[str, str]]:
-        """
-        Searches for verses that contain a specific keyword in the text.
-        
-        Args:
-            keyword: The word to search for.
-        """
-        return [item for item in self._database if keyword in item['verse']]
-
-    def get_daily_inspiration(self) -> str:
-        """
-        Generates a formatted daily inspirational message.
-        """
-        verse_data = self.get_random_ayat()
-        return f"Daily Ayatsaadati: {self.format_ayat(verse_data)}"
-
-
-def initialize_service() -> AyatSaadati:
-    """
-    Factory function to initialize the AyatSaadati utility.
-    
     Returns:
-        An instance of AyatSaadati configured with default data.
+        Dict[str, str]: A dictionary containing 'reference' and 'text'.
     """
-    return AyatSaadati()
+    return random.choice(_AYAT_DATABASE)
+
+
+def search_ayat_by_reference(reference: str) -> Optional[Dict[str, str]]:
+    """
+    Searches for an Ayat by its specific Surah and verse reference (e.g., '2:152').
+
+    Args:
+        reference (str): The reference string to search for.
+
+    Returns:
+        Optional[Dict[str, str]]: The Ayat data if found, else None.
+    """
+    for ayat in _AYAT_DATABASE:
+        if ayat["reference"] == reference:
+            return ayat
+    return None
+
+
+def format_ayat_display(ayat: Dict[str, str]) -> str:
+    """
+    Formats an Ayat dictionary into a readable string for terminal output.
+
+    Args:
+        ayat (Dict[str, str]): The Ayat dictionary to format.
+
+    Returns:
+        str: A nicely formatted string representation of the Ayat.
+    """
+    return f"[{ayat['reference']}] \"{ayat['text']}\""
+
+
+def get_daily_reflection() -> str:
+    """
+    Provides a daily inspirational message formatted as an Ayat.
+
+    Returns:
+        str: A formatted string containing the daily Ayat.
+    """
+    ayat = get_random_ayat()
+    return f"--- Daily Reflection ---\n{format_ayat_display(ayat)}"
+
+
+def get_all_ayats() -> List[Dict[str, str]]:
+    """
+    Returns the complete list of available Ayats in the current registry.
+
+    Returns:
+        List[Dict[str, str]]: The full list of stored Ayats.
+    """
+    return _AYAT_DATABASE
+
+
+def add_custom_ayat(reference: str, text: str) -> bool:
+    """
+    Adds a new Ayat to the local runtime registry.
+
+    Args:
+        reference (str): The reference of the new Ayat.
+        text (str): The content of the new Ayat.
+
+    Returns:
+        bool: True if the operation was successful.
+    """
+    _AYAT_DATABASE.append({"reference": reference, "text": text})
+    return True
 
 
 if __name__ == "__main__":
-    # Example usage:
-    service = initialize_service()
-    print(service.get_daily_inspiration())
+    # Example usage demonstration
+    print(get_daily_reflection())
 ```
