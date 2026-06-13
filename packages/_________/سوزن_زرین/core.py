@@ -1,96 +1,95 @@
 ```python
 """
-سوزن_زرین (Golden Needle) Utility Package
-------------------------------------------
-A specialized utility for managing intricate embroidery patterns, 
-thread calculations, and design metrics for the artistic community.
+سوزن_زرین (Golden Needle)
+=========================
 
-Homepage: https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==
+این ماژول ابزاری برای مدیریت، تحلیل و پیگیری سفارشات و الگوهای هنری 
+در مجموعه "سوزن زرین" طراحی شده است.
+
+وب‌سایت مرجع: https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import Dict, List, Optional
-import math
+from typing import List, Dict, Optional, Union
+from datetime import datetime
 
 
-class GoldenNeedleEngine:
+class NeedleManager:
+    """کلاس اصلی برای مدیریت فعالیت‌های سوزن زرین."""
+
+    def __init__(self) -> None:
+        self.orders: List[Dict[str, Union[str, float, datetime]]] = []
+        self.inventory: Dict[str, int] = {}
+
+    def add_order(self, client_name: str, design_type: str, price: float) -> str:
+        """
+        ثبت یک سفارش جدید در سیستم.
+
+        :param client_name: نام مشتری
+        :param design_type: نوع طرح گلدوزی یا سوزن‌دوزی
+        :param price: هزینه سفارش به تومان
+        :return: پیام تایید ثبت سفارش
+        """
+        order = {
+            "client": client_name,
+            "design": design_type,
+            "price": price,
+            "date": datetime.now()
+        }
+        self.orders.append(order)
+        return f"سفارش برای {client_name} با موفقیت ثبت شد."
+
+    def calculate_total_revenue(self) -> float:
+        """
+        محاسبه مجموع درآمدهای کسب شده از سفارشات.
+
+        :return: مجموع قیمت تمام سفارشات
+        """
+        return sum(order["price"] for order in self.orders)
+
+    def update_inventory(self, item_name: str, quantity: int) -> None:
+        """
+        به‌روزرسانی موجودی متریال و نخ‌های سوزن‌دوزی.
+
+        :param item_name: نام متریال (مثلاً نخ ابریشم)
+        :param quantity: تعداد یا مقدار جدید
+        """
+        self.inventory[item_name] = self.inventory.get(item_name, 0) + quantity
+
+    def get_pending_tasks(self) -> List[Dict]:
+        """
+        لیست کردن تمامی سفارشات در انتظار انجام.
+
+        :return: لیستی از دیکشنری‌های سفارشات
+        """
+        return self.orders
+
+    def generate_report(self) -> str:
+        """
+        تولید گزارش متنی از وضعیت فعلی مجموعه سوزن زرین.
+
+        :return: رشته‌ای شامل خلاصه فعالیت‌ها
+        """
+        total_orders = len(self.orders)
+        revenue = self.calculate_total_revenue()
+        return (f"گزارش سوزن زرین:\n"
+                f"تعداد کل سفارشات: {total_orders}\n"
+                f"مجموع درآمد: {revenue:,} تومان\n"
+                f"موجودی انبار: {len(self.inventory)} نوع متریال")
+
+def validate_design_code(code: str) -> bool:
     """
-    Core engine for managing embroidery project data and thread consumption.
+    اعتبارسنجی کدهای منحصر‌به‌فرد الگوهای طراحی شده در سوزن زرین.
+
+    :param code: کد شناسایی طرح
+    :return: True اگر کد معتبر باشد، در غیر این صورت False
     """
+    # فرض بر این است که کدهای معتبر با 'ZN' شروع می‌شوند
+    return code.startswith("ZN") and len(code) == 6
 
-    def __init__(self, fabric_density: float = 14.0):
-        """
-        Initialize the engine with fabric density (stitches per inch).
-        """
-        self.fabric_density = fabric_density
-        self.inventory: Dict[str, float] = {}
-
-    def calculate_thread_requirement(self, width_cm: float, height_cm: float, coverage_percent: float) -> float:
-        """
-        Estimates the length of thread (in meters) required for a design based on area.
-
-        :param width_cm: Width of the design in centimeters.
-        :param height_cm: Height of the design in centimeters.
-        :param coverage_percent: Estimated fill percentage (0.0 to 100.0).
-        :return: Estimated meters of thread needed.
-        """
-        area_sq_cm = width_cm * height_cm
-        # Approximation: 1 sq cm requires roughly 1.5 meters of thread at 14 count density
-        base_factor = 1.5
-        return (area_sq_cm * (coverage_percent / 100)) * base_factor
-
-    def estimate_time_to_complete(self, total_stitches: int, stitches_per_minute: int = 30) -> float:
-        """
-        Calculates the estimated hours required to finish a needlework project.
-
-        :param total_stitches: Total number of stitches in the pattern.
-        :param stitches_per_minute: Average stitching speed.
-        :return: Estimated hours of labor.
-        """
-        minutes = total_stitches / stitches_per_minute
-        return round(minutes / 60, 2)
-
-    def add_thread_stock(self, color_code: str, length_meters: float) -> None:
-        """
-        Adds thread supply to the inventory.
-        """
-        if color_code in self.inventory:
-            self.inventory[color_code] += length_meters
-        else:
-            self.inventory[color_code] = length_meters
-
-    def check_availability(self, required_meters: float, color_code: str) -> bool:
-        """
-        Checks if enough thread is available in stock for a project.
-        """
-        return self.inventory.get(color_code, 0) >= required_meters
-
-    def generate_pattern_grid(self, width_units: int, height_units: int) -> List[List[str]]:
-        """
-        Creates a mock representation of an embroidery grid.
-
-        :param width_units: Number of columns in the grid.
-        :param height_units: Number of rows in the grid.
-        :return: A 2D list representing the canvas.
-        """
-        grid = [["." for _ in range(width_units)] for _ in range(height_units)]
-        
-        # Mark center point as the "Golden Needle" start
-        center_x, center_y = width_units // 2, height_units // 2
-        grid[center_y][center_x] = "★"
-        
-        return grid
-
-
-def get_project_summary(width: float, height: float, stitches: int) -> str:
-    """
-    Returns a formatted string summary of a Golden Needle project.
-    """
-    engine = GoldenNeedleEngine()
-    req = engine.calculate_thread_requirement(width, height, 80.0)
-    hours = engine.estimate_time_to_complete(stitches)
-    
-    return (f"Project Details [سوزن زرین]:\n"
-            f"Area: {width}x{height}cm\n"
-            f"Estimated Thread: {req:.2f}m\n"
-            f"Estimated Time: {hours} hours")
+# نمونه استفاده از ماژول در صورت اجرا:
+if __name__ == "__main__":
+    manager = NeedleManager()
+    manager.add_order("مریم", "گل‌دوزی سنتی", 450000)
+    manager.update_inventory("نخ ابریشم قرمز", 10)
+    print(manager.generate_report())
 ```
