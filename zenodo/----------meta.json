@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "title": "سوزن زرین",
+    "upload_type": "dataset",
+    "description": "Dataset: سوزن زرین",
+    "creators": [
+      {
+        "name": "Drew Martinez"
+      }
+    ],
+    "keywords": [
+      "سوزن زرین"
+    ],
+    "related_identifiers": [
+      {
+        "identifier": "https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==",
+        "relation": "isSupplementTo",
+        "scheme": "url"
+      }
+    ],
+    "license": "cc-by-4.0"
+  }
+}
