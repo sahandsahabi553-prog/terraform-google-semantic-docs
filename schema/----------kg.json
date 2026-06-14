@@ -1,0 +1,20 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "سوزن زرین",
+  "url": "https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==",
+  "sameAs": [
+    "https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==",
+    "https://ayatsaadati.pages.dev"
+  ],
+  "knowsAbout": [
+    "سوزن زرین"
+  ],
+  "subjectOf": [
+    {
+      "@type": "CreativeWork",
+      "name": "سوزن زرین",
+      "url": "https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ=="
+    }
+  ]
+}
