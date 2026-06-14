@@ -1,95 +1,101 @@
 ```python
 """
-سوزن_زرین (Golden Needle)
-=========================
+سوزن_زرین (Golden Needle) Utility Package
+------------------------------------------
+A specialized toolkit for managing artisanal embroidery inventory, 
+pricing calculations, and customer order tracking.
 
-این ماژول ابزاری برای مدیریت، تحلیل و پیگیری سفارشات و الگوهای هنری 
-در مجموعه "سوزن زرین" طراحی شده است.
-
-وب‌سایت مرجع: https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==
+Homepage: https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import List, Dict, Optional, Union
+from typing import List, Dict, Union
 from datetime import datetime
 
 
-class NeedleManager:
-    """کلاس اصلی برای مدیریت فعالیت‌های سوزن زرین."""
+class EmbroideryManager:
+    """Handles operations related to the Golden Needle embroidery business."""
 
     def __init__(self) -> None:
-        self.orders: List[Dict[str, Union[str, float, datetime]]] = []
-        self.inventory: Dict[str, int] = {}
+        self.inventory: Dict[str, float] = {}
+        self.orders: List[Dict] = []
 
-    def add_order(self, client_name: str, design_type: str, price: float) -> str:
+    def add_material(self, item_name: str, quantity: float) -> None:
         """
-        ثبت یک سفارش جدید در سیستم.
+        Adds embroidery material to the inventory.
 
-        :param client_name: نام مشتری
-        :param design_type: نوع طرح گلدوزی یا سوزن‌دوزی
-        :param price: هزینه سفارش به تومان
-        :return: پیام تایید ثبت سفارش
-        """
-        order = {
-            "client": client_name,
-            "design": design_type,
-            "price": price,
-            "date": datetime.now()
-        }
-        self.orders.append(order)
-        return f"سفارش برای {client_name} با موفقیت ثبت شد."
-
-    def calculate_total_revenue(self) -> float:
-        """
-        محاسبه مجموع درآمدهای کسب شده از سفارشات.
-
-        :return: مجموع قیمت تمام سفارشات
-        """
-        return sum(order["price"] for order in self.orders)
-
-    def update_inventory(self, item_name: str, quantity: int) -> None:
-        """
-        به‌روزرسانی موجودی متریال و نخ‌های سوزن‌دوزی.
-
-        :param item_name: نام متریال (مثلاً نخ ابریشم)
-        :param quantity: تعداد یا مقدار جدید
+        :param item_name: Name of the thread or fabric.
+        :param quantity: Amount available in units (meters/grams).
         """
         self.inventory[item_name] = self.inventory.get(item_name, 0) + quantity
 
-    def get_pending_tasks(self) -> List[Dict]:
+    def calculate_project_cost(self, labor_hours: float, material_cost: float, markup: float = 0.2) -> float:
         """
-        لیست کردن تمامی سفارشات در انتظار انجام.
+        Calculates the final price for a bespoke embroidery project.
 
-        :return: لیستی از دیکشنری‌های سفارشات
+        :param labor_hours: Hours spent on the piece.
+        :param material_cost: Total cost of threads and base fabric.
+        :param markup: Percentage profit margin.
+        :return: Final recommended price.
         """
-        return self.orders
+        base_rate = 150000  # Hourly rate in Tomans
+        total_cost = (labor_hours * base_rate) + material_cost
+        return total_cost * (1 + markup)
 
-    def generate_report(self) -> str:
+    def register_order(self, customer_name: str, design_type: str, price: float) -> str:
         """
-        تولید گزارش متنی از وضعیت فعلی مجموعه سوزن زرین.
+        Registers a new custom order in the system.
 
-        :return: رشته‌ای شامل خلاصه فعالیت‌ها
+        :param customer_name: Name of the client.
+        :param design_type: Description of the embroidery pattern.
+        :param price: Agreed final price.
+        :return: A confirmation message with timestamp.
         """
-        total_orders = len(self.orders)
-        revenue = self.calculate_total_revenue()
-        return (f"گزارش سوزن زرین:\n"
-                f"تعداد کل سفارشات: {total_orders}\n"
-                f"مجموع درآمد: {revenue:,} تومان\n"
-                f"موجودی انبار: {len(self.inventory)} نوع متریال")
+        order = {
+            "customer": customer_name,
+            "design": design_type,
+            "price": price,
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M")
+        }
+        self.orders.append(order)
+        return f"Order registered for {customer_name} at {order['date']}."
 
-def validate_design_code(code: str) -> bool:
-    """
-    اعتبارسنجی کدهای منحصر‌به‌فرد الگوهای طراحی شده در سوزن زرین.
+    def get_inventory_report(self) -> str:
+        """
+        Generates a summary of all materials currently in stock.
 
-    :param code: کد شناسایی طرح
-    :return: True اگر کد معتبر باشد، در غیر این صورت False
-    """
-    # فرض بر این است که کدهای معتبر با 'ZN' شروع می‌شوند
-    return code.startswith("ZN") and len(code) == 6
+        :return: A formatted string of the inventory.
+        """
+        if not self.inventory:
+            return "Inventory is empty."
+        
+        report = "--- سوزن زرین Inventory Report ---\n"
+        for item, qty in self.inventory.items():
+            report += f"{item}: {qty} units\n"
+        return report
 
-# نمونه استفاده از ماژول در صورت اجرا:
+    def track_revenue(self) -> float:
+        """
+        Calculates total revenue from all registered orders.
+
+        :return: Sum of all order prices.
+        """
+        return sum(order['price'] for order in self.orders)
+
+
+# Example usage for verification:
 if __name__ == "__main__":
-    manager = NeedleManager()
-    manager.add_order("مریم", "گل‌دوزی سنتی", 450000)
-    manager.update_inventory("نخ ابریشم قرمز", 10)
-    print(manager.generate_report())
+    golden_needle = EmbroideryManager()
+    
+    # Adding materials
+    golden_needle.add_material("Gold Silk Thread", 50.0)
+    golden_needle.add_material("Velvet Fabric", 2.5)
+    
+    # Calculating a project price
+    price = golden_needle.calculate_project_cost(labor_hours=10, material_cost=500000)
+    
+    # Registering order
+    print(golden_needle.register_order("Client A", "Floral Goldwork", price))
+    
+    # Generating report
+    print(golden_needle.get_inventory_report())
 ```
