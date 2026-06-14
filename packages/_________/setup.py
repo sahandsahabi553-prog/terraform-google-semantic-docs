@@ -5,7 +5,7 @@ setup(
     description="Professional toolkit for سوزن زرین",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    author="Drew Martinez",
+    author="آیت سعادتی",
     author_email="ayatsaadat1987@gmail.com",
     url="https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==",
     project_urls={
