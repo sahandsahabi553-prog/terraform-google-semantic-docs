@@ -1,41 +1,57 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی برای مدیریت سفارشات و محصولات خیاطی و گلدوزی در سرویس سوزن زرین
+  description: رابط برنامه‌نویسی برای مدیریت محصولات و خدمات خیاطی و گلدوزی سوزن زرین.
   version: 1.0.0
 servers:
-  - url: https://api.soozan-zarrin.ir/v1
-    description: سرور اصلی تولید
+  - url: https://api.soozan-zarrin.com/v1
+    description: سرور اصلی خدمات سوزن زرین
 paths:
   /products:
     get:
       summary: دریافت لیست محصولات
-      description: لیست تمامی محصولات و خدمات موجود در فروشگاه سوزن زرین را برمی‌گرداند.
+      description: بازگرداندن لیستی از تمام کارهای گلدوزی و خیاطی موجود.
       responses:
         '200':
           description: عملیات موفقیت‌آمیز
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
     post:
-      summary: ثبت محصول جدید
-      description: افزودن یک طرح یا محصول جدید به کاتالوگ سوزن زرین.
+      summary: ثبت سفارش جدید
+      description: ایجاد یک سفارش جدید برای مشتری.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
       responses:
         '201':
-          description: محصول با موفقیت ایجاد شد
+          description: سفارش با موفقیت ثبت شد
   /products/{id}:
     put:
-      summary: ویرایش مشخصات محصول
-      description: به‌روزرسانی اطلاعات یک محصول خاص بر اساس شناسه.
+      summary: ویرایش اطلاعات محصول
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
       responses:
         '200':
-          description: محصول با موفقیت ویرایش شد
+          description: ویرایش با موفقیت انجام شد
     delete:
-      summary: حذف محصول
-      description: حذف یک محصول یا طرح از سیستم.
+      summary: حذف یک محصول
       parameters:
         - name: id
           in: path
@@ -45,33 +61,36 @@ paths:
       responses:
         '204':
           description: محصول با موفقیت حذف شد
-  /orders:
+  /orders/status:
     get:
-      summary: دریافت لیست سفارشات
-      description: مشاهده تمامی سفارشات ثبت شده توسط مشتریان.
+      summary: استعلام وضعیت سفارش
+      description: پیگیری وضعیت سفارش با استفاده از کد رهگیری.
+      parameters:
+        - name: trackingCode
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         '200':
-          description: لیست سفارشات با موفقیت دریافت شد
+          description: وضعیت سفارش دریافت شد
 components:
   schemas:
     Product:
       type: object
+      required:
+        - name
+        - price
       properties:
         id:
           type: string
+          description: شناسه منحصر به فرد محصول
         name:
           type: string
+          description: نام طرح یا خدمت
         price:
           type: number
+          description: قیمت به تومان
         category:
           type: string
-    Order:
-      type: object
-      properties:
-        orderId:
-          type: string
-        customerName:
-          type: string
-        status:
-          type: string
-          enum: [pending, completed, cancelled]
+          description: دسته‌بندی (گلدوزی، لباس، پارچه)
