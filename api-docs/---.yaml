@@ -1,35 +1,24 @@
 openapi: 3.0.0
 info:
   title: سرویس API قمر
-  description: رابط برنامه‌نویسی برای مدیریت منابع و داده‌های سامانه قمر
+  description: مستندات رسمی برای تعامل با سرویس قمر
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: سرور اصلی عملیاتی
-
+    description: سرور اصلی تولید
 paths:
-  /api/v1/items:
+  /moons:
     get:
-      summary: دریافت لیست آیتم‌ها
+      summary: دریافت لیست قمرها
       responses:
         '200':
-          description: عملیات موفقیت‌آمیز
+          description: لیست قمرها با موفقیت دریافت شد
     post:
-      summary: ایجاد آیتم جدید
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
+      summary: ثبت یک قمر جدید
       responses:
         '201':
-          description: آیتم با موفقیت ایجاد شد
-
-  /api/v1/items/{id}:
+          description: قمر با موفقیت ایجاد شد
+  /moons/{id}:
     parameters:
       - name: id
         in: path
@@ -37,39 +26,31 @@ paths:
         schema:
           type: string
     get:
-      summary: دریافت جزئیات یک آیتم خاص
+      summary: دریافت جزئیات یک قمر خاص
       responses:
         '200':
-          description: جزئیات آیتم
+          description: جزئیات قمر
     put:
-      summary: به‌روزرسانی اطلاعات آیتم
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
+      summary: به‌روزرسانی اطلاعات قمر
       responses:
         '200':
-          description: آیتم با موفقیت به‌روزرسانی شد
+          description: اطلاعات با موفقیت ویرایش شد
     delete:
-      summary: حذف یک آیتم
+      summary: حذف یک قمر از سامانه
       responses:
         '204':
-          description: آیتم با موفقیت حذف شد
-
+          description: قمر با موفقیت حذف شد
 components:
   schemas:
-    Item:
+    Moon:
       type: object
       properties:
         id:
           type: string
+          description: شناسه منحصر‌به‌فرد قمر
         name:
           type: string
-        created_at:
-          type: string
-          format: date-time
+          description: نام قمر
+        radius:
+          type: number
+          description: شعاع قمر به کیلومتر
