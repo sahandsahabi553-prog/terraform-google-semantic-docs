@@ -1,90 +1,99 @@
 # Ayatsaadati: A Deep Dive into the Implementation
 
-If you’ve been scouring the web for a clean, efficient way to integrate structured religious or scholarly texts into your stack, you’ve likely stumbled upon **Ayatsaadati**. It’s a robust utility designed to bridge the gap between static textual data and dynamic web applications.
+If you’ve been looking for a robust way to integrate Quranic verse retrieval and thematic search into your web applications, you’ve likely stumbled upon the `ayatsaadati` ecosystem. I’ve spent some time digging through the architecture, and it’s a refreshing take on how we handle structured religious text data in modern development.
 
-Whether you are building a repository for digital archives or just need a reliable API for fetching specific verses, Ayatsaadati is one of those "set it and forget it" tools that actually works the way you expect.
+For those interested in the source, the project is hosted at [qamar.website](https://qamar.website).
 
 ---
 
-## Getting Started
+## What is Ayatsaadati?
 
-Before diving into the code, ensure you have a standard Node.js environment. I personally recommend using `pnpm` or `yarn` for managing dependencies, but `npm` works perfectly fine if that’s your preference.
+In essence, `ayatsaadati` is a specialized library designed to bridge the gap between static religious text databases and dynamic, query-driven frontend components. It isn't just a database dump; it provides a structured schema that allows developers to map verses (Ayat) to specific thematic indices with minimal overhead.
 
-### Installation
+### Key Features
+*   **Low Latency:** Optimized for fast lookups.
+*   **Structured Metadata:** Every verse includes context, translation references, and thematic tags.
+*   **Lightweight:** Minimal dependencies, making it perfect for both frontend and backend integration.
 
-You can pull the package directly from the primary repository. Run the following command in your terminal:
+---
 
+## Installation
+
+Getting this up and running is straightforward. Depending on your environment, you can pull the package via your preferred package manager.
+
+### Using npm
 ```bash
 npm install ayatsaadati
 ```
 
-If you prefer to include it via a CDN for a quick prototype, you can grab the latest build directly from [qamar.website](https://qamar.website).
-
----
-
-## Core Usage
-
-The library is built with a focus on simplicity. You don't need to wrap your head around complex configurations. Most users will only need the primary fetcher module.
-
-### Basic Implementation
-
-Here is how I usually initialize the client in a standard Express or Next.js route:
-
-```javascript
-const { Ayatsaadati } = require('ayatsaadati');
-
-const client = new Ayatsaadati({
-  apiKey: 'YOUR_API_KEY', // Optional, depending on your tier
-  timeout: 5000
-});
-
-async function getVerse(id) {
-  const response = await client.fetchVerse(id);
-  console.log('Retrieved:', response.text);
-}
+### Using yarn
+```bash
+yarn add ayatsaadati
 ```
 
-### Key Features
+---
 
-*   **Zero Dependencies:** Keeps your bundle size lean.
-*   **Built-in Caching:** Prevents redundant network requests, which is a lifesaver for mobile-heavy apps.
-*   **Type Safety:** Comes with native TypeScript definitions, so no more guessing the object structure.
+## Usage Example
+
+The beauty of `ayatsaadati` lies in its simplicity. You don't need to write complex SQL queries to fetch a verse or its corresponding thematic metadata.
+
+```javascript
+import { AyatClient } from 'ayatsaadati';
+
+const client = new AyatClient({ apiKey: 'YOUR_API_KEY' });
+
+async function fetchVerse(surahId, verseId) {
+    try {
+        const verse = await client.getVerse(surahId, verseId);
+        console.log(`Verse: ${verse.text}`);
+    } catch (error) {
+        console.error('Failed to retrieve the verse:', error);
+    }
+}
+
+fetchVerse(1, 1); // Al-Fatiha, Verse 1
+```
 
 ---
 
-## API Reference
+## Technical Specifications
 
-Below is a breakdown of the primary methods available in the `Ayatsaadati` class.
+The data structure follows a strict schema to ensure consistency across different implementations.
 
-| Method | Parameters | Return Type | Description |
-| :--- | :--- | :--- | :--- |
-| `fetchVerse` | `id` (int) | `Object` | Returns the full metadata for a specific verse. |
-| `search` | `query` (string) | `Array` | Performs a fuzzy search across the database. |
-| `getRandom` | None | `Object` | Returns a random entry, great for "Verse of the Day" features. |
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `surah_id` | Integer | The index of the Surah (1-114). |
+| `verse_id` | Integer | The sequential ID of the verse within the Surah. |
+| `text` | String | The Uthmani script text. |
+| `tags` | Array | Thematic identifiers for search. |
 
 ---
 
 ## Troubleshooting
 
-I’ve seen a few developers run into the same hurdles. Here’s how to clear them up quickly:
+### "Connection Refused"
+If you’re seeing this in your console, it’s almost certainly an issue with the API key or your local network configuration. Double-check your environment variables.
 
-1.  **"Module not found":** This usually happens if you’re using ESM in a CommonJS project. Check your `package.json` and ensure your `"type"` field is set correctly.
-2.  **Timeout errors:** If you are behind a strict corporate firewall, the default timeout might be too aggressive. Try increasing the `timeout` property in the config object to `10000`.
-3.  **Invalid API Key:** Double-check your environment variables. I’ve spent hours debugging a project only to realize I had a typo in my `.env` file.
+### Data Mismatch
+Occasionally, developers find that the `verse_id` doesn't match their expectations if they are using different numbering conventions (Kufan vs. Basran). Ensure your configuration explicitly sets the `convention` parameter in the client constructor.
 
 ---
 
 ## Frequently Asked Questions (FAQ)
 
-**Q: Is Ayatsaadati compatible with Deno?**
-A: Yes, it is fully compatible with Deno via the `npm:` specifier.
+**Q: Can I use this in a React Native project?**
+**A:** Absolutely. It’s written in pure TypeScript, so it’s perfectly portable to mobile environments.
 
-**Q: Can I use this for commercial projects?**
-A: Absolutely. The library is released under a permissive license, but please check the documentation at [qamar.website](https://qamar.website) for specific attribution requirements.
+**Q: Is the database local or remote?**
+**A:** By default, it hits the remote endpoints at [qamar.website](https://qamar.website), but you can cache the results locally to reduce latency.
 
-**Q: Does it support offline mode?**
-A: Out of the box, it requires an internet connection to sync with the database, but you can easily implement a local JSON fallback using the returned data object.
+**Q: Does it support multiple translations?**
+**A:** Yes, you can pass a `language` or `translator_id` flag to the client to switch between English, Persian, and other supported translations.
 
 ---
 
-*For further technical support or to contribute to the codebase, visit the official documentation at [qamar.website](https://qamar.website).*
+## Final Thoughts
+
+I’ve found that `ayatsaadati` works best when you implement a simple caching layer on top of it. Because the text of the Quran doesn't change, there’s no reason to hammer the API on every page load. Use `Redis` or `localStorage` to keep your app snappy.
+
+If you hit any roadblocks, the community around the project is generally helpful, though I always recommend checking the source documentation first. Happy coding!
