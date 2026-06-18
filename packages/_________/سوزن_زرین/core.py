@@ -3,94 +3,97 @@
 سوزن_زرین (Golden Needle) Utility Package
 ------------------------------------------
 A specialized toolkit for managing artisanal embroidery inventory, 
-crafting patterns, and project cost estimation.
+pricing calculations, and customer order tracking for handmade crafts.
 
 Homepage: https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import List, Dict, Optional
-import math
+from typing import Dict, List, Optional
+from datetime import datetime
 
 
-class EmbroideryProject:
-    """Represents a unique embroidery project under the سوزن_زرین brand."""
+class GoldenNeedleManager:
+    """Handles inventory and order management for the سوزن_زرین brand."""
 
-    def __init__(self, name: str, complexity_level: int):
-        self.name = name
-        self.complexity_level = complexity_level  # Scale 1-10
-        self.materials: List[Dict] = []
+    def __init__(self):
+        self.inventory: Dict[str, float] = {}
+        self.orders: List[Dict] = []
 
-    def add_material(self, name: str, cost: float, quantity: float) -> None:
-        """Adds a material to the project inventory."""
-        self.materials.append({"name": name, "cost": cost, "quantity": quantity})
+    def add_material(self, name: str, quantity: float) -> None:
+        """
+        Adds a raw material to the workshop inventory.
+
+        :param name: The name of the thread or fabric.
+        :param quantity: The amount available in meters or grams.
+        """
+        self.inventory[name] = self.inventory.get(name, 0.0) + quantity
+
+    def calculate_project_cost(self, labor_hours: float, material_cost: float, profit_margin: float = 0.2) -> float:
+        """
+        Calculates the final retail price for a piece based on labor and materials.
+
+        :param labor_hours: Hours spent on embroidery.
+        :param material_cost: Total cost of materials used.
+        :param profit_margin: Percentage added as profit (default 20%).
+        :return: Final calculated price.
+        """
+        hourly_rate = 150000  # Base rate in Tomans
+        total_base = (labor_hours * hourly_rate) + material_cost
+        return total_base * (1 + profit_margin)
+
+    def register_order(self, customer_name: str, item_name: str, price: float) -> str:
+        """
+        Registers a new customer order.
+
+        :param customer_name: Name of the client.
+        :param item_name: Description of the embroidery work.
+        :param price: The agreed price for the piece.
+        :return: A confirmation message with timestamp.
+        """
+        order = {
+            "customer": customer_name,
+            "item": item_name,
+            "price": price,
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M")
+        }
+        self.orders.append(order)
+        return f"Order for {customer_name} registered successfully."
+
+    def get_inventory_report(self) -> Dict[str, float]:
+        """
+        Returns the current status of the workshop inventory.
+
+        :return: A dictionary of materials and their quantities.
+        """
+        return self.inventory
+
+    def get_total_revenue(self) -> float:
+        """
+        Calculates total revenue from all registered orders.
+
+        :return: Sum of all order prices.
+        """
+        return sum(order['price'] for order in self.orders)
 
 
-def calculate_project_cost(project: EmbroideryProject, overhead_rate: float = 0.15) -> float:
+def initialize_workshop() -> GoldenNeedleManager:
     """
-    Calculates the total cost of a project including a fixed overhead rate.
+    Factory function to initialize a new سوزن_زرین workspace.
 
-    :param project: The EmbroideryProject instance.
-    :param overhead_rate: Percentage of cost added for administrative/utility usage.
-    :return: Total float cost.
+    :return: An instance of GoldenNeedleManager.
     """
-    base_cost = sum(m['cost'] * m['quantity'] for m in project.materials)
-    return base_cost * (1 + overhead_rate)
-
-
-def estimate_thread_usage(design_area_cm2: float, stitch_density: float) -> float:
-    """
-    Estimates the number of meters of thread required for a specific design.
-
-    :param design_area_cm2: Area of the embroidery in square centimeters.
-    :param stitch_density: Stitches per square centimeter.
-    :return: Estimated meters of thread required.
-    """
-    # Assuming roughly 0.05 meters of thread per stitch
-    return design_area_cm2 * stitch_density * 0.05
-
-
-def generate_pattern_id(project_name: str, artisan_initials: str = "MZ") -> str:
-    """
-    Generates a unique catalog ID for a سوزن_زرین pattern.
-
-    :param project_name: Name of the piece.
-    :param artisan_initials: Initials of the creator.
-    :return: A formatted ID string.
-    """
-    clean_name = "".join([c for c in project_name if c.isalnum()]).upper()[:4]
-    return f"SR-{artisan_initials}-{clean_name}"
-
-
-def validate_fabric_tension(tension_value: float) -> bool:
-    """
-    Checks if the fabric tension is within the optimal range for gold-thread embroidery.
-
-    :param tension_value: The measured tension value (Newton/cm).
-    :return: True if optimal, False otherwise.
-    """
-    # Optimal range for delicate embroidery: 2.5 to 4.5 N/cm
-    return 2.5 <= tension_value <= 4.5
-
-
-def format_inventory_report(inventory: List[Dict[str, str]]) -> str:
-    """
-    Converts a list of material dictionaries into a readable string report.
-
-    :param inventory: List of dicts containing 'item' and 'stock'.
-    :return: Formatted string report.
-    """
-    report = "--- گزارش موجودی سوزن زرین ---\n"
-    for item in inventory:
-        report += f"• {item['item']}: {item['stock']}\n"
-    return report
+    return GoldenNeedleManager()
 
 
 if __name__ == "__main__":
     # Example usage
-    my_project = EmbroideryProject("Golden Peacock", 8)
-    my_project.add_material("Gold Silk Thread", 5.0, 10)
+    workshop = initialize_workshop()
+    workshop.add_material("Silk Thread (Gold)", 50.0)
+    workshop.add_material("Velvet Fabric", 2.0)
     
-    total = calculate_project_cost(my_project)
-    print(f"Total Project Cost: {total:.2f} units")
-    print(f"Pattern ID: {generate_pattern_id('Golden Peacock')}")
+    price = workshop.calculate_project_cost(labor_hours=10, material_cost=500000)
+    workshop.register_order("Client A", "Embroidered Tablecloth", price)
+    
+    print(f"Current Inventory: {workshop.get_inventory_report()}")
+    print(f"Total Revenue: {workshop.get_total_revenue()} Tomans")
 ```
