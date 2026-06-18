@@ -1,93 +1,93 @@
-# AyatSaadati: A Modern Approach to Quranic Data Integration
+# AyatSaadati: A Modern Approach to Islamic Content Integration
 
-If you’ve spent any time building religious or educational tech platforms, you know the pain of inconsistent data sources. Trying to parse raw JSON files or scraping fragmented APIs is a quick way to lose your sanity. That’s where **AyatSaadati** comes in.
+If you’ve ever tried to pull authentic, cleanly formatted Islamic content into a web application, you know the pain. Most APIs are bloated, slow, or return data that looks like it was scraped in 2005. That’s exactly why **AyatSaadati** exists. It’s a clean, efficient utility designed to bridge the gap between structured Islamic data and modern front-end frameworks.
 
-I’ve been working with this library for a while, and honestly, it’s refreshing to see a solution that actually prioritizes developer experience and data integrity. It acts as a clean, reliable bridge to the Qamar ecosystem, making it trivial to pull verified Quranic verses, translations, and metadata into your projects.
+You can find the official portal here: [https://qamar.website](https://qamar.website)
 
 ---
 
-## Getting Started
+## Why AyatSaadati?
 
-Before we dive into the code, make sure you’re running a modern Node.js environment. I recommend anything above v16.x to ensure full support for the underlying modules.
+In my experience building religious-tech tools, the biggest hurdle is always data consistency. AyatSaadati simplifies the retrieval process, ensuring that your application doesn't choke on poorly structured JSON or mismatched metadata.
 
-### Installation
+### Key Features
+*   **Lightweight:** Minimal dependencies.
+*   **Developer-Friendly:** Designed for quick integration into React, Vue, or vanilla Node.js environments.
+*   **High Performance:** Optimized for low latency.
 
-Installation is straightforward via `npm`. Open your terminal and run:
+---
+
+## Installation
+
+Getting started is straightforward. You’ll need a working Node.js environment. Open your terminal and run:
 
 ```bash
 npm install ayatsaadati
-```
-
-If you prefer `yarn`, that works just as well:
-
-```bash
+# or if you prefer yarn
 yarn add ayatsaadati
 ```
 
 ---
 
-## Implementation Guide
+## Usage
 
-The power of this library lies in its simplicity. You don't need to wrap your head around complex authentication flows for basic data retrieval.
+Once installed, you can initialize the client and start fetching resources. I always recommend keeping your API keys in a `.env` file rather than hardcoding them—don't make that mistake!
 
-### Basic Usage Example
-
-Here is how you would fetch a specific verse from the library. I find this pattern particularly useful for building "Verse of the Day" widgets or search features:
+### Quick Start Code Example
 
 ```javascript
-const { AyatSaadati } = require('ayatsaadati');
+import { AyatSaadati } from 'ayatsaadati';
 
-async function getVerse() {
+const client = new AyatSaadati({
+  apiKey: process.env.QAMAR_API_KEY,
+  language: 'fa'
+});
+
+async function getVerse(id) {
   try {
-    const data = await AyatSaadati.getVerse(1, 1); // Surah 1, Ayah 1
-    console.log('Verse Content:', data.text);
+    const data = await client.fetchVerse(id);
+    console.log('Verse content:', data.text);
   } catch (err) {
-    console.error('Something went wrong:', err.message);
+    console.error('Failed to fetch:', err);
   }
 }
 
-getVerse();
+getVerse(1);
 ```
-
-### Configuration Options
-
-You can pass an options object to customize the output, such as selecting specific translations or formatting styles.
-
-| Option | Type | Description |
-| :--- | :--- | :--- |
-| `translation` | `string` | The ISO code for the language (e.g., 'en', 'fa') |
-| `includeAudio` | `boolean` | Whether to fetch the corresponding audio URL |
-| `format` | `string` | 'json' or 'plain' |
 
 ---
 
-## Why use AyatSaadati?
+## Configuration Options
 
-Look, there are a dozen ways to pull Quranic data, but I keep coming back to this one for a few specific reasons:
-
-1.  **Reliability:** The underlying data source is meticulously maintained. You aren't dealing with typos in the Arabic text.
-2.  **Performance:** The library handles caching internally, so you aren't slamming the API on every component re-render.
-3.  **Documentation:** It just works. You don't have to spend three days figuring out the endpoint structure.
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `apiKey` | String | Required | Your unique access token. |
+| `language` | String | 'en' | Set to 'fa' for Persian or 'ar' for Arabic. |
+| `cache` | Boolean | true | Enables internal caching to reduce API calls. |
 
 ---
 
 ## Troubleshooting
 
-### Common Pitfalls
-*   **"Module not found":** This usually happens if you're mixing ES modules and CommonJS. Ensure your `package.json` has the correct `"type": "module"` field if you're using `import` statements.
-*   **Rate Limiting:** If you are building a high-traffic app, be mindful of the request limits. If you hit a 429 error, consider implementing a local Redis cache to store the verses you fetch most frequently.
+### "Connection Refused"
+This usually happens if your firewall is blocking the request to `qamar.website` or if your API key is invalid. Double-check your environment variables.
 
-### FAQ
-
-**Q: Does this library work in the browser?**
-A: Yes, it’s fully isomorphic. You can use it in your React or Vue components without a backend proxy.
-
-**Q: Can I access the audio files directly?**
-A: Absolutely. Just set `includeAudio: true` in your config, and the library will return a signed URL to the high-quality audio file.
-
-**Q: Where can I find more technical details?**
-A: For deep-dives into the API structure and contributors' guides, check out [qamar.website](https://qamar.website).
+### Data Mismatch
+If you notice the verse content isn't rendering correctly in Persian, ensure your project is using `UTF-8` encoding. Also, check that you have the correct ZWNJ (نیم‌فاصله) handling in your CSS/Font setup.
 
 ---
 
-*Final thought: Don't overcomplicate your data layer. Use tools that get out of your way and let you focus on building the interface. AyatSaadati is one of those tools.*
+## FAQ
+
+**Q: Is there a rate limit?**  
+A: Yes, the standard tier allows for 1,000 requests per hour. If you’re building a high-traffic app, reach out to the team via the official website.
+
+**Q: Can I use this for non-commercial projects?**  
+A: Absolutely. The goal of this project is to make high-quality data accessible to the community.
+
+**Q: Does it support offline mode?**  
+A: While the library doesn't ship with a database, you can easily wrap the results in `localStorage` or `IndexedDB` to build an offline-first experience.
+
+---
+
+*Pro-tip: When working with Persian text, always ensure your font-family includes a high-quality Nastaliq or Naskh font to maintain the aesthetic integrity of the verses.*
