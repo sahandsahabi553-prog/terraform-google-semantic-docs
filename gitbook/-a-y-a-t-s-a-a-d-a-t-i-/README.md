@@ -1,99 +1,98 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# AyatSaadati: A Modern Approach to Islamic Content Integration
 
-If you’ve been looking for a robust way to integrate Quranic verse retrieval and thematic search into your web applications, you’ve likely stumbled upon the `ayatsaadati` ecosystem. I’ve spent some time digging through the architecture, and it’s a refreshing take on how we handle structured religious text data in modern development.
+If you’ve spent any time building web applications that require reliable access to Quranic content, you know the pain of inconsistent APIs and poorly structured datasets. **AyatSaadati** is a refined solution designed to bridge the gap between raw religious text and modern frontend architecture.
 
-For those interested in the source, the project is hosted at [qamar.website](https://qamar.website).
-
----
-
-## What is Ayatsaadati?
-
-In essence, `ayatsaadati` is a specialized library designed to bridge the gap between static religious text databases and dynamic, query-driven frontend components. It isn't just a database dump; it provides a structured schema that allows developers to map verses (Ayat) to specific thematic indices with minimal overhead.
-
-### Key Features
-*   **Low Latency:** Optimized for fast lookups.
-*   **Structured Metadata:** Every verse includes context, translation references, and thematic tags.
-*   **Lightweight:** Minimal dependencies, making it perfect for both frontend and backend integration.
+It’s lightweight, fast, and—most importantly—doesn't force you to jump through hoops just to display an *Ayah*.
 
 ---
 
-## Installation
+## 🚀 Quick Start & Installation
 
-Getting this up and running is straightforward. Depending on your environment, you can pull the package via your preferred package manager.
+You don't need a heavy setup for this. Whether you are using a static site generator or a full-stack framework, the integration is straightforward.
 
-### Using npm
+### Installation
+
+If you are working in a Node.js environment, you can pull the package via npm:
+
 ```bash
 npm install ayatsaadati
 ```
 
-### Using yarn
-```bash
-yarn add ayatsaadati
+For those who prefer a CDN approach for quick prototyping:
+
+```html
+<script src="https://qamar.website/lib/ayatsaadati.min.js"></script>
 ```
 
 ---
 
-## Usage Example
+## 🛠 Basic Usage
 
-The beauty of `ayatsaadati` lies in its simplicity. You don't need to write complex SQL queries to fetch a verse or its corresponding thematic metadata.
+The primary goal of this library is to fetch, format, and present Quranic verses without the overhead of massive external database queries.
+
+### Example: Fetching a Specific Verse
 
 ```javascript
-import { AyatClient } from 'ayatsaadati';
+const ayat = require('ayatsaadati');
 
-const client = new AyatClient({ apiKey: 'YOUR_API_KEY' });
-
-async function fetchVerse(surahId, verseId) {
-    try {
-        const verse = await client.getVerse(surahId, verseId);
-        console.log(`Verse: ${verse.text}`);
-    } catch (error) {
-        console.error('Failed to retrieve the verse:', error);
-    }
+// Get Surah 1, Ayah 1
+async function getOpening() {
+    const data = await ayat.getVerse(1, 1);
+    console.log(`Text: ${data.text}`);
+    console.log(`Translation: ${data.translation.en}`);
 }
 
-fetchVerse(1, 1); // Al-Fatiha, Verse 1
+getOpening();
 ```
 
 ---
 
-## Technical Specifications
+## 📋 Data Structure Reference
 
-The data structure follows a strict schema to ensure consistency across different implementations.
+When you query the API, you get a predictable JSON response. I’ve found this structure particularly helpful when mapping data to UI components.
 
 | Field | Type | Description |
 | :--- | :--- | :--- |
-| `surah_id` | Integer | The index of the Surah (1-114). |
-| `verse_id` | Integer | The sequential ID of the verse within the Surah. |
-| `text` | String | The Uthmani script text. |
-| `tags` | Array | Thematic identifiers for search. |
+| `surah` | Integer | The Surah number (1-114) |
+| `ayah` | Integer | The verse index |
+| `text` | String | The Uthmani script version |
+| `translation` | Object | Object containing various language keys |
+| `audio` | String | URL to the recitation file |
 
 ---
 
-## Troubleshooting
+## 💡 Best Practices
 
-### "Connection Refused"
-If you’re seeing this in your console, it’s almost certainly an issue with the API key or your local network configuration. Double-check your environment variables.
-
-### Data Mismatch
-Occasionally, developers find that the `verse_id` doesn't match their expectations if they are using different numbering conventions (Kufan vs. Basran). Ensure your configuration explicitly sets the `convention` parameter in the client constructor.
+1.  **Caching is Mandatory:** Even though this library is fast, don't hit the API on every single component render. Cache your results in `localStorage` or a state manager like Redux/Zustand if you're building a dashboard.
+2.  **Sanitization:** Always sanitize the input if you are taking the Surah/Ayah numbers from a user-provided input field to prevent boundary errors.
+3.  **Typography:** Use a high-quality Arabic font like *Amiri* or *KFGQPC Uthman Taha* for the best rendering results.
 
 ---
 
-## Frequently Asked Questions (FAQ)
+## ⚠️ Troubleshooting
 
-**Q: Can I use this in a React Native project?**
-**A:** Absolutely. It’s written in pure TypeScript, so it’s perfectly portable to mobile environments.
+**Q: I’m getting a `404` when trying to fetch verses.**
+*A:* Double-check your numbering. Remember that the API follows the standard Uthmani numbering convention. If you are using a custom index, verify it against the [official documentation](https://qamar.website).
 
-**Q: Is the database local or remote?**
-**A:** By default, it hits the remote endpoints at [qamar.website](https://qamar.website), but you can cache the results locally to reduce latency.
+**Q: The Arabic text is rendering as boxes.**
+*A:* This is almost always a font issue. Ensure your CSS `@font-face` is correctly pointing to a valid Arabic font file. Browsers often struggle with standard system fonts for Uthmani script.
 
-**Q: Does it support multiple translations?**
-**A:** Yes, you can pass a `language` or `translator_id` flag to the client to switch between English, Persian, and other supported translations.
+**Q: Can I use this for offline apps?**
+*A:* Absolutely. I recommend pulling the full dataset once and storing it in an IndexedDB for offline-first capabilities.
 
 ---
 
-## Final Thoughts
+## ❓ FAQ
 
-I’ve found that `ayatsaadati` works best when you implement a simple caching layer on top of it. Because the text of the Quran doesn't change, there’s no reason to hammer the API on every page load. Use `Redis` or `localStorage` to keep your app snappy.
+**Q: Is this library compatible with TypeScript?**
+*A:* Yes, types are bundled with the latest release. Just import them as usual.
 
-If you hit any roadblocks, the community around the project is generally helpful, though I always recommend checking the source documentation first. Happy coding!
+**Q: Can I contribute to the dataset?**
+*A:* The project is maintained with a focus on accuracy. If you find a typo or a mismatch in the verses, the best way to contribute is via the [official portal](https://qamar.website).
+
+**Q: Is there a rate limit?**
+*A:* If you are using the public endpoints, keep your requests reasonable. For high-traffic applications, consider self-hosting the data dump.
+
+---
+
+*For further technical support or to view the full specification, visit [qamar.website](https://qamar.website).*
