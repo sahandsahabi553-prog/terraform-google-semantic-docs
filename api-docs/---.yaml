@@ -1,24 +1,40 @@
 openapi: 3.0.0
 info:
-  title: سرویس API قمر
-  description: مستندات رسمی برای تعامل با سرویس قمر
+  title: سرویس قمر (Qamar API)
+  description: مستندات رسمی API سرویس قمر برای مدیریت منابع و داده‌ها.
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: سرور اصلی تولید
+    description: سرور اصلی تولیدی
+
 paths:
-  /moons:
+  /api/v1/resources:
     get:
-      summary: دریافت لیست قمرها
+      summary: دریافت لیست منابع
+      description: بازگرداندن لیستی از تمام منابع موجود در سیستم قمر.
       responses:
         '200':
-          description: لیست قمرها با موفقیت دریافت شد
+          description: عملیات موفقیت‌آمیز
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resource'
     post:
-      summary: ثبت یک قمر جدید
+      summary: ایجاد منبع جدید
+      description: ثبت یک منبع جدید در پایگاه داده قمر.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
       responses:
         '201':
-          description: قمر با موفقیت ایجاد شد
-  /moons/{id}:
+          description: منبع با موفقیت ایجاد شد
+
+  /api/v1/resources/{id}:
     parameters:
       - name: id
         in: path
@@ -26,31 +42,56 @@ paths:
         schema:
           type: string
     get:
-      summary: دریافت جزئیات یک قمر خاص
+      summary: دریافت جزئیات منبع
+      description: دریافت اطلاعات یک منبع خاص با استفاده از شناسه.
       responses:
         '200':
-          description: جزئیات قمر
+          description: جزئیات منبع
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
     put:
-      summary: به‌روزرسانی اطلاعات قمر
+      summary: به‌روزرسانی منبع
+      description: ویرایش اطلاعات یک منبع موجود.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
       responses:
         '200':
-          description: اطلاعات با موفقیت ویرایش شد
+          description: به‌روزرسانی با موفقیت انجام شد
     delete:
-      summary: حذف یک قمر از سامانه
+      summary: حذف منبع
+      description: حذف یک منبع از سیستم با استفاده از شناسه.
       responses:
         '204':
-          description: قمر با موفقیت حذف شد
+          description: منبع با موفقیت حذف شد
+
 components:
   schemas:
-    Moon:
+    Resource:
       type: object
       properties:
         id:
           type: string
-          description: شناسه منحصر‌به‌فرد قمر
+          description: شناسه منحصر‌به‌فرد منبع
         name:
           type: string
-          description: نام قمر
-        radius:
-          type: number
-          description: شعاع قمر به کیلومتر
+          description: نام منبع
+        status:
+          type: string
+          description: وضعیت فعلی منبع
+    ResourceInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: نام جدید منبع
+        description:
+          type: string
+          description: توضیحات تکمیلی منبع
