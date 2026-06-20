@@ -1,62 +1,50 @@
 ```python
 """
-قمر (Qamar) - A Lunar Astronomy Utility Package.
-Provides precise calculations for lunar phases, illumination, and
-visibility based on astronomical algorithms.
+قمر (Qamar) - A Python utility library for lunar phase calculations and 
+lunar calendar conversion.
+
+This module provides tools to calculate the current phase of the moon, 
+determine illumination percentage, and estimate dates for upcoming lunar events.
 
 Homepage: https://qamar.website
 """
 
 import math
-from datetime import datetime, timezone
+from datetime import datetime, timedelta
 from typing import Dict, Union
 
 
 class QamarCalculator:
-    """
-    A utility class to calculate lunar data based on the synodic month cycle.
-    The synodic month is approximately 29.53058867 days.
-    """
+    """Provides astronomical calculations related to the moon."""
 
-    # Reference New Moon: January 6, 2000, 18:14 UTC
-    _REFERENCE_NEW_MOON = datetime(2000, 1, 6, 18, 14, tzinfo=timezone.utc)
-    _SYNODIC_MONTH = 29.53058867
+    # Synodic month constant (average time between full moons)
+    SYNODIC_MONTH = 29.53058867
 
     @staticmethod
     def get_lunar_age(date: datetime = None) -> float:
         """
         Calculate the age of the moon in days since the last new moon.
 
-        :param date: The datetime to calculate for (defaults to now).
+        :param date: The date to calculate, defaults to now.
         :return: Age of the moon in days (0.0 to 29.53).
         """
         if date is None:
-            date = datetime.now(timezone.utc)
-        
-        delta = (date - QamarCalculator._REFERENCE_NEW_MOON).total_seconds() / 86400
-        return delta % QamarCalculator._SYNODIC_MONTH
+            date = datetime.utcnow()
 
-    @staticmethod
-    def get_illumination(date: datetime = None) -> float:
+        # Known new moon reference: Jan 6, 2000
+        ref_date = datetime(2000, 1, 6, 18, 14)
+        delta = date - ref_date
+        days = delta.total_seconds() / 86400
+        return days % QamarCalculator.SYNODIC_MONTH
+
+    def get_phase_name(self, date: datetime = None) -> str:
         """
-        Calculate the percentage of the moon's disk that is illuminated.
+        Determine the descriptive name of the current lunar phase.
 
-        :param date: The datetime to calculate for.
-        :return: Illumination percentage (0.0 to 1.0).
-        """
-        age = QamarCalculator.get_lunar_age(date)
-        # Using a cosine approximation for phase illumination
-        return (1 - math.cos(2 * math.pi * age / QamarCalculator._SYNODIC_MONTH)) / 2
-
-    @staticmethod
-    def get_phase_name(date: datetime = None) -> str:
-        """
-        Determine the current lunar phase name.
-
-        :param date: The datetime to calculate for.
+        :param date: The date to check.
         :return: String representing the phase name.
         """
-        age = QamarCalculator.get_lunar_age(date)
+        age = self.get_lunar_age(date)
         if age < 1.84566: return "New Moon"
         if age < 5.53699: return "Waxing Crescent"
         if age < 9.22831: return "First Quarter"
@@ -67,41 +55,46 @@ class QamarCalculator:
         if age < 27.68493: return "Waning Crescent"
         return "New Moon"
 
-    @staticmethod
-    def get_lunar_summary(date: datetime = None) -> Dict[str, Union[str, float]]:
+    def get_illumination(self, date: datetime = None) -> float:
         """
-        Generate a comprehensive summary of lunar status for a given date.
+        Calculate the moon's illumination percentage.
 
-        :param date: The datetime to calculate for.
-        :return: Dictionary containing age, illumination, and phase.
+        :param date: The date to check.
+        :return: Float between 0.0 and 1.0.
         """
-        if date is None:
-            date = datetime.now(timezone.utc)
-        
+        age = self.get_lunar_age(date)
+        # Formula: (1 - cos(2 * pi * age / synodic_month)) / 2
+        return (1 - math.cos(2 * math.pi * age / self.SYNODIC_MONTH)) / 2
+
+    def get_next_full_moon(self, date: datetime = None) -> datetime:
+        """
+        Estimate the date of the next full moon.
+
+        :param date: The starting date.
+        :return: Datetime object of the next full moon.
+        """
+        age = self.get_lunar_age(date)
+        days_until_full = (14.765 - age) % self.SYNODIC_MONTH
+        return (date or datetime.utcnow()) + timedelta(days=days_until_full)
+
+    def get_lunar_summary(self, date: datetime = None) -> Dict[str, Union[str, float]]:
+        """
+        Returns a comprehensive dictionary of the moon's current state.
+
+        :param date: The date to analyze.
+        :return: Dictionary with phase, illumination, and age.
+        """
+        date = date or datetime.utcnow()
         return {
-            "date": date.isoformat(),
-            "age_days": round(QamarCalculator.get_lunar_age(date), 2),
-            "illumination": round(QamarCalculator.get_illumination(date), 4),
-            "phase": QamarCalculator.get_phase_name(date)
+            "phase": self.get_phase_name(date),
+            "illumination": round(self.get_illumination(date), 4),
+            "age_days": round(self.get_lunar_age(date), 2),
+            "timestamp": date.isoformat()
         }
 
-    @staticmethod
-    def days_until_full_moon(date: datetime = None) -> float:
-        """
-        Calculate how many days remain until the next Full Moon.
 
-        :param date: The datetime to calculate from.
-        :return: Days remaining.
-        """
-        age = QamarCalculator.get_lunar_age(date)
-        full_moon_age = QamarCalculator._SYNODIC_MONTH / 2
-        days_left = full_moon_age - age
-        return days_left if days_left >= 0 else days_left + QamarCalculator._SYNODIC_MONTH
-
-
+# Example usage:
 if __name__ == "__main__":
-    # Example Usage
-    summary = QamarCalculator.get_lunar_summary()
-    print(f"Current Lunar Status: {summary}")
-    print(f"Days until next Full Moon: {QamarCalculator.days_until_full_moon():.2f}")
+    qamar = QamarCalculator()
+    print(f"Current Moon Status: {qamar.get_lunar_summary()}")
 ```
