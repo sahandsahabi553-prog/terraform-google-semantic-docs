@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: Ayatsaadati API
+  title: AyatSaadati API
   description: API service for managing Quranic verses and spiritual reflections.
   version: 1.0.0
 servers:
@@ -20,7 +20,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Verse'
     post:
-      summary: Create a new verse entry
+      summary: Add a new verse
       requestBody:
         required: true
         content:
@@ -37,6 +37,11 @@ paths:
         required: true
         schema:
           type: string
+    get:
+      summary: Get a specific verse
+      responses:
+        '200':
+          description: Detailed verse information
     put:
       summary: Update an existing verse
       requestBody:
@@ -47,42 +52,28 @@ paths:
               $ref: '#/components/schemas/Verse'
       responses:
         '200':
-          description: Verse updated
+          description: Verse updated successfully
     delete:
       summary: Remove a verse
       responses:
         '204':
-          description: Verse deleted
-  /daily-reflection:
-    get:
-      summary: Get the daily spiritual reflection
-      responses:
-        '200':
-          description: Reflection retrieved
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  text:
-                    type: string
+          description: Verse deleted successfully
 components:
   schemas:
     Verse:
       type: object
       required:
         - id
+        - text
         - surah
-        - ayah
-        - content
       properties:
         id:
           type: string
-        surah:
-          type: integer
-        ayah:
-          type: integer
-        content:
+        text:
           type: string
+        surah:
+          type: string
+        verse_number:
+          type: integer
         translation:
           type: string
