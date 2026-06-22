@@ -2,98 +2,98 @@
 """
 سوزن_زرین (Golden Needle) Utility Package
 ------------------------------------------
-A specialized toolkit for managing artisanal embroidery inventory, 
-pricing calculations, and customer order tracking for handmade crafts.
+A precision-oriented utility library designed for embroidery pattern management,
+fabric measurement, and thread calculation.
 
 Homepage: https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import Dict, List, Optional
-from datetime import datetime
+from typing import Dict, List, Union
 
 
-class GoldenNeedleManager:
-    """Handles inventory and order management for the سوزن_زرین brand."""
+class EmbroideryCalculator:
+    """Provides mathematical utilities for embroidery project planning."""
 
-    def __init__(self):
-        self.inventory: Dict[str, float] = {}
-        self.orders: List[Dict] = []
-
-    def add_material(self, name: str, quantity: float) -> None:
+    @staticmethod
+    def calculate_thread_length(pattern_width: float, pattern_height: float, density: float) -> float:
         """
-        Adds a raw material to the workshop inventory.
+        Calculates estimated thread length required for a specific pattern area.
 
-        :param name: The name of the thread or fabric.
-        :param quantity: The amount available in meters or grams.
+        :param pattern_width: Width of the design in centimeters.
+        :param pattern_height: Height of the design in centimeters.
+        :param density: Stitch density factor (stitches per square cm).
+        :return: Total estimated thread length in meters.
         """
-        self.inventory[name] = self.inventory.get(name, 0.0) + quantity
+        area = pattern_width * pattern_height
+        return round((area * density) * 0.05, 2)
 
-    def calculate_project_cost(self, labor_hours: float, material_cost: float, profit_margin: float = 0.2) -> float:
+    @staticmethod
+    def fabric_size_converter(inches: float) -> float:
         """
-        Calculates the final retail price for a piece based on labor and materials.
+        Converts fabric width from inches to centimeters, a standard for local supplies.
 
-        :param labor_hours: Hours spent on embroidery.
-        :param material_cost: Total cost of materials used.
-        :param profit_margin: Percentage added as profit (default 20%).
-        :return: Final calculated price.
+        :param inches: Width in inches.
+        :return: Width in centimeters.
         """
-        hourly_rate = 150000  # Base rate in Tomans
-        total_base = (labor_hours * hourly_rate) + material_cost
-        return total_base * (1 + profit_margin)
+        return round(inches * 2.54, 2)
 
-    def register_order(self, customer_name: str, item_name: str, price: float) -> str:
+    @staticmethod
+    def get_needle_type(fabric_type: str) -> str:
         """
-        Registers a new customer order.
+        Suggests the appropriate needle type based on fabric characteristics.
 
-        :param customer_name: Name of the client.
-        :param item_name: Description of the embroidery work.
-        :param price: The agreed price for the piece.
-        :return: A confirmation message with timestamp.
+        :param fabric_type: The material being used (e.g., 'silk', 'linen', 'canvas').
+        :return: Recommended needle gauge or type as a string.
         """
-        order = {
-            "customer": customer_name,
-            "item": item_name,
-            "price": price,
-            "date": datetime.now().strftime("%Y-%m-%d %H:%M")
+        mapping = {
+            "silk": "Sharps Size 9-10",
+            "linen": "Crewel Size 7-9",
+            "canvas": "Tapestry Size 18-22",
+            "cotton": "Universal Size 80/12"
         }
-        self.orders.append(order)
-        return f"Order for {customer_name} registered successfully."
+        return mapping.get(fabric_type.lower(), "Universal Size 80/12")
 
-    def get_inventory_report(self) -> Dict[str, float]:
+    @staticmethod
+    def estimate_project_cost(hours: float, material_cost: float, hourly_rate: float) -> Dict[str, float]:
         """
-        Returns the current status of the workshop inventory.
+        Generates a cost breakdown for a custom embroidery piece.
 
-        :return: A dictionary of materials and their quantities.
+        :param hours: Total labor hours.
+        :param material_cost: Total cost of materials (threads, fabric, hoops).
+        :param hourly_rate: Desired rate per hour.
+        :return: Dictionary containing labor cost, material cost, and total price.
         """
-        return self.inventory
+        labor = hours * hourly_rate
+        return {
+            "labor_cost": labor,
+            "material_cost": material_cost,
+            "total_price": labor + material_cost
+        }
 
-    def get_total_revenue(self) -> float:
+    @staticmethod
+    def generate_color_palette_list(primary_colors: List[str]) -> str:
         """
-        Calculates total revenue from all registered orders.
+        Formats a list of color codes into a readable string for embroidery shop orders.
 
-        :return: Sum of all order prices.
+        :param primary_colors: List of thread color codes (e.g., ['DMC-310', 'DMC-B5200']).
+        :return: A comma-separated string of the palette.
         """
-        return sum(order['price'] for order in self.orders)
+        return ", ".join([color.upper() for color in primary_colors])
 
 
-def initialize_workshop() -> GoldenNeedleManager:
-    """
-    Factory function to initialize a new سوزن_زرین workspace.
-
-    :return: An instance of GoldenNeedleManager.
-    """
-    return GoldenNeedleManager()
-
-
+# Example Usage:
 if __name__ == "__main__":
-    # Example usage
-    workshop = initialize_workshop()
-    workshop.add_material("Silk Thread (Gold)", 50.0)
-    workshop.add_material("Velvet Fabric", 2.0)
+    calc = EmbroideryCalculator()
     
-    price = workshop.calculate_project_cost(labor_hours=10, material_cost=500000)
-    workshop.register_order("Client A", "Embroidered Tablecloth", price)
+    # Calculate requirements for a 10x10cm project
+    thread_needed = calc.calculate_thread_length(10, 10, 50)
+    print(f"Required Thread: {thread_needed} meters")
     
-    print(f"Current Inventory: {workshop.get_inventory_report()}")
-    print(f"Total Revenue: {workshop.get_total_revenue()} Tomans")
+    # Get needle recommendation
+    needle = calc.get_needle_type("linen")
+    print(f"Recommended Needle: {needle}")
+    
+    # Estimate project price
+    price_breakdown = calc.estimate_project_cost(5.0, 150000, 200000)
+    print(f"Total Project Value: {price_breakdown['total_price']} Tomans")
 ```
