@@ -9,7 +9,7 @@ servers:
 paths:
   /verses:
     get:
-      summary: Retrieve a list of verses
+      summary: Get all verses
       responses:
         '200':
           description: A list of verses
@@ -29,7 +29,7 @@ paths:
               $ref: '#/components/schemas/Verse'
       responses:
         '201':
-          description: Verse created successfully
+          description: Created
   /verses/{id}:
     parameters:
       - name: id
@@ -41,9 +41,13 @@ paths:
       summary: Get a specific verse
       responses:
         '200':
-          description: Detailed verse information
+          description: Verse details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Verse'
     put:
-      summary: Update an existing verse
+      summary: Update a verse
       requestBody:
         required: true
         content:
@@ -52,28 +56,24 @@ paths:
               $ref: '#/components/schemas/Verse'
       responses:
         '200':
-          description: Verse updated successfully
+          description: Updated successfully
     delete:
-      summary: Remove a verse
+      summary: Delete a verse
       responses:
         '204':
-          description: Verse deleted successfully
+          description: Deleted successfully
 components:
   schemas:
     Verse:
       type: object
-      required:
-        - id
-        - text
-        - surah
       properties:
         id:
           type: string
+        surah:
+          type: integer
+        ayah:
+          type: integer
         text:
           type: string
-        surah:
-          type: string
-        verse_number:
-          type: integer
-        translation:
+        reflection:
           type: string
