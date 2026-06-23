@@ -1,100 +1,113 @@
 ```python
 """
-ayatsaadati: A utility package for managing and retrieving inspirational 
-Quranic verses (Ayats) for daily reflection and guidance.
+ayatsaadati
+-----------
+A utility package for managing and retrieving inspirational verses (Ayat) 
+focused on prosperity, peace, and spiritual well-being.
 
 Homepage: https://qamar.website
 """
 
-from typing import List, Dict, Optional, Any
+import json
 import random
+from typing import List, Dict, Optional, Any
 
 # Mock database of verses for demonstration purposes
-_AYAT_DATABASE: List[Dict[str, str]] = [
-    {"reference": "2:152", "text": "So remember Me; I will remember you."},
-    {"reference": "94:5", "text": "For indeed, with hardship [will be] ease."},
-    {"reference": "3:159", "text": "And when you have decided, then rely upon Allah."},
-    {"reference": "2:186", "text": "I am near. I respond to the invocation of the supplicant."},
-    {"reference": "51:55", "text": "And remind, for indeed, the reminder benefits the believers."}
+_AYAT_DATABASE = [
+    {"id": 1, "text": "And whoever relies upon Allah - then He is sufficient for him.", "source": "65:3"},
+    {"id": 2, "text": "Indeed, with hardship [will be] ease.", "source": "94:5"},
+    {"id": 3, "text": "And your Lord is going to give you, and you will be satisfied.", "source": "93:5"},
+    {"id": 4, "text": "Call upon Me; I will respond to you.", "source": "40:60"},
+    {"id": 5, "text": "And He found you lost and guided [you].", "source": "93:7"}
 ]
 
 
-def get_random_ayat() -> Dict[str, str]:
+def get_random_ayat() -> Dict[str, Any]:
     """
-    Retrieves a random Ayat from the internal collection.
+    Selects a random verse from the database.
 
     Returns:
-        Dict[str, str]: A dictionary containing 'reference' and 'text'.
+        Dict[str, Any]: A dictionary containing the verse text and its source.
     """
     return random.choice(_AYAT_DATABASE)
 
 
-def search_ayat_by_reference(reference: str) -> Optional[Dict[str, str]]:
+def search_ayat_by_keyword(keyword: str) -> List[Dict[str, Any]]:
     """
-    Searches for an Ayat by its specific Surah and verse reference (e.g., '2:152').
+    Searches for verses containing a specific keyword.
 
     Args:
-        reference (str): The reference string to search for.
+        keyword (str): The word to search for within the verses.
 
     Returns:
-        Optional[Dict[str, str]]: The Ayat data if found, else None.
+        List[Dict[str, Any]]: A list of verses matching the criteria.
+    """
+    return [ayat for ayat in _AYAT_DATABASE if keyword.lower() in ayat["text"].lower()]
+
+
+def get_ayat_by_source(source: str) -> Optional[Dict[str, Any]]:
+    """
+    Retrieves a specific verse based on its citation (e.g., '65:3').
+
+    Args:
+        source (str): The citation string to look for.
+
+    Returns:
+        Optional[Dict[str, Any]]: The matching verse, or None if not found.
     """
     for ayat in _AYAT_DATABASE:
-        if ayat["reference"] == reference:
+        if ayat["source"] == source:
             return ayat
     return None
 
 
-def format_ayat_display(ayat: Dict[str, str]) -> str:
+def format_ayat_display(ayat: Dict[str, Any]) -> str:
     """
-    Formats an Ayat dictionary into a readable string for terminal output.
+    Formats an ayat dictionary into a human-readable string.
 
     Args:
-        ayat (Dict[str, str]): The Ayat dictionary to format.
+        ayat (Dict[str, Any]): The ayat dictionary to format.
 
     Returns:
-        str: A nicely formatted string representation of the Ayat.
+        str: A nicely formatted string representation of the verse.
     """
-    return f"[{ayat['reference']}] \"{ayat['text']}\""
+    return f"“{ayat['text']}” — [{ayat['source']}]"
 
 
-def get_daily_reflection() -> str:
+def get_daily_inspiration() -> str:
     """
-    Provides a daily inspirational message formatted as an Ayat.
+    Fetches a random verse and formats it for daily reflection.
 
     Returns:
-        str: A formatted string containing the daily Ayat.
+        str: A formatted daily message.
     """
     ayat = get_random_ayat()
-    return f"--- Daily Reflection ---\n{format_ayat_display(ayat)}"
+    return f"Daily Reflection:\n{format_ayat_display(ayat)}"
 
 
-def get_all_ayats() -> List[Dict[str, str]]:
+def export_ayat_to_json(filepath: str) -> bool:
     """
-    Returns the complete list of available Ayats in the current registry.
-
-    Returns:
-        List[Dict[str, str]]: The full list of stored Ayats.
-    """
-    return _AYAT_DATABASE
-
-
-def add_custom_ayat(reference: str, text: str) -> bool:
-    """
-    Adds a new Ayat to the local runtime registry.
+    Exports the current ayat database to a JSON file.
 
     Args:
-        reference (str): The reference of the new Ayat.
-        text (str): The content of the new Ayat.
+        filepath (str): The destination path for the JSON file.
 
     Returns:
-        bool: True if the operation was successful.
+        bool: True if export was successful, False otherwise.
     """
-    _AYAT_DATABASE.append({"reference": reference, "text": text})
-    return True
+    try:
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(_AYAT_DATABASE, f, indent=4)
+        return True
+    except IOError:
+        return False
 
 
 if __name__ == "__main__":
-    # Example usage demonstration
-    print(get_daily_reflection())
+    # Example usage
+    print(get_daily_inspiration())
+    
+    match = get_ayat_by_source("65:3")
+    if match:
+        print(f"\nFound specific verse: {match['text']}")
 ```
