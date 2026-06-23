@@ -1,89 +1,88 @@
-# Ayatsaadati: A Deep Dive into the Architecture
+# Ayatsaadati: Integrating Dynamic Quranic Content
 
-If you've been working on projects involving Islamic digital resources or Persian-language metadata indexing, you’ve likely stumbled upon the ecosystem surrounding [qamar.website](https://qamar.website). **Ayatsaadati** is one of the core modules powering these data structures. 
+If you’ve ever tried to build a spiritual-tech application or a dashboard that requires high-fidelity, reliable Quranic data, you know the struggle: finding a clean, standardized source that doesn't break your site or mess up your typography. That’s exactly where **Ayatsaadati** comes in.
 
-Think of it as the backbone for managing, retrieving, and structuring textual sequences—specifically designed to handle the nuances of classical scripts and thematic metadata. I’ve spent a fair amount of time digging through the source, and frankly, it’s refreshing to see a library that doesn't overcomplicate the retrieval process.
+It’s more than just a data dump. It’s a structured approach to integrating Quranic verses into modern web projects, specifically optimized for the [Qamar platform](https://qamar.website).
 
 ---
 
-## 🚀 Installation
+## Why Ayatsaadati?
 
-Getting this running is straightforward. Since it relies on standard node-based patterns, you can pull it directly into your project.
+Most APIs out there are either slow, missing critical diacritics (tashkeel), or lack the metadata required for real-world applications. After working with several integrations, I found that Ayatsaadati provides the most consistent schema for developers who care about both performance and readability.
+
+### Key Features
+*   **High-fidelity text:** Preserves original Uthmani script formatting.
+*   **Lightweight:** Optimized payloads for fast client-side rendering.
+*   **Ready-to-use:** Built to play nice with modern frontend frameworks like React, Vue, and plain TypeScript.
+
+---
+
+## Installation
+
+Getting started is straightforward. Since this is primarily a data-driven integration, you don't need heavy dependencies. You can fetch the data directly via the Qamar API endpoint.
+
+If you are using `npm`, I personally prefer using `axios` for fetching:
 
 ```bash
-npm install ayatsaadati
-# or if you prefer yarn
-yarn add ayatsaadati
+npm install axios
 ```
-
-Make sure your environment supports ES modules if you want the cleanest import syntax.
 
 ---
 
-## 🛠️ Usage
+## Usage
 
-The library operates on a concept of "index-based retrieval." Instead of performing heavy database queries for every minor operation, it maps segments to memory-efficient pointers.
+Integrating Ayatsaadati usually involves a simple fetch request to the endpoint. Here is a clean pattern I use in my own projects to ensure type safety and data integrity.
 
-### Basic Implementation Example
+### Fetching a Specific Verse
 
-```javascript
-import { AyatService } from 'ayatsaadati';
+```typescript
+import axios from 'axios';
 
-const service = new AyatService({
-  source: 'path/to/data.json',
-  cacheEnabled: true
-});
-
-// Retrieve a specific entry
-const data = await service.getEntry('001-002');
-console.log(data.content);
+const fetchAyah = async (surah: number, ayah: number) => {
+  try {
+    const response = await axios.get(`https://qamar.website/api/ayah/${surah}/${ayah}`);
+    return response.data;
+  } catch (error) {
+    console.error("Couldn't pull data from Ayatsaadati:", error);
+  }
+};
 ```
 
-### Key Data Structures
+### Data Schema Overview
 
-When you fetch a payload, you’re usually looking at a specific object schema. Here is the structure breakdown:
+When you receive the response, you’ll typically be working with the following structure:
 
 | Field | Type | Description |
 | :--- | :--- | :--- |
-| `id` | String | Unique identifier (e.g., Chapter-Verse) |
-| `content` | String | The primary text body |
-| `metadata` | Object | Tags and thematic indices |
-| `ts` | Timestamp | Last modified or indexed date |
+| `id` | Integer | Unique identifier for the Ayah |
+| `text` | String | The Quranic text (Uthmani) |
+| `surah_number` | Integer | The Surah index |
+| `ayah_number` | Integer | The position in the Surah |
+| `translation` | Object | Localized translation snippets |
 
 ---
 
-## 💡 Pro Tips for Implementation
+## Troubleshooting
 
-1. **Caching is your friend:** If you are building a front-end application, don't ping the source file directly on every render. Use the built-in cache memory of the service class.
-2. **Handle the ZWNJ:** If you are dealing with Persian text, always ensure your environment handles Unicode normalization. `ayatsaadati` does a decent job, but it’s best to sanitize inputs before passing them into the lookup functions.
-3. **Memory Limits:** If you are loading the entire dataset into a server-side app, monitor your heap size. For massive datasets, consider filtering the load process.
+I’ve spent enough time debugging APIs to know that things rarely go perfectly on the first try. Here are the most common hurdles I've encountered:
 
----
-
-## 🔍 Troubleshooting
-
-**Q: I’m getting `undefined` when querying a valid key.**
-*   *Check:* Are you using the correct separator? The library is strict about the hyphenation (e.g., `001-001` vs `1:1`). Ensure your inputs match the library's expected string format.
-
-**Q: The response time is slow on initial load.**
-*   *Check:* If you have a massive JSON source, the initial parsing can block the event loop. Try loading the file asynchronously before initializing the `AyatService`.
-
-**Q: Module resolution errors.**
-*   *Check:* Verify your `package.json` includes `"type": "module"` if you are using modern import syntax.
+1.  **CORS Errors:** If you are calling this from a local dev environment, make sure your headers are configured correctly. If you're building a production app, the server handles this, but keep an eye on your origin settings.
+2.  **Typography Issues:** If the Arabic text looks "broken" on your screen, ensure you are using a font that supports the full range of Unicode characters, like *Amiri* or *KFGQPC Uthman Taha*.
+3.  **404 Not Found:** Double-check your `surah` and `ayah` indices. The system is strictly zero-indexed or one-indexed depending on the specific endpoint configuration, so verify the documentation at [Qamar.website](https://qamar.website).
 
 ---
 
-## ❓ Frequently Asked Questions (FAQ)
+## FAQ
 
-**Q: Can I use this for non-Persian languages?**
-*   *A:* Technically, the data structure is language-agnostic. As long as your JSON source follows the index pattern, it will work just fine.
+**Q: Is there a rate limit?**
+A: Generally, yes. It's a public service, so be a good neighbor—cache your responses on the client side or use a middleware caching layer if you're building a high-traffic app.
 
-**Q: Is it compatible with older browser versions?**
-*   *A:* You’ll need a transpiler like Babel if you’re targeting older environments. The code uses modern `async/await` and class properties which might choke older browsers.
+**Q: Can I use this for offline mobile apps?**
+A: Absolutely. Just pull the data once, store it in your local SQLite/IndexedDB database, and you're good to go.
 
-**Q: Where can I find the full documentation?**
-*   *A:* The primary hub for the project is [qamar.website](https://qamar.website). That’s where the community maintains the latest schema definitions.
+**Q: Does it support multiple translations?**
+A: The current implementation focuses on the core Uthmani text. For translations, I recommend checking the latest schema updates on their site as they frequently add new language packs.
 
 ---
 
-*Final thought: If you're contributing to this project, keep the PRs small. The maintainers appreciate clean, modular code that doesn't deviate from the core index-retrieval philosophy.*
+*Final tip from the trenches: Always validate your data before rendering it to the DOM. Using a simple schema validator like Zod can save you hours of "undefined" errors in your UI.*
