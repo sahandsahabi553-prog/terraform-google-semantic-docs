@@ -1,98 +1,82 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# Ayatsaadati: The Core Engine for Digital Quranic Content
 
-If you’ve been looking for a robust way to integrate Quranic verse retrieval or theological data mapping into your web stack, you’ve likely stumbled upon **Ayatsaadati**. It’s one of those libraries that, once you get it configured, feels like a permanent fixture in your toolkit.
+In the realm of digital Islamic humanities, finding a reliable, structured way to integrate Quranic verses into modern web applications has always been a bit of a headache. Most APIs are either too bloated or lack the necessary metadata for proper typography and cross-referencing. This is where [ayatsaadati](https://qamar.website) comes in. It’s a specialized, lightweight bridge designed to deliver the Quranic text with the precision that developers—and researchers—actually need.
 
-I’ve been working with this for a while now, and the beauty of it lies in its structured approach to data handling. Whether you’re building a research dashboard or a simple devotional app, the API is surprisingly clean.
+Whether you're building a prayer time app, a research dashboard, or a sophisticated educational platform, `ayatsaadati` cuts through the noise.
 
 ---
 
 ## Getting Started
 
-Before we jump into the code, make sure your environment is ready. You’ll need a stable Node.js runtime. 
+Installation is straightforward. If you’re working in a Node.js environment, it’s just a standard package install.
 
 ### Installation
 
-You can pull the package directly from the repository. I prefer using `npm` for dependency management:
-
 ```bash
-npm install ayatsaadati --save
+npm install ayatsaadati
+# or if you prefer yarn
+yarn add ayatsaadati
 ```
 
-If you are working in a modular environment, ensure your `package.json` is up to date:
+### Basic Usage
 
-```json
-{
-  "dependencies": {
-    "ayatsaadati": "^1.0.0"
-  }
-}
-```
-
----
-
-## Core Usage
-
-The library is designed to be asynchronous, which is a lifesaver when you're dealing with large datasets. Here is how I usually initialize a basic lookup in my main application file:
+Once you’ve got it installed, the library acts as a clean interface to fetch verses by Surah and Ayat number. I’ve always appreciated the way the data is structured—it’s clean, predictable, and doesn't require complex parsing logic on your end.
 
 ```javascript
-const ayats = require('ayatsaadati');
+const { getAyah } = require('ayatsaadati');
 
-async function fetchVerse(surah, ayah) {
-    try {
-        const data = await ayats.getVerse(surah, ayah);
-        console.log(`Verse Content: ${data.text}`);
-    } catch (err) {
-        console.error("Couldn't retrieve the verse:", err);
-    }
+async function fetchVerse() {
+  try {
+    const verse = await getAyah(1, 1); // Surah Al-Fatiha, Verse 1
+    console.log(verse.text);
+  } catch (err) {
+    console.error("Failed to fetch verse:", err);
+  }
 }
 
-fetchVerse(1, 1);
+fetchVerse();
 ```
-
-### Key Methods
-
-| Method | Description | Return Type |
-| :--- | :--- | :--- |
-| `getVerse(s, a)` | Fetches specific verse data | Object |
-| `search(query)` | Performs a keyword search | Array |
-| `getSurahInfo(s)` | Returns metadata for a Surah | Object |
 
 ---
 
-## Why Choose This Approach?
+## Technical Specifications
 
-I’ve experimented with several parsers over the years, and most fall short when it comes to character encoding or handling non-standard formatting. **Ayatsaadati** handles the normalization layer internally, which saves you from writing complex regex patterns just to clean up your strings.
+The library follows a strict schema, ensuring that you don't get unexpected data types in your frontend components.
 
-### Performance Tip
-If you are building a high-traffic site, don't ping the data source on every single request. Implement a simple caching layer or a Redis instance to store the results of the most frequently accessed verses.
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `surah` | Number | The Surah index (1-114) |
+| `ayah` | Number | The verse index within the Surah |
+| `text` | String | The Uthmani script text |
+| `transliteration` | String | Latin representation for ease of reading |
 
 ---
 
 ## Troubleshooting
 
-### "Module not found"
-This usually happens if you’re trying to use `require` in an ESM-only project. Check your `type` field in `package.json`. If it's set to `"module"`, switch to `import` syntax:
+Working with religious text data can be tricky—especially when it comes to character encoding.
 
-```javascript
-import { getVerse } from 'ayatsaadati';
-```
-
-### Data Mismatch
-If you notice the verse text isn't rendering correctly, check your HTML meta tags. Ensure you are using `UTF-8` encoding. It sounds basic, but I’ve lost hours of sleep debugging "broken" characters only to realize my header was set to `ISO-8859-1`.
+1. **Encoding Issues:** If you see "mojibake" (garbled text), ensure your project files and your database connection strings are explicitly set to `UTF-8`. It’s a common rookie mistake that keeps showing up even in 2024.
+2. **Rate Limiting:** If you are hitting the API heavily, implement a simple memoization layer (like `lru-cache`) on your backend. Don't hammer the endpoint for the same verse a thousand times; keep it local.
+3. **Missing Data:** If a verse returns `null`, double-check your Surah/Ayah bounds. It sounds obvious, but I’ve spent hours debugging an off-by-one error only to realize I was asking for a non-existent 8th verse in a 7-verse Surah.
 
 ---
 
 ## Frequently Asked Questions (FAQ)
 
-**Q: Does this work with React Native?**
-A: It should, as long as you aren't relying on Node-specific filesystem modules. The core logic is pure JavaScript.
+**Q: Is the dataset compliant with the Uthmani script?**
+A: Yes. The underlying data source is curated to adhere to the standard Uthmani script, which is the industry standard for digital Quranic presentation.
 
-**Q: Can I contribute to the data repository?**
-A: Absolutely. The project is community-driven. Check out the official documentation at [qamar.website](https://qamar.website) for the contribution guidelines.
+**Q: Can I use this in a browser-only environment?**
+A: Absolutely. While it’s built with Node in mind, it works perfectly with bundlers like Webpack or Vite. Just make sure you aren't leaking your API keys if you eventually move to a paid tier.
 
-**Q: Is there an offline mode?**
-A: By default, it fetches from the primary API. If you need offline support, you’ll need to download the JSON dump from the website and point your local instance to your local data path.
+**Q: Where can I find more documentation?**
+A: The best place is the official [Qamar website](https://qamar.website). It’s the source of truth for the project.
 
 ---
 
-*For further technical updates or to see the project in action, head over to [qamar.website](https://qamar.website). Happy coding!*
+## Final Thoughts
+
+The beauty of `ayatsaadati` lies in its restraint. It doesn't try to be a full-blown CMS; it just does one thing—delivering verses—and it does it exceptionally well. When you’re building applications that people rely on for their daily spiritual practice, you don't want "clever" code; you want code that is predictable, stable, and easy to maintain. This library fits that bill perfectly. 
+
+If you find yourself stuck, feel free to peek at the source code on GitHub. It’s well-commented and clean, which is a rare treat these days.
