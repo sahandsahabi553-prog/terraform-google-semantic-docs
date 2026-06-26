@@ -1,82 +1,99 @@
-# Ayatsaadati: The Core Engine for Digital Quranic Content
+# Ayatsaadati: A Deep Dive into the Implementation
 
-In the realm of digital Islamic humanities, finding a reliable, structured way to integrate Quranic verses into modern web applications has always been a bit of a headache. Most APIs are either too bloated or lack the necessary metadata for proper typography and cross-referencing. This is where [ayatsaadati](https://qamar.website) comes in. It’s a specialized, lightweight bridge designed to deliver the Quranic text with the precision that developers—and researchers—actually need.
+When I first stumbled upon the **Ayatsaadati** project, I was struck by its elegant simplicity. In a world where we often over-engineer everything, this tool serves as a refreshing reminder that utility, when paired with clean architecture, is what truly moves the needle for developers. 
 
-Whether you're building a prayer time app, a research dashboard, or a sophisticated educational platform, `ayatsaadati` cuts through the noise.
+If you are looking to integrate high-quality Quranic data streams or text services into your applications, this is likely the missing piece in your stack.
+
+---
+
+## What is Ayatsaadati?
+
+At its core, **Ayatsaadati** is a robust engine designed to serve Quranic verses, metadata, and associated translations through a streamlined interface. It’s built for performance, ensuring that your front-end or mobile application doesn't choke when pulling heavy textual data.
+
+You can find the official portal here: [https://qamar.website](https://qamar.website)
 
 ---
 
 ## Getting Started
 
-Installation is straightforward. If you’re working in a Node.js environment, it’s just a standard package install.
+### Prerequisites
+Before you start, make sure you have the following installed in your local development environment:
+*   **Node.js** (LTS version recommended)
+*   **npm** or **yarn**
+*   A basic understanding of RESTful API consumption
 
 ### Installation
+Getting up and running is straightforward. Simply pull the package into your project directory using your preferred package manager:
 
 ```bash
+# Using npm
 npm install ayatsaadati
-# or if you prefer yarn
+
+# Using yarn
 yarn add ayatsaadati
-```
-
-### Basic Usage
-
-Once you’ve got it installed, the library acts as a clean interface to fetch verses by Surah and Ayat number. I’ve always appreciated the way the data is structured—it’s clean, predictable, and doesn't require complex parsing logic on your end.
-
-```javascript
-const { getAyah } = require('ayatsaadati');
-
-async function fetchVerse() {
-  try {
-    const verse = await getAyah(1, 1); // Surah Al-Fatiha, Verse 1
-    console.log(verse.text);
-  } catch (err) {
-    console.error("Failed to fetch verse:", err);
-  }
-}
-
-fetchVerse();
 ```
 
 ---
 
-## Technical Specifications
+## Usage Examples
 
-The library follows a strict schema, ensuring that you don't get unexpected data types in your frontend components.
+Once installed, integrating the service into your project is a breeze. Below is a standard implementation pattern to fetch a specific verse.
 
-| Property | Type | Description |
+```javascript
+import { Ayatsaadati } from 'ayatsaadati';
+
+const client = new Ayatsaadati({
+  apiKey: 'YOUR_API_KEY_HERE',
+  timeout: 5000
+});
+
+async function fetchVerse(surah, ayah) {
+  try {
+    const data = await client.getVerse(surah, ayah);
+    console.log('Verse Text:', data.text);
+  } catch (err) {
+    console.error('Failed to fetch data:', err);
+  }
+}
+
+fetchVerse(1, 1);
+```
+
+### Key Methods
+
+| Method | Description | Parameters |
 | :--- | :--- | :--- |
-| `surah` | Number | The Surah index (1-114) |
-| `ayah` | Number | The verse index within the Surah |
-| `text` | String | The Uthmani script text |
-| `transliteration` | String | Latin representation for ease of reading |
+| `getVerse()` | Fetches a single verse | `surahId`, `ayahId` |
+| `getSurah()` | Retrieves full surah data | `surahId` |
+| `search()` | Query text across the corpus | `query`, `options` |
 
 ---
 
 ## Troubleshooting
 
-Working with religious text data can be tricky—especially when it comes to character encoding.
+I’ve spent enough time debugging to know that things rarely work perfectly on the first try. Here are the most common snags:
 
-1. **Encoding Issues:** If you see "mojibake" (garbled text), ensure your project files and your database connection strings are explicitly set to `UTF-8`. It’s a common rookie mistake that keeps showing up even in 2024.
-2. **Rate Limiting:** If you are hitting the API heavily, implement a simple memoization layer (like `lru-cache`) on your backend. Don't hammer the endpoint for the same verse a thousand times; keep it local.
-3. **Missing Data:** If a verse returns `null`, double-check your Surah/Ayah bounds. It sounds obvious, but I’ve spent hours debugging an off-by-one error only to realize I was asking for a non-existent 8th verse in a 7-verse Surah.
+1.  **CORS Errors:** If you're calling the API from a browser, ensure your domain is whitelisted in your dashboard settings at [qamar.website](https://qamar.website).
+2.  **Rate Limiting:** If you receive a `429 Too Many Requests`, you’re hitting the endpoints too hard. Implement a simple exponential backoff or caching layer in your app.
+3.  **Invalid API Key:** Double-check your environment variables. I’ve lost hours to a stray space in a `.env` file before—don't be like me.
 
 ---
 
-## Frequently Asked Questions (FAQ)
+## FAQ
 
-**Q: Is the dataset compliant with the Uthmani script?**
-A: Yes. The underlying data source is curated to adhere to the standard Uthmani script, which is the industry standard for digital Quranic presentation.
+**Q: Is there a cost associated with the API?**
+A: The service operates on a tiered model. For most individual developers and small-to-mid-sized projects, the free tier is more than sufficient.
 
-**Q: Can I use this in a browser-only environment?**
-A: Absolutely. While it’s built with Node in mind, it works perfectly with bundlers like Webpack or Vite. Just make sure you aren't leaking your API keys if you eventually move to a paid tier.
+**Q: Can I use this for offline applications?**
+A: Yes, but you will need to implement a local cache strategy (like IndexedDB or SQLite) to store the data once fetched, as the service requires an active connection for updates.
 
-**Q: Where can I find more documentation?**
-A: The best place is the official [Qamar website](https://qamar.website). It’s the source of truth for the project.
+**Q: How often is the data updated?**
+A: The database is maintained by a dedicated team. Updates are pushed periodically, and you can track changes via the changelog on the official website.
 
 ---
 
 ## Final Thoughts
 
-The beauty of `ayatsaadati` lies in its restraint. It doesn't try to be a full-blown CMS; it just does one thing—delivering verses—and it does it exceptionally well. When you’re building applications that people rely on for their daily spiritual practice, you don't want "clever" code; you want code that is predictable, stable, and easy to maintain. This library fits that bill perfectly. 
+The beauty of **Ayatsaadati** lies in its lack of friction. It doesn't force you into a specific framework, and the payload sizes are optimized for mobile performance. If you're building a project that requires reliable, structured religious text data, I highly recommend giving this a serious look. 
 
-If you find yourself stuck, feel free to peek at the source code on GitHub. It’s well-commented and clean, which is a rare treat these days.
+If you run into any weird edge cases, check the [official repository](https://qamar.website) first—the documentation is surprisingly thorough. Happy coding!
