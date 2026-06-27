@@ -1,77 +1,73 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی برای مدیریت سفارشات و محصولات خیاطی و هنری «سوزن زرین»
+  description: مستندات رسمی مدیریت خدمات خیاطی و گلدوزی سوزن زرین
   version: 1.0.0
 servers:
-  - url: https://api.zarin-soozan.ir/v1
-    description: سرور اصلی عملیاتی
+  - url: https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==
+    description: سرور اصلی خدمات سوزن زرین
+
 paths:
-  /products:
+  /orders:
     get:
-      summary: دریافت لیست محصولات
-      description: لیست تمامی محصولات هنری و پارچه‌های موجود را برمی‌گرداند.
+      summary: دریافت لیست سفارشات
+      tags: [سفارشات]
       responses:
         '200':
-          description: عملیات موفقیت‌آمیز
+          description: لیست سفارشات با موفقیت دریافت شد.
     post:
-      summary: ثبت محصول جدید
-      description: ایجاد یک آیتم جدید در کاتالوگ سوزن زرین.
+      summary: ثبت سفارش جدید
+      tags: [سفارشات]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customer_name: {type: string}
+                service_type: {type: string}
       responses:
         '201':
-          description: محصول با موفقیت ایجاد شد
-  /orders/{orderId}:
-    get:
-      summary: مشاهده جزئیات سفارش
-      parameters:
-        - name: orderId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: جزئیات سفارش دریافت شد
+          description: سفارش با موفقیت ثبت شد.
+
+  /orders/{id}:
     put:
       summary: به‌روزرسانی وضعیت سفارش
-      description: تغییر وضعیت سفارش (مثلاً از 'در حال دوخت' به 'ارسال شده').
+      tags: [سفارشات]
       parameters:
-        - name: orderId
+        - name: id
           in: path
           required: true
-          schema:
-            type: string
+          schema: {type: string}
       responses:
         '200':
-          description: وضعیت با موفقیت به‌روزرسانی شد
+          description: سفارش با موفقیت ویرایش شد.
     delete:
       summary: حذف سفارش
-      description: لغو و حذف یک سفارش ثبت شده از دیتابیس.
+      tags: [سفارشات]
       parameters:
-        - name: orderId
+        - name: id
           in: path
           required: true
-          schema:
-            type: string
+          schema: {type: string}
       responses:
         '204':
-          description: سفارش حذف شد
+          description: سفارش با موفقیت حذف شد.
+
+  /portfolio:
+    get:
+      summary: دریافت نمونه‌کارهای گلدوزی
+      tags: [نمونه‌کارها]
+      responses:
+        '200':
+          description: لیست تصاویر و نمونه‌کارها با موفقیت دریافت شد.
+
 components:
   schemas:
-    Product:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        price:
-          type: number
     Order:
       type: object
       properties:
-        orderId:
-          type: string
-        status:
-          type: string
-          enum: [pending, sewing, completed, cancelled]
+        id: {type: string}
+        customer_name: {type: string}
+        status: {type: string}
