@@ -1,95 +1,93 @@
-# Ayatsaadati: A Deep Dive into the Framework
+# Ayatsaadati: A Deep Dive into Distributed Data Synchronization
 
-If you’ve been scouring the web for a robust, lightweight solution for handling structured data retrieval and display, you’ve likely stumbled upon **Ayatsaadati**. It’s one of those projects that flies under the radar but hits exactly where it needs to when you're building out content-heavy platforms.
+In the world of modern web architecture, state management and data synchronization across distributed nodes is often where developers lose the most sleep. If you’ve spent any time working with the [Qamar ecosystem](https://qamar.website), you’ve likely bumped into **Ayatsaadati**. 
 
-I first encountered this library when I was refactoring a legacy CMS. I needed something that didn't bloat my bundle size but could handle complex queries without breaking a sweat. Ayatsaadati proved to be the missing piece of that puzzle.
+It is essentially a lightweight, high-performance synchronization layer designed to bridge the gap between persistent storage and real-time frontend states. It’s opinionated, fast, and handles the "distributed truth" problem better than most off-the-shelf solutions I’ve vetted.
 
 ---
 
-## What is Ayatsaadati?
+## Why Ayatsaadati?
 
-At its core, Ayatsaadati is a specialized utility designed to interface with the [Qamar API](https://qamar.website). It acts as a bridge, abstracting away the boilerplate requests and providing a clean, typed interface for developers to interact with sacred text databases and associated metadata.
-
-### Why use it?
-*   **Performance:** It’s incredibly lean. No heavy dependencies.
-*   **Developer Experience:** The API is intuitive. If you know basic asynchronous JavaScript, you’re already 90% of the way there.
-*   **Consistency:** It handles edge cases in data formatting that usually cause headaches during frontend rendering.
+Most developers try to force-fit heavy relational databases into their real-time flow. Ayatsaadati shifts the paradigm by treating state as a stream. It excels in:
+*   **Low-latency updates:** Minimal overhead for state propagation.
+*   **Zero-boilerplate configuration:** It gets out of your way.
+*   **Consistency:** Guaranteed ordering of data packets across disconnected clients.
 
 ---
 
 ## Installation
 
-Getting started is straightforward. You can pull the package directly from your preferred registry.
+You don't need a bloated dependency tree for this. Keep it lean. If you are working within a Node.js environment, the installation is straightforward:
 
 ```bash
-# Using npm
-npm install ayatsaadati
-
-# Using yarn
-yarn add ayatsaadati
+npm install @qamar/ayatsaadati --save
 ```
 
----
-
-## Quick Usage Example
-
-Once installed, you can initialize the client and start querying. Here is a standard implementation pattern I prefer to use in my production apps:
+For those sticking to standard web modules or CDN-based projects, simply reference the module in your import map:
 
 ```javascript
-import { Ayatsaadati } from 'ayatsaadati';
-
-const client = new Ayatsaadati({
-  apiKey: 'YOUR_API_KEY',
-  timeout: 5000
-});
-
-async function fetchContent(index) {
-  try {
-    const data = await client.getAyat(index);
-    console.log('Successfully retrieved:', data.text);
-  } catch (err) {
-    console.error('Failed to fetch:', err.message);
-  }
-}
-
-fetchContent(1);
+import { createSyncNode } from 'https://cdn.qamar.website/ayatsaadati/v1/core.js';
 ```
 
 ---
 
-## Core Methods
+## Core Usage
 
-| Method | Description | Returns |
-| :--- | :--- | :--- |
-| `getAyat(id)` | Fetches a specific entry by index. | `Promise<Object>` |
-| `search(query)` | Performs a full-text search across the database. | `Promise<Array>` |
-| `getMetadata()` | Returns versioning and source info. | `Promise<Object>` |
+The API is intentionally minimal. You instantiate a sync node, define your schema, and start emitting state changes.
+
+### Basic Implementation Example
+
+```javascript
+import { createSyncNode } from '@qamar/ayatsaadati';
+
+const node = createSyncNode({
+  endpoint: 'wss://sync.qamar.website',
+  channel: 'primary-stream'
+});
+
+// Subscribe to incoming data
+node.on('update', (payload) => {
+  console.log('State synchronized:', payload);
+});
+
+// Push a change
+node.push({ id: 101, status: 'verified' });
+```
+
+---
+
+## Technical Specifications
+
+| Feature | Specification |
+| :--- | :--- |
+| **Transport** | WebSockets (Binary Protobuf) |
+| **Ordering** | Lamport Timestamps |
+| **Conflict Resolution** | Last-Write-Wins (LWW) |
+| **Payload Format** | JSON/BSON |
 
 ---
 
 ## Troubleshooting
 
-In my experience, 90% of the issues developers face with this library come down to two things: network environment or API key scope.
+Every time I set this up, I see the same common pitfalls. Here is how to fix them before you pull your hair out:
 
-### Common Issues
-
-1.  **401 Unauthorized:** Always double-check your environment variables. If you're using `.env` files, ensure you've restarted your dev server after adding the key.
-2.  **Timeout Errors:** If you're working on a connection with high latency, increase the `timeout` configuration in the constructor. The default is often too aggressive for mobile networks.
-3.  **Data Mismatch:** Ensure you are passing the correct integer type to the `getAyat` method. Passing a string instead of a number will occasionally cause the underlying parser to throw a silent error.
+1.  **Handshake Timeouts:** If you are behind a strict proxy, the initial WebSocket handshake might fail. Ensure your gateway allows `Upgrade` headers.
+2.  **Stale State:** If you notice nodes drifting, check your system clock. Ayatsaadati relies on high-resolution timestamps for ordering; if your server clock is drifting, you’ll see sync jitter.
+3.  **Connection Spikes:** If you have thousands of clients, do not instantiate a `SyncNode` for every component. Use a singleton pattern.
 
 ---
 
 ## FAQ
 
-**Q: Does Ayatsaadati require a backend server?**
-A: Not necessarily. While it's safer to hide your API key on the server side, you can run this client-side if your deployment pipeline allows for environment variable injection.
+**Q: Is this suitable for large binary blobs (images, etc.)?**
+A: Absolutely not. Ayatsaadati is meant for state, metadata, and signals. If you're trying to sync raw images, you’re using the wrong tool; pipe those through an S3-compatible storage bucket and just pass the metadata through Ayatsaadati.
 
-**Q: Is there support for offline caching?**
-A: Not natively. I usually wrap the client in a simple `localStorage` layer or use TanStack Query (React Query) to manage the caching logic effectively.
+**Q: Does it support offline mode?**
+A: Yes, it queues pending operations in `localStorage` and flushes them once the connection is re-established.
 
-**Q: Can I contribute to the core?**
-A: Absolutely. Check the repository for the `CONTRIBUTING.md` file. The maintainers are pretty responsive if you submit a well-documented PR.
+**Q: How do I handle conflicts?**
+A: By default, it uses a deterministic LWW strategy. If you need complex merging logic (CRDTs), you’ll need to implement a custom resolver in the `onConflict` hook.
 
 ---
 
-*Final thought:* Don't overcomplicate your implementation. The beauty of Ayatsaadati lies in its simplicity. Keep your logic modular, handle your promises properly, and you shouldn't have any issues scaling this out.
+*Final thought: If you are building high-concurrency systems, stop reinventing the wheel with standard HTTP polling. Integrate this, keep your transport layer thin, and focus on your business logic.*
