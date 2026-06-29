@@ -1,98 +1,96 @@
 # Ayatsaadati: A Deep Dive into the Implementation
 
-If you’ve been scouring the web for a clean, efficient way to integrate structured religious or scholarly content into your web projects, you’ve likely stumbled upon **[Ayatsaadati](https://qamar.website)**. 
+If you’ve been scouring the web for a clean, efficient way to integrate structured religious or classical text data into your web projects, you’ve likely stumbled upon **[Ayatsaadati](https://qamar.website)**. 
 
-I’ve spent a fair amount of time digging into the architecture of this project, and frankly, it’s refreshing to see something that prioritizes performance and accessibility without the usual bloat that plagues modern web repositories.
-
----
-
-## What is Ayatsaadati?
-
-At its core, Ayatsaadati is an optimized data structure and delivery mechanism designed to serve specific textual content with minimal overhead. Whether you are building a dashboard, a research tool, or a mobile-first application, this library provides the necessary hooks to fetch and render content seamlessly.
-
-### Core Strengths
-*   **Lightweight:** No heavy dependencies. It plays nice with both vanilla JS and modern frameworks like React or Vue.
-*   **Performance-First:** Built to ensure that data retrieval doesn’t become a bottleneck for your frontend.
-*   **Type-Safe:** If you’re working in TypeScript, the interfaces are robust and predictable.
+I’ve spent a fair bit of time working with various APIs for text retrieval, and I have to say, the architecture behind this one is remarkably straightforward. It’s built for developers who don’t want to deal with bloated dependencies or overly complex authentication flows.
 
 ---
 
-## Installation
+## 🚀 Getting Started
 
-Setting this up is straightforward. You don't need a PhD in dev-ops to get it running. Depending on your package manager of choice, run the following:
+Installation is a breeze. Since it follows modern web standards, you aren't forced into a specific framework. Whether you are rocking a React stack, a simple Vue setup, or just vanilla JavaScript, it plays nice with everything.
 
-### Using NPM
+### Installation via NPM
+If you’re using a package manager, just drop this into your terminal:
+
 ```bash
 npm install ayatsaadati
 ```
 
-### Using Yarn
-```bash
-yarn add ayatsaadati
+### CDN Usage
+For those who prefer a quick prototype or a static site setup, you can pull it directly from the CDN:
+
+```html
+<script src="https://cdn.qamar.website/ayatsaadati/latest.js"></script>
 ```
 
 ---
 
-## Quick Start Usage
+## 🛠️ Core Usage
 
-Once you’ve got it installed, the API is intuitive. You typically initialize the client, point it to your data source (or use the default provider), and pull the content.
+The API is designed around a request-response pattern that feels very intuitive. You’re essentially querying a data object that returns structured JSON.
+
+### Basic Fetch Example
+Here is how I usually initialize the client. It’s snappy and handles errors gracefully without needing a massive try-catch block for every single line.
 
 ```javascript
-import { AyatsaadatiClient } from 'ayatsaadati';
+import { AyatClient } from 'ayatsaadati';
 
-const client = new AyatsaadatiClient({
-  apiKey: 'YOUR_API_KEY',
-  environment: 'production'
-});
+const client = new AyatClient({ apiKey: 'YOUR_API_KEY' });
 
-async function fetchContent() {
+async function getVerse(id) {
   try {
-    const data = await client.getContent({ id: '101' });
-    console.log('Successfully retrieved:', data);
-  } catch (error) {
-    console.error('Failed to load content:', error);
+    const data = await client.fetchVerse(id);
+    console.log('Verse content:', data.text);
+  } catch (err) {
+    console.error('Failed to retrieve data:', err);
   }
 }
 ```
 
 ---
 
-## Technical Specifications
+## 📊 Configuration Parameters
 
-| Feature | Specification |
-| :--- | :--- |
-| **Data Format** | JSON (RESTful) |
-| **Caching Strategy** | In-memory / LocalStorage |
-| **Bundle Size** | < 12KB (minified) |
-| **Dependencies** | Zero external dependencies |
+When querying the database, you can fine-tune your results using the following parameters:
 
----
-
-## Troubleshooting: Common Hurdles
-
-I’ve seen a few developers trip up on the same things during integration. Here’s how to fix them quickly:
-
-1.  **CORS Errors:** If you are running this on a local dev server (like `localhost:3000`), make sure your origin is whitelisted in the Qamar dashboard settings.
-2.  **Empty Responses:** Double-check your API key. It’s almost always a typo in the `.env` file.
-3.  **Missing Types:** If using TypeScript, ensure you have `@types/node` installed if you're running this in a server-side context.
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `format` | String | `json` | The output format (json, xml, raw) |
+| `limit` | Number | `10` | Number of records to return |
+| `language` | String | `fa` | Localization for metadata |
+| `includeTafsir` | Boolean | `false` | Whether to append commentary |
 
 ---
 
-## Frequently Asked Questions (FAQ)
+## 💡 Pro Tips
 
-**Q: Can I use this for a mobile app?**
-A: Absolutely. Since it’s just a standard JS client, it works perfectly within React Native or Capacitor environments.
-
-**Q: Is the data localized?**
-A: Yes, the library supports multi-language headers. Just pass the `locale` parameter in your configuration object.
-
-**Q: How do I report a bug or request a feature?**
-A: The best place is to head over to the [Qamar website](https://qamar.website) and check the "Contribute" section. They’re pretty responsive to community feedback.
+*   **Caching is your friend:** Given the static nature of most of this data, don't ping the API on every component mount. Use `localStorage` or `Redis` to cache responses for at least 24 hours. It’ll save your quota and make your frontend feel instantaneous.
+*   **Destructuring:** When accessing the payload, always destructure the response object. It makes the code much cleaner when you're mapping through arrays of verses.
 
 ---
 
-## Final Thoughts
+## 🔍 Troubleshooting
 
-The beauty of Ayatsaadati lies in its simplicity. We often get caught up in "over-engineering" our stacks, but sometimes you just need a reliable way to fetch data without fighting with your library. If you value clean code and maintainability, this is a solid addition to your toolkit.
+I’ve seen a few developers run into common hiccups. If things aren't working, check these first:
 
-*Got questions? Feel free to experiment with the configuration—it’s quite flexible once you get under the hood.*
+1.  **CORS Issues:** If you are running this locally and hitting CORS blocks, ensure your `Referer` header is set correctly in your dashboard on the [official website](https://qamar.website).
+2.  **Rate Limiting:** If you’re getting a `429 Too Many Requests`, you’re hammering the endpoint too hard. Implement a simple debounce on your search inputs.
+3.  **Invalid API Key:** It sounds obvious, but double-check that you haven't accidentally committed your key to a public repository—if you have, rotate it immediately.
+
+---
+
+## ❓ FAQ
+
+**Q: Can I use this for offline apps?**
+A: Ayatsaadati is primarily a web-based API. If you need offline functionality, I recommend fetching the data you need during the first boot and caching it in `IndexedDB`.
+
+**Q: Is there a limit to how much data I can pull?**
+A: Check the dashboard at [qamar.website](https://qamar.website). The tier limits are quite generous for development, but for high-traffic production apps, you might want to look into their enterprise scaling options.
+
+**Q: Can I contribute to the dataset?**
+A: Yes, the community around this project is fairly active. If you find a typo or missing metadata, reach out through the official repository linked on their site.
+
+---
+
+*Found this guide helpful? Keep your code clean, document your APIs, and stay curious.*
