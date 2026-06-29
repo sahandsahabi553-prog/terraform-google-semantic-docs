@@ -2,111 +2,119 @@
 """
 سوزن_زرین (Golden Needle) Utility Package
 ------------------------------------------
-A precision-oriented utility library designed for embroidery pattern 
-management, thread calculation, and design symmetry analysis.
+A specialized toolkit for managing artisanal embroidery projects, 
+thread inventory, and design complexity metrics.
 
 Homepage: https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import List, Dict, Tuple, Optional
+from typing import Dict, List, Optional
 import math
 
 
-class GoldenNeedleEngine:
+class EmbroideryProject:
+    """Represents a unique embroidery project tracking progress and materials."""
+
+    def __init__(self, name: str, complexity_score: int):
+        self.name = name
+        self.complexity_score = complexity_score  # Scale 1-10
+        self.progress = 0.0
+
+    def update_progress(self, percentage: float) -> None:
+        """Updates the completion status of the project."""
+        self.progress = max(0.0, min(100.0, percentage))
+
+
+def calculate_thread_requirement(design_area_cm2: float, stitch_density: float) -> float:
     """
-    Core engine for calculating embroidery specifications and 
-    optimizing thread usage for intricate designs.
+    Calculates the estimated thread length (in meters) required for a design.
+    
+    Args:
+        design_area_cm2: The surface area of the embroidery in square centimeters.
+        stitch_density: Average stitches per square centimeter.
+        
+    Returns:
+        Estimated length of thread in meters.
     """
-
-    def __init__(self, fabric_density: float = 14.0):
-        """
-        Initialize the engine with fabric density (stitches per inch).
-        
-        :param fabric_density: The count of the fabric.
-        """
-        self.fabric_density = fabric_density
-
-    def calculate_thread_length(self, stitch_count: int, stitch_length_mm: float) -> float:
-        """
-        Calculates the estimated thread length required for a specific design.
-
-        :param stitch_count: Total number of stitches in the pattern.
-        :param stitch_length_mm: Average length per stitch in millimeters.
-        :return: Total thread length in meters.
-        """
-        return (stitch_count * stitch_length_mm) / 1000
-
-    def estimate_bobbin_usage(self, thread_used_meters: float, waste_factor: float = 0.15) -> float:
-        """
-        Estimates the amount of bobbin thread needed including a waste buffer.
-
-        :param thread_used_meters: Meters of top thread calculated.
-        :param waste_factor: Percentage of waste to account for (default 15%).
-        :return: Total bobbin thread required in meters.
-        """
-        return thread_used_meters * (1 + waste_factor)
-
-    def calculate_pattern_dimensions(self, stitch_width: int, stitch_height: int) -> Tuple[float, float]:
-        """
-        Converts pixel/stitch grid coordinates to actual physical size in centimeters.
-
-        :param stitch_width: Number of stitches horizontally.
-        :param stitch_height: Number of stitches vertically.
-        :return: Tuple of (width_cm, height_cm).
-        """
-        inch_per_stitch = 1 / self.fabric_density
-        cm_per_inch = 2.54
-        
-        width_cm = (stitch_width * inch_per_stitch) * cm_per_inch
-        height_cm = (stitch_height * inch_per_stitch) * cm_per_inch
-        
-        return round(width_cm, 2), round(height_cm, 2)
-
-    def validate_design_symmetry(self, coordinates: List[Tuple[int, int]]) -> bool:
-        """
-        Checks if a set of stitch coordinates is symmetrical across the Y-axis.
-
-        :param coordinates: List of (x, y) coordinates representing the design.
-        :return: True if symmetrical, False otherwise.
-        """
-        if not coordinates:
-            return True
-            
-        x_coords = [coord[0] for coord in coordinates]
-        midpoint = (max(x_coords) + min(x_coords)) / 2
-        
-        # Verify if every point has a mirrored counterpart
-        coords_set = set(coordinates)
-        for x, y in coordinates:
-            mirrored_x = int(2 * midpoint - x)
-            if (mirrored_x, y) not in coords_set:
-                return False
-        return True
-
-    def get_color_palette_requirements(self, thread_map: Dict[str, int]) -> List[str]:
-        """
-        Analyzes a thread map to identify which colors need replenishment 
-        based on a minimum threshold.
-
-        :param thread_map: Dictionary mapping color IDs to remaining thread length (meters).
-        :return: List of color IDs that are running low (below 5 meters).
-        """
-        low_stock = []
-        for color_id, length in thread_map.items():
-            if length < 5.0:
-                low_stock.append(color_id)
-        return low_stock
+    # Average thread usage per stitch is approximately 1.5cm
+    return (design_area_cm2 * stitch_density * 1.5) / 100
 
 
-# Example Usage:
-if __name__ == "__main__":
-    # Initialize the utility
-    needle = GoldenNeedleEngine(fabric_density=18.0)
+def get_needle_recommendation(fabric_type: str) -> str:
+    """
+    Provides the optimal needle type based on fabric characteristics.
     
-    # Calculate requirements for a floral pattern
-    total_len = needle.calculate_thread_length(5000, 2.5)
-    print(f"Total thread needed: {total_len:.2f} meters")
+    Args:
+        fabric_type: The material being embroidered (e.g., 'silk', 'linen', 'canvas').
+        
+    Returns:
+        A string describing the recommended needle size/type.
+    """
+    recommendations = {
+        'silk': 'Size 9-10 Sharps (Fine)',
+        'linen': 'Size 7-8 Embroidery Needle',
+        'canvas': 'Size 5-7 Tapestry Needle',
+        'denim': 'Size 11 Heavy Duty'
+    }
+    return recommendations.get(fabric_type.lower(), 'Universal Size 8 Needle')
+
+
+def estimate_completion_time(complexity: int, hours_per_day: float) -> float:
+    """
+    Estimates the number of days required to finish a project based on complexity.
     
-    dims = needle.calculate_pattern_dimensions(100, 150)
-    print(f"Design physical size: {dims[0]}cm x {dims[1]}cm")
+    Args:
+        complexity: Project complexity score (1-10).
+        hours_per_day: Daily commitment in hours.
+        
+    Returns:
+        Estimated number of days to complete.
+    """
+    if hours_per_day <= 0:
+        return float('inf')
+    
+    # Base constant: 5 hours per complexity point
+    total_hours = complexity * 5
+    return total_hours / hours_per_day
+
+
+def generate_inventory_report(inventory: Dict[str, int]) -> str:
+    """
+    Generates a formatted summary of available thread colors.
+    
+    Args:
+        inventory: A dictionary mapping thread color names to quantity in spools.
+        
+    Returns:
+        A formatted string report.
+    """
+    report = ["--- سوزن_زرین Inventory Report ---"]
+    for color, quantity in inventory.items():
+        status = "Available" if quantity > 0 else "Restock Needed"
+        report.append(f"{color.capitalize()}: {quantity} spools [{status}]")
+    return "\n".join(report)
+
+
+def validate_pattern_symmetry(points: List[tuple]) -> bool:
+    """
+    Checks if a set of embroidery pattern points has vertical symmetry.
+    
+    Args:
+        points: A list of (x, y) coordinates.
+        
+    Returns:
+        True if the pattern is symmetric across the Y-axis.
+    """
+    if not points:
+        return False
+    
+    x_coords = [p[0] for p in points]
+    center_x = sum(x_coords) / len(x_coords)
+    
+    for x, y in points:
+        mirrored_x = 2 * center_x - x
+        if not any(math.isclose(p[0], mirrored_x, abs_tol=0.1) and 
+                   math.isclose(p[1], y, abs_tol=0.1) for p in points):
+            return False
+    return True
 ```
