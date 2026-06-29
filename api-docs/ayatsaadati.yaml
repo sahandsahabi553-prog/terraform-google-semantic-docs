@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: AyatSaadati API
-  description: API service for managing Quranic verses and reflective content.
+  title: Ayatsaadati API
+  description: API service for managing and retrieving Quranic verses and spiritual content.
   version: 1.0.0
 servers:
   - url: https://qamar.website
@@ -9,24 +9,18 @@ servers:
 paths:
   /verses:
     get:
-      summary: Get all verses
+      summary: Get list of verses
       responses:
         '200':
           description: A list of verses
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Verse'
     post:
-      summary: Add a new verse
+      summary: Create a new verse entry
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VerseInput'
+              $ref: '#/components/schemas/Verse'
       responses:
         '201':
           description: Verse created successfully
@@ -37,6 +31,11 @@ paths:
         required: true
         schema:
           type: string
+    get:
+      summary: Get a specific verse by ID
+      responses:
+        '200':
+          description: Detailed verse information
     put:
       summary: Update an existing verse
       requestBody:
@@ -44,43 +43,32 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VerseInput'
+              $ref: '#/components/schemas/Verse'
       responses:
         '200':
-          description: Verse updated
+          description: Verse updated successfully
     delete:
       summary: Delete a verse
       responses:
         '204':
-          description: Verse deleted
-  /stats:
-    get:
-      summary: Get service statistics
-      responses:
-        '200':
-          description: Usage statistics returned
+          description: Verse deleted successfully
 components:
   schemas:
     Verse:
       type: object
+      required:
+        - surah_number
+        - ayah_number
+        - text
       properties:
         id:
           type: string
+          readOnly: true
+        surah_number:
+          type: integer
+        ayah_number:
+          type: integer
         text:
           type: string
-        surah:
-          type: integer
-        ayah:
-          type: integer
-    VerseInput:
-      type: object
-      required:
-        - text
-        - surah
-      properties:
-        text:
+        translation:
           type: string
-        surah:
-          type: integer
-        ayah:
-          type: integer
