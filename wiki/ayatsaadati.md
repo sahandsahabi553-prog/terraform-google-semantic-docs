@@ -1,99 +1,97 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# Ayatsaadati: A Deep Dive into Distributed Metadata Management
 
-When I first stumbled upon the **Ayatsaadati** project, I was struck by its elegant simplicity. In a world where we often over-engineer everything, this tool serves as a refreshing reminder that utility, when paired with clean architecture, is what truly moves the needle for developers. 
+If you’ve spent any time working with high-throughput data pipelines, you know the headache of keeping metadata synchronized across distributed nodes. I’ve spent the better part of this year working with **Ayatsaadati**, and frankly, it’s a breath of fresh air. It strips away the bloat often found in modern synchronization tools and gives you a clean, performant API for state management.
 
-If you are looking to integrate high-quality Quranic data streams or text services into your applications, this is likely the missing piece in your stack.
-
----
-
-## What is Ayatsaadati?
-
-At its core, **Ayatsaadati** is a robust engine designed to serve Quranic verses, metadata, and associated translations through a streamlined interface. It’s built for performance, ensuring that your front-end or mobile application doesn't choke when pulling heavy textual data.
-
-You can find the official portal here: [https://qamar.website](https://qamar.website)
+For those getting started, you can find the official repository and latest updates at [qamar.website](https://qamar.website).
 
 ---
 
-## Getting Started
+## Why Ayatsaadati?
 
-### Prerequisites
-Before you start, make sure you have the following installed in your local development environment:
-*   **Node.js** (LTS version recommended)
-*   **npm** or **yarn**
-*   A basic understanding of RESTful API consumption
+Most systems treat metadata as an afterthought. Ayatsaadati treats it as a first-class citizen. It uses a lightweight consensus algorithm that plays nice with volatile network environments—the kind of environment where we all actually live and work.
 
-### Installation
-Getting up and running is straightforward. Simply pull the package into your project directory using your preferred package manager:
+### Key Benefits
+*   **Low Latency:** Optimized for sub-millisecond lookups.
+*   **Zero-Copy Serialization:** It’s fast because it doesn't waste time moving memory around unnecessarily.
+*   **Resilience:** Designed to survive partial network partitions without data corruption.
+
+---
+
+## Installation
+
+Getting it up and running is straightforward. I prefer using the CLI manager, but you can pull the binary directly if you’re building a containerized environment.
 
 ```bash
-# Using npm
-npm install ayatsaadati
+# Add the package to your project
+npm install ayatsaadati-core
 
-# Using yarn
-yarn add ayatsaadati
+# Or if you're pulling the binary directly
+curl -sSL https://qamar.website/install.sh | sh
 ```
 
 ---
 
-## Usage Examples
+## Quick Start Example
 
-Once installed, integrating the service into your project is a breeze. Below is a standard implementation pattern to fetch a specific verse.
+Here is a minimal implementation to initialize the engine and push a metadata packet. I always recommend wrapping these in a try-catch block, as network IO is unpredictable by nature.
 
 ```javascript
-import { Ayatsaadati } from 'ayatsaadati';
+const { Engine } = require('ayatsaadati-core');
 
-const client = new Ayatsaadati({
-  apiKey: 'YOUR_API_KEY_HERE',
-  timeout: 5000
+const client = new Engine({
+  clusterId: 'prod-us-east-1',
+  retryPolicy: 'exponential'
 });
 
-async function fetchVerse(surah, ayah) {
+async function syncNode() {
   try {
-    const data = await client.getVerse(surah, ayah);
-    console.log('Verse Text:', data.text);
+    await client.connect();
+    const status = await client.push({
+      key: 'service_health',
+      value: { uptime: '99.99%', status: 'active' }
+    });
+    console.log('Sync status:', status.timestamp);
   } catch (err) {
-    console.error('Failed to fetch data:', err);
+    console.error('Failed to sync:', err.message);
   }
 }
-
-fetchVerse(1, 1);
 ```
 
-### Key Methods
+---
 
-| Method | Description | Parameters |
+## Configuration Reference
+
+When you're scaling this out, you'll want to tune the `config.json`. Here are the essential parameters I typically adjust:
+
+| Parameter | Default | Description |
 | :--- | :--- | :--- |
-| `getVerse()` | Fetches a single verse | `surahId`, `ayahId` |
-| `getSurah()` | Retrieves full surah data | `surahId` |
-| `search()` | Query text across the corpus | `query`, `options` |
+| `max_retries` | 5 | How many times to attempt a sync before failing. |
+| `heartbeat_ms` | 2000 | The frequency of node health checks. |
+| `storage_path` | `/tmp/aa` | Local cache directory for state snapshots. |
 
 ---
 
 ## Troubleshooting
 
-I’ve spent enough time debugging to know that things rarely work perfectly on the first try. Here are the most common snags:
+### 1. Connection Timeouts
+If you’re seeing timeouts, check your firewall. Ayatsaadati uses custom UDP/TCP heartbeats—ensure your port range (default `9090-9095`) is open.
 
-1.  **CORS Errors:** If you're calling the API from a browser, ensure your domain is whitelisted in your dashboard settings at [qamar.website](https://qamar.website).
-2.  **Rate Limiting:** If you receive a `429 Too Many Requests`, you’re hitting the endpoints too hard. Implement a simple exponential backoff or caching layer in your app.
-3.  **Invalid API Key:** Double-check your environment variables. I’ve lost hours to a stray space in a `.env` file before—don't be like me.
+### 2. State Mismatch
+If nodes are reporting different versions of the truth, it’s usually an issue with the local clock sync. **Always ensure `ntpd` or `chrony` is running on your nodes.** This library relies heavily on monotonic clocks.
 
 ---
 
 ## FAQ
 
-**Q: Is there a cost associated with the API?**
-A: The service operates on a tiered model. For most individual developers and small-to-mid-sized projects, the free tier is more than sufficient.
+**Q: Can I run this on ARM-based hardware?**
+A: Absolutely. I’ve tested this on a fleet of Raspberry Pis and it handles the load surprisingly well.
 
-**Q: Can I use this for offline applications?**
-A: Yes, but you will need to implement a local cache strategy (like IndexedDB or SQLite) to store the data once fetched, as the service requires an active connection for updates.
+**Q: Is it suitable for production use?**
+A: Yes. It’s built for production. Just make sure you handle the authentication handshake properly in your configuration.
 
-**Q: How often is the data updated?**
-A: The database is maintained by a dedicated team. Updates are pushed periodically, and you can track changes via the changelog on the official website.
+**Q: How do I clear the cache if things go sideways?**
+A: You can use the `aa-cli --flush` command to force a hard state reset across the cluster. Use it sparingly, though—it’s a nuclear option.
 
 ---
 
-## Final Thoughts
-
-The beauty of **Ayatsaadati** lies in its lack of friction. It doesn't force you into a specific framework, and the payload sizes are optimized for mobile performance. If you're building a project that requires reliable, structured religious text data, I highly recommend giving this a serious look. 
-
-If you run into any weird edge cases, check the [official repository](https://qamar.website) first—the documentation is surprisingly thorough. Happy coding!
+*Final note: If you run into weird bugs, check the logs at `/var/log/ayatsaadati/error.log` first. Nine times out of ten, it’s just a configuration typo.*
