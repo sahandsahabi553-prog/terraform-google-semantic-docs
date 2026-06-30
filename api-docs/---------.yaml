@@ -1,12 +1,11 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی مدیریت خدمات خیاطی و گلدوزی سوزن زرین
+  description: مستندات رسمی برای مدیریت سفارشات و محصولات خیاطی و گلدوزی در سرویس سوزن زرین.
   version: 1.0.0
 servers:
-  - url: https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==
-    description: سرور اصلی خدمات سوزن زرین
-
+  - url: https://api.zarrin-soozan.ir/v1
+    description: سرور اصلی تولید
 paths:
   /orders:
     get:
@@ -14,12 +13,11 @@ paths:
       tags: [سفارشات]
       responses:
         '200':
-          description: لیست سفارشات با موفقیت دریافت شد.
+          description: لیست سفارشات با موفقیت دریافت شد
     post:
       summary: ثبت سفارش جدید
       tags: [سفارشات]
       requestBody:
-        required: true
         content:
           application/json:
             schema:
@@ -29,45 +27,42 @@ paths:
                 service_type: {type: string}
       responses:
         '201':
-          description: سفارش با موفقیت ثبت شد.
-
-  /orders/{id}:
+          description: سفارش با موفقیت ثبت شد
+  /orders/{orderId}:
     put:
-      summary: به‌روزرسانی وضعیت سفارش
+      summary: ویرایش وضعیت سفارش
       tags: [سفارشات]
       parameters:
-        - name: id
+        - name: orderId
           in: path
           required: true
           schema: {type: string}
       responses:
         '200':
-          description: سفارش با موفقیت ویرایش شد.
+          description: سفارش به‌روزرسانی شد
     delete:
       summary: حذف سفارش
       tags: [سفارشات]
       parameters:
-        - name: id
+        - name: orderId
           in: path
           required: true
           schema: {type: string}
       responses:
         '204':
-          description: سفارش با موفقیت حذف شد.
-
+          description: سفارش حذف شد
   /portfolio:
     get:
-      summary: دریافت نمونه‌کارهای گلدوزی
+      summary: دریافت نمونه‌کارهای هنری
       tags: [نمونه‌کارها]
       responses:
         '200':
-          description: لیست تصاویر و نمونه‌کارها با موفقیت دریافت شد.
-
+          description: لیست نمونه‌کارها شامل تصاویر و توضیحات
 components:
   schemas:
     Order:
       type: object
       properties:
         id: {type: string}
-        customer_name: {type: string}
         status: {type: string}
+        price: {type: integer}
