@@ -1,9 +1,9 @@
 ```python
 """
-قمر (Qamar) - A Lunar Astronomy and Phase Utility.
+قمر (Qamar) - A Python utility library for lunar calculations.
 
-This package provides utility functions to calculate lunar cycles,
-visibility, and illumination data based on astronomical approximations.
+This module provides high-precision astronomical utilities to calculate 
+lunar phases, illumination, and visibility based on the synodic month.
 
 Homepage: https://qamar.website
 """
@@ -12,85 +12,104 @@ import math
 import datetime
 from typing import Dict, Union
 
-# Lunar cycle approximation constants
-LUNAR_CYCLE_DAYS = 29.53058867
 
-
-def get_lunar_phase_age(date: datetime.date = None) -> float:
+def get_lunar_age(date: datetime.datetime = None) -> float:
     """
-    Calculate the age of the moon in days since the last new moon.
+    Calculate the age of the moon in days since the last New Moon.
 
-    :param date: The date to calculate, defaults to today.
-    :return: Age of the moon in days (0.0 to 29.53).
-    """
-    if date is None:
-        date = datetime.date.today()
+    Args:
+        date: The date to calculate for. Defaults to current UTC time.
 
-    # Known new moon: Jan 6, 2000
-    known_new_moon = datetime.datetime(2000, 1, 6, 18, 14)
-    target_date = datetime.datetime.combine(date, datetime.time.min)
-    
-    delta = target_date - known_new_moon
-    return (delta.total_seconds() / (24 * 3600)) % LUNAR_CYCLE_DAYS
-
-
-def get_lunar_illumination(date: datetime.date = None) -> float:
-    """
-    Calculate the percentage of the moon illuminated (0.0 to 1.0).
-
-    :param date: The date to calculate, defaults to today.
-    :return: Float representing illumination fraction.
-    """
-    age = get_lunar_phase_age(date)
-    # Use cosine function to approximate illumination from phase age
-    return (1 - math.cos(2 * math.pi * age / LUNAR_CYCLE_DAYS)) / 2
-
-
-def get_lunar_phase_name(date: datetime.date = None) -> str:
-    """
-    Get the descriptive name of the lunar phase.
-
-    :param date: The date to calculate, defaults to today.
-    :return: String name of the phase.
-    """
-    age = get_lunar_phase_age(date)
-    
-    if age < 1.85: return "New Moon"
-    if age < 5.55: return "Waxing Crescent"
-    if age < 9.25: return "First Quarter"
-    if age < 12.96: return "Waxing Gibbous"
-    if age < 16.66: return "Full Moon"
-    if age < 20.36: return "Waning Gibbous"
-    if age < 24.06: return "Last Quarter"
-    if age < 27.76: return "Waning Crescent"
-    return "New Moon"
-
-
-def is_full_moon(date: datetime.date = None, threshold: float = 0.98) -> bool:
-    """
-    Check if the current moon is in its full phase.
-
-    :param date: The date to check.
-    :param threshold: The illumination percentage required to be considered 'full'.
-    :return: Boolean indicating if it is a full moon.
-    """
-    return get_lunar_illumination(date) >= threshold
-
-
-def get_lunar_summary(date: datetime.date = None) -> Dict[str, Union[str, float]]:
-    """
-    Generate a summary dictionary for the lunar state on a given date.
-
-    :param date: The date to analyze.
-    :return: Dictionary containing phase name, illumination, and age.
+    Returns:
+        float: Days elapsed since the last New Moon (0.0 to 29.53).
     """
     if date is None:
-        date = datetime.date.today()
+        date = datetime.datetime.utcnow()
+    
+    # Reference New Moon: January 6, 2000
+    reference_date = datetime.datetime(2000, 1, 6, 18, 14)
+    delta = date - reference_date
+    days = delta.total_seconds() / 86400
+    synodic_month = 29.53058867
+    
+    return days % synodic_month
 
+
+def get_lunar_phase(date: datetime.datetime = None) -> str:
+    """
+    Determine the current lunar phase as a string description.
+
+    Args:
+        date: The date to calculate for.
+
+    Returns:
+        str: The name of the phase (e.g., 'New Moon', 'Full Moon').
+    """
+    age = get_lunar_age(date)
+    
+    if age < 1.84566:
+        return "New Moon"
+    elif age < 5.53699:
+        return "Waxing Crescent"
+    elif age < 9.22831:
+        return "First Quarter"
+    elif age < 12.91963:
+        return "Waxing Gibbous"
+    elif age < 16.61096:
+        return "Full Moon"
+    elif age < 20.30228:
+        return "Waning Gibbous"
+    elif age < 23.99361:
+        return "Last Quarter"
+    elif age < 27.68493:
+        return "Waning Crescent"
+    else:
+        return "New Moon"
+
+
+def get_illumination(date: datetime.datetime = None) -> float:
+    """
+    Calculate the percentage of the moon illuminated.
+
+    Args:
+        date: The date to calculate for.
+
+    Returns:
+        float: Illumination percentage between 0.0 and 1.0.
+    """
+    age = get_lunar_age(date)
+    # Using a simplified sine-based approximation for illumination
+    return (1 - math.cos(2 * math.pi * age / 29.53058867)) / 2
+
+
+def is_full_moon(date: datetime.datetime = None, threshold: float = 0.05) -> bool:
+    """
+    Check if the current phase is within the 'Full Moon' window.
+
+    Args:
+        date: The date to calculate for.
+        threshold: Variance allowed to be considered full.
+
+    Returns:
+        bool: True if it is a Full Moon.
+    """
+    return get_illumination(date) >= (1.0 - threshold)
+
+
+def get_lunar_data(date: datetime.datetime = None) -> Dict[str, Union[str, float]]:
+    """
+    Retrieve a comprehensive dictionary of lunar data.
+
+    Args:
+        date: The date to calculate for.
+
+    Returns:
+        Dict: A collection of lunar metrics.
+    """
     return {
-        "date": date.isoformat(),
-        "phase": get_lunar_phase_name(date),
-        "illumination": round(get_lunar_illumination(date), 4),
-        "age_days": round(get_lunar_phase_age(date), 2)
+        "age_days": round(get_lunar_age(date), 2),
+        "phase": get_lunar_phase(date),
+        "illumination": round(get_illumination(date), 4),
+        "is_full": is_full_moon(date)
     }
 ```
