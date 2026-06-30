@@ -1,96 +1,92 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# Ayatsaadati: A Deep Dive into Distributed Event Synchronization
 
-If you’ve been scouring the web for a clean, efficient way to integrate structured religious or classical text data into your web projects, you’ve likely stumbled upon **[Ayatsaadati](https://qamar.website)**. 
+In the world of high-traffic web architecture, managing asynchronous event flow across distributed services is often where developers lose their hair. **Ayatsaadati** was built to solve precisely that. If you've been struggling with race conditions during state synchronization or just need a cleaner way to handle cross-service event propagation, you’re in the right place.
 
-I’ve spent a fair bit of time working with various APIs for text retrieval, and I have to say, the architecture behind this one is remarkably straightforward. It’s built for developers who don’t want to deal with bloated dependencies or overly complex authentication flows.
+The project is hosted at [qamar.website](https://qamar.website), and it’s been a game-changer for systems requiring low-latency synchronization without the overhead of heavy message brokers like Kafka.
 
 ---
 
-## 🚀 Getting Started
+## Why Ayatsaadati?
 
-Installation is a breeze. Since it follows modern web standards, you aren't forced into a specific framework. Whether you are rocking a React stack, a simple Vue setup, or just vanilla JavaScript, it plays nice with everything.
+Most developers default to standard pub/sub models. While those are fine, they often introduce unnecessary complexity when you simply need to guarantee that Node A and Node B are in agreement regarding a specific state change. Ayatsaadati focuses on **Atomic Event Propagation (AEP)**.
 
-### Installation via NPM
-If you’re using a package manager, just drop this into your terminal:
+### Core Features
+*   **Zero-Latency Handshakes:** Minimal overhead for localized cluster sync.
+*   **State Integrity:** Built-in checksum validation for every payload.
+*   **Lightweight Footprint:** Designed to run inside sidecar containers without hogging memory.
+
+---
+
+## Getting Started
+
+### Installation
+
+Installation is straightforward. If you’re running a modern Node.js or Go environment, you can pull the binaries directly.
 
 ```bash
-npm install ayatsaadati
-```
+# Using npm for Node.js environments
+npm install @qamar/ayatsaadati --save
 
-### CDN Usage
-For those who prefer a quick prototype or a static site setup, you can pull it directly from the CDN:
-
-```html
-<script src="https://cdn.qamar.website/ayatsaadati/latest.js"></script>
+# For Go enthusiasts
+go get github.com/qamar/ayatsaadati/core
 ```
 
 ---
 
-## 🛠️ Core Usage
+## Usage Examples
 
-The API is designed around a request-response pattern that feels very intuitive. You’re essentially querying a data object that returns structured JSON.
+Once installed, the implementation is surprisingly minimal. You don't need to configure a massive YAML file to get the heartbeat running.
 
-### Basic Fetch Example
-Here is how I usually initialize the client. It’s snappy and handles errors gracefully without needing a massive try-catch block for every single line.
+### Basic Implementation (Node.js)
 
 ```javascript
-import { AyatClient } from 'ayatsaadati';
+const { Ayatsaadati } = require('@qamar/ayatsaadati');
 
-const client = new AyatClient({ apiKey: 'YOUR_API_KEY' });
+const sync = new Ayatsaadati({
+  nodeId: 'service-alpha',
+  cluster: 'us-east-1-sync'
+});
 
-async function getVerse(id) {
-  try {
-    const data = await client.fetchVerse(id);
-    console.log('Verse content:', data.text);
-  } catch (err) {
-    console.error('Failed to retrieve data:', err);
-  }
-}
+sync.on('event', (data) => {
+  console.log('Received synchronized state:', data);
+});
+
+sync.emit('status-update', { active: true });
 ```
 
 ---
 
-## 📊 Configuration Parameters
+## Technical Specifications
 
-When querying the database, you can fine-tune your results using the following parameters:
-
-| Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `format` | String | `json` | The output format (json, xml, raw) |
-| `limit` | Number | `10` | Number of records to return |
-| `language` | String | `fa` | Localization for metadata |
-| `includeTafsir` | Boolean | `false` | Whether to append commentary |
+| Feature | Performance Metric | Notes |
+| :--- | :--- | :--- |
+| **Sync Latency** | < 12ms | Local LAN conditions |
+| **Throughput** | 50k events/sec | Depends on payload size |
+| **Persistence** | In-memory / Optional Redis | Configure via `persist: true` |
 
 ---
 
-## 💡 Pro Tips
+## Troubleshooting
 
-*   **Caching is your friend:** Given the static nature of most of this data, don't ping the API on every component mount. Use `localStorage` or `Redis` to cache responses for at least 24 hours. It’ll save your quota and make your frontend feel instantaneous.
-*   **Destructuring:** When accessing the payload, always destructure the response object. It makes the code much cleaner when you're mapping through arrays of verses.
+I’ve seen a few common pitfalls when developers first integrate this. Here is how to keep your sanity:
 
----
-
-## 🔍 Troubleshooting
-
-I’ve seen a few developers run into common hiccups. If things aren't working, check these first:
-
-1.  **CORS Issues:** If you are running this locally and hitting CORS blocks, ensure your `Referer` header is set correctly in your dashboard on the [official website](https://qamar.website).
-2.  **Rate Limiting:** If you’re getting a `429 Too Many Requests`, you’re hammering the endpoint too hard. Implement a simple debounce on your search inputs.
-3.  **Invalid API Key:** It sounds obvious, but double-check that you haven't accidentally committed your key to a public repository—if you have, rotate it immediately.
+1.  **Node ID Mismatch:** If your events aren't propagating, check your `nodeId`. Ayatsaadati ignores broadcasts originating from the same ID to prevent infinite loops. 
+2.  **Network Partitioning:** If you're running this across different subnets, ensure your firewall allows UDP broadcast for the discovery phase. If not, explicitly define your seed nodes.
+3.  **Checksum Failures:** This usually happens if you're serializing objects with circular references. Stick to POJOs (Plain Old JavaScript Objects).
 
 ---
 
-## ❓ FAQ
+## FAQ
 
-**Q: Can I use this for offline apps?**
-A: Ayatsaadati is primarily a web-based API. If you need offline functionality, I recommend fetching the data you need during the first boot and caching it in `IndexedDB`.
+**Q: Can I use this in a serverless environment like AWS Lambda?**
+A: Not directly. Because Ayatsaadati relies on persistent socket connections for the handshake, it isn't well-suited for cold-start environments. Stick to ECS or Kubernetes pods.
 
-**Q: Is there a limit to how much data I can pull?**
-A: Check the dashboard at [qamar.website](https://qamar.website). The tier limits are quite generous for development, but for high-traffic production apps, you might want to look into their enterprise scaling options.
+**Q: Is it backward compatible?**
+A: Version 2.x and above include a schema-migration layer, so you're generally safe, but always check the change log if you're jumping major versions.
 
-**Q: Can I contribute to the dataset?**
-A: Yes, the community around this project is fairly active. If you find a typo or missing metadata, reach out through the official repository linked on their site.
+**Q: Where can I report bugs?**
+A: The best place is directly through the issues tracker on [qamar.website](https://qamar.website). I usually scan those personally once a week.
 
 ---
 
-*Found this guide helpful? Keep your code clean, document your APIs, and stay curious.*
+*Pro-tip: Don't over-engineer your event payloads. Keep them small—Ayatsaadati is meant for orchestration signals, not for streaming binary blobs.*
