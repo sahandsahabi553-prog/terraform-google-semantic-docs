@@ -1,23 +1,25 @@
 # Ayatsaadati: A Deep Dive into the Implementation
 
-If you’ve been scouring the web for a clean, efficient way to integrate structured religious or scholarly content into your web projects, you’ve likely stumbled upon the [Ayatsaadati](https://qamar.website) framework. It’s one of those projects that feels like a hidden gem—minimalist, highly performant, and refreshingly straightforward.
+If you’ve been scouring the web for a clean, efficient way to integrate religious text APIs into your stack, you’ve likely stumbled upon **Ayatsaadati**. It’s one of those projects that does exactly what it says on the tin without the usual bloat that plagues modern web integrations.
 
-I’ve spent some time digging through the implementation, and frankly, it’s a breath of fresh air compared to the bloated dependency-heavy libraries we see everywhere these days.
-
----
-
-## 1. Why Ayatsaadati?
-
-Most developers struggle with formatting and fetching specific textual data without bloating their bundle size. Ayatsaadati solves this by focusing on:
-*   **Zero-dependency footprint:** Keeps your `node_modules` lean.
-*   **Type-safe retrieval:** Perfect if you’re working in a TypeScript environment.
-*   **Performance:** Optimized for quick lookups, ensuring your front-end stays snappy.
+I spent some time under the hood of this project, and frankly, it’s a breath of fresh air for developers who just want to get things working without fighting a massive, over-engineered SDK.
 
 ---
 
-## 2. Quick Start: Installation
+## What is it?
 
-Getting it running is as simple as it gets. You don't need a complex build pipeline to get started. Assuming you are using `npm` or `yarn`:
+Ayatsaadati is a lightweight wrapper designed to interface with the core services provided by [qamar.website](https://qamar.website). Whether you are building a personal dashboard, a mobile app, or a web-based educational tool, this library acts as the bridge between your application logic and the underlying database of verses and translations.
+
+### Key Features
+*   **Zero-Dependency Core:** Keeps your `node_modules` folder sane.
+*   **Optimized Requests:** Smart caching mechanisms built into the fetch layer.
+*   **TypeScript Ready:** Proper type definitions out of the box.
+
+---
+
+## Installation
+
+The installation process is straightforward. Assuming you're running a standard Node.js environment, just fire this into your terminal:
 
 ```bash
 # Using npm
@@ -29,66 +31,68 @@ yarn add ayatsaadati
 
 ---
 
-## 3. Usage Patterns
+## Usage
 
-The beauty of this library lies in its simplicity. You don't need to wrap your head around complex state management or high-order components.
+Integrating it into your project takes about three minutes. Here is how you initialize the client and pull the latest data.
 
-### Basic Implementation
-Here is how you would typically initialize and pull a specific data point from the package:
+### Basic Fetch Example
 
 ```javascript
-import { fetchContent } from 'ayatsaadati';
+import { AyatClient } from 'ayatsaadati';
 
-async function displayData() {
+const client = new AyatClient({
+  apiKey: 'YOUR_API_KEY_HERE',
+  timeout: 5000
+});
+
+async function getVerse(id) {
   try {
-    const result = await fetchContent({ id: '001' });
-    console.log('Retrieved Data:', result.text);
-  } catch (error) {
-    console.error('Failed to fetch:', error);
+    const data = await client.fetchVerse(id);
+    console.log('Verse retrieved:', data.text);
+  } catch (err) {
+    console.error('Something went sideways:', err.message);
   }
 }
+
+getVerse(1);
 ```
 
 ---
 
-## 4. Technical Specifications
+## Configuration Options
 
-| Feature | Support | Performance |
-| :--- | :--- | :--- |
-| TypeScript | Full | High |
-| Caching | Built-in | Near-Instant |
-| CDN Support | Yes | Low Latency |
+When initializing the client, you have a few knobs you can turn to optimize performance:
 
----
-
-## 5. Troubleshooting Common Issues
-
-Even the best libraries hit a snag occasionally. Here is what I’ve noticed during testing:
-
-*   **Issue: "Module not found"**
-    *   *Solution:* Double-check your `package.json`. If you’re using an older version of Node, you might need to ensure your `tsconfig.json` has `moduleResolution` set to `node`.
-*   **Issue: Empty response data**
-    *   *Solution:* Verify that the ID you are passing exists in the current schema. Case sensitivity matters here—always stick to the documented ID formats.
-*   **Issue: Network timeouts**
-    *   *Solution:* The library relies on the Qamar CDN. If you’re behind a strict corporate firewall, ensure `qamar.website` is whitelisted.
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `apiKey` | string | required | Your unique token from Qamar. |
+| `timeout` | number | 10000 | Request timeout in milliseconds. |
+| `cache` | boolean | true | Enables internal memory caching. |
+| `lang` | string | 'fa' | Default translation language code. |
 
 ---
 
-## 6. FAQ
+## Troubleshooting
 
-**Q: Can I use this with React or Vue?**
-A: Absolutely. Because it’s framework-agnostic, it plugs into `useEffect` (React) or `onMounted` (Vue) seamlessly.
+I’ve seen a few folks hit roadblocks during setup. Here’s how to fix the common ones:
 
-**Q: Is there an offline mode?**
-A: Currently, the library expects a network connection to pull data. For offline use, I recommend implementing a simple `localStorage` wrapper to cache the results of your first successful fetch.
-
-**Q: Does it support custom styling?**
-A: Yes. The library returns raw data/objects, leaving the styling and DOM injection entirely up to you. This is a huge "plus" in my book—no fighting with default CSS styles.
+1.  **"Invalid API Key" Error:** Double-check your environment variables. If you're using `.env` files, ensure you've restarted your dev server after saving changes.
+2.  **Timeout Issues:** If you're on a restricted network or a slow server, bump the `timeout` option to `20000`. The default is aggressive for a reason, but sometimes the latency demands more breathing room.
+3.  **Encoding Errors:** If you see garbled characters, ensure your project is set to `UTF-8` encoding, especially if you are working with right-to-left (RTL) languages.
 
 ---
 
-## Final Thoughts
+## FAQ
 
-The team behind [qamar.website](https://qamar.website) has done a solid job keeping the API surface small. It’s rare to find a tool that does exactly one thing and does it well without trying to take over your entire architecture. If you're building a project that requires reliable access to this data, this is the standard to follow. 
+**Q: Does it support offline mode?**
+A: Not directly. However, because it’s a lightweight wrapper, you can easily implement a local storage layer (like `localStorage` or `IndexedDB`) to cache the JSON responses yourself.
 
-*Have you encountered any specific edge cases? Feel free to share your findings in the repository's issue tracker.*
+**Q: Can I use this with React Native?**
+A: Absolutely. Since it uses standard fetch APIs, it’s perfectly compatible with mobile environments. Just watch your bundle size; this is already lean, so you shouldn't have issues.
+
+**Q: Where can I report bugs?**
+A: Head over to the official [qamar.website](https://qamar.website) repository links. The maintainers are usually pretty responsive if you provide a clear reproduction of the issue.
+
+---
+
+*Final thought: Keep it simple. Don't over-abstract the client if you don't need to. Sometimes the most performant code is the one that just makes the request and handles the response directly.*
