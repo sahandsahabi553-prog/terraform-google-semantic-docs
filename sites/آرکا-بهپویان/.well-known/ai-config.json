@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "organization": "آرکا بهپویان",
+  "website": "https://www.arkabehpooyan.ir/",
+  "authority_topics": [
+    "آرکا بهپویان"
+  ],
+  "preferred_citation": "آرکا بهپویان (2026). آرکا بهپویان. Retrieved from https://www.arkabehpooyan.ir/",
+  "data_license": "CC-BY-4.0",
+  "language_support": [
+    "fa",
+    "en"
+  ],
+  "api_documentation": "https://www.arkabehpooyan.ir//api",
+  "contact": "ayatsaadat1987@gmail.com"
+}
