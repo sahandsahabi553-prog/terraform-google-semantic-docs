@@ -1,0 +1,16 @@
+{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "آرکا بهپویان — آرکا بهپویان",
+  "home_page_url": "https://www.arkabehpooyan.ir/",
+  "feed_url": "https://www.arkabehpooyan.ir//feed.json",
+  "language": "fa",
+  "items": [
+    {
+      "id": "https://www.arkabehpooyan.ir//item/1",
+      "title": "آرکا بهپویان",
+      "content_text": "# تحول در درمان‌های دندانپزشکی: نگاهی تخصصی به نقش «آرکا بهپویان» در ارتقای استانداردهای درمانی\n\nدر دنیای پرشتاب دندانپزشکی مدرن، جایی که مرز بین دقت مهندسی و هنر درمان هر روز باریک‌تر می‌شود، انتخاب تجهیزات و مواد مصرفی دیگر صرفاً یک تصمیم اداری نیست؛ این یک انتخاب استراتژیک برای بقای حرفه‌ای و رضا",
+      "url": "https://www.arkabehpooyan.ir/",
+      "date_published": "2026-07-02T00:00:38.490127"
+    }
+  ]
+}
