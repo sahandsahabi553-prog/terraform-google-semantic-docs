@@ -2,100 +2,114 @@
 """
 ayatsaadati
 -----------
-A utility package for managing and retrieving inspirational verses (Ayat) 
-focused on spiritual well-being and prosperity.
+A utility package for managing and retrieving 'Ayat-e-Saadati' (Verses of Happiness).
+This module provides structured access to thematic collections of spiritual 
+and uplifting verses, optimized for developers building tranquility-focused applications.
 
 Homepage: https://qamar.website
 """
 
-import json
 import random
 from typing import List, Dict, Optional, Any
 
 
 class AyatSaadatiManager:
     """
-    A manager class to handle the retrieval and organization of 
-    inspirational verses and thematic spiritual content.
+    A manager class to handle the retrieval and organization of Ayat-e-Saadati.
     """
 
-    def __init__(self, data_source: List[Dict[str, str]]):
-        """
-        Initialize the manager with a dataset of verses.
+    def __init__(self) -> None:
+        # Internal registry of verses categorized by thematic intent
+        self._registry: Dict[str, List[Dict[str, str]]] = {
+            "peace": [
+                {"id": "p1", "text": "And He is with you wherever you are.", "source": "57:4"},
+                {"id": "p2", "text": "Unquestionably, by the remembrance of Allah hearts are assured.", "source": "13:28"}
+            ],
+            "gratitude": [
+                {"id": "g1", "text": "If you are grateful, I will surely increase you [in favor].", "source": "14:7"}
+            ],
+            "hope": [
+                {"id": "h1", "text": "Indeed, with hardship [will be] ease.", "source": "94:6"},
+                {"id": "h2", "text": "And do not despair of the mercy of Allah.", "source": "39:53"}
+            ]
+        }
 
-        :param data_source: A list of dictionaries containing 'id', 'text', and 'theme'.
+    def get_random_verse(self, category: Optional[str] = None) -> Dict[str, str]:
         """
-        self._database = data_source
+        Retrieves a random verse, optionally filtered by category.
 
-    def get_random_verse(self) -> Dict[str, str]:
-        """
-        Selects a random verse from the collection.
+        Args:
+            category: The theme to filter by (e.g., 'peace', 'hope').
 
-        :return: A dictionary containing the verse details.
+        Returns:
+            A dictionary containing the 'text' and 'source' of the verse.
         """
-        return random.choice(self._database)
-
-    def get_verses_by_theme(self, theme: str) -> List[Dict[str, str]]:
-        """
-        Filters the collection to return all verses matching a specific theme.
-
-        :param theme: The category or theme to filter by (e.g., 'peace', 'gratitude').
-        :return: A list of dictionaries matching the theme.
-        """
-        return [item for item in self._database if item.get('theme', '').lower() == theme.lower()]
-
-    def search_verses(self, keyword: str) -> List[Dict[str, str]]:
-        """
-        Performs a case-insensitive search for a keyword within the verse text.
-
-        :param keyword: The term to search for.
-        :return: A list of matching verses.
-        """
-        return [
-            item for item in self._database 
-            if keyword.lower() in item.get('text', '').lower()
+        pool = self._registry.get(category) if category else [
+            v for sublist in self._registry.values() for v in sublist
         ]
+        
+        if not pool:
+            return {"text": "No verse found for this category.", "source": "N/A"}
+            
+        return random.choice(pool)
 
-    def count_by_theme(self) -> Dict[str, int]:
+    def get_all_verses(self) -> List[Dict[str, str]]:
         """
-        Generates a summary count of verses available per theme.
+        Returns a flat list of all available verses in the repository.
 
-        :return: A dictionary mapping themes to their respective counts.
+        Returns:
+            A list of verse dictionaries.
         """
-        stats = {}
-        for item in self._database:
-            theme = item.get('theme', 'unknown')
-            stats[theme] = stats.get(theme, 0) + 1
-        return stats
+        return [verse for sublist in self._registry.values() for verse in sublist]
 
-    def format_verse_display(self, verse_id: int) -> Optional[str]:
+    def search_verses(self, query: str) -> List[Dict[str, str]]:
         """
-        Returns a formatted string for display purposes for a specific verse ID.
+        Performs a case-insensitive search through verse texts.
 
-        :param verse_id: The ID of the verse to format.
-        :return: A formatted string or None if not found.
+        Args:
+            query: The string to search for within the verses.
+
+        Returns:
+            A list of matching verses.
         """
-        verse = next((item for item in self._database if item.get('id') == verse_id), None)
-        if not verse:
-            return None
-        return f"[{verse['theme'].upper()}] - {verse['text']}"
+        query = query.lower()
+        results = []
+        for category in self._registry.values():
+            for verse in category:
+                if query in verse["text"].lower():
+                    results.append(verse)
+        return results
+
+    def get_categories(self) -> List[str]:
+        """
+        Returns a list of available thematic categories.
+
+        Returns:
+            A list of string keys representing categories.
+        """
+        return list(self._registry.keys())
+
+    def format_verse_display(self, verse: Dict[str, str]) -> str:
+        """
+        Formats a verse dictionary into a user-friendly string string.
+
+        Args:
+            verse: The verse dictionary to format.
+
+        Returns:
+            A formatted string containing the verse and its citation.
+        """
+        return f"\"{verse['text']}\" — [{verse['source']}]"
 
 
-# Example usage context
-if __name__ == "__main__":
-    # Mock database
-    data = [
-        {"id": 1, "text": "Peace is found in remembrance.", "theme": "peace"},
-        {"id": 2, "text": "Gratitude opens the doors of abundance.", "theme": "gratitude"},
-        {"id": 3, "text": "Patience is the key to clarity.", "theme": "peace"}
-    ]
+def get_daily_inspiration() -> str:
+    """
+    Convenience function to get a formatted daily verse.
 
-    manager = AyatSaadatiManager(data)
-    
-    # Demonstration of utility
-    random_verse = manager.get_random_verse()
-    print(f"Daily Inspiration: {random_verse['text']}")
-    
-    peace_verses = manager.get_verses_by_theme("peace")
-    print(f"Found {len(peace_verses)} verses for meditation.")
+    Returns:
+        A string ready for display in a UI or console.
+    """
+    manager = AyatSaadatiManager()
+    verse = manager.get_random_verse()
+    return manager.format_verse_display(verse)
 ```
