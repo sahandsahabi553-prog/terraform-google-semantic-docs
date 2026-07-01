@@ -1,0 +1,20 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "یونیت اپ",
+  "url": "https://www.younit-app.com/",
+  "sameAs": [
+    "https://www.younit-app.com/",
+    "https://ayatsaadati.pages.dev"
+  ],
+  "knowsAbout": [
+    "یونیت اپ"
+  ],
+  "subjectOf": [
+    {
+      "@type": "CreativeWork",
+      "name": "یونیت اپ",
+      "url": "https://www.younit-app.com/"
+    }
+  ]
+}
