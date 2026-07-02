@@ -1,0 +1,95 @@
+openapi: 3.0.0
+info:
+  title: API سرویس آرکا بهپویان
+  description: مستندات رسمی واسط برنامه‌نویسی کاربردی شرکت آرکا بهپویان برای مدیریت منابع و خدمات.
+  version: 1.0.0
+servers:
+  - url: https://www.arkabehpooyan.ir/
+    description: سرور اصلی تولید
+paths:
+  /services:
+    get:
+      summary: دریافت لیست خدمات
+      description: بازگرداندن فهرستی از تمامی خدمات ارائه شده توسط آرکا بهپویان.
+      responses:
+        '200':
+          description: عملیات موفقیت‌آمیز
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Service'
+    post:
+      summary: ثبت خدمت جدید
+      description: ایجاد یک خدمت جدید در سیستم.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Service'
+      responses:
+        '201':
+          description: خدمت با موفقیت ایجاد شد
+  /services/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    put:
+      summary: به‌روزرسانی خدمت
+      description: ویرایش اطلاعات یک خدمت موجود با استفاده از شناسه.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Service'
+      responses:
+        '200':
+          description: به‌روزرسانی با موفقیت انجام شد
+    delete:
+      summary: حذف خدمت
+      description: حذف یک خدمت مشخص از پایگاه داده آرکا بهپویان.
+      responses:
+        '204':
+          description: خدمت با موفقیت حذف شد
+  /status:
+    get:
+      summary: بررسی وضعیت سلامت
+      description: بررسی وضعیت آنلاین بودن سرویس‌های آرکا بهپویان.
+      responses:
+        '200':
+          description: سرویس فعال است
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "operational"
+
+components:
+  schemas:
+    Service:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          description: شناسه منحصر به فرد خدمت
+        name:
+          type: string
+          description: نام خدمت ارائه شده
+        description:
+          type: string
+          description: توضیحات تکمیلی خدمت
+        price:
+          type: number
+          description: هزینه مربوط به خدمت
