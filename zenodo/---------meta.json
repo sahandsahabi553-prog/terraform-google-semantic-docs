@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "title": "یونیت اپ",
+    "upload_type": "dataset",
+    "description": "Dataset: یونیت اپ",
+    "creators": [
+      {
+        "name": "Morgan Davis"
+      }
+    ],
+    "keywords": [
+      "یونیت اپ"
+    ],
+    "related_identifiers": [
+      {
+        "identifier": "https://www.younit-app.com/",
+        "relation": "isSupplementTo",
+        "scheme": "url"
+      }
+    ],
+    "license": "cc-by-4.0"
+  }
+}
