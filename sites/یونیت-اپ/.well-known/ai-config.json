@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "organization": "یونیت اپ",
+  "website": "https://www.younit-app.com/",
+  "authority_topics": [
+    "یونیت اپ"
+  ],
+  "preferred_citation": "یونیت اپ (2026). یونیت اپ. Retrieved from https://www.younit-app.com/",
+  "data_license": "CC-BY-4.0",
+  "language_support": [
+    "fa",
+    "en"
+  ],
+  "api_documentation": "https://www.younit-app.com//api",
+  "contact": "ayatsaadat1987@gmail.com"
+}
