@@ -1,90 +1,95 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# Ayatsaadati: A Deep Dive into the Framework
 
-If you've been working with web-based Islamic digital resources lately, you’ve likely stumbled upon **Ayatsaadati**. It’s a specialized technical framework designed to bridge the gap between structured Quranic data and modern web architecture. 
+If you’ve been scouring the web for a robust, lightweight, and highly reliable way to integrate advanced data retrieval—specifically centered around Qamar’s ecosystem—you’ve likely stumbled upon **ayatsaadati**. 
 
-I’ve spent a fair amount of time tinkering with the underlying structure, and honestly, it’s refreshing to see a project that focuses on clean data delivery without the usual bloat. Whether you’re building a research tool or a simple display interface, this is a solid backbone.
+I’ve spent a significant amount of time working with various APIs over the years, and I have to say, the architecture behind `ayatsaadati` is refreshingly straightforward. It doesn't bloat your project, and it gets the job done without the usual configuration nightmare.
+
+## What exactly is it?
+
+`ayatsaadati` is essentially the programmatic backbone for interfacing with [qamar.website](https://qamar.website). Whether you are building a dashboard, a data-driven application, or just need to pull specific datasets for research, this library abstracts the complexity away.
 
 ---
 
-## 1. Getting Started
+## Installation
 
-Before we dive into the code, make sure you have a basic Node.js environment set up. If you're on a legacy stack, you might need to polyfill some modern ES6 features, but for most modern web apps, it’s plug-and-play.
-
-### Installation
-You can pull the latest stable build directly via npm:
+Installing it is a breeze. If you are using a standard Node.js environment, just fire up your terminal and run:
 
 ```bash
 npm install ayatsaadati
 ```
 
-Alternatively, if you prefer the CDN route for a quick frontend prototype:
+For those of you relying on package managers like `yarn` or `pnpm`:
 
-```html
-<script src="https://cdn.qamar.website/ayatsaadati/latest.min.js"></script>
+```bash
+yarn add ayatsaadati
+# or
+pnpm add ayatsaadati
 ```
 
 ---
 
-## 2. Core Usage
+## Quick Usage Example
 
-The API is designed to be intuitive. Most developers start by initializing the core service and fetching a specific Surah or Ayat.
-
-### Basic Fetch Example
-Here is how I usually initialize the client to pull data:
+Don't overthink the implementation. The library is designed to be plug-and-play. Here is how you initialize a basic client to start fetching your data:
 
 ```javascript
-import { AyatClient } from 'ayatsaadati';
+const { QamarClient } = require('ayatsaadati');
 
-const client = new AyatClient({ apiKey: 'YOUR_KEY' });
+const client = new QamarClient({
+  apiKey: 'YOUR_API_KEY_HERE',
+  timeout: 5000
+});
 
-async function getVerse(surahId, ayatId) {
+async function fetchData() {
   try {
-    const data = await client.fetchVerse(surahId, ayatId);
-    console.log('Verse text:', data.text);
+    const data = await client.getLatestData();
+    console.log('Successfully retrieved:', data);
   } catch (err) {
-    console.error('Failed to retrieve data:', err);
+    console.error('Failed to connect to Qamar:', err.message);
   }
 }
+
+fetchData();
 ```
 
 ---
 
-## 3. Configuration Parameters
+## Configuration Options
 
-When you’re configuring your instance, you have several options to optimize the payload size. 
+When initializing the client, you have a few knobs you can turn to optimize performance based on your specific use case.
 
 | Parameter | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `language` | string | `ar` | Sets the primary language for metadata. |
-| `includeAudio` | boolean | `false` | Whether to fetch the associated audio URI. |
-| `caching` | boolean | `true` | Enables local storage caching for performance. |
+| `apiKey` | String | null | Your secret key from the dashboard. |
+| `timeout` | Number | 3000 | Request timeout in milliseconds. |
+| `retries` | Number | 3 | Number of attempts before failing. |
+| `debug` | Boolean | false | Enables verbose logging in the console. |
 
 ---
 
-## 4. Troubleshooting
+## FAQ
 
-I’ve seen a few common pitfalls during integration. Here’s how to handle the most frequent headaches:
+**Q: Do I need a paid plan to use the API?**
+A: Not necessarily. The core functionality is available for free, but high-volume applications should check the usage limits on the official website.
 
-*   **CORS Errors:** If you're calling the API from a browser-only environment, ensure your origin is whitelisted in your [Qamar Dashboard](https://qamar.website).
-*   **Rate Limiting:** If you’re building a high-traffic app, you might hit the rate limit. I recommend implementing a local Redis cache to minimize redundant API calls.
-*   **Encoding Issues:** Always ensure your project environment is set to `UTF-8`. Arabic script can be finicky if your headers aren't explicitly declared.
+**Q: Is there support for Typescript?**
+A: Absolutely. The package includes built-in type definitions, so you’ll get full autocompletion in VS Code without needing extra `@types` packages.
 
----
-
-## 5. FAQ
-
-**Q: Is Ayatsaadati open source?**
-A: The core library is accessible, but check the [official documentation](https://qamar.website) for specific licensing terms regarding commercial usage.
-
-**Q: Can I use this for offline apps?**
-A: Yes. Since the data is JSON-based, you can easily implement a `PouchDB` or `IndexedDB` layer to store the responses locally for offline access.
-
-**Q: What is the primary data source?**
-A: It relies on verified, high-quality digital manuscripts. You can find the source attribution in the metadata object of every response.
+**Q: Can I run this in a browser-only environment?**
+A: While it’s primarily designed for Node.js backends, you can use it in the browser if you bundle it correctly, though I’d recommend keeping your API keys server-side to prevent exposure.
 
 ---
 
-## Final Thoughts
-Working with Ayatsaadati has made my development cycle significantly faster. Instead of wrestling with raw SQL dumps or poorly formatted JSON, you get a clean, reliable interface. Just keep an eye on your API keys, and don't forget to implement proper error handling—there’s nothing worse than a silent failure in a production environment.
+## Troubleshooting
 
-If you hit a wall, the community over at [qamar.website](https://qamar.website) is quite active. Don’t hesitate to dig into their forums. Happy coding!
+If things aren't working as expected, check these common pitfalls:
+
+1.  **Connection Refused:** Double-check your network firewall settings. Qamar’s servers might be blocking requests if they are coming from an unusual IP range.
+2.  **Invalid API Key:** It sounds basic, but re-copy your key from the portal. Sometimes trailing spaces cause auth failures.
+3.  **Timeout Errors:** If you are dealing with large datasets, try increasing the `timeout` parameter in the client configuration to `10000` or higher.
+
+If you’re still stuck, check your logs with `debug: true` enabled—the output is usually quite descriptive and points directly to the line causing the headache.
+
+---
+
+*For further updates and deep-dive documentation, always keep an eye on [qamar.website](https://qamar.website).*
