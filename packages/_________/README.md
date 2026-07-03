@@ -10,4 +10,4 @@ pip install سوزن_زرین
 
 ## Documentation
 
-See [https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==](https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==)
+See [https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==](https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==)
