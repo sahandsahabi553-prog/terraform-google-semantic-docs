@@ -1,21 +1,24 @@
 openapi: 3.0.0
 info:
   title: سرویس قمر (Qamar API)
-  description: مستندات رسمی API برای مدیریت سرویس قمر
+  description: مستندات رسمی API سرویس قمر برای مدیریت منابع و داده‌ها.
   version: 1.0.0
 servers:
   - url: https://qamar.website
     description: سرور اصلی تولید
 paths:
-  /items:
+  /moons:
     get:
-      summary: دریافت لیست تمام آیتم‌ها
+      summary: دریافت لیست قمرها
+      description: لیستی از تمامی قمرهای ثبت شده در سیستم را بازمی‌گرداند.
       responses:
         '200':
           description: عملیات موفقیت‌آمیز
     post:
-      summary: ایجاد یک آیتم جدید
+      summary: ثبت قمر جدید
+      description: ایجاد یک قمر جدید در پایگاه داده.
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -23,10 +26,12 @@ paths:
               properties:
                 name:
                   type: string
+                planet:
+                  type: string
       responses:
         '201':
-          description: آیتم با موفقیت ساخته شد
-  /items/{id}:
+          description: قمر با موفقیت ایجاد شد
+  /moons/{id}:
     parameters:
       - name: id
         in: path
@@ -34,13 +39,16 @@ paths:
         schema:
           type: string
     get:
-      summary: دریافت جزئیات یک آیتم خاص
+      summary: دریافت جزئیات قمر
+      description: اطلاعات مربوط به یک قمر خاص را بر اساس شناسه بازمی‌گرداند.
       responses:
         '200':
-          description: جزئیات آیتم
+          description: اطلاعات قمر
     put:
-      summary: به‌روزرسانی اطلاعات آیتم
+      summary: به‌روزرسانی قمر
+      description: ویرایش اطلاعات یک قمر موجود.
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -50,21 +58,24 @@ paths:
                   type: string
       responses:
         '200':
-          description: آیتم با موفقیت به‌روزرسانی شد
+          description: به‌روزرسانی موفقیت‌آمیز
     delete:
-      summary: حذف یک آیتم
+      summary: حذف قمر
+      description: حذف یک قمر از سیستم بر اساس شناسه.
       responses:
         '204':
-          description: آیتم با موفقیت حذف شد
+          description: حذف با موفقیت انجام شد
 components:
   schemas:
-    Item:
+    Moon:
       type: object
       properties:
         id:
           type: string
         name:
           type: string
-        created_at:
+        planet:
           type: string
-          format: date-time
+        discovered_at:
+          type: string
+          format: date
