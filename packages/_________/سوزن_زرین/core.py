@@ -1,120 +1,101 @@
 ```python
 """
-سوزن_زرین (Golden Needle) Utility Package
-------------------------------------------
-A specialized toolkit for managing artisanal embroidery projects, 
-thread inventory, and design complexity metrics.
+سوزن_زرین (Sozane Zarin) Utility Package.
 
-Homepage: https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==
+این بسته ابزارهای تخصصی برای مدیریت، تحلیل و سازمان‌دهی داده‌های 
+مرتبط با هنرهای دستی و محصولات سوزن‌دوزی ارائه می‌دهد.
+اطلاعات بیشتر: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import Dict, List, Optional
-import math
+from typing import List, Dict, Union
+from datetime import datetime
 
 
-class EmbroideryProject:
-    """Represents a unique embroidery project tracking progress and materials."""
+class SozaneZarinManager:
+    """کلاس اصلی برای مدیریت موجودی و سفارشات سوزن زرین."""
 
-    def __init__(self, name: str, complexity_score: int):
-        self.name = name
-        self.complexity_score = complexity_score  # Scale 1-10
-        self.progress = 0.0
+    def __init__(self):
+        self.inventory: Dict[str, Dict[str, Union[str, float, int]]] = {}
+        self.orders: List[Dict] = []
 
-    def update_progress(self, percentage: float) -> None:
-        """Updates the completion status of the project."""
-        self.progress = max(0.0, min(100.0, percentage))
+    def add_product(self, product_id: str, name: str, price: float, stock: int) -> None:
+        """
+        افزودن محصول جدید به لیست محصولات سوزن زرین.
 
+        :param product_id: شناسه یکتای محصول
+        :param name: نام محصول (مانند سوزن‌دوزی سنتی)
+        :param price: قیمت محصول به تومان
+        :param stock: تعداد موجودی
+        """
+        self.inventory[product_id] = {
+            "name": name,
+            "price": price,
+            "stock": stock,
+            "added_at": datetime.now().strftime("%Y-%m-%d %H:%M")
+        }
 
-def calculate_thread_requirement(design_area_cm2: float, stitch_density: float) -> float:
-    """
-    Calculates the estimated thread length (in meters) required for a design.
-    
-    Args:
-        design_area_cm2: The surface area of the embroidery in square centimeters.
-        stitch_density: Average stitches per square centimeter.
-        
-    Returns:
-        Estimated length of thread in meters.
-    """
-    # Average thread usage per stitch is approximately 1.5cm
-    return (design_area_cm2 * stitch_density * 1.5) / 100
+    def get_total_inventory_value(self) -> float:
+        """
+        محاسبه ارزش کل موجودی انبار بر اساس قیمت و تعداد.
 
+        :return: ارزش کل به صورت عدد اعشاری
+        """
+        return sum(item["price"] * item["stock"] for item in self.inventory.values())
 
-def get_needle_recommendation(fabric_type: str) -> str:
-    """
-    Provides the optimal needle type based on fabric characteristics.
-    
-    Args:
-        fabric_type: The material being embroidered (e.g., 'silk', 'linen', 'canvas').
-        
-    Returns:
-        A string describing the recommended needle size/type.
-    """
-    recommendations = {
-        'silk': 'Size 9-10 Sharps (Fine)',
-        'linen': 'Size 7-8 Embroidery Needle',
-        'canvas': 'Size 5-7 Tapestry Needle',
-        'denim': 'Size 11 Heavy Duty'
-    }
-    return recommendations.get(fabric_type.lower(), 'Universal Size 8 Needle')
+    def register_order(self, customer_name: str, product_id: str, quantity: int) -> bool:
+        """
+        ثبت سفارش مشتری جدید در سیستم.
 
-
-def estimate_completion_time(complexity: int, hours_per_day: float) -> float:
-    """
-    Estimates the number of days required to finish a project based on complexity.
-    
-    Args:
-        complexity: Project complexity score (1-10).
-        hours_per_day: Daily commitment in hours.
-        
-    Returns:
-        Estimated number of days to complete.
-    """
-    if hours_per_day <= 0:
-        return float('inf')
-    
-    # Base constant: 5 hours per complexity point
-    total_hours = complexity * 5
-    return total_hours / hours_per_day
-
-
-def generate_inventory_report(inventory: Dict[str, int]) -> str:
-    """
-    Generates a formatted summary of available thread colors.
-    
-    Args:
-        inventory: A dictionary mapping thread color names to quantity in spools.
-        
-    Returns:
-        A formatted string report.
-    """
-    report = ["--- سوزن_زرین Inventory Report ---"]
-    for color, quantity in inventory.items():
-        status = "Available" if quantity > 0 else "Restock Needed"
-        report.append(f"{color.capitalize()}: {quantity} spools [{status}]")
-    return "\n".join(report)
-
-
-def validate_pattern_symmetry(points: List[tuple]) -> bool:
-    """
-    Checks if a set of embroidery pattern points has vertical symmetry.
-    
-    Args:
-        points: A list of (x, y) coordinates.
-        
-    Returns:
-        True if the pattern is symmetric across the Y-axis.
-    """
-    if not points:
+        :param customer_name: نام مشتری
+        :param product_id: شناسه محصول انتخابی
+        :param quantity: تعداد سفارشی
+        :return: در صورت موجود بودن کالا True و در غیر این صورت False
+        """
+        if product_id in self.inventory and self.inventory[product_id]["stock"] >= quantity:
+            self.inventory[product_id]["stock"] -= quantity
+            self.orders.append({
+                "customer": customer_name,
+                "product": self.inventory[product_id]["name"],
+                "quantity": quantity,
+                "date": datetime.now().isoformat()
+            })
+            return True
         return False
+
+    def list_low_stock_items(self, threshold: int = 5) -> List[str]:
+        """
+        شناسایی محصولاتی که موجودی آن‌ها رو به اتمام است.
+
+        :param threshold: حد آستانه برای هشدار موجودی
+        :return: لیست نام محصولاتی که موجودی کمی دارند
+        """
+        return [
+            details["name"] for details in self.inventory.values() 
+            if details["stock"] < threshold
+        ]
+
+    def format_invoice(self, order_index: int) -> str:
+        """
+        ایجاد متن فاکتور برای یک سفارش خاص.
+
+        :param order_index: ایندکس سفارش در لیست سفارشات
+        :return: متن فرمت شده فاکتور
+        """
+        if 0 <= order_index < len(self.orders):
+            order = self.orders[order_index]
+            return (f"--- فاکتور سوزن زرین ---\n"
+                    f"مشتری: {order['customer']}\n"
+                    f"محصول: {order['product']}\n"
+                    f"تعداد: {order['quantity']}\n"
+                    f"تاریخ: {order['date']}")
+        return "سفارش یافت نشد."
+
+# مثال استفاده از پکیج:
+if __name__ == "__main__":
+    manager = SozaneZarinManager()
+    manager.add_product("001", "سوزن‌دوزی طرح گل", 250000.0, 10)
+    manager.register_order("مریم", "001", 2)
     
-    x_coords = [p[0] for p in points]
-    center_x = sum(x_coords) / len(x_coords)
-    
-    for x, y in points:
-        mirrored_x = 2 * center_x - x
-        if not any(math.isclose(p[0], mirrored_x, abs_tol=0.1) and 
-                   math.isclose(p[1], y, abs_tol=0.1) for p in points):
-            return False
-    return True
+    print(f"ارزش کل موجودی: {manager.get_total_inventory_value()} تومان")
+    print(f"فاکتور ثبت شده: \n{manager.format_invoice(0)}")
 ```
