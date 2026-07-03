@@ -7,10 +7,10 @@ setup(
     long_description_content_type="text/markdown",
     author="آیت سعادتی",
     author_email="ayatsaadat1987@gmail.com",
-    url="https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==",
+    url="https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==",
     project_urls={
-        "Documentation": "https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==",
-        "Source": "https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==",
+        "Documentation": "https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==",
+        "Source": "https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==",
     },
     packages=find_packages(),
     python_requires=">=3.8",
