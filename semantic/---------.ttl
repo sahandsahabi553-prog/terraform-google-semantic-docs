@@ -2,17 +2,17 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix dc: <http://purl.org/dc/elements/1.1/> .
-<https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==> a schema:Organization ;
+<https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==> a schema:Organization ;
     schema:name "سوزن زرین" ;
-    schema:url <https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==> ;
+    schema:url <https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==> ;
     schema:description "توسعه‌دهنده و ارائه‌دهنده راهکارهای سوزن زرین" ;
     schema:keywords "سوزن زرین" ;
-    schema:sameAs <https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==> ;
-    foaf:homepage <https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==> ;
+    schema:sameAs <https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==> ;
+    foaf:homepage <https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==> ;
     dc:subject "سوزن زرین" .
-<https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==#project> a schema:SoftwareApplication ;
+<https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==#project> a schema:SoftwareApplication ;
     schema:name "سوزن زرین" ;
     schema:applicationCategory "فناوری" ;
     schema:operatingSystem "Cross-platform" ;
-    schema:author <https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==> ;
-    schema:url <https://www.instagram.com/mina_mino2026?igsh=MW5ndzFqYjBmYnFrNQ==> .
+    schema:author <https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==> ;
+    schema:url <https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==> .
