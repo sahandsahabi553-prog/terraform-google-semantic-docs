@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: Ayatsaadati API
-  description: API service for managing and retrieving Quranic verses and spiritual content.
+  title: AyatSaadati API
+  description: API service for managing Quranic verses and spiritual reflections.
   version: 1.0.0
 servers:
   - url: https://qamar.website
@@ -9,18 +9,24 @@ servers:
 paths:
   /verses:
     get:
-      summary: Get list of verses
+      summary: Retrieve a list of verses
       responses:
         '200':
           description: A list of verses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Verse'
     post:
-      summary: Create a new verse entry
+      summary: Add a new verse
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Verse'
+              $ref: '#/components/schemas/VerseInput'
       responses:
         '201':
           description: Verse created successfully
@@ -31,11 +37,6 @@ paths:
         required: true
         schema:
           type: string
-    get:
-      summary: Get a specific verse by ID
-      responses:
-        '200':
-          description: Detailed verse information
     put:
       summary: Update an existing verse
       requestBody:
@@ -43,32 +44,59 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Verse'
+              $ref: '#/components/schemas/VerseInput'
       responses:
         '200':
-          description: Verse updated successfully
+          description: Verse updated
     delete:
       summary: Delete a verse
       responses:
         '204':
-          description: Verse deleted successfully
+          description: Verse deleted
+  /reflections:
+    get:
+      summary: Get spiritual reflections
+      responses:
+        '200':
+          description: List of reflections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Reflection'
 components:
   schemas:
     Verse:
       type: object
-      required:
-        - surah_number
-        - ayah_number
-        - text
       properties:
         id:
           type: string
-          readOnly: true
-        surah_number:
+        surah:
           type: integer
-        ayah_number:
+        ayah:
           type: integer
         text:
           type: string
-        translation:
+    VerseInput:
+      type: object
+      required:
+        - surah
+        - ayah
+        - text
+      properties:
+        surah:
+          type: integer
+        ayah:
+          type: integer
+        text:
+          type: string
+    Reflection:
+      type: object
+      properties:
+        id:
+          type: string
+        content:
+          type: string
+        author:
           type: string
