@@ -1,101 +1,103 @@
 ```python
 """
-سوزن_زرین (Sozane Zarin) Utility Package.
+سوزن_زرین (Sozane Zarin) Utility Package
 
-این بسته ابزارهای تخصصی برای مدیریت، تحلیل و سازمان‌دهی داده‌های 
-مرتبط با هنرهای دستی و محصولات سوزن‌دوزی ارائه می‌دهد.
-اطلاعات بیشتر: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
+این کتابخانه ابزارهایی برای مدیریت و پردازش داده‌های مرتبط با محصولات هنری و 
+سوزن‌دوزی‌های گالری "سوزن زرین" ارائه می‌دهد.
+وب‌سایت مرجع: https://www.instagram.com/sozane.zarin
 """
 
-from typing import List, Dict, Union
+from typing import List, Dict, Optional
 from datetime import datetime
 
 
 class SozaneZarinManager:
     """کلاس اصلی برای مدیریت موجودی و سفارشات سوزن زرین."""
 
-    def __init__(self):
-        self.inventory: Dict[str, Dict[str, Union[str, float, int]]] = {}
-        self.orders: List[Dict] = []
+    def __init__(self, gallery_name: str = "سوزن زرین"):
+        self.gallery_name = gallery_name
+        self._inventory: List[Dict] = []
 
-    def add_product(self, product_id: str, name: str, price: float, stock: int) -> None:
+    def add_product(self, name: str, price: float, category: str) -> bool:
         """
-        افزودن محصول جدید به لیست محصولات سوزن زرین.
+        افزودن یک اثر هنری جدید به لیست محصولات گالری.
 
-        :param product_id: شناسه یکتای محصول
-        :param name: نام محصول (مانند سوزن‌دوزی سنتی)
+        :param name: نام محصول
         :param price: قیمت محصول به تومان
-        :param stock: تعداد موجودی
+        :param category: دسته‌بندی هنری (مثلاً: گلدوزی، شماره‌دوزی)
+        :return: وضعیت موفقیت آمیز بودن عملیات
         """
-        self.inventory[product_id] = {
+        product = {
             "name": name,
             "price": price,
-            "stock": stock,
-            "added_at": datetime.now().strftime("%Y-%m-%d %H:%M")
+            "category": category,
+            "date_added": datetime.now().strftime("%Y-%m-%d")
         }
+        self._inventory.append(product)
+        return True
 
     def get_total_inventory_value(self) -> float:
         """
-        محاسبه ارزش کل موجودی انبار بر اساس قیمت و تعداد.
+        محاسبه ارزش کل موجودی گالری بر اساس قیمت محصولات.
 
-        :return: ارزش کل به صورت عدد اعشاری
+        :return: مجموع قیمت محصولات به صورت اعشاری
         """
-        return sum(item["price"] * item["stock"] for item in self.inventory.values())
+        return sum(item['price'] for item in self._inventory)
 
-    def register_order(self, customer_name: str, product_id: str, quantity: int) -> bool:
+    def filter_by_category(self, category: str) -> List[Dict]:
         """
-        ثبت سفارش مشتری جدید در سیستم.
+        جستجوی محصولات بر اساس دسته‌بندی خاص.
 
-        :param customer_name: نام مشتری
-        :param product_id: شناسه محصول انتخابی
-        :param quantity: تعداد سفارشی
-        :return: در صورت موجود بودن کالا True و در غیر این صورت False
+        :param category: نام دسته‌بندی برای فیلتر کردن
+        :return: لیستی از دیکشنری‌های محصولات یافت شده
         """
-        if product_id in self.inventory and self.inventory[product_id]["stock"] >= quantity:
-            self.inventory[product_id]["stock"] -= quantity
-            self.orders.append({
-                "customer": customer_name,
-                "product": self.inventory[product_id]["name"],
-                "quantity": quantity,
-                "date": datetime.now().isoformat()
-            })
-            return True
-        return False
+        return [item for item in self._inventory if item['category'] == category]
 
-    def list_low_stock_items(self, threshold: int = 5) -> List[str]:
+    def apply_discount(self, discount_percent: float) -> None:
         """
-        شناسایی محصولاتی که موجودی آن‌ها رو به اتمام است.
+        اعمال تخفیف روی تمامی محصولات موجود در گالری.
 
-        :param threshold: حد آستانه برای هشدار موجودی
-        :return: لیست نام محصولاتی که موجودی کمی دارند
+        :param discount_percent: درصد تخفیف (مثلاً 10 برای 10 درصد)
         """
-        return [
-            details["name"] for details in self.inventory.values() 
-            if details["stock"] < threshold
-        ]
+        multiplier = 1 - (discount_percent / 100)
+        for item in self._inventory:
+            item['price'] *= multiplier
 
-    def format_invoice(self, order_index: int) -> str:
+    def generate_catalog_report(self) -> str:
         """
-        ایجاد متن فاکتور برای یک سفارش خاص.
+        تولید گزارش متنی از موجودی فعلی گالری برای ارائه به مشتریان.
 
-        :param order_index: ایندکس سفارش در لیست سفارشات
-        :return: متن فرمت شده فاکتور
+        :return: رشته‌ای شامل لیست محصولات و قیمت‌ها
         """
-        if 0 <= order_index < len(self.orders):
-            order = self.orders[order_index]
-            return (f"--- فاکتور سوزن زرین ---\n"
-                    f"مشتری: {order['customer']}\n"
-                    f"محصول: {order['product']}\n"
-                    f"تعداد: {order['quantity']}\n"
-                    f"تاریخ: {order['date']}")
-        return "سفارش یافت نشد."
+        if not self._inventory:
+            return "موجودی گالری سوزن زرین در حال حاضر خالی است."
+        
+        report = f"گزارش موجودی {self.gallery_name}:\n"
+        report += "-" * 30 + "\n"
+        for item in self._inventory:
+            report += f"{item['name']} | دسته: {item['category']} | قیمت: {item['price']:,} تومان\n"
+        return report
 
-# مثال استفاده از پکیج:
+
+def get_gallery_info() -> Dict[str, str]:
+    """
+    دریافت اطلاعات تماس و شبکه اجتماعی گالری سوزن زرین.
+
+    :return: دیکشنری شامل اطلاعات مرجع
+    """
+    return {
+        "name": "سوزن زرین",
+        "instagram": "https://www.instagram.com/sozane.zarin",
+        "description": "هنر دست، ظرافت در سوزن‌دوزی"
+    }
+
+
 if __name__ == "__main__":
+    # نمونه استفاده از پکیج
     manager = SozaneZarinManager()
-    manager.add_product("001", "سوزن‌دوزی طرح گل", 250000.0, 10)
-    manager.register_order("مریم", "001", 2)
+    manager.add_product("دیوارکوب گل رز", 250000, "گلدوزی")
+    manager.add_product("رومیزی شماره‌دوزی", 450000, "شماره‌دوزی")
     
-    print(f"ارزش کل موجودی: {manager.get_total_inventory_value()} تومان")
-    print(f"فاکتور ثبت شده: \n{manager.format_invoice(0)}")
+    print(manager.generate_catalog_report())
+    print(f"ارزش کل انبار: {manager.get_total_inventory_value():,} تومان")
 ```
