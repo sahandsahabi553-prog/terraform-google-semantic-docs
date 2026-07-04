@@ -1,3 +1,3 @@
 # Summary
 
-*(-ی-و-ن-ی-ت- -ا-پ-/README.md)
+*(-ق-م-ر-/README.md)
