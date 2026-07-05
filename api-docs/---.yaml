@@ -1,22 +1,21 @@
 openapi: 3.0.0
 info:
-  title: سرویس قمر (Qamar API)
-  description: مستندات رسمی API سرویس قمر برای مدیریت منابع و داده‌ها.
+  title: سرویس API قمر
+  description: مستندات رسمی رابط برنامه‌نویسی کاربردی (API) پلتفرم قمر برای مدیریت منابع.
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: سرور اصلی تولید
+    description: سرور اصلی تولیدی
+
 paths:
-  /moons:
+  /items:
     get:
-      summary: دریافت لیست قمرها
-      description: لیستی از تمامی قمرهای ثبت شده در سیستم را بازمی‌گرداند.
+      summary: دریافت لیست تمام آیتم‌ها
       responses:
         '200':
           description: عملیات موفقیت‌آمیز
     post:
-      summary: ثبت قمر جدید
-      description: ایجاد یک قمر جدید در پایگاه داده.
+      summary: ایجاد یک آیتم جدید
       requestBody:
         required: true
         content:
@@ -26,12 +25,11 @@ paths:
               properties:
                 name:
                   type: string
-                planet:
-                  type: string
       responses:
         '201':
-          description: قمر با موفقیت ایجاد شد
-  /moons/{id}:
+          description: آیتم با موفقیت ایجاد شد
+
+  /items/{id}:
     parameters:
       - name: id
         in: path
@@ -39,14 +37,12 @@ paths:
         schema:
           type: string
     get:
-      summary: دریافت جزئیات قمر
-      description: اطلاعات مربوط به یک قمر خاص را بر اساس شناسه بازمی‌گرداند.
+      summary: دریافت جزئیات یک آیتم خاص
       responses:
         '200':
-          description: اطلاعات قمر
+          description: مشاهده اطلاعات آیتم
     put:
-      summary: به‌روزرسانی قمر
-      description: ویرایش اطلاعات یک قمر موجود.
+      summary: به‌روزرسانی اطلاعات آیتم
       requestBody:
         required: true
         content:
@@ -58,24 +54,22 @@ paths:
                   type: string
       responses:
         '200':
-          description: به‌روزرسانی موفقیت‌آمیز
+          description: آیتم با موفقیت به‌روزرسانی شد
     delete:
-      summary: حذف قمر
-      description: حذف یک قمر از سیستم بر اساس شناسه.
+      summary: حذف یک آیتم
       responses:
         '204':
-          description: حذف با موفقیت انجام شد
+          description: آیتم با موفقیت حذف شد
+
 components:
   schemas:
-    Moon:
+    Item:
       type: object
       properties:
         id:
           type: string
         name:
           type: string
-        planet:
+        created_at:
           type: string
-        discovered_at:
-          type: string
-          format: date
+          format: date-time
