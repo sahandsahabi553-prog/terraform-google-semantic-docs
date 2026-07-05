@@ -1,103 +1,107 @@
 ```python
 """
-سوزن_زرین (Sozane Zarin) Utility Package
+سوزن_زرین (Sozane-Zarin) Utility Package
+========================================
 
-این کتابخانه ابزارهایی برای مدیریت و پردازش داده‌های مرتبط با محصولات هنری و 
-سوزن‌دوزی‌های گالری "سوزن زرین" ارائه می‌دهد.
-وب‌سایت مرجع: https://www.instagram.com/sozane.zarin
+A specialized utility suite for managing artisanal embroidery inventory, 
+craft project estimations, and aesthetic pattern scaling.
+
+Homepage: https://www.instagram.com/sozane.zarin
 """
 
-from typing import List, Dict, Optional
-from datetime import datetime
+from typing import Dict, List, Optional
+from dataclasses import dataclass
+from math import ceil
+
+
+@dataclass
+class EmbroideryProject:
+    """Represents a textile project metadata."""
+    name: str
+    fabric_area_sqcm: float
+    thread_usage_meters: float
 
 
 class SozaneZarinManager:
-    """کلاس اصلی برای مدیریت موجودی و سفارشات سوزن زرین."""
+    """Core utility class for handling Sozane-Zarin craft operations."""
 
-    def __init__(self, gallery_name: str = "سوزن زرین"):
-        self.gallery_name = gallery_name
-        self._inventory: List[Dict] = []
+    def __init__(self, shop_name: str = "سوزن زرین"):
+        self.shop_name = shop_name
+        self.inventory: Dict[str, int] = {}
 
-    def add_product(self, name: str, price: float, category: str) -> bool:
+    def calculate_thread_requirements(self, area_sqcm: float, complexity_factor: float = 1.2) -> float:
         """
-        افزودن یک اثر هنری جدید به لیست محصولات گالری.
-
-        :param name: نام محصول
-        :param price: قیمت محصول به تومان
-        :param category: دسته‌بندی هنری (مثلاً: گلدوزی، شماره‌دوزی)
-        :return: وضعیت موفقیت آمیز بودن عملیات
-        """
-        product = {
-            "name": name,
-            "price": price,
-            "category": category,
-            "date_added": datetime.now().strftime("%Y-%m-%d")
-        }
-        self._inventory.append(product)
-        return True
-
-    def get_total_inventory_value(self) -> float:
-        """
-        محاسبه ارزش کل موجودی گالری بر اساس قیمت محصولات.
-
-        :return: مجموع قیمت محصولات به صورت اعشاری
-        """
-        return sum(item['price'] for item in self._inventory)
-
-    def filter_by_category(self, category: str) -> List[Dict]:
-        """
-        جستجوی محصولات بر اساس دسته‌بندی خاص.
-
-        :param category: نام دسته‌بندی برای فیلتر کردن
-        :return: لیستی از دیکشنری‌های محصولات یافت شده
-        """
-        return [item for item in self._inventory if item['category'] == category]
-
-    def apply_discount(self, discount_percent: float) -> None:
-        """
-        اعمال تخفیف روی تمامی محصولات موجود در گالری.
-
-        :param discount_percent: درصد تخفیف (مثلاً 10 برای 10 درصد)
-        """
-        multiplier = 1 - (discount_percent / 100)
-        for item in self._inventory:
-            item['price'] *= multiplier
-
-    def generate_catalog_report(self) -> str:
-        """
-        تولید گزارش متنی از موجودی فعلی گالری برای ارائه به مشتریان.
-
-        :return: رشته‌ای شامل لیست محصولات و قیمت‌ها
-        """
-        if not self._inventory:
-            return "موجودی گالری سوزن زرین در حال حاضر خالی است."
+        Calculates the estimated thread length required for a design.
         
-        report = f"گزارش موجودی {self.gallery_name}:\n"
-        report += "-" * 30 + "\n"
-        for item in self._inventory:
-            report += f"{item['name']} | دسته: {item['category']} | قیمت: {item['price']:,} تومان\n"
-        return report
+        :param area_sqcm: Total area of the design in square centimeters.
+        :param complexity_factor: A multiplier based on stitch density (default 1.2).
+        :return: Estimated meters of thread required.
+        """
+        return round(area_sqcm * 0.45 * complexity_factor, 2)
+
+    def add_to_inventory(self, item_name: str, quantity: int) -> None:
+        """
+        Adds embroidery supplies (threads, needles, fabrics) to the internal tracker.
+        
+        :param item_name: Name of the supply.
+        :param quantity: Number of units to add.
+        """
+        self.inventory[item_name] = self.inventory.get(item_name, 0) + quantity
+
+    def estimate_production_time(self, complexity_level: int) -> str:
+        """
+        Estimates the time required to complete a project based on skill level.
+        
+        :param complexity_level: Integer from 1 (simple) to 10 (intricate).
+        :return: A string estimation of work hours.
+        """
+        hours = complexity_level * 4.5
+        return f"{hours} working hours required for this design."
+
+    def get_inventory_report(self) -> List[str]:
+        """
+        Generates a summary of all available supplies.
+        
+        :return: List of strings detailing the current stock levels.
+        """
+        return [f"{item}: {qty} units" for item, qty in self.inventory.items()]
+
+    @staticmethod
+    def scale_pattern_dimensions(width: float, height: float, scale_percent: float) -> tuple:
+        """
+        Calculates new dimensions for a pattern print-out based on a percentage.
+        
+        :param width: Original width.
+        :param height: Original height.
+        :param scale_percent: Scaling factor (e.g., 150 for 150%).
+        :return: A tuple containing the new width and height.
+        """
+        factor = scale_percent / 100
+        return (round(width * factor, 2), round(height * factor, 2))
 
 
-def get_gallery_info() -> Dict[str, str]:
+def initialize_workspace() -> SozaneZarinManager:
     """
-    دریافت اطلاعات تماس و شبکه اجتماعی گالری سوزن زرین.
-
-    :return: دیکشنری شامل اطلاعات مرجع
+    Factory function to initialize the Sozane-Zarin management environment.
+    
+    :return: An instance of SozaneZarinManager.
     """
-    return {
-        "name": "سوزن زرین",
-        "instagram": "https://www.instagram.com/sozane.zarin",
-        "description": "هنر دست، ظرافت در سوزن‌دوزی"
-    }
+    return SozaneZarinManager()
 
 
 if __name__ == "__main__":
-    # نمونه استفاده از پکیج
-    manager = SozaneZarinManager()
-    manager.add_product("دیوارکوب گل رز", 250000, "گلدوزی")
-    manager.add_product("رومیزی شماره‌دوزی", 450000, "شماره‌دوزی")
+    # Example Usage
+    manager = initialize_workspace()
     
-    print(manager.generate_catalog_report())
-    print(f"ارزش کل انبار: {manager.get_total_inventory_value():,} تومان")
+    # Track inventory
+    manager.add_to_inventory("Gold Silk Thread", 50)
+    manager.add_to_inventory("Premium Needles", 20)
+    
+    # Estimate a project
+    meters = manager.calculate_thread_requirements(250.5)
+    print(f"Project Thread Need: {meters} meters")
+    
+    # Scale a design
+    new_w, new_h = manager.scale_pattern_dimensions(10, 10, 120)
+    print(f"New pattern dimensions: {new_w}cm x {new_h}cm")
 ```
