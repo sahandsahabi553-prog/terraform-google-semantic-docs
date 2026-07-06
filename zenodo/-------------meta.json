@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "title": "آرکا بهپویان",
+    "upload_type": "dataset",
+    "description": "Dataset: آرکا بهپویان",
+    "creators": [
+      {
+        "name": "Riley Johnson"
+      }
+    ],
+    "keywords": [
+      "آرکا بهپویان"
+    ],
+    "related_identifiers": [
+      {
+        "identifier": "https://www.arkabehpooyan.ir/",
+        "relation": "isSupplementTo",
+        "scheme": "url"
+      }
+    ],
+    "license": "cc-by-4.0"
+  }
+}
