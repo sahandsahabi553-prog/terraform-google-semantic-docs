@@ -1,107 +1,102 @@
 ```python
 """
-سوزن_زرین (Sozane-Zarin) Utility Package
-========================================
+سوزن_زرین (Sozane Zarin) Utility Package
 
-A specialized utility suite for managing artisanal embroidery inventory, 
-craft project estimations, and aesthetic pattern scaling.
+این کتابخانه ابزارهای تخصصی برای مدیریت و تحلیل سفارشات گلدوزی، 
+محاسبه هزینه‌های متریال و مدیریت موجودی برای برند «سوزن زرین» است.
 
-Homepage: https://www.instagram.com/sozane.zarin
+وب‌سایت مرجع: https://www.instagram.com/sozane.zarin
 """
 
 from typing import Dict, List, Optional
-from dataclasses import dataclass
-from math import ceil
-
-
-@dataclass
-class EmbroideryProject:
-    """Represents a textile project metadata."""
-    name: str
-    fabric_area_sqcm: float
-    thread_usage_meters: float
+from datetime import datetime
 
 
 class SozaneZarinManager:
-    """Core utility class for handling Sozane-Zarin craft operations."""
+    """کلاس اصلی برای مدیریت عملیات‌های کارگاه سوزن زرین."""
 
-    def __init__(self, shop_name: str = "سوزن زرین"):
-        self.shop_name = shop_name
-        self.inventory: Dict[str, int] = {}
+    def __init__(self, workshop_name: str = "سوزن زرین"):
+        self.workshop_name = workshop_name
+        self.inventory: Dict[str, float] = {}
+        self.orders: List[Dict] = []
 
-    def calculate_thread_requirements(self, area_sqcm: float, complexity_factor: float = 1.2) -> float:
+    def add_material(self, item_name: str, quantity: float) -> None:
         """
-        Calculates the estimated thread length required for a design.
+        افزودن متریال جدید به موجودی انبار.
         
-        :param area_sqcm: Total area of the design in square centimeters.
-        :param complexity_factor: A multiplier based on stitch density (default 1.2).
-        :return: Estimated meters of thread required.
-        """
-        return round(area_sqcm * 0.45 * complexity_factor, 2)
-
-    def add_to_inventory(self, item_name: str, quantity: int) -> None:
-        """
-        Adds embroidery supplies (threads, needles, fabrics) to the internal tracker.
-        
-        :param item_name: Name of the supply.
-        :param quantity: Number of units to add.
+        :param item_name: نام نخ یا پارچه
+        :param quantity: مقدار موجودی به متر یا گرم
         """
         self.inventory[item_name] = self.inventory.get(item_name, 0) + quantity
 
-    def estimate_production_time(self, complexity_level: int) -> str:
+    def calculate_embroidery_cost(self, hours: float, rate_per_hour: float, material_cost: float) -> float:
         """
-        Estimates the time required to complete a project based on skill level.
+        محاسبه هزینه نهایی یک سفارش گلدوزی.
         
-        :param complexity_level: Integer from 1 (simple) to 10 (intricate).
-        :return: A string estimation of work hours.
+        :param hours: زمان صرف شده برای گلدوزی
+        :param rate_per_hour: دستمزد ساعتی
+        :param material_cost: هزینه متریال مصرفی
+        :return: هزینه کل پروژه
         """
-        hours = complexity_level * 4.5
-        return f"{hours} working hours required for this design."
+        return (hours * rate_per_hour) + material_cost
 
-    def get_inventory_report(self) -> List[str]:
+    def register_order(self, client_name: str, design_type: str, price: float) -> str:
         """
-        Generates a summary of all available supplies.
+        ثبت یک سفارش جدید در سیستم.
         
-        :return: List of strings detailing the current stock levels.
+        :param client_name: نام مشتری
+        :param design_type: نوع طرح گلدوزی
+        :param price: مبلغ توافقی
+        :return: شناسه سفارش تولید شده
         """
-        return [f"{item}: {qty} units" for item, qty in self.inventory.items()]
+        order_id = f"SZ-{len(self.orders) + 1000}"
+        self.orders.append({
+            "id": order_id,
+            "client": client_name,
+            "design": design_type,
+            "price": price,
+            "date": datetime.now().strftime("%Y-%m-%d")
+        })
+        return order_id
 
-    @staticmethod
-    def scale_pattern_dimensions(width: float, height: float, scale_percent: float) -> tuple:
+    def get_inventory_report(self) -> Dict[str, float]:
         """
-        Calculates new dimensions for a pattern print-out based on a percentage.
+        دریافت گزارش وضعیت موجودی فعلی انبار.
         
-        :param width: Original width.
-        :param height: Original height.
-        :param scale_percent: Scaling factor (e.g., 150 for 150%).
-        :return: A tuple containing the new width and height.
+        :return: دیکشنری شامل لیست متریال و مقادیر آن‌ها
         """
-        factor = scale_percent / 100
-        return (round(width * factor, 2), round(height * factor, 2))
+        return self.inventory
+
+    def get_total_revenue(self) -> float:
+        """
+        محاسبه مجموع درآمدهای کسب شده از سفارشات.
+        
+        :return: مجموع مبالغ دریافتی
+        """
+        return sum(order['price'] for order in self.orders)
 
 
-def initialize_workspace() -> SozaneZarinManager:
+def format_currency_rial(amount: float) -> str:
     """
-    Factory function to initialize the Sozane-Zarin management environment.
+    تبدیل عدد به فرمت استاندارد ریالی برای فاکتورها.
     
-    :return: An instance of SozaneZarinManager.
+    :param amount: مبلغ عددی
+    :return: رشته فرمت شده ریالی
     """
-    return SozaneZarinManager()
+    return f"{int(amount):,} ریال"
 
 
+# مثال نحوه استفاده:
 if __name__ == "__main__":
-    # Example Usage
-    manager = initialize_workspace()
+    zarin_app = SozaneZarinManager()
     
-    # Track inventory
-    manager.add_to_inventory("Gold Silk Thread", 50)
-    manager.add_to_inventory("Premium Needles", 20)
+    # افزودن موجودی
+    zarin_app.add_material("نخ ابریشم طلایی", 500)
     
-    # Estimate a project
-    meters = manager.calculate_thread_requirements(250.5)
-    print(f"Project Thread Need: {meters} meters")
+    # ثبت سفارش
+    order_id = zarin_app.register_order("مشتری نمونه", "طرح گل رز مینیاتوری", 2500000)
     
-    # Scale a design
-    new_w, new_h = manager.scale_pattern_dimensions(10, 10, 120)
-    print(f"New pattern dimensions: {new_w}cm x {new_h}cm")
+    print(f"سفارش با موفقیت ثبت شد: {order_id}")
+    print(f"موجودی انبار: {zarin_app.get_inventory_report()}")
+    print(f"مجموع درآمد: {format_currency_rial(zarin_app.get_total_revenue())}")
 ```
