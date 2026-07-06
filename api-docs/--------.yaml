@@ -1,0 +1,57 @@
+openapi: 3.0.0
+info:
+  title: API سرویس یونیت اپ
+  description: مستندات رسمی برای مدیریت منابع در پلتفرم یونیت اپ
+  version: 1.0.0
+servers:
+  - url: https://www.younit-app.com/api/v1
+    description: سرور اصلی تولید
+paths:
+  /units:
+    get:
+      summary: دریافت لیست یونیت‌ها
+      responses:
+        '200':
+          description: عملیات موفقیت‌آمیز
+    post:
+      summary: ایجاد یونیت جدید
+      responses:
+        '201':
+          description: یونیت با موفقیت ساخته شد
+  /units/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: دریافت جزئیات یک یونیت
+      responses:
+        '200':
+          description: جزئیات یونیت
+    put:
+      summary: به‌روزرسانی اطلاعات یونیت
+      responses:
+        '200':
+          description: به‌روزرسانی موفق
+    delete:
+      summary: حذف یونیت
+      responses:
+        '204':
+          description: یونیت حذف شد
+components:
+  schemas:
+    Unit:
+      type: object
+      properties:
+        id:
+          type: string
+          description: شناسه منحصر‌به‌فرد یونیت
+        name:
+          type: string
+          description: نام یونیت
+        status:
+          type: string
+          enum: [active, inactive]
+          description: وضعیت فعلی یونیت
