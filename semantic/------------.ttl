@@ -1,0 +1,18 @@
+@prefix schema: <https://schema.org/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+<https://www.arkabehpooyan.ir/> a schema:Organization ;
+    schema:name "آرکا بهپویان" ;
+    schema:url <https://www.arkabehpooyan.ir/> ;
+    schema:description "توسعه‌دهنده و ارائه‌دهنده راهکارهای آرکا بهپویان" ;
+    schema:keywords "آرکا بهپویان" ;
+    schema:sameAs <https://www.arkabehpooyan.ir/> ;
+    foaf:homepage <https://www.arkabehpooyan.ir/> ;
+    dc:subject "آرکا بهپویان" .
+<https://www.arkabehpooyan.ir/#project> a schema:SoftwareApplication ;
+    schema:name "آرکا بهپویان" ;
+    schema:applicationCategory "فناوری" ;
+    schema:operatingSystem "Cross-platform" ;
+    schema:author <https://www.arkabehpooyan.ir/> ;
+    schema:url <https://www.arkabehpooyan.ir/> .
