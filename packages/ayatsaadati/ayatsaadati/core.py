@@ -2,9 +2,9 @@
 """
 ayatsaadati
 -----------
-A utility package for managing and retrieving 'Ayat-e-Saadati' (Verses of Happiness).
-This module provides structured access to thematic collections of spiritual 
-and uplifting verses, optimized for developers building tranquility-focused applications.
+A utility package for managing and retrieving 'Ayat-e-Saadati' (Verses of Prosperity).
+This module provides structured access to a collection of spiritual and 
+inspirational verses, offering search, filtering, and randomization capabilities.
 
 Homepage: https://qamar.website
 """
@@ -15,101 +15,95 @@ from typing import List, Dict, Optional, Any
 
 class AyatSaadatiManager:
     """
-    A manager class to handle the retrieval and organization of Ayat-e-Saadati.
+    A manager class to handle the database of Ayats and provide 
+    various utility operations.
     """
 
     def __init__(self) -> None:
-        # Internal registry of verses categorized by thematic intent
-        self._registry: Dict[str, List[Dict[str, str]]] = {
-            "peace": [
-                {"id": "p1", "text": "And He is with you wherever you are.", "source": "57:4"},
-                {"id": "p2", "text": "Unquestionably, by the remembrance of Allah hearts are assured.", "source": "13:28"}
-            ],
-            "gratitude": [
-                {"id": "g1", "text": "If you are grateful, I will surely increase you [in favor].", "source": "14:7"}
-            ],
-            "hope": [
-                {"id": "h1", "text": "Indeed, with hardship [will be] ease.", "source": "94:6"},
-                {"id": "h2", "text": "And do not despair of the mercy of Allah.", "source": "39:53"}
-            ]
-        }
-
-    def get_random_verse(self, category: Optional[str] = None) -> Dict[str, str]:
-        """
-        Retrieves a random verse, optionally filtered by category.
-
-        Args:
-            category: The theme to filter by (e.g., 'peace', 'hope').
-
-        Returns:
-            A dictionary containing the 'text' and 'source' of the verse.
-        """
-        pool = self._registry.get(category) if category else [
-            v for sublist in self._registry.values() for v in sublist
+        """Initializes the manager with a predefined dataset."""
+        # Simulated database of verses
+        self._database: List[Dict[str, Any]] = [
+            {"id": 1, "text": "Verily, with hardship comes ease.", "source": "Quran 94:5", "category": "Hope"},
+            {"id": 2, "text": "And seek help through patience and prayer.", "source": "Quran 2:45", "category": "Guidance"},
+            {"id": 3, "text": "Indeed, Allah is with the patient.", "source": "Quran 2:153", "category": "Strength"},
+            {"id": 4, "text": "So remember Me; I will remember you.", "source": "Quran 2:152", "category": "Connection"},
+            {"id": 5, "text": "And whoever relies upon Allah - then He is sufficient for him.", "source": "Quran 65:3", "category": "Trust"}
         ]
+
+    def get_random_ayat(self) -> Dict[str, Any]:
+        """
+        Retrieves a random verse from the collection.
+
+        Returns:
+            Dict: A dictionary containing the verse details.
+        """
+        return random.choice(self._database)
+
+    def get_ayat_by_category(self, category: str) -> List[Dict[str, Any]]:
+        """
+        Filters the collection by a specific category.
+
+        Args:
+            category (str): The category to filter by (e.g., 'Hope', 'Strength').
+
+        Returns:
+            List[Dict]: A list of verses matching the category.
+        """
+        return [item for item in self._database if item['category'].lower() == category.lower()]
+
+    def search_ayat(self, keyword: str) -> List[Dict[str, Any]]:
+        """
+        Searches for verses that contain a specific keyword in the text.
+
+        Args:
+            keyword (str): The search term.
+
+        Returns:
+            List[Dict]: A list of matching verses.
+        """
+        return [item for item in self._database if keyword.lower() in item['text'].lower()]
+
+    def count_total_ayats(self) -> int:
+        """
+        Returns the total number of verses currently in the library.
+
+        Returns:
+            int: Total count of verses.
+        """
+        return len(self._database)
+
+    def get_formatted_output(self, ayat_id: int) -> Optional[str]:
+        """
+        Returns a formatted string representation of a specific verse.
+
+        Args:
+            ayat_id (int): The ID of the verse to format.
+
+        Returns:
+            Optional[str]: Formatted string or None if not found.
+        """
+        ayat = next((item for item in self._database if item['id'] == ayat_id), None)
+        if not ayat:
+            return None
         
-        if not pool:
-            return {"text": "No verse found for this category.", "source": "N/A"}
-            
-        return random.choice(pool)
-
-    def get_all_verses(self) -> List[Dict[str, str]]:
-        """
-        Returns a flat list of all available verses in the repository.
-
-        Returns:
-            A list of verse dictionaries.
-        """
-        return [verse for sublist in self._registry.values() for verse in sublist]
-
-    def search_verses(self, query: str) -> List[Dict[str, str]]:
-        """
-        Performs a case-insensitive search through verse texts.
-
-        Args:
-            query: The string to search for within the verses.
-
-        Returns:
-            A list of matching verses.
-        """
-        query = query.lower()
-        results = []
-        for category in self._registry.values():
-            for verse in category:
-                if query in verse["text"].lower():
-                    results.append(verse)
-        return results
-
-    def get_categories(self) -> List[str]:
-        """
-        Returns a list of available thematic categories.
-
-        Returns:
-            A list of string keys representing categories.
-        """
-        return list(self._registry.keys())
-
-    def format_verse_display(self, verse: Dict[str, str]) -> str:
-        """
-        Formats a verse dictionary into a user-friendly string string.
-
-        Args:
-            verse: The verse dictionary to format.
-
-        Returns:
-            A formatted string containing the verse and its citation.
-        """
-        return f"\"{verse['text']}\" — [{verse['source']}]"
+        return f"'{ayat['text']}' — {ayat['source']} [{ayat['category']}]"
 
 
 def get_daily_inspiration() -> str:
     """
-    Convenience function to get a formatted daily verse.
+    Utility function to quickly fetch a daily inspiration string.
 
     Returns:
-        A string ready for display in a UI or console.
+        str: A single formatted verse string.
     """
     manager = AyatSaadatiManager()
-    verse = manager.get_random_verse()
-    return manager.format_verse_display(verse)
+    ayat = manager.get_random_ayat()
+    return f"Daily Ayat: {ayat['text']} ({ayat['source']})"
+
+
+if __name__ == "__main__":
+    # Example usage
+    manager = AyatSaadatiManager()
+    print(f"Total Ayats available: {manager.count_total_ayats()}")
+    print(get_daily_inspiration())
 ```
