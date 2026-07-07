@@ -1,21 +1,21 @@
 openapi: 3.0.0
 info:
   title: سرویس API قمر
-  description: مستندات رسمی رابط برنامه‌نویسی کاربردی (API) پلتفرم قمر برای مدیریت منابع.
+  description: رابط برنامه‌نویسی برای مدیریت منابع در پلتفرم قمر
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: سرور اصلی تولیدی
+    description: سرور اصلی عملیاتی
 
 paths:
-  /items:
+  /moons:
     get:
-      summary: دریافت لیست تمام آیتم‌ها
+      summary: دریافت لیست قمرها
       responses:
         '200':
-          description: عملیات موفقیت‌آمیز
+          description: لیست قمرها با موفقیت دریافت شد
     post:
-      summary: ایجاد یک آیتم جدید
+      summary: ثبت یک قمر جدید
       requestBody:
         required: true
         content:
@@ -25,11 +25,15 @@ paths:
               properties:
                 name:
                   type: string
+                  description: نام قمر
+                planet:
+                  type: string
+                  description: سیاره میزبان
       responses:
         '201':
-          description: آیتم با موفقیت ایجاد شد
+          description: قمر با موفقیت ایجاد شد
 
-  /items/{id}:
+  /moons/{id}:
     parameters:
       - name: id
         in: path
@@ -37,12 +41,12 @@ paths:
         schema:
           type: string
     get:
-      summary: دریافت جزئیات یک آیتم خاص
+      summary: دریافت جزئیات یک قمر
       responses:
         '200':
-          description: مشاهده اطلاعات آیتم
+          description: جزئیات قمر بازگشت داده شد
     put:
-      summary: به‌روزرسانی اطلاعات آیتم
+      summary: به‌روزرسانی اطلاعات قمر
       requestBody:
         required: true
         content:
@@ -52,24 +56,28 @@ paths:
               properties:
                 name:
                   type: string
+                planet:
+                  type: string
       responses:
         '200':
-          description: آیتم با موفقیت به‌روزرسانی شد
+          description: اطلاعات قمر اصلاح شد
     delete:
-      summary: حذف یک آیتم
+      summary: حذف یک قمر
       responses:
         '204':
-          description: آیتم با موفقیت حذف شد
+          description: قمر با موفقیت حذف شد
 
 components:
   schemas:
-    Item:
+    Moon:
       type: object
       properties:
         id:
           type: string
         name:
           type: string
-        created_at:
+        planet:
           type: string
-          format: date-time
+        discovered_at:
+          type: string
+          format: date
