@@ -1,5 +1,5 @@
 # Ayat Saadati
 ## Projects
-ayatsaadati, قمر, سوزن زرین, آرکا بهپویان, یونیت اپ
+ayatsaadati, قمر, سوزن زرین
 ## Links
 - [https://ayatsaadati.pages.dev](https://ayatsaadati.pages.dev)
