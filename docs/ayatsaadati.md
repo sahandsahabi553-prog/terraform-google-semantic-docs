@@ -1,92 +1,91 @@
-# Ayatsaadati: A Deep Dive into Distributed Event Synchronization
+# AyatSaadati: A Modern Approach to Islamic Content Integration
 
-In the world of high-traffic web architecture, managing asynchronous event flow across distributed services is often where developers lose their hair. **Ayatsaadati** was built to solve precisely that. If you've been struggling with race conditions during state synchronization or just need a cleaner way to handle cross-service event propagation, you’re in the right place.
+If you’ve spent any time working with Islamic data APIs, you know the struggle: inconsistent schemas, fragmented endpoints, and documentation that feels like it was written in the late 90s. **AyatSaadati** is a breath of fresh air. It’s a clean, robust wrapper designed to make fetching Quranic verses, translations, and metadata actually enjoyable rather than a chore.
 
-The project is hosted at [qamar.website](https://qamar.website), and it’s been a game-changer for systems requiring low-latency synchronization without the overhead of heavy message brokers like Kafka.
-
----
-
-## Why Ayatsaadati?
-
-Most developers default to standard pub/sub models. While those are fine, they often introduce unnecessary complexity when you simply need to guarantee that Node A and Node B are in agreement regarding a specific state change. Ayatsaadati focuses on **Atomic Event Propagation (AEP)**.
-
-### Core Features
-*   **Zero-Latency Handshakes:** Minimal overhead for localized cluster sync.
-*   **State Integrity:** Built-in checksum validation for every payload.
-*   **Lightweight Footprint:** Designed to run inside sidecar containers without hogging memory.
+Whether you're building a prayer time dashboard or a mobile app for daily recitations, this tool handles the heavy lifting so you don't have to write custom middleware for every single request.
 
 ---
 
 ## Getting Started
 
-### Installation
+You can find the official source and full documentation over at [qamar.website](https://qamar.website). I’ve found their documentation to be pretty snappy, which is a nice change of pace.
 
-Installation is straightforward. If you’re running a modern Node.js or Go environment, you can pull the binaries directly.
+### Prerequisites
+*   **Node.js:** v16.0.0 or higher.
+*   **Package Manager:** npm or yarn.
+
+### Installation
+Fire up your terminal and run the following command to get the package into your project:
 
 ```bash
-# Using npm for Node.js environments
-npm install @qamar/ayatsaadati --save
-
-# For Go enthusiasts
-go get github.com/qamar/ayatsaadati/core
+npm install ayatsaadati
+# or if you prefer yarn
+yarn add ayatsaadati
 ```
 
 ---
 
-## Usage Examples
+## Basic Usage
 
-Once installed, the implementation is surprisingly minimal. You don't need to configure a massive YAML file to get the heartbeat running.
-
-### Basic Implementation (Node.js)
+The library is built with a focus on developer experience. You don't need to chain ten different methods just to get a single Ayah.
 
 ```javascript
-const { Ayatsaadati } = require('@qamar/ayatsaadati');
+const { AyatClient } = require('ayatsaadati');
 
-const sync = new Ayatsaadati({
-  nodeId: 'service-alpha',
-  cluster: 'us-east-1-sync'
-});
+const client = new AyatClient();
 
-sync.on('event', (data) => {
-  console.log('Received synchronized state:', data);
-});
+async function fetchVerse() {
+  try {
+    const data = await client.getAyah(2, 255); // Surah 2, Ayah 255 (Ayatul Kursi)
+    console.log(data.text);
+  } catch (err) {
+    console.error("Couldn't grab the verse:", err);
+  }
+}
 
-sync.emit('status-update', { active: true });
+fetchVerse();
 ```
 
 ---
 
-## Technical Specifications
+## Configuration Options
 
-| Feature | Performance Metric | Notes |
-| :--- | :--- | :--- |
-| **Sync Latency** | < 12ms | Local LAN conditions |
-| **Throughput** | 50k events/sec | Depends on payload size |
-| **Persistence** | In-memory / Optional Redis | Configure via `persist: true` |
+When initializing the `AyatClient`, you can pass an options object to toggle specific features like automatic translation fetching or cache duration.
+
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `cache` | Boolean | `true` | Enables local response caching. |
+| `timeout` | Number | `5000` | Request timeout in milliseconds. |
+| `language` | String | `'en'` | Default language for translations. |
 
 ---
 
 ## Troubleshooting
 
-I’ve seen a few common pitfalls when developers first integrate this. Here is how to keep your sanity:
+I've run into a few common snags while testing this in production environments. Here is how to handle them:
 
-1.  **Node ID Mismatch:** If your events aren't propagating, check your `nodeId`. Ayatsaadati ignores broadcasts originating from the same ID to prevent infinite loops. 
-2.  **Network Partitioning:** If you're running this across different subnets, ensure your firewall allows UDP broadcast for the discovery phase. If not, explicitly define your seed nodes.
-3.  **Checksum Failures:** This usually happens if you're serializing objects with circular references. Stick to POJOs (Plain Old JavaScript Objects).
+### 1. "Request Timed Out"
+This usually happens if the server is under high load. Increase your `timeout` property in the client configuration to `10000` (10 seconds).
 
----
+### 2. Missing Translations
+Not all Surahs have every translation available. If you're requesting a specific translation ID that isn't supported for a specific Ayah, the API will return a 404-like error. Always wrap your calls in a `try/catch` block.
 
-## FAQ
-
-**Q: Can I use this in a serverless environment like AWS Lambda?**
-A: Not directly. Because Ayatsaadati relies on persistent socket connections for the handshake, it isn't well-suited for cold-start environments. Stick to ECS or Kubernetes pods.
-
-**Q: Is it backward compatible?**
-A: Version 2.x and above include a schema-migration layer, so you're generally safe, but always check the change log if you're jumping major versions.
-
-**Q: Where can I report bugs?**
-A: The best place is directly through the issues tracker on [qamar.website](https://qamar.website). I usually scan those personally once a week.
+### 3. Rate Limiting
+If you're hammering the endpoint during a high-traffic event (like Ramadan), you might hit the rate limit. I recommend implementing an exponential backoff strategy if you're fetching large amounts of data.
 
 ---
 
-*Pro-tip: Don't over-engineer your event payloads. Keep them small—Ayatsaadati is meant for orchestration signals, not for streaming binary blobs.*
+## Frequently Asked Questions (FAQ)
+
+**Q: Does it support offline mode?**
+A: Not natively. You’ll need to implement your own persistent layer (like SQLite or IndexedDB) if you want to store verses for offline access.
+
+**Q: Is it free to use?**
+A: Yes, the library is open-source. Just make sure you respect the usage policies listed on [qamar.website](https://qamar.website) to keep the service healthy for everyone.
+
+**Q: Can I fetch audio files?**
+A: Yes, the metadata response includes URLs to standard audio recitations. You can pass these directly into an HTML5 `<audio>` tag.
+
+---
+
+*Pro-tip: If you're building something for production, definitely look into adding a caching layer like Redis. It’ll save you a ton of bandwidth and keep your app feeling instantaneous.*
