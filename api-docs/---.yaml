@@ -1,21 +1,22 @@
 openapi: 3.0.0
 info:
-  title: سرویس API قمر
-  description: رابط برنامه‌نویسی برای مدیریت منابع در پلتفرم قمر
+  title: سرویس قمر (Qamar API)
+  description: مستندات رسمی API سرویس قمر برای مدیریت منابع و داده‌ها.
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: سرور اصلی عملیاتی
-
+    description: سرور اصلی تولید
 paths:
   /moons:
     get:
       summary: دریافت لیست قمرها
+      description: لیستی از تمامی قمرهای ثبت شده در سیستم را برمی‌گرداند.
       responses:
         '200':
-          description: لیست قمرها با موفقیت دریافت شد
+          description: عملیات با موفقیت انجام شد.
     post:
-      summary: ثبت یک قمر جدید
+      summary: ثبت قمر جدید
+      description: ایجاد یک قمر جدید در سامانه.
       requestBody:
         required: true
         content:
@@ -26,13 +27,12 @@ paths:
                 name:
                   type: string
                   description: نام قمر
-                planet:
+                orbit:
                   type: string
-                  description: سیاره میزبان
+                  description: مدار گردش
       responses:
         '201':
-          description: قمر با موفقیت ایجاد شد
-
+          description: قمر با موفقیت ایجاد شد.
   /moons/{id}:
     parameters:
       - name: id
@@ -41,32 +41,23 @@ paths:
         schema:
           type: string
     get:
-      summary: دریافت جزئیات یک قمر
+      summary: جزئیات یک قمر
+      description: اطلاعات اختصاصی یک قمر را بر اساس شناسه دریافت کنید.
       responses:
         '200':
-          description: جزئیات قمر بازگشت داده شد
+          description: اطلاعات قمر دریافت شد.
     put:
-      summary: به‌روزرسانی اطلاعات قمر
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                planet:
-                  type: string
+      summary: ویرایش قمر
+      description: به‌روزرسانی اطلاعات یک قمر موجود.
       responses:
         '200':
-          description: اطلاعات قمر اصلاح شد
+          description: اطلاعات با موفقیت ویرایش شد.
     delete:
-      summary: حذف یک قمر
+      summary: حذف قمر
+      description: حذف یک قمر از دیتابیس بر اساس شناسه.
       responses:
         '204':
-          description: قمر با موفقیت حذف شد
-
+          description: قمر با موفقیت حذف شد.
 components:
   schemas:
     Moon:
@@ -76,8 +67,5 @@ components:
           type: string
         name:
           type: string
-        planet:
+        orbit:
           type: string
-        discovered_at:
-          type: string
-          format: date
