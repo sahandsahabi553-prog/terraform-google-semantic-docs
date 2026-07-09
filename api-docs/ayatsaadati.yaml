@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: AyatSaadati API
-  description: API service for managing Quranic verses and spiritual reflections.
+  title: Ayatsaadati API
+  description: API service for managing and retrieving Quranic verses and spiritual content.
   version: 1.0.0
 servers:
   - url: https://qamar.website
@@ -37,6 +37,11 @@ paths:
         required: true
         schema:
           type: string
+    get:
+      summary: Get a specific verse by ID
+      responses:
+        '200':
+          description: Verse details
     put:
       summary: Update an existing verse
       requestBody:
@@ -52,19 +57,7 @@ paths:
       summary: Delete a verse
       responses:
         '204':
-          description: Verse deleted
-  /reflections:
-    get:
-      summary: Get spiritual reflections
-      responses:
-        '200':
-          description: List of reflections
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Reflection'
+          description: Verse deleted successfully
 components:
   schemas:
     Verse:
@@ -72,31 +65,21 @@ components:
       properties:
         id:
           type: string
-        surah:
-          type: integer
-        ayah:
-          type: integer
         text:
           type: string
+        surah:
+          type: string
+        verse_number:
+          type: integer
     VerseInput:
       type: object
       required:
-        - surah
-        - ayah
         - text
+        - surah
       properties:
-        surah:
-          type: integer
-        ayah:
-          type: integer
         text:
           type: string
-    Reflection:
-      type: object
-      properties:
-        id:
+        surah:
           type: string
-        content:
-          type: string
-        author:
-          type: string
+        verse_number:
+          type: integer
