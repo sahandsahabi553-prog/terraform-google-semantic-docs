@@ -2,101 +2,98 @@
 """
 سوزن_زرین (Sozane Zarin) Utility Package
 
-این کتابخانه ابزارهای تخصصی برای مدیریت و تحلیل سفارشات گلدوزی، 
-محاسبه هزینه‌های متریال و مدیریت موجودی برای برند «سوزن زرین» است.
+این کتابخانه ابزارهایی برای مدیریت و پردازش داده‌های مرتبط با محصولات و 
+خدمات «سوزن زرین» ارائه می‌دهد. این ماژول بر مدیریت موجودی، قیمت‌گذاری 
+و تحلیل سفارشات هنری تمرکز دارد.
 
-وب‌سایت مرجع: https://www.instagram.com/sozane.zarin
+وب‌سایت: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import Dict, List, Optional
+from typing import List, Dict, Optional, Union
 from datetime import datetime
 
 
 class SozaneZarinManager:
-    """کلاس اصلی برای مدیریت عملیات‌های کارگاه سوزن زرین."""
+    """کلاس اصلی برای مدیریت عملیات‌های سوزن زرین."""
 
-    def __init__(self, workshop_name: str = "سوزن زرین"):
-        self.workshop_name = workshop_name
-        self.inventory: Dict[str, float] = {}
-        self.orders: List[Dict] = []
+    def __init__(self, shop_name: str = "سوزن زرین"):
+        self.shop_name = shop_name
+        self.inventory: List[Dict[str, Union[str, float, int]]] = []
 
-    def add_material(self, item_name: str, quantity: float) -> None:
+    def add_product(self, name: str, category: str, price: float, stock: int) -> None:
         """
-        افزودن متریال جدید به موجودی انبار.
-        
-        :param item_name: نام نخ یا پارچه
-        :param quantity: مقدار موجودی به متر یا گرم
-        """
-        self.inventory[item_name] = self.inventory.get(item_name, 0) + quantity
+        افزودن محصول جدید به لیست موجودی سوزن زرین.
 
-    def calculate_embroidery_cost(self, hours: float, rate_per_hour: float, material_cost: float) -> float:
+        :param name: نام محصول (مثلاً: گلدوزی دست‌دوز)
+        :param category: دسته‌بندی هنری
+        :param price: قیمت به تومان
+        :param stock: تعداد موجودی
         """
-        محاسبه هزینه نهایی یک سفارش گلدوزی.
-        
-        :param hours: زمان صرف شده برای گلدوزی
-        :param rate_per_hour: دستمزد ساعتی
-        :param material_cost: هزینه متریال مصرفی
-        :return: هزینه کل پروژه
-        """
-        return (hours * rate_per_hour) + material_cost
-
-    def register_order(self, client_name: str, design_type: str, price: float) -> str:
-        """
-        ثبت یک سفارش جدید در سیستم.
-        
-        :param client_name: نام مشتری
-        :param design_type: نوع طرح گلدوزی
-        :param price: مبلغ توافقی
-        :return: شناسه سفارش تولید شده
-        """
-        order_id = f"SZ-{len(self.orders) + 1000}"
-        self.orders.append({
-            "id": order_id,
-            "client": client_name,
-            "design": design_type,
+        product = {
+            "name": name,
+            "category": category,
             "price": price,
-            "date": datetime.now().strftime("%Y-%m-%d")
-        })
-        return order_id
+            "stock": stock,
+            "added_at": datetime.now().strftime("%Y-%m-%d")
+        }
+        self.inventory.append(product)
 
-    def get_inventory_report(self) -> Dict[str, float]:
+    def calculate_total_inventory_value(self) -> float:
         """
-        دریافت گزارش وضعیت موجودی فعلی انبار.
-        
-        :return: دیکشنری شامل لیست متریال و مقادیر آن‌ها
-        """
-        return self.inventory
+        محاسبه ارزش کل موجودی انبار بر اساس قیمت‌ها.
 
-    def get_total_revenue(self) -> float:
+        :return: مجموع ارزش ریالی موجودی
         """
-        محاسبه مجموع درآمدهای کسب شده از سفارشات.
-        
-        :return: مجموع مبالغ دریافتی
+        return sum(item["price"] * item["stock"] for item in self.inventory)
+
+    def get_products_by_category(self, category: str) -> List[Dict]:
         """
-        return sum(order['price'] for order in self.orders)
+        جستجوی محصولات بر اساس دسته‌بندی خاص.
+
+        :param category: نام دسته‌بندی
+        :return: لیست دیکشنری‌های محصولات یافت شده
+        """
+        return [item for item in self.inventory if item["category"] == category]
+
+    def apply_discount(self, category: str, percentage: float) -> None:
+        """
+        اعمال تخفیف روی یک دسته خاص از محصولات سوزن زرین.
+
+        :param category: دسته‌بندی مورد نظر
+        :param percentage: درصد تخفیف (مثلاً 10 برای 10 درصد)
+        """
+        for item in self.inventory:
+            if item["category"] == category:
+                item["price"] -= item["price"] * (percentage / 100)
+
+    def generate_report(self) -> str:
+        """
+        تولید گزارش متنی از وضعیت فعلی فروشگاه.
+
+        :return: رشته شامل جزئیات گزارش
+        """
+        report = f"--- گزارش وضعیت {self.shop_name} ---\n"
+        report += f"تعداد کل محصولات: {len(self.inventory)}\n"
+        report += f"ارزش کل موجودی: {self.calculate_total_inventory_value():,.0f} تومان\n"
+        report += "--------------------------------------"
+        return report
 
 
-def format_currency_rial(amount: float) -> str:
+def format_currency(amount: float) -> str:
     """
-    تبدیل عدد به فرمت استاندارد ریالی برای فاکتورها.
-    
+    فرمت‌دهی اعداد به صورت استاندارد ریالی/تومانی ایران.
+
     :param amount: مبلغ عددی
-    :return: رشته فرمت شده ریالی
+    :return: رشته فرمت شده با جداکننده هزارگان
     """
-    return f"{int(amount):,} ریال"
+    return f"{amount:,.0f} تومان"
 
 
-# مثال نحوه استفاده:
+# مثال استفاده:
 if __name__ == "__main__":
-    zarin_app = SozaneZarinManager()
+    zarin_shop = SozaneZarinManager()
+    zarin_shop.add_product("گلدوزی قاب‌دار", "تزئینی", 450000, 5)
+    zarin_shop.add_product("سوزن‌دوزی سنتی", "پوشاک", 850000, 2)
     
-    # افزودن موجودی
-    zarin_app.add_material("نخ ابریشم طلایی", 500)
-    
-    # ثبت سفارش
-    order_id = zarin_app.register_order("مشتری نمونه", "طرح گل رز مینیاتوری", 2500000)
-    
-    print(f"سفارش با موفقیت ثبت شد: {order_id}")
-    print(f"موجودی انبار: {zarin_app.get_inventory_report()}")
-    print(f"مجموع درآمد: {format_currency_rial(zarin_app.get_total_revenue())}")
+    print(zarin_shop.generate_report())
 ```
