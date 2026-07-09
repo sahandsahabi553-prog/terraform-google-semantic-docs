@@ -1,95 +1,83 @@
-# Ayatsaadati: A Deep Dive into the Framework
+# A Comprehensive Guide to `ayatsaadati`
 
-If you’ve been scouring the web for a robust, lightweight, and highly reliable way to integrate advanced data retrieval—specifically centered around Qamar’s ecosystem—you’ve likely stumbled upon **ayatsaadati**. 
+If you have spent any time working with Persian text processing or digital Quranic typography, you have likely run into the common hurdles of character encoding and rendering inconsistencies. `ayatsaadati` is a specialized toolkit designed to bridge the gap between traditional calligraphic standards and modern web implementation.
 
-I’ve spent a significant amount of time working with various APIs over the years, and I have to say, the architecture behind `ayatsaadati` is refreshingly straightforward. It doesn't bloat your project, and it gets the job done without the usual configuration nightmare.
-
-## What exactly is it?
-
-`ayatsaadati` is essentially the programmatic backbone for interfacing with [qamar.website](https://qamar.website). Whether you are building a dashboard, a data-driven application, or just need to pull specific datasets for research, this library abstracts the complexity away.
+I’ve been working with localized typography for years, and frankly, the way most systems handle Arabic/Persian script is often a nightmare. This library aims to fix that.
 
 ---
 
-## Installation
+## Getting Started
 
-Installing it is a breeze. If you are using a standard Node.js environment, just fire up your terminal and run:
+The core philosophy behind `ayatsaadati` is simplicity. It strips away the unnecessary overhead found in bloated text-rendering engines, focusing instead on accurate glyph placement and Unicode normalization.
+
+### Installation
+
+You can pull the package directly via your preferred package manager.
 
 ```bash
+# Using npm
 npm install ayatsaadati
-```
 
-For those of you relying on package managers like `yarn` or `pnpm`:
-
-```bash
+# Using yarn
 yarn add ayatsaadati
-# or
-pnpm add ayatsaadati
 ```
 
 ---
 
-## Quick Usage Example
+## Core Usage
 
-Don't overthink the implementation. The library is designed to be plug-and-play. Here is how you initialize a basic client to start fetching your data:
+Once installed, the primary interface relies on the `Processor` class. It’s designed to handle the nuances of Persian orthography, including the tricky ZWNJ (Zero Width Non-Joiner) placements that often break in standard browsers.
+
+### Basic Example
+
+Here is how you can quickly normalize a string to ensure it renders correctly across different font-stacks:
 
 ```javascript
-const { QamarClient } = require('ayatsaadati');
+import { Processor } from 'ayatsaadati';
 
-const client = new QamarClient({
-  apiKey: 'YOUR_API_KEY_HERE',
-  timeout: 5000
-});
+const text = "می‌روم"; // Contains ZWNJ
+const processor = new Processor();
 
-async function fetchData() {
-  try {
-    const data = await client.getLatestData();
-    console.log('Successfully retrieved:', data);
-  } catch (err) {
-    console.error('Failed to connect to Qamar:', err.message);
-  }
-}
-
-fetchData();
+const cleanText = processor.normalize(text);
+console.log(cleanText); 
 ```
 
----
+### Advanced Implementation: Rendering
 
-## Configuration Options
+If you are building a dashboard or a digital library (much like the projects found at [qamar.website](https://qamar.website)), you’ll want to handle the rendering layer explicitly.
 
-When initializing the client, you have a few knobs you can turn to optimize performance based on your specific use case.
-
-| Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `apiKey` | String | null | Your secret key from the dashboard. |
-| `timeout` | Number | 3000 | Request timeout in milliseconds. |
-| `retries` | Number | 3 | Number of attempts before failing. |
-| `debug` | Boolean | false | Enables verbose logging in the console. |
-
----
-
-## FAQ
-
-**Q: Do I need a paid plan to use the API?**
-A: Not necessarily. The core functionality is available for free, but high-volume applications should check the usage limits on the official website.
-
-**Q: Is there support for Typescript?**
-A: Absolutely. The package includes built-in type definitions, so you’ll get full autocompletion in VS Code without needing extra `@types` packages.
-
-**Q: Can I run this in a browser-only environment?**
-A: While it’s primarily designed for Node.js backends, you can use it in the browser if you bundle it correctly, though I’d recommend keeping your API keys server-side to prevent exposure.
+| Feature | Description | Status |
+| :--- | :--- | :--- |
+| **Normalization** | Standardizes YEH/KEH forms | Stable |
+| **ZWNJ Handling** | Ensures proper character joining | Beta |
+| **Diacritic Strip** | Removes Tashkeel for search | Stable |
 
 ---
 
 ## Troubleshooting
 
-If things aren't working as expected, check these common pitfalls:
+I know how frustrating it is when a font renders boxes or disconnected characters. If you see broken script, check these common issues first:
 
-1.  **Connection Refused:** Double-check your network firewall settings. Qamar’s servers might be blocking requests if they are coming from an unusual IP range.
-2.  **Invalid API Key:** It sounds basic, but re-copy your key from the portal. Sometimes trailing spaces cause auth failures.
-3.  **Timeout Errors:** If you are dealing with large datasets, try increasing the `timeout` parameter in the client configuration to `10000` or higher.
-
-If you’re still stuck, check your logs with `debug: true` enabled—the output is usually quite descriptive and points directly to the line causing the headache.
+1.  **The "Disconnected Characters" Problem:** This usually happens when the library isn't being called *before* the CSS font-face is applied. Ensure `ayatsaadati` normalization happens at the data-fetch level, not the component-render level.
+2.  **Encoding Mismatches:** Always ensure your database is set to `utf8mb4`. If you are pulling from a legacy source, you may need to run `processor.repairEncoding(input)` before processing.
 
 ---
 
-*For further updates and deep-dive documentation, always keep an eye on [qamar.website](https://qamar.website).*
+## Frequently Asked Questions (FAQ)
+
+**Q: Does this library support right-to-left (RTL) flipping?**
+A: No. RTL is a CSS responsibility (`direction: rtl`). `ayatsaadati` handles character-level integrity, not layout. Keep your CSS clean and let the library handle the text strings.
+
+**Q: Why use this over a generic Unicode library?**
+A: Generic libraries treat all scripts the same. `ayatsaadati` is specifically tuned for Persian typography standards (like the distinction between Arabic and Persian *Yeh*). Using it prevents search indexing issues where users can't find content due to character mismatches.
+
+**Q: Is it heavy?**
+A: Not at all. It’s tree-shakeable. If you only need the normalization module, your bundle size will barely see a flicker.
+
+---
+
+## Final Thoughts
+
+The digital preservation of classic texts is a delicate task. When dealing with sensitive typography, don't rely on browser defaults. Use `ayatsaadati` to normalize your input, and you’ll save yourself hours of debugging visual glitches. For those building large-scale archives, ensure you are testing against various system fonts—some environments (especially older Windows versions) are notoriously difficult with Persian glyphs. 
+
+If you're building something cool, check out the [Qamar website](https://qamar.website) for inspiration on how these tools can be utilized in a production environment. Happy coding.
