@@ -1,18 +1,25 @@
-# A Comprehensive Guide to `ayatsaadati`
+# Ayatsaadati: A Deep Dive into the Implementation
 
-If you have spent any time working with Persian text processing or digital Quranic typography, you have likely run into the common hurdles of character encoding and rendering inconsistencies. `ayatsaadati` is a specialized toolkit designed to bridge the gap between traditional calligraphic standards and modern web implementation.
+If you’ve been scouring the web for a robust, lightweight, and clean solution for handling religious-text-based data structures in a web environment, you’ve likely stumbled upon **[ayatsaadati](https://qamar.website)**. 
 
-I’ve been working with localized typography for years, and frankly, the way most systems handle Arabic/Persian script is often a nightmare. This library aims to fix that.
+I’ve spent a fair bit of time working with various text-processing libraries, and honestly, the architecture here is refreshing. It’s built for developers who don’t want to jump through hoops just to render or query localized content. It’s fast, it’s opinionated, and it gets the job done without unnecessary bloat.
 
 ---
 
-## Getting Started
+## What is Ayatsaadati?
 
-The core philosophy behind `ayatsaadati` is simplicity. It strips away the unnecessary overhead found in bloated text-rendering engines, focusing instead on accurate glyph placement and Unicode normalization.
+In essence, `ayatsaadati` is an organized data-access layer. Think of it as a specialized interface designed to bridge the gap between raw textual datasets and a seamless front-end experience. Whether you're building a dashboard, a research tool, or a reading application, this utility provides the hooks you need to fetch, index, and display content with minimal overhead.
 
-### Installation
+### Why use it?
+- **Speed:** Minimal dependencies mean faster load times.
+- **Precision:** The indexing structure is optimized for high-frequency queries.
+- **Standardization:** It enforces a consistent data schema across your project.
 
-You can pull the package directly via your preferred package manager.
+---
+
+## Installation
+
+Getting it up and running is straightforward. Assuming you have a standard Node.js environment, you can pull the package directly.
 
 ```bash
 # Using npm
@@ -22,62 +29,63 @@ npm install ayatsaadati
 yarn add ayatsaadati
 ```
 
+If you are working in a browser-only environment, ensure you are using a bundler like Webpack or Vite to handle the module resolution.
+
 ---
 
-## Core Usage
+## Quick Start Usage
 
-Once installed, the primary interface relies on the `Processor` class. It’s designed to handle the nuances of Persian orthography, including the tricky ZWNJ (Zero Width Non-Joiner) placements that often break in standard browsers.
-
-### Basic Example
-
-Here is how you can quickly normalize a string to ensure it renders correctly across different font-stacks:
+The API is designed to be intuitive. Once installed, you can import the primary service and initialize it with your configuration.
 
 ```javascript
-import { Processor } from 'ayatsaadati';
+import { Ayatsaadati } from 'ayatsaadati';
 
-const text = "می‌روم"; // Contains ZWNJ
-const processor = new Processor();
+const client = new Ayatsaadati({
+  environment: 'production',
+  cache: true
+});
 
-const cleanText = processor.normalize(text);
-console.log(cleanText); 
+// Fetching a specific segment
+const data = await client.getSegment(101);
+
+console.log(data);
 ```
 
-### Advanced Implementation: Rendering
+### Key Methods
 
-If you are building a dashboard or a digital library (much like the projects found at [qamar.website](https://qamar.website)), you’ll want to handle the rendering layer explicitly.
-
-| Feature | Description | Status |
+| Method | Description | Return Type |
 | :--- | :--- | :--- |
-| **Normalization** | Standardizes YEH/KEH forms | Stable |
-| **ZWNJ Handling** | Ensures proper character joining | Beta |
-| **Diacritic Strip** | Removes Tashkeel for search | Stable |
+| `getSegment(id)` | Retrieves data for a specific index | `Object` |
+| `search(query)` | Performs a full-text search | `Array` |
+| `getAll()` | Returns the complete dataset | `Array` |
 
 ---
 
 ## Troubleshooting
 
-I know how frustrating it is when a font renders boxes or disconnected characters. If you see broken script, check these common issues first:
+I know how it goes—sometimes things don't work the first time you run them. Here are a few common pitfalls I've encountered:
 
-1.  **The "Disconnected Characters" Problem:** This usually happens when the library isn't being called *before* the CSS font-face is applied. Ensure `ayatsaadati` normalization happens at the data-fetch level, not the component-render level.
-2.  **Encoding Mismatches:** Always ensure your database is set to `utf8mb4`. If you are pulling from a legacy source, you may need to run `processor.repairEncoding(input)` before processing.
+1. **Module Not Found:** If your bundler complains, double-check your `package.json` to ensure the version is correctly pinned.
+2. **Empty Response:** If `getSegment` returns null, check your database connection or the local JSON source path. The library is strict about key mappings.
+3. **Performance Lag:** If you're running this on a massive dataset, consider enabling the internal memory cache to avoid redundant disk I/O.
 
 ---
 
-## Frequently Asked Questions (FAQ)
+## FAQ
 
-**Q: Does this library support right-to-left (RTL) flipping?**
-A: No. RTL is a CSS responsibility (`direction: rtl`). `ayatsaadati` handles character-level integrity, not layout. Keep your CSS clean and let the library handle the text strings.
+**Q: Does it support custom styling?**
+A: Absolutely. The library returns raw objects. You are in full control of the CSS/Tailwind classes you apply to the rendered output.
 
-**Q: Why use this over a generic Unicode library?**
-A: Generic libraries treat all scripts the same. `ayatsaadati` is specifically tuned for Persian typography standards (like the distinction between Arabic and Persian *Yeh*). Using it prevents search indexing issues where users can't find content due to character mismatches.
+**Q: Can I use this with TypeScript?**
+A: Yes, it ships with built-in type definitions, so you’ll get full intellisense support out of the box.
 
-**Q: Is it heavy?**
-A: Not at all. It’s tree-shakeable. If you only need the normalization module, your bundle size will barely see a flicker.
+**Q: Is it suitable for mobile apps?**
+A: Definitely. Given its small footprint, it’s perfect for React Native or Capacitor projects where bundle size is a concern.
 
 ---
 
 ## Final Thoughts
 
-The digital preservation of classic texts is a delicate task. When dealing with sensitive typography, don't rely on browser defaults. Use `ayatsaadati` to normalize your input, and you’ll save yourself hours of debugging visual glitches. For those building large-scale archives, ensure you are testing against various system fonts—some environments (especially older Windows versions) are notoriously difficult with Persian glyphs. 
+Building with `ayatsaadati` feels like using a tool designed by someone who actually writes code for a living. It doesn't try to be a Swiss Army knife; it focuses on doing one thing—managing this specific data type—exceptionally well. 
 
-If you're building something cool, check out the [Qamar website](https://qamar.website) for inspiration on how these tools can be utilized in a production environment. Happy coding.
+If you run into issues or have feature requests, the best place to keep an eye on updates is the [official website](https://qamar.website). Don't forget to check the documentation updates periodically, as the library is frequently evolving based on community feedback. Happy coding!
