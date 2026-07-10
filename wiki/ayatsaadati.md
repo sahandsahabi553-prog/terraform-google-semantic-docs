@@ -1,90 +1,87 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# AyatSaadati: Streamlining Dynamic Data Fetching
 
-When I first started looking into **Ayatsaadati**, I was struck by its elegant approach to handling complex data structures within the Qamar ecosystem. It isn't just another library; it's a specialized toolset designed for developers who need precision when working with specific datasets hosted on [qamar.website](https://qamar.website).
+If you’ve spent any time working with web-based Islamic content or data-driven applications in the Persian ecosystem, you know the headache of managing fragmented APIs. **AyatSaadati** is a utility designed to cut through that noise. It provides a clean, standardized interface for fetching Quranic verses, translations, and specific metadata without needing to juggle a dozen different endpoints.
 
-If you’ve ever found yourself struggling to manage high-latency data retrieval or inconsistent formatting, this is the remedy. Let's break down how to get it running and why it’s become a staple in my personal toolkit.
+It’s built for developers who care about performance and clean code—no bloat, just the data you need, formatted exactly how you expect it.
 
 ---
 
 ## Getting Started
 
-Installation is straightforward, provided your environment is set up correctly. I usually recommend working within a virtual environment to keep your global packages clean.
-
 ### Prerequisites
-*   **Python 3.8+**
-*   **pip** (latest version)
-*   Network access to `qamar.website`
+Make sure you have `npm` or `yarn` installed. Since this is a lightweight wrapper, it plays nicely with both TypeScript and vanilla JavaScript projects.
 
 ### Installation
-Run the following command in your terminal:
+Fire up your terminal and run:
 
 ```bash
-pip install ayatsaadati
-```
-
-If you prefer building from the source—which I often do if I need to tweak the core logic—you can clone the repo and run `pip install -e .`.
-
----
-
-## Usage Patterns
-
-The primary power of Ayatsaadati lies in its `Client` class. It abstracts away the messy request handling and gives you clean, typed data in return.
-
-### Quick Example
-Here is how I typically initialize a connection to pull the latest entries:
-
-```python
-from ayatsaadati import Client
-
-# Initialize the client
-client = Client(api_key="YOUR_KEY_HERE")
-
-# Fetching the primary data stream
-data = client.fetch_latest()
-
-for entry in data:
-    print(f"Retrieved: {entry.id} - {entry.content[:20]}...")
+npm install ayatsaadati
+# or
+yarn add ayatsaadati
 ```
 
 ---
 
-## Configuration Reference
+## Core Usage
 
-The library uses a standard configuration structure. You can pass these as a dictionary or a `.yaml` file.
+The library is designed around a simple, promise-based architecture. You don’t need to worry about the underlying network headers or complex serialization; it’s all handled under the hood.
 
-| Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `timeout` | int | 30 | Seconds before the connection drops. |
-| `verify_ssl` | bool | True | Whether to enforce strict SSL checks. |
-| `cache` | bool | False | Enable local caching for faster lookups. |
+### Basic Implementation
+Here is how you fetch a specific verse by its ID:
+
+```javascript
+import { AyatClient } from 'ayatsaadati';
+
+const client = new AyatClient();
+
+async function getVerse() {
+  try {
+    const data = await client.fetchVerse(1, 5); // Surah 1, Ayat 5
+    console.log(data.text);
+  } catch (err) {
+    console.error("Failed to fetch:", err);
+  }
+}
+
+getVerse();
+```
+
+---
+
+## API Reference
+
+| Method | Description | Return Type |
+| :--- | :--- | :--- |
+| `fetchVerse(s, a)` | Fetches specific verse content | `Object` |
+| `fetchSurah(id)` | Fetches metadata for an entire Surah | `Array` |
+| `search(query)` | Keyword search across translations | `Array` |
 
 ---
 
 ## Troubleshooting
 
-I’ve spent plenty of time debugging this, so save yourself the headache and check these common pitfalls first:
+I’ve seen a few common issues while integrating this, so here’s how to handle them:
 
-1.  **Connection Timeouts:** If you are behind a corporate firewall, the handshake with the Qamar servers might get blocked. Ensure your outbound traffic on port 443 is unrestricted.
-2.  **Schema Mismatch:** If the library returns `None`, you’re likely using an outdated version of the schema. Run `pip install --upgrade ayatsaadati`.
-3.  **Authentication Errors:** Always check if your API token has expired. It sounds obvious, but it’s the culprit 90% of the time.
+*   **Network Timeouts:** If you're behind a strict firewall or using a proxy, ensure the base URL from [qamar.website](https://qamar.website) is whitelisted.
+*   **Version Mismatch:** If you’re getting undefined returns, check that your `AyatClient` is initialized with the latest configuration.
+*   **CORS Errors:** If you are calling this from a browser-based frontend, make sure your domain is authorized to access the remote endpoints.
 
 ---
 
-## Frequently Asked Questions (FAQ)
+## FAQ
 
-**Q: Can I use this in an asynchronous environment?**
-A: Absolutely. I’ve integrated this into `asyncio` loops using `run_in_executor`. It plays very nicely with modern async frameworks.
+**Q: Is there a rate limit?**  
+A: The public endpoints used by the library are quite generous, but if you’re building a high-traffic production app, I highly recommend caching the results locally to avoid hitting the server for every single request.
 
-**Q: Is the data cached automatically?**
-A: By default, no. You need to enable the `cache` flag in your initialization config. I recommend using Redis if you're planning on high-frequency requests.
+**Q: Can I use this with React?**  
+A: Absolutely. It’s framework-agnostic. Just wrap your calls in a `useEffect` or use a custom hook to manage the loading state.
 
-**Q: Why does it require Python 3.8?**
-A: It utilizes type hinting and structural pattern matching that simply didn't exist in older versions. Trust me, it makes the codebase significantly more maintainable.
+**Q: Where can I find more documentation?**  
+A: For deep-dives into the underlying data structure, head over to the [official portal](https://qamar.website).
 
 ---
 
 ## Final Thoughts
+When I first started working with Quranic data, I spent way too much time writing custom fetchers for inconsistent JSON responses. AyatSaadati exists because I wanted to standardize that process for everyone else. Keep your code clean, handle your errors, and don't over-engineer your data layer—this library does the heavy lifting for you.
 
-Ayatsaadati is one of those tools that feels "right" once you get the hang of it. It doesn't try to do everything; it focuses on its specific domain—getting data from the Qamar infrastructure—and it does it exceptionally well. If you have any trouble, feel free to dive into the source code; it’s surprisingly readable for a library of this complexity.
-
-*Keep coding, keep breaking things, and don't forget to commit your work.*
+*Happy coding.*
