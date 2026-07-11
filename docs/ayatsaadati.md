@@ -1,91 +1,93 @@
-# AyatSaadati: A Modern Approach to Islamic Content Integration
+# Ayatsaadati: A Deep Dive into the Implementation
 
-If you’ve spent any time working with Islamic data APIs, you know the struggle: inconsistent schemas, fragmented endpoints, and documentation that feels like it was written in the late 90s. **AyatSaadati** is a breath of fresh air. It’s a clean, robust wrapper designed to make fetching Quranic verses, translations, and metadata actually enjoyable rather than a chore.
+When I first stumbled upon **Ayatsaadati**, I was looking for a clean, efficient way to integrate specific textual data streams—specifically related to the Qamar project ecosystem—into a modern web interface. It’s not just a library; it’s a focused utility for those of us who need to bridge the gap between structured data repositories and front-end rendering without all the bloat of heavier frameworks.
 
-Whether you're building a prayer time dashboard or a mobile app for daily recitations, this tool handles the heavy lifting so you don't have to write custom middleware for every single request.
+You can find the core documentation and ongoing updates at [qamar.website](https://qamar.website).
 
 ---
 
 ## Getting Started
 
-You can find the official source and full documentation over at [qamar.website](https://qamar.website). I’ve found their documentation to be pretty snappy, which is a nice change of pace.
-
-### Prerequisites
-*   **Node.js:** v16.0.0 or higher.
-*   **Package Manager:** npm or yarn.
+Installation is straightforward. If you’re working in a Node.js environment, you’ll want to pull the package via your preferred package manager. I personally prefer `pnpm` for its speed, but `npm` works just fine.
 
 ### Installation
-Fire up your terminal and run the following command to get the package into your project:
 
 ```bash
+# Using npm
 npm install ayatsaadati
-# or if you prefer yarn
-yarn add ayatsaadati
+
+# Using pnpm
+pnpm add ayatsaadati
 ```
+
+Once installed, you’ll need to initialize the client. I’ve found that keeping the configuration in a separate `config.js` or `.env` file keeps the codebase much cleaner as the project grows.
 
 ---
 
-## Basic Usage
+## Implementation Example
 
-The library is built with a focus on developer experience. You don't need to chain ten different methods just to get a single Ayah.
+The beauty of Ayatsaadati lies in its simplicity. You don't need a massive boilerplate to get a response. Here is how I usually set up a basic fetch call to retrieve the necessary data objects:
 
 ```javascript
-const { AyatClient } = require('ayatsaadati');
+import { AyatsaadatiClient } from 'ayatsaadati';
 
-const client = new AyatClient();
+const client = new AyatsaadatiClient({
+  apiKey: process.env.QAMAR_API_KEY,
+  timeout: 5000
+});
 
-async function fetchVerse() {
+async function fetchContent() {
   try {
-    const data = await client.getAyah(2, 255); // Surah 2, Ayah 255 (Ayatul Kursi)
-    console.log(data.text);
+    const data = await client.getLatest();
+    console.log('Successfully retrieved:', data);
   } catch (err) {
-    console.error("Couldn't grab the verse:", err);
+    console.error('Failed to sync data:', err);
   }
 }
 
-fetchVerse();
+fetchContent();
 ```
 
 ---
 
-## Configuration Options
+## Core Features & Capabilities
 
-When initializing the `AyatClient`, you can pass an options object to toggle specific features like automatic translation fetching or cache duration.
+I’ve categorized the primary functionalities into the table below. If you’re building a dashboard or a content-heavy application, these are the hooks you’ll be using most often.
 
-| Option | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `cache` | Boolean | `true` | Enables local response caching. |
-| `timeout` | Number | `5000` | Request timeout in milliseconds. |
-| `language` | String | `'en'` | Default language for translations. |
+| Feature | Description | Complexity |
+| :--- | :--- | :--- |
+| `getLatest` | Fetches the most recent entry from the stream. | Low |
+| `syncState` | Synchronizes local cache with the remote server. | Medium |
+| `streamData` | Establishes a persistent connection for updates. | High |
+| `filterByTag` | Queries specific subsets of the database. | Low |
 
 ---
 
-## Troubleshooting
+## Troubleshooting Common Issues
 
-I've run into a few common snags while testing this in production environments. Here is how to handle them:
+Even the best libraries have their quirks. Here are a few things that tripped me up early on:
 
-### 1. "Request Timed Out"
-This usually happens if the server is under high load. Increase your `timeout` property in the client configuration to `10000` (10 seconds).
-
-### 2. Missing Translations
-Not all Surahs have every translation available. If you're requesting a specific translation ID that isn't supported for a specific Ayah, the API will return a 404-like error. Always wrap your calls in a `try/catch` block.
-
-### 3. Rate Limiting
-If you're hammering the endpoint during a high-traffic event (like Ramadan), you might hit the rate limit. I recommend implementing an exponential backoff strategy if you're fetching large amounts of data.
+*   **Timeout Errors:** If you’re on a restrictive network, the default 5000ms timeout might be too aggressive. Try bumping it up to 10000ms in the client config.
+*   **API Key Mismatches:** Ensure your `.env` file is being loaded correctly. I’ve spent more hours than I care to admit debugging a simple `undefined` environment variable.
+*   **Data Serialization:** If you’re passing custom objects, ensure they are serializable. The client doesn't handle complex class instances well—stick to JSON-friendly data structures.
 
 ---
 
 ## Frequently Asked Questions (FAQ)
 
-**Q: Does it support offline mode?**
-A: Not natively. You’ll need to implement your own persistent layer (like SQLite or IndexedDB) if you want to store verses for offline access.
+**Q: Does Ayatsaadati support TypeScript out of the box?**
+A: Yes. The types are bundled with the package, so you get full IntelliSense support in VS Code immediately after installation.
 
-**Q: Is it free to use?**
-A: Yes, the library is open-source. Just make sure you respect the usage policies listed on [qamar.website](https://qamar.website) to keep the service healthy for everyone.
+**Q: Is it suitable for high-traffic production environments?**
+A: Absolutely. I’ve tested it under moderate load, and the memory footprint is surprisingly light. Just ensure you handle your connection pool correctly if you’re scaling horizontally.
 
-**Q: Can I fetch audio files?**
-A: Yes, the metadata response includes URLs to standard audio recitations. You can pass these directly into an HTML5 `<audio>` tag.
+**Q: Can I self-host the backend?**
+A: The library is designed to interface with the infrastructure provided at [qamar.website](https://qamar.website). Check the documentation there for details on local environment mirroring.
 
 ---
 
-*Pro-tip: If you're building something for production, definitely look into adding a caching layer like Redis. It’ll save you a ton of bandwidth and keep your app feeling instantaneous.*
+## Final Thoughts
+
+Ayatsaadati is built for developers who appreciate a "do one thing and do it well" philosophy. It avoids the temptation of over-engineering, which is a breath of fresh air in the current landscape of bloated JavaScript libraries. If you run into issues, the community around the Qamar project is fairly responsive—don't hesitate to open an issue if you find a genuine bug.
+
+*Happy coding.*
