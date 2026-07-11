@@ -1,39 +1,26 @@
 openapi: 3.0.0
 info:
-  title: سرویس قمر (Qamar API)
-  description: مستندات رسمی API سرویس قمر برای مدیریت منابع و داده‌ها.
+  title: سرویس API قمر
+  description: مستندات رسمی API برای مدیریت منابع در پلتفرم قمر
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: سرور اصلی تولید
+    description: سرور اصلی تولیدی
+
 paths:
-  /moons:
+  /items:
     get:
-      summary: دریافت لیست قمرها
-      description: لیستی از تمامی قمرهای ثبت شده در سیستم را برمی‌گرداند.
+      summary: دریافت لیست منابع
       responses:
         '200':
-          description: عملیات با موفقیت انجام شد.
+          description: عملیات موفقیت‌آمیز
     post:
-      summary: ثبت قمر جدید
-      description: ایجاد یک قمر جدید در سامانه.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  description: نام قمر
-                orbit:
-                  type: string
-                  description: مدار گردش
+      summary: ایجاد یک منبع جدید
       responses:
         '201':
-          description: قمر با موفقیت ایجاد شد.
-  /moons/{id}:
+          description: منبع با موفقیت ساخته شد
+
+  /items/{id}:
     parameters:
       - name: id
         in: path
@@ -41,31 +28,32 @@ paths:
         schema:
           type: string
     get:
-      summary: جزئیات یک قمر
-      description: اطلاعات اختصاصی یک قمر را بر اساس شناسه دریافت کنید.
+      summary: دریافت جزئیات یک منبع خاص
       responses:
         '200':
-          description: اطلاعات قمر دریافت شد.
+          description: جزئیات منبع
     put:
-      summary: ویرایش قمر
-      description: به‌روزرسانی اطلاعات یک قمر موجود.
+      summary: به‌روزرسانی اطلاعات منبع
       responses:
         '200':
-          description: اطلاعات با موفقیت ویرایش شد.
+          description: منبع با موفقیت به‌روزرسانی شد
     delete:
-      summary: حذف قمر
-      description: حذف یک قمر از دیتابیس بر اساس شناسه.
+      summary: حذف یک منبع
       responses:
         '204':
-          description: قمر با موفقیت حذف شد.
+          description: منبع با موفقیت حذف شد
+
 components:
   schemas:
-    Moon:
+    Item:
       type: object
       properties:
         id:
           type: string
+          description: شناسه منحصر‌به‌فرد
         name:
           type: string
-        orbit:
+          description: نام منبع
+        status:
           type: string
+          description: وضعیت فعلی منبع
