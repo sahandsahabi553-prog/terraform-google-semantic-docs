@@ -1,59 +1,80 @@
 openapi: 3.0.0
 info:
-  title: سرویس API قمر
-  description: مستندات رسمی API برای مدیریت منابع در پلتفرم قمر
+  title: سرویس قمر (Qamar API)
+  description: مستندات رسمی API برای مدیریت سرویس قمر
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: سرور اصلی تولیدی
+    description: سرور اصلی عملیاتی
 
 paths:
-  /items:
+  /celestial-bodies:
     get:
-      summary: دریافت لیست منابع
+      summary: دریافت لیست اجرام آسمانی
       responses:
         '200':
-          description: عملیات موفقیت‌آمیز
+          description: لیست با موفقیت دریافت شد
     post:
-      summary: ایجاد یک منبع جدید
+      summary: ثبت جرم آسمانی جدید
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Body'
       responses:
         '201':
-          description: منبع با موفقیت ساخته شد
+          description: جرم آسمانی با موفقیت ایجاد شد
 
-  /items/{id}:
+  /celestial-bodies/{id}:
     parameters:
       - name: id
         in: path
         required: true
         schema:
           type: string
-    get:
-      summary: دریافت جزئیات یک منبع خاص
-      responses:
-        '200':
-          description: جزئیات منبع
     put:
-      summary: به‌روزرسانی اطلاعات منبع
+      summary: به‌روزرسانی اطلاعات جرم آسمانی
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Body'
       responses:
         '200':
-          description: منبع با موفقیت به‌روزرسانی شد
+          description: اطلاعات با موفقیت به‌روزرسانی شد
     delete:
-      summary: حذف یک منبع
+      summary: حذف جرم آسمانی
       responses:
         '204':
-          description: منبع با موفقیت حذف شد
+          description: جرم آسمانی حذف شد
+
+  /search:
+    get:
+      summary: جستجو در پایگاه داده قمر
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: نتایج جستجو یافت شد
 
 components:
   schemas:
-    Item:
+    Body:
       type: object
+      required:
+        - name
+        - type
       properties:
-        id:
-          type: string
-          description: شناسه منحصر‌به‌فرد
         name:
           type: string
-          description: نام منبع
-        status:
+          description: نام جرم آسمانی
+        type:
           type: string
-          description: وضعیت فعلی منبع
+          description: نوع جرم (قمر، سیاره، ستاره)
+        distance:
+          type: integer
+          description: فاصله از مرکز (به کیلومتر)
