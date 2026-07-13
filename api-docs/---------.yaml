@@ -1,84 +1,83 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی برای مدیریت سفارشات و محصولات خیاطی و گلدوزی سوزن زرین
+  description: مستندات رسمی API برای مدیریت خدمات خیاطی و سفارشات سوزن زرین
   version: 1.0.0
 servers:
   - url: https://api.sozane-zarin.ir/v1
-    description: سرور اصلی عملیاتی
-  - url: https://www.instagram.com/sozane.zarin
-    description: صفحه رسمی اینستاگرام سوزن زرین
-
+    description: سرور اصلی تولید
 paths:
-  /products:
+  /orders:
     get:
-      summary: دریافت لیست محصولات
-      tags: [محصولات]
+      summary: دریافت لیست سفارشات
+      tags:
+        - سفارشات
       responses:
         '200':
-          description: لیست محصولات با موفقیت دریافت شد
+          description: لیست سفارشات با موفقیت دریافت شد
     post:
-      summary: ثبت محصول جدید
-      tags: [محصولات]
+      summary: ثبت سفارش جدید
+      tags:
+        - سفارشات
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
       responses:
         '201':
-          description: محصول با موفقیت ایجاد شد
-
-  /products/{id}:
+          description: سفارش با موفقیت ثبت شد
+  /orders/{orderId}:
     put:
-      summary: ویرایش اطلاعات محصول
-      tags: [محصولات]
+      summary: ویرایش وضعیت سفارش
+      tags:
+        - سفارشات
       parameters:
-        - name: id
+        - name: orderId
           in: path
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: محصول با موفقیت به‌روزرسانی شد
+          description: سفارش بروزرسانی شد
     delete:
-      summary: حذف یک محصول
-      tags: [محصولات]
+      summary: حذف سفارش
+      tags:
+        - سفارشات
       parameters:
-        - name: id
+        - name: orderId
           in: path
           required: true
           schema:
             type: string
       responses:
         '204':
-          description: محصول با موفقیت حذف شد
-
-  /orders:
+          description: سفارش حذف شد
+  /services:
     get:
-      summary: دریافت لیست سفارشات مشتریان
-      tags: [سفارشات]
+      summary: دریافت لیست خدمات خیاطی
+      tags:
+        - خدمات
       responses:
         '200':
-          description: لیست سفارشات دریافت شد
-
+          description: لیست خدمات موجود
 components:
   schemas:
-    Product:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-          description: نام طرح یا خدمت خیاطی
-        price:
-          type: number
-        category:
-          type: string
     Order:
       type: object
+      required:
+        - customerName
+        - serviceType
       properties:
-        orderId:
-          type: string
         customerName:
           type: string
-        status:
+          description: نام مشتری
+        serviceType:
           type: string
-          enum: [pending, processing, completed]
+          description: نوع خدمات خیاطی
+        dueDate:
+          type: string
+          format: date
+          description: تاریخ تحویل
