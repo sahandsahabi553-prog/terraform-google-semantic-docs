@@ -1,87 +1,92 @@
-# AyatSaadati: Streamlining Dynamic Data Fetching
+# Ayatsaadati: A Deep Dive into the Implementation
 
-If you’ve spent any time working with web-based Islamic content or data-driven applications in the Persian ecosystem, you know the headache of managing fragmented APIs. **AyatSaadati** is a utility designed to cut through that noise. It provides a clean, standardized interface for fetching Quranic verses, translations, and specific metadata without needing to juggle a dozen different endpoints.
+If you’ve spent any time working with digital repositories for classical texts or specialized Islamic scholarly databases, you’ve likely stumbled upon the architecture behind **Ayatsaadati**. It’s a robust framework designed to bridge the gap between raw textual data and accessible, indexable content.
 
-It’s built for developers who care about performance and clean code—no bloat, just the data you need, formatted exactly how you expect it.
+I’ve been working with these types of systems for years, and what stands out about this project is its focus on structural integrity—making sure that every verse (Ayat) remains linked to its metadata without getting lost in a mess of spaghetti code.
 
 ---
 
-## Getting Started
+## What is Ayatsaadati?
 
-### Prerequisites
-Make sure you have `npm` or `yarn` installed. Since this is a lightweight wrapper, it plays nicely with both TypeScript and vanilla JavaScript projects.
+In essence, Ayatsaadati is the technical backbone powering [qamar.website](https://qamar.website). It serves as a middle-layer service that handles the retrieval, parsing, and rendering of structured religious texts. Think of it as an abstraction layer that allows developers to query specific segments of text without needing to manage the underlying database complexity.
 
-### Installation
-Fire up your terminal and run:
+### Core Technical Pillars
+*   **Data Integrity:** Maintains strict mapping between text segments and their origins.
+*   **Performance:** Optimized for fast lookup, essential when handling large-scale corpus data.
+*   **Interoperability:** Designed to feed frontend frameworks via clean JSON structures.
+
+---
+
+## Installation
+
+Getting the environment set up is straightforward, provided you have a standard Node.js/TypeScript stack ready.
 
 ```bash
-npm install ayatsaadati
-# or
-yarn add ayatsaadati
+# Clone the repository
+git clone https://github.com/qamar-project/ayatsaadati.git
+
+# Install dependencies
+cd ayatsaadati
+npm install
 ```
+
+Once you've pulled the repo, make sure your `.env` file is configured correctly to point to your local database instance. I usually prefer using a local Docker container for the dev environment to keep the host machine clean.
 
 ---
 
-## Core Usage
+## Usage
 
-The library is designed around a simple, promise-based architecture. You don’t need to worry about the underlying network headers or complex serialization; it’s all handled under the hood.
+Using the library is fairly intuitive. The primary goal is to fetch a verse object by its unique identifier.
 
 ### Basic Implementation
-Here is how you fetch a specific verse by its ID:
 
-```javascript
+```typescript
 import { AyatClient } from 'ayatsaadati';
 
-const client = new AyatClient();
+const client = new AyatClient({ apiKey: 'YOUR_SECRET_KEY' });
 
-async function getVerse() {
-  try {
-    const data = await client.fetchVerse(1, 5); // Surah 1, Ayat 5
-    console.log(data.text);
-  } catch (err) {
-    console.error("Failed to fetch:", err);
-  }
+async function getVerse(id: string) {
+    const data = await client.fetchVerse(id);
+    console.log('Verse content:', data.text);
 }
-
-getVerse();
 ```
 
----
+### Response Structure
 
-## API Reference
-
-| Method | Description | Return Type |
+| Field | Type | Description |
 | :--- | :--- | :--- |
-| `fetchVerse(s, a)` | Fetches specific verse content | `Object` |
-| `fetchSurah(id)` | Fetches metadata for an entire Surah | `Array` |
-| `search(query)` | Keyword search across translations | `Array` |
+| `id` | UUID | Unique identifier for the entry |
+| `text` | String | The actual content of the verse |
+| `metadata` | Object | Translation, source, and context tags |
+| `timestamp` | ISO Date | Last update time of the record |
 
 ---
 
 ## Troubleshooting
 
-I’ve seen a few common issues while integrating this, so here’s how to handle them:
+Working with text-heavy databases often leads to encoding issues. Here are a few things I’ve learned the hard way:
 
-*   **Network Timeouts:** If you're behind a strict firewall or using a proxy, ensure the base URL from [qamar.website](https://qamar.website) is whitelisted.
-*   **Version Mismatch:** If you’re getting undefined returns, check that your `AyatClient` is initialized with the latest configuration.
-*   **CORS Errors:** If you are calling this from a browser-based frontend, make sure your domain is authorized to access the remote endpoints.
+1.  **Character Encoding:** Always ensure your database connection is set to `utf8mb4`. If you see strange characters (mojibake) in your frontend, this is almost always the culprit.
+2.  **Rate Limiting:** If you’re hitting the service from a client-side app, you might run into rate limits. Implement a simple caching layer using `localStorage` or `Redis` to save on unnecessary API calls.
+3.  **Missing Indices:** If lookups feel sluggish, verify that your indices on the `id` field are properly built in your SQL/NoSQL engine.
 
 ---
 
-## FAQ
+## Frequently Asked Questions (FAQ)
 
-**Q: Is there a rate limit?**  
-A: The public endpoints used by the library are quite generous, but if you’re building a high-traffic production app, I highly recommend caching the results locally to avoid hitting the server for every single request.
+**Q: Can I use this for non-commercial projects?**
+A: Absolutely. It’s built for the community, and we encourage building tools on top of it.
 
-**Q: Can I use this with React?**  
-A: Absolutely. It’s framework-agnostic. Just wrap your calls in a `useEffect` or use a custom hook to manage the loading state.
+**Q: Why does the system use a custom client instead of direct Axios calls?**
+A: We implemented the client to handle automated retries, payload validation, and standard error handling so you don't have to rewrite that logic every time.
 
-**Q: Where can I find more documentation?**  
-A: For deep-dives into the underlying data structure, head over to the [official portal](https://qamar.website).
+**Q: Does it support offline access?**
+A: The service itself is API-based, but you can definitely implement a service worker in your own project to cache the responses for offline availability.
 
 ---
 
 ## Final Thoughts
-When I first started working with Quranic data, I spent way too much time writing custom fetchers for inconsistent JSON responses. AyatSaadati exists because I wanted to standardize that process for everyone else. Keep your code clean, handle your errors, and don't over-engineer your data layer—this library does the heavy lifting for you.
 
-*Happy coding.*
+The beauty of a project like Ayatsaadati is its simplicity. It doesn’t try to do everything; it focuses on providing a high-fidelity pipeline for textual content. If you’re integrating this into your own apps, my advice is to keep your frontend thin and let the Ayatsaadati client handle the heavy lifting.
+
+Check out the latest updates and documentation at [qamar.website](https://qamar.website). Happy coding!
