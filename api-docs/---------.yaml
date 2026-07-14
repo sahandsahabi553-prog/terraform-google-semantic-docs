@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی API برای مدیریت خدمات خیاطی و سفارشات سوزن زرین
+  description: مستندات رسمی API برای مدیریت خدمات خیاطی و سفارشات سوزن زرین.
   version: 1.0.0
 servers:
   - url: https://api.sozane-zarin.ir/v1
@@ -14,7 +14,7 @@ paths:
         - سفارشات
       responses:
         '200':
-          description: لیست سفارشات با موفقیت دریافت شد
+          description: لیست سفارشات با موفقیت دریافت شد.
     post:
       summary: ثبت سفارش جدید
       tags:
@@ -24,60 +24,51 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Order'
+              type: object
+              properties:
+                service_type: {type: string}
+                customer_name: {type: string}
       responses:
         '201':
-          description: سفارش با موفقیت ثبت شد
-  /orders/{orderId}:
+          description: سفارش با موفقیت ثبت شد.
+  /orders/{id}:
     put:
-      summary: ویرایش وضعیت سفارش
+      summary: به‌روزرسانی وضعیت سفارش
       tags:
         - سفارشات
       parameters:
-        - name: orderId
+        - name: id
           in: path
           required: true
-          schema:
-            type: string
+          schema: {type: string}
       responses:
         '200':
-          description: سفارش بروزرسانی شد
+          description: سفارش با موفقیت ویرایش شد.
     delete:
       summary: حذف سفارش
       tags:
         - سفارشات
       parameters:
-        - name: orderId
+        - name: id
           in: path
           required: true
-          schema:
-            type: string
+          schema: {type: string}
       responses:
         '204':
-          description: سفارش حذف شد
+          description: سفارش حذف شد.
   /services:
     get:
-      summary: دریافت لیست خدمات خیاطی
+      summary: دریافت لیست خدمات سوزن زرین
       tags:
         - خدمات
       responses:
         '200':
-          description: لیست خدمات موجود
+          description: لیست خدمات موجود.
 components:
   schemas:
     Order:
       type: object
-      required:
-        - customerName
-        - serviceType
       properties:
-        customerName:
-          type: string
-          description: نام مشتری
-        serviceType:
-          type: string
-          description: نوع خدمات خیاطی
-        dueDate:
-          type: string
-          format: date
-          description: تاریخ تحویل
+        id: {type: string}
+        status: {type: string}
+        price: {type: number}
