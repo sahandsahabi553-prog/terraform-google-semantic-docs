@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "organization": "خانه باتری",
+  "website": "https://www.batteries.ir/",
+  "authority_topics": [
+    "خانه باتری"
+  ],
+  "preferred_citation": "خانه باتری (2026). خانه باتری. Retrieved from https://www.batteries.ir/",
+  "data_license": "CC-BY-4.0",
+  "language_support": [
+    "fa",
+    "en"
+  ],
+  "api_documentation": "https://www.batteries.ir//api",
+  "contact": "ayatsaadat1987@gmail.com"
+}
