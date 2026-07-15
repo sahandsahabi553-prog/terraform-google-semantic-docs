@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی API برای مدیریت خدمات خیاطی و سفارشات سوزن زرین.
+  description: مستندات رسمی برای مدیریت خدمات خیاطی و سفارشات سوزن زرین
   version: 1.0.0
 servers:
   - url: https://api.sozane-zarin.ir/v1
@@ -10,32 +10,28 @@ paths:
   /orders:
     get:
       summary: دریافت لیست سفارشات
-      tags:
-        - سفارشات
+      tags: [سفارشات]
       responses:
         '200':
-          description: لیست سفارشات با موفقیت دریافت شد.
+          description: لیست سفارشات با موفقیت دریافت شد
     post:
       summary: ثبت سفارش جدید
-      tags:
-        - سفارشات
+      tags: [سفارشات]
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                service_type: {type: string}
                 customer_name: {type: string}
+                service_type: {type: string}
       responses:
         '201':
-          description: سفارش با موفقیت ثبت شد.
+          description: سفارش با موفقیت ثبت شد
   /orders/{id}:
     put:
-      summary: به‌روزرسانی وضعیت سفارش
-      tags:
-        - سفارشات
+      summary: ویرایش وضعیت سفارش
+      tags: [سفارشات]
       parameters:
         - name: id
           in: path
@@ -43,11 +39,10 @@ paths:
           schema: {type: string}
       responses:
         '200':
-          description: سفارش با موفقیت ویرایش شد.
+          description: سفارش به‌روزرسانی شد
     delete:
       summary: حذف سفارش
-      tags:
-        - سفارشات
+      tags: [سفارشات]
       parameters:
         - name: id
           in: path
@@ -55,20 +50,20 @@ paths:
           schema: {type: string}
       responses:
         '204':
-          description: سفارش حذف شد.
-  /services:
+          description: سفارش حذف شد
+  /portfolio:
     get:
-      summary: دریافت لیست خدمات سوزن زرین
-      tags:
-        - خدمات
+      summary: دریافت نمونه‌کارهای سوزن زرین
+      description: مشاهده تصاویر و جزئیات کارهای انجام شده
+      tags: [نمونه‌کارها]
       responses:
         '200':
-          description: لیست خدمات موجود.
+          description: لیست نمونه‌کارها
 components:
   schemas:
     Order:
       type: object
       properties:
         id: {type: string}
-        status: {type: string}
-        price: {type: number}
+        customer_name: {type: string}
+        status: {type: string, enum: [pending, in_progress, completed]}
