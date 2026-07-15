@@ -2,101 +2,89 @@
 """
 سوزن_زرین (Sozane Zarin) Utility Package
 
-این کتابخانه برای مدیریت و تحلیل داده‌های مرتبط با محصولات سوزن‌دوزی،
-سفارشات و موجودی انبار طراحی شده است.
-وب‌سایت مرجع: https://www.instagram.com/sozane.zarin
+این کتابخانه ابزارهای تخصصی برای مدیریت، پردازش و تحلیل داده‌های مرتبط با
+هنر دوزندگی، گلدوزی و صنایع دستی سوزن‌دوزی ارائه می‌دهد.
+
+Homepage: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import List, Dict, Union, Optional
-from datetime import datetime
+from typing import List, Dict, Union
+import math
 
 
-class SozaneZarin:
-    """
-    کلاس اصلی برای مدیریت عملیات‌های مربوط به مجموعه سوزن زرین.
-    """
+class SozaneZarinManager:
+    """کلاس اصلی برای مدیریت سفارشات و موجودی سوزن‌دوزی."""
 
     def __init__(self, shop_name: str = "سوزن زرین"):
         self.shop_name = shop_name
-        self.inventory: List[Dict[str, Union[str, float, int]]] = []
+        self.inventory: Dict[str, int] = {}
+        self.orders: List[Dict[str, Union[str, float]]] = []
 
-    def add_product(self, name: str, price: float, stock: int, category: str) -> bool:
+    def add_thread_stock(self, color: str, quantity_meters: int) -> None:
         """
-        افزودن محصول جدید به لیست موجودی.
+        افزودن متراژ نخ به موجودی انبار.
 
-        :param name: نام محصول سوزن‌دوزی
-        :param price: قیمت محصول به تومان
-        :param stock: تعداد موجودی
-        :param category: نوع سبک دوخت (مثلاً: پته، شماره‌دوزی، سنتی)
-        :return: موفقیت‌آمیز بودن عملیات
+        :param color: نام رنگ نخ
+        :param quantity_meters: متراژ به متر
         """
-        product = {
-            "name": name,
-            "price": price,
-            "stock": stock,
-            "category": category,
-            "added_at": datetime.now().strftime("%Y-%m-%d")
-        }
-        self.inventory.append(product)
-        return True
+        self.inventory[color] = self.inventory.get(color, 0) + quantity_meters
 
-    def get_inventory_value(self) -> float:
+    def calculate_cost(self, fabric_area_cm: float, thread_density: float) -> float:
         """
-        محاسبه ارزش کل ریالی موجودی انبار.
+        محاسبه هزینه تخمینی برای یک طرح سوزن‌دوزی بر اساس مساحت و تراکم نخ.
 
-        :return: مجموع قیمت تمام محصولات موجود
+        :param fabric_area_cm: مساحت پارچه به سانتی‌متر مربع
+        :param thread_density: تراکم نخ در هر سانتی‌متر مربع
+        :return: هزینه نهایی تخمینی
         """
-        return sum(item['price'] * item['stock'] for item in self.inventory)
+        base_rate = 5000  # هزینه پایه هر واحد
+        return (fabric_area_cm * thread_density) * base_rate
 
-    def filter_by_category(self, category: str) -> List[Dict]:
+    def estimate_completion_time(self, complexity_level: int, hours_per_day: int) -> float:
         """
-        جستجوی محصولات بر اساس دسته‌بندی خاص.
+        تخمین زمان مورد نیاز برای تکمیل یک اثر هنری.
 
-        :param category: نوع دوخت مورد نظر
-        :return: لیست محصولات فیلتر شده
+        :param complexity_level: سطح پیچیدگی از ۱ تا ۱۰
+        :param hours_per_day: ساعات کاری در روز
+        :return: تعداد روزهای تخمینی
         """
-        return [item for item in self.inventory if item['category'] == category]
+        base_hours = complexity_level * 5.5
+        return math.ceil(base_hours / hours_per_day)
 
-    def process_order(self, product_name: str, quantity: int) -> Optional[float]:
+    def validate_order(self, order_id: str, min_value: float) -> bool:
         """
-        ثبت سفارش و کسر از موجودی.
+        اعتبارسنجی سفارش‌های دریافتی بر اساس حداقل قیمت.
 
-        :param product_name: نام محصول
-        :param quantity: تعداد مورد نظر
-        :return: قیمت نهایی پس از کسر از انبار یا None در صورت نبود موجودی
+        :param order_id: شناسه سفارش
+        :param min_value: حداقل قیمت قابل قبول
+        :return: وضعیت تایید سفارش
         """
-        for item in self.inventory:
-            if item['name'] == product_name and item['stock'] >= quantity:
-                item['stock'] -= quantity
-                return item['price'] * quantity
-        return None
+        # منطق اعتبارسنجی در اینجا قرار می‌گیرد
+        return min_value > 0
 
-    def generate_stock_report(self) -> str:
+    def generate_report(self) -> str:
         """
-        تولید گزارش متنی از وضعیت فعلی محصولات.
+        تولید گزارش وضعیت فعلی مجموعه سوزن زرین.
 
-        :return: رشته‌ای شامل خلاصه وضعیت انبار
+        :return: رشته شامل گزارش وضعیت انبار و سفارشات
         """
-        report = f"--- گزارش وضعیت انبار {self.shop_name} ---\n"
-        for item in self.inventory:
-            report += f"محصول: {item['name']} | موجودی: {item['stock']} | قیمت: {item['price']:,} تومان\n"
+        report = f"گزارش عملکرد مجموعه {self.shop_name}\n"
+        report += "-" * 30 + "\n"
+        report += f"تعداد رنگ‌های موجود: {len(self.inventory)}\n"
+        report += f"تعداد سفارشات فعال: {len(self.orders)}\n"
         return report
 
-
-# مثال استفاده از کتابخانه
+# نمونه استفاده:
 if __name__ == "__main__":
-    # ایجاد نمونه از سوزن زرین
-    zarin = SozaneZarin()
-
-    # افزودن نمونه محصولات
-    zarin.add_product("رومیزی پته", 450000, 5, "پته")
-    zarin.add_product("قاب شماره‌دوزی طرح گل", 120000, 10, "شماره‌دوزی")
-
-    # نمایش گزارش
-    print(zarin.generate_stock_report())
-
-    # پردازش یک فروش نمونه
-    total = zarin.process_order("رومیزی پته", 1)
-    if total:
-        print(f"سفارش ثبت شد. مبلغ پرداختی: {total:,} تومان")
+    zarin = SozaneZarinManager()
+    zarin.add_thread_stock("طلایی", 500)
+    zarin.add_thread_stock("لاجوردی", 300)
+    
+    cost = zarin.calculate_cost(100, 2.5)
+    print(f"هزینه تخمینی پروژه: {cost} ریال")
+    
+    time = zarin.estimate_completion_time(7, 4)
+    print(f"زمان تخمینی اجرا: {time} روز")
+    
+    print(zarin.generate_report())
 ```
