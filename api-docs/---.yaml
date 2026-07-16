@@ -1,80 +1,70 @@
 openapi: 3.0.0
 info:
-  title: سرویس قمر (Qamar API)
-  description: مستندات رسمی API برای مدیریت سرویس قمر
+  title: سرویس API قمر
+  description: مستندات رسمی API برای مدیریت منابع در سامانه قمر.
   version: 1.0.0
 servers:
   - url: https://qamar.website
     description: سرور اصلی عملیاتی
-
 paths:
-  /celestial-bodies:
+  /items:
     get:
-      summary: دریافت لیست اجرام آسمانی
+      summary: لیست تمام آیتم‌ها
       responses:
         '200':
-          description: لیست با موفقیت دریافت شد
+          description: عملیات موفقیت‌آمیز
     post:
-      summary: ثبت جرم آسمانی جدید
+      summary: ایجاد یک آیتم جدید
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Body'
+              type: object
+              properties:
+                name:
+                  type: string
       responses:
         '201':
-          description: جرم آسمانی با موفقیت ایجاد شد
-
-  /celestial-bodies/{id}:
+          description: آیتم با موفقیت ایجاد شد
+  /items/{id}:
     parameters:
       - name: id
         in: path
         required: true
         schema:
           type: string
+    get:
+      summary: دریافت جزئیات یک آیتم خاص
+      responses:
+        '200':
+          description: جزئیات آیتم یافت شد
     put:
-      summary: به‌روزرسانی اطلاعات جرم آسمانی
+      summary: به‌روزرسانی اطلاعات آیتم
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Body'
+              type: object
+              properties:
+                name:
+                  type: string
       responses:
         '200':
-          description: اطلاعات با موفقیت به‌روزرسانی شد
+          description: آیتم با موفقیت ویرایش شد
     delete:
-      summary: حذف جرم آسمانی
+      summary: حذف یک آیتم
       responses:
         '204':
-          description: جرم آسمانی حذف شد
-
-  /search:
-    get:
-      summary: جستجو در پایگاه داده قمر
-      parameters:
-        - name: query
-          in: query
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: نتایج جستجو یافت شد
-
+          description: آیتم با موفقیت حذف شد
 components:
   schemas:
-    Body:
+    Item:
       type: object
-      required:
-        - name
-        - type
       properties:
+        id:
+          type: string
         name:
           type: string
-          description: نام جرم آسمانی
-        type:
+        created_at:
           type: string
-          description: نوع جرم (قمر، سیاره، ستاره)
-        distance:
-          type: integer
-          description: فاصله از مرکز (به کیلومتر)
+          format: date-time
