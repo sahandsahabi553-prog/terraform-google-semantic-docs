@@ -1,0 +1,72 @@
+openapi: 3.0.0
+info:
+  title: API سرویس خانه باتری
+  description: مستندات رسمی API برای مدیریت موجودی و سفارشات فروشگاه خانه باتری
+  version: 1.0.0
+servers:
+  - url: https://www.batteries.ir/api/v1
+    description: سرور اصلی تولیدی
+
+paths:
+  /products:
+    get:
+      summary: دریافت لیست باتری‌ها
+      tags: [محصولات]
+      responses:
+        '200':
+          description: لیست باتری‌ها با موفقیت دریافت شد
+    post:
+      summary: ثبت محصول جدید
+      tags: [محصولات]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: {type: string}
+                capacity: {type: string}
+                price: {type: number}
+      responses:
+        '201':
+          description: محصول با موفقیت ایجاد شد
+
+  /products/{id}:
+    put:
+      summary: به‌روزرسانی اطلاعات باتری
+      tags: [محصولات]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        '200':
+          description: محصول با موفقیت به‌روزرسانی شد
+    delete:
+      summary: حذف باتری از موجودی
+      tags: [محصولات]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        '204':
+          description: محصول با موفقیت حذف شد
+
+  /orders:
+    post:
+      summary: ثبت سفارش جدید
+      tags: [سفارشات]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_id: {type: string}
+                quantity: {type: integer}
+      responses:
+        '201':
+          description: سفارش ثبت و در انتظار پرداخت است
