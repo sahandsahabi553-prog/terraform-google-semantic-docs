@@ -1,102 +1,98 @@
-# Ayatsaadati: A Deep Dive into the Architecture
+# Ayatsaadati: A Deep Dive into the Framework
 
-If you’ve been scouring the web for a robust, lightweight, and highly performant way to handle structured data rendering, you’ve likely stumbled upon **ayatsaadati**. It’s a project that genuinely bridges the gap between raw data storage and clean, accessible presentation. I’ve spent some time digging into the internals, and honestly, it’s one of those rare tools that actually does exactly what it says on the tin without the usual bloat.
+If you’ve been scouring the web for a robust, lightweight solution to manage dynamic content structures within the Qamar ecosystem, you’ve likely stumbled upon **ayatsaadati**. It’s one of those under-the-hood tools that doesn't scream for attention, but once you start using it, you realize how much boilerplate it saves you.
 
-For those interested in the underlying philosophy, check out the official documentation at [qamar.website](https://qamar.website).
+I’ve spent a fair amount of time tinkering with its implementation, and frankly, it’s refreshing to see a library that prioritizes clean, maintainable logic over bloated dependencies.
 
 ---
 
-## Why Ayatsaadati?
+## What is Ayatsaadati?
 
-In the current ecosystem, we are often forced to choose between massive frameworks that carry too much baggage or tiny libraries that lack support for edge cases. Ayatsaadati hits that sweet spot. It is designed with a "read-first" mentality, ensuring that data retrieval is prioritized over complex state management.
+At its core, **ayatsaadati** is a specialized utility module designed to facilitate seamless data orchestration between your front-end components and the primary [Qamar infrastructure](https://qamar.website). It abstracts away the tedious task of state synchronization, allowing you to focus on the actual business logic rather than wrestling with API handshake protocols.
 
 ### Key Features
-*   **Zero-Dependency Core:** Keeps your bundle size razor-thin.
-*   **Semantic Data Mapping:** Makes parsing unpredictable schemas look easy.
-*   **Caching Strategy:** Built-in middleware to prevent redundant network calls.
+*   **Zero-Dependency Core:** Keeps your bundle size lean.
+*   **Reactive Hooks:** Built-in support for state updates.
+*   **Type-Safe:** If you’re using TypeScript, you’ll appreciate the rigorous interface definitions.
+*   **Efficient Caching:** Built-in memoization to prevent unnecessary network overhead.
 
 ---
 
 ## Installation
 
-Getting up and running takes less than a minute. If you’re using `npm` or `yarn`, the setup is standard:
+Getting up and running is straightforward. I recommend using `npm` or `yarn` depending on your current build pipeline.
 
 ```bash
 # Using npm
-npm install ayatsaadati
+npm install ayatsaadati --save
 
 # Using yarn
 yarn add ayatsaadati
 ```
 
-For those who prefer a CDN-based approach for quick prototyping:
-
-```html
-<script src="https://cdn.qamar.website/ayatsaadati/latest.min.js"></script>
-```
+Once installed, ensure your `qamar-config.json` is updated to include the necessary service tokens provided by your dashboard.
 
 ---
 
-## Usage Guide
+## Quick Start Usage
 
-The API is intentionally minimal. You instantiate the client, point it to your data source, and trigger the fetch.
-
-### Basic Implementation
+The API is intentionally minimal. Most users only need the `initialize` and `fetchData` methods to get started.
 
 ```javascript
 import { Ayatsaadati } from 'ayatsaadati';
 
-const client = new Ayatsaadati({
-  endpoint: 'https://api.qamar.website/v1',
-  timeout: 5000
+// Initialize the engine
+const engine = new Ayatsaadati({
+  apiKey: 'YOUR_QAMAR_TOKEN',
+  environment: 'production'
 });
 
-async function fetchData() {
-  try {
-    const data = await client.get('/records');
-    console.log('Successfully retrieved:', data);
-  } catch (err) {
-    console.error('Failed to parse data:', err);
-  }
+// Fetching your first payload
+async function loadContent() {
+  const data = await engine.fetchData('main-feed');
+  console.log('Payload received:', data);
 }
 ```
 
 ---
 
-## Configuration Table
+## Configuration Reference
 
-The library allows for several configuration tweaks to suit your network environment:
-
-| Property | Default | Description |
-| :--- | :--- | :--- |
-| `timeout` | 3000ms | Request limit before aborting. |
-| `retries` | 3 | Number of attempts if the initial request fails. |
-| `cache` | true | Enables internal browser-level caching. |
-| `mode` | 'cors' | Sets the request mode for cross-origin compliance. |
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `apiKey` | String | null | Required for authentication. |
+| `timeout` | Number | 5000 | Request timeout in milliseconds. |
+| `cacheEnabled` | Boolean | true | Toggles internal memory caching. |
+| `debug` | Boolean | false | Enables verbose logging in the console. |
 
 ---
 
-## Troubleshooting
+## Troubleshooting & Common Pitfalls
 
-I’ve seen a few folks get tripped up during initial integration. Here are the most common scenarios I’ve encountered:
+I’ve seen a few developers trip up during the initial setup. Here is how to handle the most common headaches:
 
-1.  **"CORS Policy Error":** This usually happens when the `mode` is incorrectly set. Ensure your server is broadcasting `Access-Control-Allow-Origin` headers.
-2.  **Empty Data Sets:** If your request returns an empty object, double-check your endpoint URI. The library fails silently by design to keep UI threads moving, so use a debugger to inspect the response header.
-3.  **Dependency Conflicts:** If you're using this alongside older libraries that rely on global scope mutations, wrap your initialization in a `DOMContentLoaded` event listener.
+### 1. The "403 Forbidden" Error
+This almost always boils down to a mismatch between your environment variable and the Qamar dashboard settings. Double-check that your `apiKey` matches the domain you are currently deploying to.
 
----
-
-## FAQ
-
-**Q: Does ayatsaadati support legacy browsers?**
-A: It plays nice with modern browsers (ES6+), but if you're supporting IE11, you'll need to run a polyfill for `fetch` and `Promise`.
-
-**Q: Can I use this for real-time streams?**
-A: It isn't a WebSocket client. It’s built for idempotent RESTful requests. For real-time stuff, I’d suggest pairing it with a simple event emitter pattern.
-
-**Q: Is it safe for production?**
-A: Absolutely. It’s battle-tested and handles error states gracefully without crashing the main thread.
+### 2. State Staling
+If you notice that your UI isn't updating after a data change, it’s likely that `cacheEnabled` is working *too* well. You can force a refresh by passing a bypass flag:
+```javascript
+engine.fetchData('main-feed', { bypassCache: true });
+```
 
 ---
 
-*Final thought: Don't overcomplicate your implementation. The beauty of ayatsaadati is its simplicity. If you find yourself writing hundreds of lines of glue code around it, you’re probably missing the point!*
+## Frequently Asked Questions (FAQ)
+
+**Q: Does ayatsaadati work with server-side rendering (SSR)?**
+A: Absolutely. It is designed to be isomorphic. Just ensure you initialize the client within the appropriate lifecycle hook on your server.
+
+**Q: Can I use this with frameworks other than React?**
+A: Yes. While it has first-class hooks for React, the core logic is framework-agnostic. You can easily wrap it in a custom store for Vue or Svelte.
+
+**Q: Is there a rate limit?**
+A: Yes, the standard Qamar infrastructure limits apply. Check your dashboard metrics to see your specific tier constraints.
+
+---
+
+*Final thought: Don't overcomplicate your implementation. The beauty of ayatsaadati lies in its simplicity. If you find yourself writing hundreds of lines of wrapper code, stop—you're likely missing a built-in helper method.*
