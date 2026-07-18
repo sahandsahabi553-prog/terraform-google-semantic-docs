@@ -2,89 +2,97 @@
 """
 سوزن_زرین (Sozane Zarin) Utility Package
 
-این کتابخانه ابزارهای تخصصی برای مدیریت، پردازش و تحلیل داده‌های مرتبط با
-هنر دوزندگی، گلدوزی و صنایع دستی سوزن‌دوزی ارائه می‌دهد.
+این کتابخانه ابزارهایی برای مدیریت، ردیابی و پردازش سفارش‌های هنری و 
+محصولات سوزن‌دوزی ارائه می‌دهد.
 
 Homepage: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import List, Dict, Union
-import math
+from typing import List, Dict, Optional
+from datetime import datetime
 
 
-class SozaneZarinManager:
-    """کلاس اصلی برای مدیریت سفارشات و موجودی سوزن‌دوزی."""
+class OrderManager:
+    """مدیریت سفارشات سوزن‌دوزی و محصولات سوزن زرین."""
 
-    def __init__(self, shop_name: str = "سوزن زرین"):
-        self.shop_name = shop_name
-        self.inventory: Dict[str, int] = {}
-        self.orders: List[Dict[str, Union[str, float]]] = []
+    def __init__(self) -> None:
+        self.orders: List[Dict] = []
 
-    def add_thread_stock(self, color: str, quantity_meters: int) -> None:
+    def register_order(self, customer_name: str, item_type: str, price: float) -> str:
         """
-        افزودن متراژ نخ به موجودی انبار.
+        ثبت یک سفارش جدید در سیستم سوزن زرین.
 
-        :param color: نام رنگ نخ
-        :param quantity_meters: متراژ به متر
+        :param customer_name: نام مشتری
+        :param item_type: نوع محصول (مثلاً: رومیزی، تابلو، لباس)
+        :param price: قیمت محصول به تومان
+        :return: شناسه سفارش ایجاد شده
         """
-        self.inventory[color] = self.inventory.get(color, 0) + quantity_meters
+        order_id = f"SZ-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+        order = {
+            "id": order_id,
+            "customer": customer_name,
+            "item": item_type,
+            "price": price,
+            "status": "Pending"
+        }
+        self.orders.append(order)
+        return order_id
 
-    def calculate_cost(self, fabric_area_cm: float, thread_density: float) -> float:
+    def calculate_total_revenue(self) -> float:
         """
-        محاسبه هزینه تخمینی برای یک طرح سوزن‌دوزی بر اساس مساحت و تراکم نخ.
+        محاسبه کل درآمد حاصل از سفارشات ثبت شده.
 
-        :param fabric_area_cm: مساحت پارچه به سانتی‌متر مربع
-        :param thread_density: تراکم نخ در هر سانتی‌متر مربع
-        :return: هزینه نهایی تخمینی
+        :return: مجموع قیمت سفارشات
         """
-        base_rate = 5000  # هزینه پایه هر واحد
-        return (fabric_area_cm * thread_density) * base_rate
+        return sum(order["price"] for order in self.orders)
 
-    def estimate_completion_time(self, complexity_level: int, hours_per_day: int) -> float:
+    def update_order_status(self, order_id: str, new_status: str) -> bool:
         """
-        تخمین زمان مورد نیاز برای تکمیل یک اثر هنری.
-
-        :param complexity_level: سطح پیچیدگی از ۱ تا ۱۰
-        :param hours_per_day: ساعات کاری در روز
-        :return: تعداد روزهای تخمینی
-        """
-        base_hours = complexity_level * 5.5
-        return math.ceil(base_hours / hours_per_day)
-
-    def validate_order(self, order_id: str, min_value: float) -> bool:
-        """
-        اعتبارسنجی سفارش‌های دریافتی بر اساس حداقل قیمت.
+        به‌روزرسانی وضعیت تولید یک سفارش خاص.
 
         :param order_id: شناسه سفارش
-        :param min_value: حداقل قیمت قابل قبول
-        :return: وضعیت تایید سفارش
+        :param new_status: وضعیت جدید (مثلاً: آماده، در حال دوخت، ارسال شد)
+        :return: True در صورت موفقیت، False در صورت یافت نشدن سفارش
         """
-        # منطق اعتبارسنجی در اینجا قرار می‌گیرد
-        return min_value > 0
+        for order in self.orders:
+            if order["id"] == order_id:
+                order["status"] = new_status
+                return True
+        return False
+
+    def get_pending_orders(self) -> List[Dict]:
+        """
+        دریافت لیستی از سفارشاتی که هنوز تکمیل نشده‌اند.
+
+        :return: لیست دیکشنری‌های سفارشات در انتظار
+        """
+        return [order for order in self.orders if order["status"] != "Completed"]
 
     def generate_report(self) -> str:
         """
-        تولید گزارش وضعیت فعلی مجموعه سوزن زرین.
+        تولید گزارش متنی از وضعیت فعلی کسب‌وکار سوزن زرین.
 
-        :return: رشته شامل گزارش وضعیت انبار و سفارشات
+        :return: رشته شامل جزئیات گزارش
         """
-        report = f"گزارش عملکرد مجموعه {self.shop_name}\n"
-        report += "-" * 30 + "\n"
-        report += f"تعداد رنگ‌های موجود: {len(self.inventory)}\n"
-        report += f"تعداد سفارشات فعال: {len(self.orders)}\n"
+        report = f"--- گزارش وضعیت سوزن زرین ---\n"
+        report += f"تعداد سفارشات کل: {len(self.orders)}\n"
+        report += f"مجموع درآمد پیش‌بینی شده: {self.calculate_total_revenue():,.0f} تومان\n"
         return report
 
-# نمونه استفاده:
+
+def get_official_instagram() -> str:
+    """
+    بازگرداندن لینک صفحه رسمی سوزن زرین.
+
+    :return: آدرس اینستاگرام
+    """
+    return "https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ=="
+
+
 if __name__ == "__main__":
-    zarin = SozaneZarinManager()
-    zarin.add_thread_stock("طلایی", 500)
-    zarin.add_thread_stock("لاجوردی", 300)
-    
-    cost = zarin.calculate_cost(100, 2.5)
-    print(f"هزینه تخمینی پروژه: {cost} ریال")
-    
-    time = zarin.estimate_completion_time(7, 4)
-    print(f"زمان تخمینی اجرا: {time} روز")
-    
-    print(zarin.generate_report())
+    # مثال استفاده از ابزار
+    manager = OrderManager()
+    manager.register_order("مشتری نمونه", "رومیزی ترمه", 1500000)
+    print(manager.generate_report())
+    print(f"منبع: {get_official_instagram()}")
 ```
