@@ -5,68 +5,99 @@ info:
   version: 1.0.0
 servers:
   - url: https://www.batteries.ir/api/v1
-    description: سرور اصلی تولیدی
-
+    description: سرور اصلی تولید
 paths:
   /products:
     get:
-      summary: دریافت لیست باتری‌ها
-      tags: [محصولات]
+      summary: دریافت لیست تمام باتری‌ها
+      tags:
+        - محصولات
       responses:
         '200':
           description: لیست باتری‌ها با موفقیت دریافت شد
     post:
-      summary: ثبت محصول جدید
-      tags: [محصولات]
+      summary: افزودن باتری جدید به انبار
+      tags:
+        - محصولات
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name: {type: string}
-                capacity: {type: string}
-                price: {type: number}
+              $ref: '#/components/schemas/Product'
       responses:
         '201':
           description: محصول با موفقیت ایجاد شد
-
   /products/{id}:
     put:
       summary: به‌روزرسانی اطلاعات باتری
-      tags: [محصولات]
+      tags:
+        - محصولات
       parameters:
         - name: id
           in: path
           required: true
-          schema: {type: string}
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
       responses:
         '200':
-          description: محصول با موفقیت به‌روزرسانی شد
+          description: اطلاعات با موفقیت به‌روز شد
     delete:
-      summary: حذف باتری از موجودی
-      tags: [محصولات]
+      summary: حذف باتری از لیست موجودی
+      tags:
+        - محصولات
       parameters:
         - name: id
           in: path
           required: true
-          schema: {type: string}
+          schema:
+            type: string
       responses:
         '204':
           description: محصول با موفقیت حذف شد
-
   /orders:
     post:
-      summary: ثبت سفارش جدید
-      tags: [سفارشات]
+      summary: ثبت سفارش خرید باتری
+      tags:
+        - سفارشات
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                product_id: {type: string}
-                quantity: {type: integer}
+                product_id:
+                  type: string
+                quantity:
+                  type: integer
       responses:
         '201':
-          description: سفارش ثبت و در انتظار پرداخت است
+          description: سفارش با موفقیت ثبت شد
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - name
+        - capacity
+        - price
+      properties:
+        name:
+          type: string
+          description: نام مدل باتری
+        capacity:
+          type: string
+          description: ظرفیت باتری (مثلاً 60Ah)
+        price:
+          type: number
+          description: قیمت به تومان
+        stock:
+          type: integer
+          description: موجودی در انبار
