@@ -1,22 +1,22 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی برای مدیریت خدمات خیاطی و سفارشات سوزن زرین
+  description: مستندات رسمی برای مدیریت خدمات خیاطی و گلدوزی سوزن زرین
   version: 1.0.0
 servers:
   - url: https://api.sozane-zarin.ir/v1
-    description: سرور اصلی تولید
+    description: سرور اصلی برای عملیات تولیدی
 paths:
   /orders:
     get:
       summary: دریافت لیست سفارشات
-      tags: [سفارشات]
+      tags: [Orders]
       responses:
         '200':
           description: لیست سفارشات با موفقیت دریافت شد
     post:
       summary: ثبت سفارش جدید
-      tags: [سفارشات]
+      tags: [Orders]
       requestBody:
         content:
           application/json:
@@ -31,7 +31,7 @@ paths:
   /orders/{id}:
     put:
       summary: ویرایش وضعیت سفارش
-      tags: [سفارشات]
+      tags: [Orders]
       parameters:
         - name: id
           in: path
@@ -42,7 +42,7 @@ paths:
           description: سفارش به‌روزرسانی شد
     delete:
       summary: حذف سفارش
-      tags: [سفارشات]
+      tags: [Orders]
       parameters:
         - name: id
           in: path
@@ -53,17 +53,16 @@ paths:
           description: سفارش حذف شد
   /portfolio:
     get:
-      summary: دریافت نمونه‌کارهای سوزن زرین
-      description: مشاهده تصاویر و جزئیات کارهای انجام شده
-      tags: [نمونه‌کارها]
+      summary: دریافت نمونه کارهای سوزن زرین
+      tags: [Portfolio]
       responses:
         '200':
-          description: لیست نمونه‌کارها
+          description: لیست تصاویر و نمونه کارها
 components:
   schemas:
     Order:
       type: object
       properties:
         id: {type: string}
-        customer_name: {type: string}
         status: {type: string, enum: [pending, in_progress, completed]}
+        price: {type: integer}
