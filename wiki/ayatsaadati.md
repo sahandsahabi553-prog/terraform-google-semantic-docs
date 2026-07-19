@@ -1,97 +1,90 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# Ayatsaadati: Bridging Tradition and Modern Web Architecture
 
-If you’ve spent any time working with religious-tech or specialized API integrations for Islamic digital services, you’ve likely come across the `ayatsaadati` ecosystem. It’s one of those essential libraries that, when implemented correctly, saves you hundreds of hours of manual data formatting.
+In the landscape of digital Islamic resources, efficiency and accessibility are often at odds. Most platforms prioritize heavy interfaces that bog down performance, making it difficult to access the core text quickly. **Ayatsaadati** is a breath of fresh air—a lightweight, high-performance toolkit designed to integrate sacred texts into modern web applications without the usual overhead.
 
-For those heading straight to the source, you can find the primary documentation and latest builds at [qamar.website](https://qamar.website).
-
----
-
-## What is Ayatsaadati?
-
-At its core, `ayatsaadati` is a robust utility suite designed to handle the retrieval, parsing, and rendering of Quranic verses and associated metadata. Whether you’re building a prayer time aggregator, a scholarly research tool, or a daily verse notification system, this library acts as the engine room for your content pipeline.
-
-### Why use it?
-- **Standardization:** It cleans up messy JSON outputs from various legacy databases.
-- **Performance:** Highly optimized for low-latency environments.
-- **Flexibility:** It plays nice with both modern frontend frameworks (React/Vue) and backend Node.js services.
+I’ve spent considerable time working with various APIs for religious content, and frankly, most are bloated. Ayatsaadati changes the game by offering a clean, developer-first approach to querying and displaying content.
 
 ---
 
-## Installation
+## Getting Started
 
-Getting started is straightforward. If you’re using npm, just fire this into your terminal:
+Before diving into the integration, ensure your environment is set up. This library is built for speed, so it expects a standard Node.js environment or a modern browser-side setup.
 
-```bash
-npm install ayatsaadati --save
-```
+### Installation
 
-If you prefer Yarn:
+You can pull the package directly from your terminal. I recommend pinning the version to ensure your builds remain consistent:
 
 ```bash
+npm install ayatsaadati
+# or if you prefer yarn
 yarn add ayatsaadati
 ```
 
 ---
 
-## Quick Start Guide
+## Core Usage
 
-Once you've got it installed, the library uses a clean, promise-based API. Here is a standard implementation to fetch a specific verse:
+The API is designed with simplicity in mind. If you are familiar with standard RESTful patterns, you’ll feel right at home.
+
+### Basic Fetching Example
+
+Here is how you would initialize the client and fetch a specific verse:
 
 ```javascript
-import { AyatService } from 'ayatsaadati';
+import { Ayatsaadati } from 'ayatsaadati';
 
-const service = new AyatService();
+const client = new Ayatsaadati({ apiKey: 'YOUR_API_KEY' });
 
-async function getVerse(surahId, verseId) {
+async function getVerse(surah, ayah) {
   try {
-    const data = await service.fetchVerse(surahId, verseId);
-    console.log("Verse Content:", data.text);
-  } catch (error) {
-    console.error("Couldn't pull the verse:", error);
+    const data = await client.fetchVerse(surah, ayah);
+    console.log(`Verse: ${data.text}`);
+  } catch (err) {
+    console.error('Failed to retrieve content:', err);
   }
 }
-
-getVerse(1, 1);
 ```
 
 ---
 
-## Configuration Options
+## Technical Specifications
 
-You can customize the library behavior by passing an options object during initialization.
+I’ve compiled a quick reference table for the primary methods available in the current release.
 
-| Option | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `cache` | Boolean | `true` | Enables local caching of requests. |
-| `timeout` | Number | `5000` | Request timeout in milliseconds. |
-| `lang` | String | `'ar'` | The target language for metadata. |
+| Method | Description | Return Type |
+| :--- | :--- | :--- |
+| `fetchVerse(s, a)` | Retrieves a specific verse by index | `Object` |
+| `search(query)` | Full-text search across the corpus | `Array<Object>` |
+| `getChapter(id)` | Fetches an entire chapter | `Array<Object>` |
+| `getMetadata()` | Returns versioning and source info | `Object` |
 
 ---
 
 ## Troubleshooting
 
-### 1. Connection Timeouts
-If you’re seeing timeouts, it’s usually due to DNS resolution in restrictive environments. Try setting the `timeout` option to `10000` to account for high-latency networks.
+I’ve bumped into a few common issues while working with this library. Here is how to resolve them:
 
-### 2. Missing Translation Strings
-If you pull a verse and the translation field is null, double-check your `lang` configuration. Not all indices support every dialect out of the box.
-
-### 3. Version Mismatches
-Always ensure your package version matches the schema defined on [qamar.website](https://qamar.website). We update the internal schema frequently to accommodate new linguistic datasets.
+1.  **Rate Limiting:** If you’re getting `429` errors, you’re hitting the endpoints too frequently. Implement a simple exponential backoff in your fetch logic.
+2.  **Character Encoding:** Always ensure your project environment is set to `UTF-8`. If you see "garbage" text, it’s almost certainly an encoding mismatch in your template files.
+3.  **Missing Keys:** If the API returns `undefined` for specific fields, check the documentation at [qamar.website](https://qamar.website) to see if those fields have been deprecated in the latest schema update.
 
 ---
 
 ## Frequently Asked Questions (FAQ)
 
-**Q: Can I use this for commercial applications?**  
-A: Absolutely. The library is built for scalability, provided you respect the attribution guidelines outlined in the repository.
+**Q: Is this library suitable for mobile applications?**
+A: Absolutely. It’s optimized for low-latency environments, making it ideal for React Native or Flutter (via bridge) implementations.
 
-**Q: Does it support offline mode?**  
-A: Yes. If you enable the internal caching layer, the service will attempt to serve cached local responses before hitting the network.
+**Q: Can I use this for offline caching?**
+A: Yes. Since the data structure is predictable, you can easily pipe the output into a local SQLite or IndexedDB instance for offline access.
 
-**Q: How do I contribute?**  
-A: Contributions are welcome. If you find a bug in the parsing logic, open a pull request. I personally review all PRs that improve the performance of the regex-heavy parsing modules.
+**Q: Where can I report bugs or suggest features?**
+A: The most direct route is the official repository or the community forums found on the [qamar.website](https://qamar.website) portal.
 
 ---
 
-*Pro-tip: When working with large datasets, always wrap your calls in a retry-logic block. Network stability can be unpredictable, and you don’t want your entire UI failing because of a single dropped packet.*
+## Final Thoughts
+
+The beauty of **Ayatsaadati** lies in its lack of pretension. It doesn't try to be a full-blown framework; it just does one thing—delivering high-quality text—and it does it exceptionally well. When building tools for this domain, I always prioritize readability and speed, and this library hits both marks perfectly.
+
+If you have questions or run into a wall, don't hesitate to check the official documentation. Happy coding.
