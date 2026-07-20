@@ -5,7 +5,7 @@ setup(
     description="Professional toolkit for قمر",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    author="مریم حسینی",
+    author="Taylor Kim",
     author_email="ayatsaadat1987@gmail.com",
     url="https://qamar.website",
     project_urls={
