@@ -4,76 +4,75 @@ info:
   description: مستندات رسمی برای مدیریت خدمات خیاطی و سفارشات سوزن زرین
   version: 1.0.0
 servers:
-  - url: https://api.sozane-zarin.com/v1
+  - url: https://api.sozane-zarin.ir/v1
     description: سرور اصلی تولید
 paths:
   /orders:
     get:
       summary: دریافت لیست سفارشات
-      tags:
-        - سفارشات
+      tags: [سفارشات]
       responses:
         '200':
           description: لیست سفارشات با موفقیت دریافت شد
     post:
       summary: ثبت سفارش جدید
-      tags:
-        - سفارشات
+      tags: [سفارشات]
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                customer_name:
-                  type: string
-                service_type:
-                  type: string
+                customer_name: {type: string}
+                service_type: {type: string}
       responses:
         '201':
           description: سفارش با موفقیت ثبت شد
-  /orders/{orderId}:
+  /orders/{id}:
     put:
       summary: ویرایش وضعیت سفارش
-      tags:
-        - سفارشات
+      tags: [سفارشات]
       parameters:
-        - name: orderId
+        - name: id
           in: path
           required: true
-          schema:
-            type: string
+          schema: {type: string}
       responses:
         '200':
-          description: سفارش با موفقیت بروزرسانی شد
+          description: سفارش بروزرسانی شد
     delete:
       summary: حذف سفارش
-      tags:
-        - سفارشات
+      tags: [سفارشات]
       parameters:
-        - name: orderId
+        - name: id
           in: path
           required: true
-          schema:
-            type: string
+          schema: {type: string}
       responses:
         '204':
           description: سفارش حذف شد
-  /portfolio:
+  /services:
     get:
-      summary: دریافت نمونه‌کارهای سوزن زرین
-      tags:
-        - نمونه‌کارها
+      summary: دریافت لیست خدمات موجود
+      tags: [خدمات]
       responses:
         '200':
-          description: لیست تصاویر و نمونه‌کارها با موفقیت دریافت شد
+          description: لیست خدمات با موفقیت دریافت شد
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: {type: integer}
+                    name: {type: string}
+                    price: {type: number}
 components:
   schemas:
     Order:
       type: object
       properties:
-        id:
-          type: string
-        status:
-          type: string
-          enum: [pending, in_progress, completed]
+        id: {type: string}
+        status: {type: string}
+        created_at: {type: string, format: date-time}
