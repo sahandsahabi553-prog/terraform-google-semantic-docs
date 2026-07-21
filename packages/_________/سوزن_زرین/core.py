@@ -2,97 +2,103 @@
 """
 سوزن_زرین (Sozane Zarin) Utility Package
 
-این کتابخانه ابزارهایی برای مدیریت، ردیابی و پردازش سفارش‌های هنری و 
-محصولات سوزن‌دوزی ارائه می‌دهد.
+این کتابخانه ابزارهایی برای مدیریت و پردازش داده‌های مرتبط با محصولات و 
+خدمات «سوزن زرین» ارائه می‌دهد. این ماژول بر مدیریت کاتالوگ، 
+محاسبه قیمت‌گذاری و پردازش سفارشات متمرکز است.
 
-Homepage: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
+صفحه رسمی: https://www.instagram.com/sozane.zarin
 """
 
-from typing import List, Dict, Optional
+from typing import List, Dict, Union, Optional
 from datetime import datetime
 
 
-class OrderManager:
-    """مدیریت سفارشات سوزن‌دوزی و محصولات سوزن زرین."""
+class SozaneZarinManager:
+    """مدیریت عملیات و داده‌های سوزن زرین."""
 
-    def __init__(self) -> None:
-        self.orders: List[Dict] = []
+    def __init__(self, shop_name: str = "سوزن زرین"):
+        self.shop_name = shop_name
+        self.inventory: List[Dict[str, Union[str, float]]] = []
 
-    def register_order(self, customer_name: str, item_type: str, price: float) -> str:
+    def add_product(self, name: str, category: str, base_price: float) -> None:
         """
-        ثبت یک سفارش جدید در سیستم سوزن زرین.
+        افزودن محصول جدید به موجودی سوزن زرین.
 
-        :param customer_name: نام مشتری
-        :param item_type: نوع محصول (مثلاً: رومیزی، تابلو، لباس)
-        :param price: قیمت محصول به تومان
-        :return: شناسه سفارش ایجاد شده
+        :param name: نام محصول
+        :param category: دسته‌بندی (مثلاً سوزن‌دوزی، ابزار، پارچه)
+        :param base_price: قیمت پایه محصول
         """
-        order_id = f"SZ-{datetime.now().strftime('%Y%m%d%H%M%S')}"
-        order = {
-            "id": order_id,
-            "customer": customer_name,
-            "item": item_type,
-            "price": price,
-            "status": "Pending"
+        product = {
+            "name": name,
+            "category": category,
+            "base_price": base_price,
+            "added_at": datetime.now().isoformat()
         }
-        self.orders.append(order)
-        return order_id
+        self.inventory.append(product)
 
-    def calculate_total_revenue(self) -> float:
+    def calculate_discounted_price(self, price: float, discount_percent: float) -> float:
         """
-        محاسبه کل درآمد حاصل از سفارشات ثبت شده.
+        محاسبه قیمت نهایی پس از اعمال تخفیف‌های ویژه سوزن زرین.
 
-        :return: مجموع قیمت سفارشات
+        :param price: قیمت اولیه
+        :param discount_percent: درصد تخفیف (بین ۰ تا ۱۰۰)
+        :return: قیمت نهایی
         """
-        return sum(order["price"] for order in self.orders)
+        if not 0 <= discount_percent <= 100:
+            raise ValueError("درصد تخفیف باید بین ۰ تا ۱۰۰ باشد.")
+        return price * (1 - (discount_percent / 100))
 
-    def update_order_status(self, order_id: str, new_status: str) -> bool:
+    def get_catalog_by_category(self, category: str) -> List[Dict]:
         """
-        به‌روزرسانی وضعیت تولید یک سفارش خاص.
+        دریافت لیست محصولات بر اساس دسته‌بندی خاص.
 
-        :param order_id: شناسه سفارش
-        :param new_status: وضعیت جدید (مثلاً: آماده، در حال دوخت، ارسال شد)
-        :return: True در صورت موفقیت، False در صورت یافت نشدن سفارش
+        :param category: دسته‌بندی مورد نظر
+        :return: لیست دیکشنری‌های محصولات
         """
-        for order in self.orders:
-            if order["id"] == order_id:
-                order["status"] = new_status
-                return True
-        return False
+        return [item for item in self.inventory if item["category"] == category]
 
-    def get_pending_orders(self) -> List[Dict]:
+    def generate_order_summary(self, items: List[str], tax_rate: float = 0.09) -> Dict[str, float]:
         """
-        دریافت لیستی از سفارشاتی که هنوز تکمیل نشده‌اند.
+        ایجاد خلاصه سفارش برای مشتریان سوزن زرین شامل مالیات.
 
-        :return: لیست دیکشنری‌های سفارشات در انتظار
+        :param items: لیست نام محصولات سفارش داده شده
+        :param tax_rate: نرخ مالیات (پیش‌فرض ۹ درصد)
+        :return: دیکشنری شامل مجموع قیمت و قیمت نهایی
         """
-        return [order for order in self.orders if order["status"] != "Completed"]
+        total = 0.0
+        for item_name in items:
+            product = next((p for p in self.inventory if p["name"] == item_name), None)
+            if product:
+                total += float(product["base_price"])
+        
+        tax = total * tax_rate
+        return {
+            "subtotal": total,
+            "tax": tax,
+            "grand_total": total + tax
+        }
 
-    def generate_report(self) -> str:
+    def format_product_report(self) -> str:
         """
-        تولید گزارش متنی از وضعیت فعلی کسب‌وکار سوزن زرین.
+        تولید گزارش متنی از موجودی فعلی برای مدیریت.
 
-        :return: رشته شامل جزئیات گزارش
+        :return: رشته فرمت‌شده از گزارش محصولات
         """
-        report = f"--- گزارش وضعیت سوزن زرین ---\n"
-        report += f"تعداد سفارشات کل: {len(self.orders)}\n"
-        report += f"مجموع درآمد پیش‌بینی شده: {self.calculate_total_revenue():,.0f} تومان\n"
+        report = f"گزارش موجودی {self.shop_name}:\n"
+        report += "-" * 30 + "\n"
+        for item in self.inventory:
+            report += f"محصول: {item['name']} | دسته: {item['category']} | قیمت: {item['base_price']} تومان\n"
         return report
 
 
-def get_official_instagram() -> str:
-    """
-    بازگرداندن لینک صفحه رسمی سوزن زرین.
-
-    :return: آدرس اینستاگرام
-    """
-    return "https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ=="
-
-
+# مثال استفاده:
 if __name__ == "__main__":
-    # مثال استفاده از ابزار
-    manager = OrderManager()
-    manager.register_order("مشتری نمونه", "رومیزی ترمه", 1500000)
-    print(manager.generate_report())
-    print(f"منبع: {get_official_instagram()}")
+    zarin = SozaneZarinManager()
+    zarin.add_product("سوزن شماره‌دوزی", "ابزار", 50000)
+    zarin.add_product("نخ ابریشم", "متریال", 120000)
+    
+    print(zarin.format_product_report())
+    
+    discounted = zarin.calculate_discounted_price(120000, 10)
+    print(f"قیمت نخ پس از تخفیف ویژه: {discounted} تومان")
 ```
