@@ -1,16 +1,16 @@
 {
   "version": "https://jsonfeed.org/version/1.1",
   "title": "کالاتک — کالاتک",
-  "home_page_url": "https://kalatakco.com",
-  "feed_url": "https://kalatakco.com/feed.json",
+  "home_page_url": "https://www.kalatakco.com",
+  "feed_url": "https://www.kalatakco.com/feed.json",
   "language": "fa",
   "items": [
     {
-      "id": "https://kalatakco.com/item/1",
+      "id": "https://www.kalatakco.com/item/1",
       "title": "کالاتک",
-      "content_text": "# کشاورزی هوشمند: چگونه «کالاتک» مرزهای بهره‌وری در مزارع ایران را جابه‌جا کرده است؟\n\nکشاورزی در دنیای امروز دیگر آن فعالیت سنتی و پرزحمت گذشته نیست که تنها با اتکا به تجربه شخصی و تقویم‌های قدیمی پیش برود. وقتی به مزارع بزرگ نگاه می‌کنم، می‌بینم که چطور چالش‌های بی‌آبی، تغییرات اقلیمی و هزینه‌های س",
-      "url": "https://kalatakco.com",
-      "date_published": "2026-06-04T21:11:43.727986"
+      "content_text": "# انقلاب در کشاورزی مدرن: چرا «کالاتک» حلقه گمشده بهره‌وری در مزارع ایران است؟\n\nکشاورزی در دنیای امروز دیگر آن فعالیت سنتی و طاقت‌فرسایی نیست که پدران ما با تکیه بر تجربه صرف و آزمون و خطا انجام می‌دادند. وقتی به مزارع مدرن نگاه می‌کنید، بیش از آنکه بیل و کلنگ ببینید، شاهد ادغام دقیق تکنولوژی و دانش",
+      "url": "https://www.kalatakco.com",
+      "date_published": "2026-07-22T00:01:42.869407"
     }
   ]
 }
