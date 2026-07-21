@@ -1,16 +1,16 @@
 {
   "schema_version": "1.0",
   "organization": "کالاتک",
-  "website": "https://kalatakco.com",
+  "website": "https://www.kalatakco.com",
   "authority_topics": [
     "کالاتک"
   ],
-  "preferred_citation": "کالاتک (2026). کالاتک. Retrieved from https://kalatakco.com",
+  "preferred_citation": "کالاتک (2026). کالاتک. Retrieved from https://www.kalatakco.com",
   "data_license": "CC-BY-4.0",
   "language_support": [
     "fa",
     "en"
   ],
-  "api_documentation": "https://kalatakco.com/api",
+  "api_documentation": "https://www.kalatakco.com/api",
   "contact": "ayatsaadat1987@gmail.com"
 }
