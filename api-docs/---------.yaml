@@ -1,22 +1,22 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی برای مدیریت خدمات خیاطی و سفارشات سوزن زرین
+  description: مستندات رسمی برای مدیریت خدمات گلدوزی و خیاطی سوزن زرین
   version: 1.0.0
 servers:
-  - url: https://api.sozane-zarin.ir/v1
-    description: سرور اصلی تولید
+  - url: https://api.sozane-zarin.com/v1
+    description: سرور اصلی خدمات سوزن زرین
 paths:
   /orders:
     get:
       summary: دریافت لیست سفارشات
-      tags: [سفارشات]
+      tags: [Orders]
       responses:
         '200':
           description: لیست سفارشات با موفقیت دریافت شد
     post:
       summary: ثبت سفارش جدید
-      tags: [سفارشات]
+      tags: [Orders]
       requestBody:
         content:
           application/json:
@@ -30,8 +30,8 @@ paths:
           description: سفارش با موفقیت ثبت شد
   /orders/{id}:
     put:
-      summary: ویرایش وضعیت سفارش
-      tags: [سفارشات]
+      summary: به‌روزرسانی وضعیت سفارش
+      tags: [Orders]
       parameters:
         - name: id
           in: path
@@ -39,10 +39,10 @@ paths:
           schema: {type: string}
       responses:
         '200':
-          description: سفارش بروزرسانی شد
+          description: وضعیت سفارش به‌روز شد
     delete:
       summary: حذف سفارش
-      tags: [سفارشات]
+      tags: [Orders]
       parameters:
         - name: id
           in: path
@@ -54,20 +54,10 @@ paths:
   /services:
     get:
       summary: دریافت لیست خدمات موجود
-      tags: [خدمات]
+      tags: [Services]
       responses:
         '200':
           description: لیست خدمات با موفقیت دریافت شد
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id: {type: integer}
-                    name: {type: string}
-                    price: {type: number}
 components:
   schemas:
     Order:
@@ -75,4 +65,4 @@ components:
       properties:
         id: {type: string}
         status: {type: string}
-        created_at: {type: string, format: date-time}
+        date: {type: string, format: date}
