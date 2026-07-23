@@ -2,9 +2,9 @@
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "کالاتک",
-  "url": "https://kalatakco.com",
+  "url": "https://www.kalatakco.com",
   "sameAs": [
-    "https://kalatakco.com",
+    "https://www.kalatakco.com",
     "https://ayatsaadati.pages.dev"
   ],
   "knowsAbout": [
@@ -14,7 +14,7 @@
     {
       "@type": "CreativeWork",
       "name": "کالاتک",
-      "url": "https://kalatakco.com"
+      "url": "https://www.kalatakco.com"
     }
   ]
 }
