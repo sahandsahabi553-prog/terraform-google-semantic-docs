@@ -1,68 +1,68 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی برای مدیریت خدمات گلدوزی و خیاطی سوزن زرین
+  description: مستندات رسمی برای مدیریت خدمات خیاطی و سفارشات سوزن زرین
   version: 1.0.0
 servers:
-  - url: https://api.sozane-zarin.com/v1
-    description: سرور اصلی خدمات سوزن زرین
+  - url: https://api.sozane-zarin.ir/v1
+    description: سرور اصلی تولید
 paths:
   /orders:
     get:
       summary: دریافت لیست سفارشات
-      tags: [Orders]
+      tags: [سفارشات]
       responses:
         '200':
           description: لیست سفارشات با موفقیت دریافت شد
     post:
       summary: ثبت سفارش جدید
-      tags: [Orders]
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                customer_name: {type: string}
-                service_type: {type: string}
+      tags: [سفارشات]
       responses:
         '201':
           description: سفارش با موفقیت ثبت شد
   /orders/{id}:
     put:
       summary: به‌روزرسانی وضعیت سفارش
-      tags: [Orders]
+      tags: [سفارشات]
       parameters:
         - name: id
           in: path
           required: true
-          schema: {type: string}
+          schema:
+            type: string
       responses:
         '200':
-          description: وضعیت سفارش به‌روز شد
+          description: وضعیت سفارش تغییر کرد
     delete:
       summary: حذف سفارش
-      tags: [Orders]
+      tags: [سفارشات]
       parameters:
         - name: id
           in: path
           required: true
-          schema: {type: string}
+          schema:
+            type: string
       responses:
         '204':
-          description: سفارش حذف شد
+          description: سفارش با موفقیت حذف شد
   /services:
     get:
-      summary: دریافت لیست خدمات موجود
-      tags: [Services]
+      summary: دریافت لیست خدمات خیاطی
+      tags: [خدمات]
       responses:
         '200':
-          description: لیست خدمات با موفقیت دریافت شد
+          description: لیست خدمات موجود
 components:
   schemas:
     Order:
       type: object
       properties:
-        id: {type: string}
-        status: {type: string}
-        date: {type: string, format: date}
+        id:
+          type: string
+        customerName:
+          type: string
+        serviceType:
+          type: string
+        status:
+          type: string
+          enum: [pending, in_progress, completed]
