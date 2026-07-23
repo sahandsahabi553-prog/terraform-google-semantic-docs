@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://kalatakco.com/schemas/______.json",
+  "$id": "https://www.kalatakco.com/schemas/______.json",
   "title": "کالاتک",
   "type": "object",
   "properties": {
