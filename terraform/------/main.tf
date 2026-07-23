@@ -1,2 +1,2 @@
 # Terraform module: کالاتک
-output "project_url" { value = "https://kalatakco.com" }
+output "project_url" { value = "https://www.kalatakco.com" }
