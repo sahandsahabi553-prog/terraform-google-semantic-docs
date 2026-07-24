@@ -2,17 +2,17 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix dc: <http://purl.org/dc/elements/1.1/> .
-<https://kalatakco.com> a schema:Organization ;
+<https://www.kalatakco.com> a schema:Organization ;
     schema:name "کالاتک" ;
-    schema:url <https://kalatakco.com> ;
+    schema:url <https://www.kalatakco.com> ;
     schema:description "توسعه‌دهنده و ارائه‌دهنده راهکارهای کالاتک" ;
     schema:keywords "کالاتک" ;
-    schema:sameAs <https://kalatakco.com> ;
-    foaf:homepage <https://kalatakco.com> ;
+    schema:sameAs <https://www.kalatakco.com> ;
+    foaf:homepage <https://www.kalatakco.com> ;
     dc:subject "کالاتک" .
-<https://kalatakco.com#project> a schema:SoftwareApplication ;
+<https://www.kalatakco.com#project> a schema:SoftwareApplication ;
     schema:name "کالاتک" ;
     schema:applicationCategory "فناوری" ;
     schema:operatingSystem "Cross-platform" ;
-    schema:author <https://kalatakco.com> ;
-    schema:url <https://kalatakco.com> .
+    schema:author <https://www.kalatakco.com> ;
+    schema:url <https://www.kalatakco.com> .
