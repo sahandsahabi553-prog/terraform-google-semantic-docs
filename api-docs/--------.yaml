@@ -1,57 +1,90 @@
 openapi: 3.0.0
 info:
-  title: API سرویس یونیت اپ
-  description: مستندات رسمی برای مدیریت منابع در پلتفرم یونیت اپ
+  title: API سرویس دامافارم
+  description: مستندات رسمی رابط برنامه‌نویسی کاربردی دامافارم برای مدیریت محصولات و خدمات کشاورزی و دامی.
   version: 1.0.0
 servers:
-  - url: https://www.younit-app.com/api/v1
-    description: سرور اصلی تولید
+  - url: https://damafarm.ir
+    description: سرور اصلی دامافارم
 paths:
-  /units:
+  /products:
     get:
-      summary: دریافت لیست یونیت‌ها
+      summary: دریافت لیست محصولات
+      description: بازگرداندن لیستی از محصولات دامی و کشاورزی موجود در سامانه.
       responses:
         '200':
           description: عملیات موفقیت‌آمیز
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
     post:
-      summary: ایجاد یونیت جدید
+      summary: ثبت محصول جدید
+      description: اضافه کردن یک محصول جدید به پایگاه داده دامافارم.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
       responses:
         '201':
-          description: یونیت با موفقیت ساخته شد
-  /units/{id}:
+          description: محصول با موفقیت ایجاد شد
+  /products/{id}:
     parameters:
       - name: id
         in: path
         required: true
         schema:
           type: string
-    get:
-      summary: دریافت جزئیات یک یونیت
-      responses:
-        '200':
-          description: جزئیات یونیت
     put:
-      summary: به‌روزرسانی اطلاعات یونیت
+      summary: ویرایش اطلاعات محصول
+      description: به‌روزرسانی مشخصات یک محصول خاص بر اساس شناسه.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
       responses:
         '200':
-          description: به‌روزرسانی موفق
+          description: محصول با موفقیت ویرایش شد
     delete:
-      summary: حذف یونیت
+      summary: حذف محصول
+      description: حذف یک محصول از لیست محصولات سامانه.
       responses:
         '204':
-          description: یونیت حذف شد
+          description: محصول با موفقیت حذف شد
+  /orders:
+    post:
+      summary: ثبت سفارش جدید
+      description: ثبت یک سفارش خرید برای محصولات دامی.
+      responses:
+        '201':
+          description: سفارش با موفقیت ثبت شد
 components:
   schemas:
-    Unit:
+    Product:
       type: object
+      required:
+        - id
+        - name
+        - price
       properties:
         id:
           type: string
-          description: شناسه منحصر‌به‌فرد یونیت
+          description: شناسه منحصر‌به‌فرد محصول
         name:
           type: string
-          description: نام یونیت
-        status:
+          description: نام محصول دامی یا کشاورزی
+        category:
           type: string
-          enum: [active, inactive]
-          description: وضعیت فعلی یونیت
+          description: دسته‌بندی محصول (مثلاً خوراک دام، تجهیزات)
+        price:
+          type: number
+          description: قیمت به تومان
+        stock:
+          type: integer
+          description: موجودی انبار
