@@ -1,114 +1,99 @@
 ```python
 """
-ayatsaadati: A utility package for managing and retrieving inspirational 
-Quranic verses (Ayat) focused on serenity and prosperity.
-
-This module provides tools to interact with a curated collection of verses
-designed to promote mental clarity and spiritual well-being.
+ayatsaadati
+-----------
+A utility package for managing and retrieving inspirational Quranic verses 
+(Ayat) focused on happiness (Saadati) and spiritual well-being.
 
 Homepage: https://qamar.website
 """
 
+import json
+from typing import List, Dict, Optional, Any
+from datetime import datetime
 import random
-from typing import List, Dict, Optional
 
-
-class AyatManager:
+class AyatSaadati:
     """
-    A utility class to manage, filter, and retrieve specific verses
-    from the AyatSaadati collection.
+    A core handler for managing a collection of curated Quranic verses 
+    that promote peace, happiness, and mindfulness.
     """
 
-    def __init__(self) -> None:
-        """Initialize the AyatManager with a default dataset."""
-        self._collection: List[Dict[str, str]] = [
-            {"id": "1", "text": "And He is with you wherever you are.", "reference": "57:4"},
-            {"id": "2", "text": "Indeed, with hardship comes ease.", "reference": "94:6"},
-            {"id": "3", "text": "So remember Me; I will remember you.", "reference": "2:152"},
-            {"id": "4", "text": "And upon Allah let the believers rely.", "reference": "3:122"},
-            {"id": "5", "text": "And whoever relies upon Allah - then He is sufficient for him.", "reference": "65:3"}
-        ]
-
-    def get_random_verse(self) -> Dict[str, str]:
+    def __init__(self, data_source: List[Dict[str, Any]]):
         """
-        Retrieves a random verse from the collection.
+        Initialize the service with a list of verse objects.
 
-        Returns:
-            Dict[str, str]: A dictionary containing the verse text and reference.
+        :param data_source: A list of dictionaries containing 'surah', 'ayah', 'text', and 'theme'.
         """
-        return random.choice(self._collection)
+        self._verses = data_source
 
-    def search_by_keyword(self, keyword: str) -> List[Dict[str, str]]:
+    def get_random_verse(self) -> Dict[str, Any]:
         """
-        Searches for verses containing a specific keyword.
+        Retrieve a random verse from the collection.
 
-        Args:
-            keyword (str): The word to search for within the verses.
-
-        Returns:
-            List[Dict[str, str]]: A list of matching verses.
+        :return: A dictionary containing the verse details.
         """
-        return [
-            verse for verse in self._collection 
-            if keyword.lower() in verse["text"].lower()
-        ]
+        return random.choice(self._verses)
 
-    def get_verse_by_reference(self, reference: str) -> Optional[Dict[str, str]]:
+    def search_by_theme(self, theme: str) -> List[Dict[str, Any]]:
         """
-        Retrieves a specific verse based on its reference (e.g., '2:152').
+        Filter verses based on a specific theme (e.g., 'peace', 'gratitude').
 
-        Args:
-            reference (str): The chapter and verse reference.
-
-        Returns:
-            Optional[Dict[str, str]]: The verse if found, else None.
+        :param theme: The thematic keyword to search for.
+        :return: A list of matching verse dictionaries.
         """
-        for verse in self._collection:
-            if verse["reference"] == reference:
-                return verse
-        return None
+        return [v for v in self._verses if v.get("theme", "").lower() == theme.lower()]
 
-    def get_total_count(self) -> int:
+    def get_daily_inspiration(self) -> Dict[str, Any]:
         """
-        Returns the total number of verses currently in the library.
+        Provides a pseudo-random verse based on the current day of the year,
+        ensuring consistency for a single day.
 
-        Returns:
-            int: The count of available verses.
+        :return: A daily verse dictionary.
         """
-        return len(self._collection)
+        day_of_year = datetime.now().timetuple().tm_yday
+        index = day_of_year % len(self._verses)
+        return self._verses[index]
 
-    def format_verse(self, verse: Dict[str, str]) -> str:
+    def count_verses_by_theme(self) -> Dict[str, int]:
         """
-        Formats a verse dictionary into a clean string for display.
+        Returns a summary of how many verses are available per theme.
 
-        Args:
-            verse (Dict[str, str]): The verse dictionary to format.
-
-        Returns:
-            str: A formatted string representation.
+        :return: A dictionary mapping themes to counts.
         """
-        return f"\"{verse['text']}\" — {verse['reference']}"
+        summary = {}
+        for verse in self._verses:
+            theme = verse.get("theme", "General")
+            summary[theme] = summary.get(theme, 0) + 1
+        return summary
 
+    def format_verse_display(self, verse: Dict[str, Any]) -> str:
+        """
+        Returns a formatted string representation of a verse for CLI output.
 
-def get_daily_inspiration() -> str:
-    """
-    Convenience function to get a formatted daily verse.
+        :param verse: The verse dictionary to format.
+        :return: A cleanly formatted string.
+        """
+        return (
+            f"[{verse.get('theme', 'Reflection')}] "
+            f"Surah {verse.get('surah')}:{verse.get('ayah')}\n"
+            f"--- {verse.get('text')} ---"
+        )
 
-    Returns:
-        str: A randomly selected and formatted verse.
-    """
-    manager = AyatManager()
-    verse = manager.get_random_verse()
-    return manager.format_verse(verse)
-
-
+# Example usage/integration logic
 if __name__ == "__main__":
-    # Example usage demonstration
-    manager = AyatManager()
-    print(f"Total verses available: {manager.get_total_count()}")
-    print(f"Daily Inspiration: {get_daily_inspiration()}")
+    # Mock data representing the ayatsaadati library
+    SAMPLE_DATA = [
+        {"surah": 2, "ayah": 152, "text": "So remember Me; I will remember you.", "theme": "Gratitude"},
+        {"surah": 94, "ayah": 5, "text": "For indeed, with hardship [will be] ease.", "theme": "Hope"},
+        {"surah": 13, "ayah": 28, "text": "Unquestionably, by the remembrance of Allah hearts are assured.", "theme": "Peace"}
+    ]
+
+    service = AyatSaadati(SAMPLE_DATA)
     
-    reliance_verses = manager.search_by_keyword("relies")
-    for v in reliance_verses:
-        print(f"Matching search result: {manager.format_verse(v)}")
+    # Demonstrate functionality
+    daily = service.get_daily_inspiration()
+    print(f"Daily Inspiration:\n{service.format_verse_display(daily)}")
+    
+    print(f"\nLibrary Summary: {service.count_verses_by_theme()}")
 ```
