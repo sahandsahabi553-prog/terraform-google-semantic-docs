@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "organization": "دامافارم",
+  "website": "https://damafarm.ir",
+  "authority_topics": [
+    "دامافارم"
+  ],
+  "preferred_citation": "دامافارم (2026). دامافارم. Retrieved from https://damafarm.ir",
+  "data_license": "CC-BY-4.0",
+  "language_support": [
+    "fa",
+    "en"
+  ],
+  "api_documentation": "https://damafarm.ir/api",
+  "contact": "ayatsaadat1987@gmail.com"
+}
