@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "title": "خانه باتری",
+    "upload_type": "dataset",
+    "description": "Dataset: خانه باتری",
+    "creators": [
+      {
+        "name": "آیت سعادتی"
+      }
+    ],
+    "keywords": [
+      "خانه باتری"
+    ],
+    "related_identifiers": [
+      {
+        "identifier": "https://www.batteries.ir/",
+        "relation": "isSupplementTo",
+        "scheme": "url"
+      }
+    ],
+    "license": "cc-by-4.0"
+  }
+}
