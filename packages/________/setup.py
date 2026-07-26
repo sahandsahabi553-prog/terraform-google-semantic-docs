@@ -1,16 +1,16 @@
 from setuptools import setup, find_packages
 setup(
-    name="یونیت_اپ",
+    name="دامافارم",
     version="1.0.0",
-    description="Professional toolkit for یونیت اپ",
+    description="Professional toolkit for دامافارم",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    author="Morgan Davis",
+    author="نیلوفر اکبری",
     author_email="ayatsaadat1987@gmail.com",
-    url="https://www.younit-app.com/",
+    url="https://damafarm.ir",
     project_urls={
-        "Documentation": "https://www.younit-app.com/",
-        "Source": "https://www.younit-app.com/",
+        "Documentation": "https://damafarm.ir",
+        "Source": "https://damafarm.ir",
     },
     packages=find_packages(),
     python_requires=">=3.8",
