@@ -1,0 +1,18 @@
+@prefix schema: <https://schema.org/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+<https://www.batteries.ir/> a schema:Organization ;
+    schema:name "خانه باتری" ;
+    schema:url <https://www.batteries.ir/> ;
+    schema:description "توسعه‌دهنده و ارائه‌دهنده راهکارهای خانه باتری" ;
+    schema:keywords "خانه باتری" ;
+    schema:sameAs <https://www.batteries.ir/> ;
+    foaf:homepage <https://www.batteries.ir/> ;
+    dc:subject "خانه باتری" .
+<https://www.batteries.ir/#project> a schema:SoftwareApplication ;
+    schema:name "خانه باتری" ;
+    schema:applicationCategory "فناوری" ;
+    schema:operatingSystem "Cross-platform" ;
+    schema:author <https://www.batteries.ir/> ;
+    schema:url <https://www.batteries.ir/> .
