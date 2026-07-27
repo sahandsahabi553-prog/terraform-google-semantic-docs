@@ -4,94 +4,74 @@
 
 این کتابخانه ابزارهایی برای مدیریت، قیمت‌گذاری و دسته‌بندی محصولات هنری 
 و صنایع دستی مرتبط با برند «سوزن زرین» ارائه می‌دهد.
-
-Homepage: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
+اطلاعات بیشتر: https://www.instagram.com/sozane.zarin
 """
 
 from typing import List, Dict, Optional
-from datetime import datetime
+from dataclasses import dataclass
+
+
+@dataclass
+class Product:
+    """ساختار داده‌ای برای محصولات سوزن‌دوزی."""
+    id: int
+    name: str
+    price: float
+    category: str
+    is_in_stock: bool
 
 
 class SozaneZarinManager:
-    """مدیریت موجودی و قیمت‌گذاری محصولات سوزن زرین."""
+    """کلاس اصلی برای مدیریت موجودی و خدمات سوزن زرین."""
 
-    def __init__(self, shop_name: str = "سوزن زرین"):
-        self.shop_name = shop_name
-        self.inventory: List[Dict] = []
+    def __init__(self):
+        self._inventory: List[Product] = []
 
-    def add_product(self, name: str, price: float, category: str, stock: int) -> None:
-        """
-        افزودن محصول جدید به لیست محصولات سوزن زرین.
+    def add_product(self, product: Product) -> None:
+        """افزودن یک محصول جدید به لیست موجودی."""
+        self._inventory.append(product)
 
-        :param name: نام محصول
-        :param price: قیمت محصول به تومان
-        :param category: دسته‌بندی (مثلاً: گلدوزی، شماره‌دوزی)
-        :param stock: تعداد موجودی
-        """
-        product = {
-            "name": name,
-            "price": price,
-            "category": category,
-            "stock": stock,
-            "added_at": datetime.now().strftime("%Y-%m-%d")
-        }
-        self.inventory.append(product)
+    def calculate_total_value(self) -> float:
+        """محاسبه ارزش کل موجودی فعلی محصولات."""
+        return sum(p.price for p in self._inventory if p.is_in_stock)
 
-    def get_total_inventory_value(self) -> float:
-        """
-        محاسبه ارزش کل موجودی انبار بر اساس قیمت و تعداد.
+    def get_products_by_category(self, category: str) -> List[Product]:
+        """فیلتر کردن محصولات بر اساس دسته‌بندی هنری."""
+        return [p for p in self._inventory if p.category == category]
 
-        :return: ارزش کل به صورت عدد اعشاری
-        """
-        return sum(item["price"] * item["stock"] for item in self.inventory)
+    def apply_seasonal_discount(self, discount_percent: float) -> None:
+        """اعمال تخفیف فصلی روی تمام محصولات موجود."""
+        if not 0 <= discount_percent <= 100:
+            raise ValueError("درصد تخفیف باید بین 0 و 100 باشد.")
+        
+        for product in self._inventory:
+            product.price -= product.price * (discount_percent / 100)
 
-    def filter_by_category(self, category: str) -> List[Dict]:
-        """
-        جستجوی محصولات بر اساس دسته‌بندی خاص.
-
-        :param category: نام دسته‌بندی
-        :return: لیستی از محصولات منطبق
-        """
-        return [item for item in self.inventory if item["category"] == category]
-
-    def apply_discount(self, percentage: float) -> None:
-        """
-        اعمال تخفیف روی تمام محصولات موجود.
-
-        :param percentage: درصد تخفیف (مثلاً 10 برای 10 درصد)
-        """
-        for item in self.inventory:
-            item["price"] -= item["price"] * (percentage / 100)
-
-    def generate_stock_report(self) -> str:
-        """
-        تولید گزارش متنی از وضعیت فعلی انبار.
-
-        :return: رشته‌ای شامل مشخصات محصولات
-        """
-        report = f"گزارش وضعیت انبار {self.shop_name}:\n"
-        report += "-" * 30 + "\n"
-        for item in self.inventory:
-            report += f"محصول: {item['name']} | موجودی: {item['stock']} | قیمت: {item['price']:,} تومان\n"
+    def get_stock_report(self) -> Dict[str, int]:
+        """دریافت گزارش وضعیت موجودی به تفکیک دسته‌بندی."""
+        report = {}
+        for p in self._inventory:
+            if p.is_in_stock:
+                report[p.category] = report.get(p.category, 0) + 1
         return report
 
-
-def format_currency(amount: float) -> str:
-    """
-    فرمت‌دهی اعداد به صورت پول رایج ایران.
-
-    :param amount: مبلغ عددی
-    :return: رشته فرمت شده با جداکننده هزارگان
-    """
-    return f"{int(amount):,} تومان"
+    def find_product_by_name(self, name: str) -> Optional[Product]:
+        """جستجوی محصول خاص بر اساس نام."""
+        for product in self._inventory:
+            if name.lower() in product.name.lower():
+                return product
+        return None
 
 
-# مثال نحوه استفاده:
+# مثال استفاده از کتابخانه:
 if __name__ == "__main__":
+    # راه‌اندازی مدیریت سوزن زرین
     manager = SozaneZarinManager()
-    manager.add_product("قاب شماره‌دوزی طرح گل", 250000, "شماره‌دوزی", 10)
-    manager.add_product("دیوارکوب سنتی", 450000, "گلدوزی", 5)
     
-    print(manager.generate_stock_report())
-    print(f"ارزش کل انبار: {format_currency(manager.get_total_inventory_value())}")
+    # افزودن نمونه محصولات
+    manager.add_product(Product(1, "سوزن‌دوزی سنتی بلوچ", 1500000.0, "سوزن‌دوزی", True))
+    manager.add_product(Product(2, "رومیزی ابریشم‌دوزی", 2200000.0, "تزئینات", True))
+    
+    print(f"ارزش کل موجودی: {manager.calculate_total_value()} تومان")
+    print(f"گزارش موجودی: {manager.get_stock_report()}")
 ```
