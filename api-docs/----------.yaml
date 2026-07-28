@@ -1,11 +1,11 @@
 openapi: 3.0.0
 info:
   title: API سرویس خانه باتری
-  description: مستندات رسمی API برای مدیریت موجودی و سفارشات فروشگاه خانه باتری
+  description: مستندات رسمی مدیریت موجودی و سفارشات فروشگاه خانه باتری
   version: 1.0.0
 servers:
-  - url: https://www.batteries.ir/api/v1
-    description: سرور اصلی تولید
+  - url: https://www.batteries.ir/
+    description: سرور اصلی
 paths:
   /products:
     get:
@@ -14,13 +14,12 @@ paths:
         - محصولات
       responses:
         '200':
-          description: لیست باتری‌ها با موفقیت دریافت شد
+          description: لیست محصولات با موفقیت دریافت شد
     post:
       summary: افزودن باتری جدید به انبار
       tags:
         - محصولات
       requestBody:
-        required: true
         content:
           application/json:
             schema:
@@ -40,16 +39,15 @@ paths:
           schema:
             type: string
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Product'
       responses:
         '200':
-          description: اطلاعات با موفقیت به‌روز شد
+          description: اطلاعات محصول به‌روزرسانی شد
     delete:
-      summary: حذف باتری از لیست موجودی
+      summary: حذف باتری از سیستم
       tags:
         - محصولات
       parameters:
@@ -60,23 +58,12 @@ paths:
             type: string
       responses:
         '204':
-          description: محصول با موفقیت حذف شد
+          description: محصول حذف شد
   /orders:
     post:
-      summary: ثبت سفارش خرید باتری
+      summary: ثبت سفارش خرید جدید
       tags:
         - سفارشات
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                product_id:
-                  type: string
-                quantity:
-                  type: integer
       responses:
         '201':
           description: سفارش با موفقیت ثبت شد
@@ -91,13 +78,13 @@ components:
       properties:
         name:
           type: string
-          description: نام مدل باتری
+          description: نام تجاری باتری
         capacity:
-          type: string
-          description: ظرفیت باتری (مثلاً 60Ah)
+          type: integer
+          description: ظرفیت باتری به آمپر ساعت
         price:
           type: number
-          description: قیمت به تومان
-        stock:
-          type: integer
-          description: موجودی در انبار
+          description: قیمت به ریال
+        brand:
+          type: string
+          description: برند تولیدکننده
