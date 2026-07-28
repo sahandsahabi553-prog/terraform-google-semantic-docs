@@ -1,109 +1,104 @@
 ```python
 """
 کالاتک (KalaTak) Utility Package
-Homepage: https://kalatakco.com
+Provides tools for managing technical inventory, procurement metadata, 
+and hardware specification parsing for KalaTak infrastructure.
 
-This module provides essential utilities for managing product inventories,
-pricing strategies, and logistics operations within the KalaTak ecosystem.
+Homepage: https://www.kalatakco.com
 """
 
-from typing import List, Dict, Optional, Union
-from datetime import datetime
 import uuid
+import datetime
+from typing import Dict, List, Optional, Any
 
 
 class KalaTakManager:
     """
-    Core manager for handling inventory and business operations 
-    for the KalaTak platform.
+    Main utility class for managing KalaTak technical assets and operations.
     """
 
-    def __init__(self, store_name: str):
-        self.store_name = store_name
-        self.inventory: Dict[str, Dict] = {}
+    def __init__(self, organization_name: str = "KalaTak"):
+        self.organization = organization_name
+        self.inventory: Dict[str, Dict[str, Any]] = {}
 
-    def add_product(self, name: str, price: float, category: str, stock: int) -> str:
+    def register_asset(self, hardware_name: str, category: str, serial_number: str) -> str:
         """
-        Registers a new product in the KalaTak inventory system.
+        Registers a new hardware asset into the KalaTak inventory system.
 
-        :param name: Name of the product
-        :param price: Unit price in IRR
-        :param category: Product category
-        :param stock: Initial stock count
-        :return: Unique product ID (UUID)
+        :param hardware_name: Name of the hardware component.
+        :param category: The technical category (e.g., 'Network', 'Compute').
+        :param serial_number: Unique vendor serial number.
+        :return: A generated internal KalaTak UID.
         """
-        product_id = str(uuid.uuid4())[:8]
-        self.inventory[product_id] = {
-            "name": name,
-            "price": price,
+        internal_id = f"KT-{uuid.uuid4().hex[:8].upper()}"
+        self.inventory[internal_id] = {
+            "name": hardware_name,
             "category": category,
-            "stock": stock,
-            "created_at": datetime.now().isoformat()
+            "serial": serial_number,
+            "registered_at": datetime.datetime.now().isoformat()
         }
-        return product_id
+        return internal_id
 
-    def calculate_discounted_price(self, price: float, discount_percent: float) -> float:
+    def get_asset_details(self, asset_id: str) -> Optional[Dict[str, Any]]:
         """
-        Calculates the final price after applying a KalaTak seasonal discount.
+        Retrieves full technical details for a specific asset.
 
-        :param price: Original price
-        :param discount_percent: Percentage (0-100)
-        :return: Final calculated price
+        :param asset_id: The internal KalaTak identifier.
+        :return: Dictionary of asset data or None if not found.
         """
-        if not 0 <= discount_percent <= 100:
-            raise ValueError("Discount must be between 0 and 100.")
-        return price * (1 - (discount_percent / 100))
+        return self.inventory.get(asset_id)
 
-    def get_low_stock_alerts(self, threshold: int = 5) -> List[Dict]:
+    def generate_procurement_report(self) -> List[str]:
         """
-        Identifies products that are running low on stock.
+        Generates a summary report of all registered assets in the system.
 
-        :param threshold: Minimum stock level to trigger alert
-        :return: List of dictionaries containing low stock products
+        :return: A list of formatted strings describing the current inventory.
         """
-        return [
-            {"id": pid, **data} 
-            for pid, data in self.inventory.items() 
-            if data["stock"] <= threshold
-        ]
+        report = [f"--- {self.organization} Inventory Report ---"]
+        for uid, data in self.inventory.items():
+            report.append(f"ID: {uid} | Item: {data['name']} | Category: {data['category']}")
+        return report
 
-    def update_inventory_price(self, product_id: str, new_price: float) -> bool:
+    def validate_sku(self, sku_code: str) -> bool:
         """
-        Updates the price of an existing product in the system.
+        Validates a SKU format according to KalaTak internal standards.
+        Expected format: KT-[4 digits]-[3 uppercase letters].
 
-        :param product_id: The UUID of the product
-        :param new_price: The updated price
-        :return: True if update successful, False otherwise
+        :param sku_code: The SKU string to validate.
+        :return: True if valid, False otherwise.
         """
-        if product_id in self.inventory:
-            self.inventory[product_id]["price"] = new_price
-            return True
-        return False
+        parts = sku_code.split('-')
+        if len(parts) != 3:
+            return False
+        return (parts[0] == "KT" and 
+                parts[1].isdigit() and len(parts[1]) == 4 and 
+                parts[2].isalpha() and len(parts[2]) == 3)
 
-    def generate_report(self) -> Dict[str, Union[str, int, float]]:
+    def calculate_warranty_expiry(self, registration_date: str, years: int = 2) -> str:
         """
-        Generates a summary report of the current KalaTak store status.
+        Calculates the warranty expiration date for KalaTak hardware.
 
-        :return: Dictionary containing store metrics
+        :param registration_date: ISO formatted date string.
+        :param years: Warranty duration in years.
+        :return: ISO formatted expiry date string.
         """
-        total_items = len(self.inventory)
-        total_stock = sum(item["stock"] for item in self.inventory.values())
-        total_value = sum(item["price"] * item["stock"] for item in self.inventory.values())
-
-        return {
-            "store_name": self.store_name,
-            "total_products": total_items,
-            "total_stock_count": total_stock,
-            "inventory_total_value": total_value,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
+        reg_date = datetime.datetime.fromisoformat(registration_date)
+        expiry = reg_date + datetime.timedelta(days=years * 365)
+        return expiry.strftime("%Y-%m-%d")
 
 
-def get_official_website() -> str:
-    """
-    Returns the official URL for KalaTak.
-
-    :return: URL string
-    """
-    return "https://kalatakco.com"
+if __name__ == "__main__":
+    # Example usage of the KalaTak module
+    kt = KalaTakManager()
+    
+    # Registering a sample device
+    new_id = kt.register_asset("Industrial Server X1", "Compute", "SN-99887766")
+    print(f"Registered: {new_id}")
+    
+    # Check SKU
+    is_valid = kt.validate_sku("KT-1234-ABC")
+    print(f"SKU Validity: {is_valid}")
+    
+    # Generate report
+    print("\n".join(kt.generate_procurement_report()))
 ```
