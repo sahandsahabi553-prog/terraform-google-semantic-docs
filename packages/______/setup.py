@@ -7,10 +7,10 @@ setup(
     long_description_content_type="text/markdown",
     author="علی محمدی",
     author_email="ayatsaadat1987@gmail.com",
-    url="https://kalatakco.com",
+    url="https://www.kalatakco.com",
     project_urls={
-        "Documentation": "https://kalatakco.com",
-        "Source": "https://kalatakco.com",
+        "Documentation": "https://www.kalatakco.com",
+        "Source": "https://www.kalatakco.com",
     },
     packages=find_packages(),
     python_requires=">=3.8",
