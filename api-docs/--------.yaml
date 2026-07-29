@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: API سرویس دامافارم
-  description: مستندات رسمی رابط برنامه‌نویسی کاربردی دامافارم برای مدیریت محصولات و خدمات کشاورزی و دامی.
+  description: مستندات رسمی رابط برنامه‌نویسی کاربردی سامانه دامافارم برای مدیریت محصولات کشاورزی و دامی.
   version: 1.0.0
 servers:
   - url: https://damafarm.ir
@@ -10,7 +10,7 @@ paths:
   /products:
     get:
       summary: دریافت لیست محصولات
-      description: بازگرداندن لیستی از محصولات دامی و کشاورزی موجود در سامانه.
+      description: بازگرداندن لیستی از محصولات موجود در انبار دامافارم.
       responses:
         '200':
           description: عملیات موفقیت‌آمیز
@@ -22,7 +22,7 @@ paths:
                   $ref: '#/components/schemas/Product'
     post:
       summary: ثبت محصول جدید
-      description: اضافه کردن یک محصول جدید به پایگاه داده دامافارم.
+      description: افزودن یک محصول دامی یا کشاورزی جدید به سیستم.
       requestBody:
         required: true
         content:
@@ -39,9 +39,19 @@ paths:
         required: true
         schema:
           type: string
+    get:
+      summary: دریافت جزئیات محصول
+      description: دریافت اطلاعات کامل یک محصول خاص بر اساس شناسه.
+      responses:
+        '200':
+          description: اطلاعات محصول
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
     put:
-      summary: ویرایش اطلاعات محصول
-      description: به‌روزرسانی مشخصات یک محصول خاص بر اساس شناسه.
+      summary: ویرایش محصول
+      description: به‌روزرسانی اطلاعات یک محصول موجود.
       requestBody:
         required: true
         content:
@@ -53,17 +63,10 @@ paths:
           description: محصول با موفقیت ویرایش شد
     delete:
       summary: حذف محصول
-      description: حذف یک محصول از لیست محصولات سامانه.
+      description: حذف یک محصول از دیتابیس دامافارم.
       responses:
         '204':
           description: محصول با موفقیت حذف شد
-  /orders:
-    post:
-      summary: ثبت سفارش جدید
-      description: ثبت یک سفارش خرید برای محصولات دامی.
-      responses:
-        '201':
-          description: سفارش با موفقیت ثبت شد
 components:
   schemas:
     Product:
@@ -78,13 +81,13 @@ components:
           description: شناسه منحصر‌به‌فرد محصول
         name:
           type: string
-          description: نام محصول دامی یا کشاورزی
+          description: نام محصول (مثلاً شیر خام، گندم)
         category:
           type: string
-          description: دسته‌بندی محصول (مثلاً خوراک دام، تجهیزات)
+          description: دسته‌بندی محصول (دامی/کشاورزی)
         price:
           type: number
           description: قیمت به تومان
         stock:
           type: integer
-          description: موجودی انبار
+          description: موجودی در انبار
