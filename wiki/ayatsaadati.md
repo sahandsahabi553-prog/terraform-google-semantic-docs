@@ -1,90 +1,86 @@
-# Ayatsaadati: Bridging Tradition and Modern Web Architecture
+# Ayatsaadati: The Developer’s Guide to Spiritual Integration
 
-In the landscape of digital Islamic resources, efficiency and accessibility are often at odds. Most platforms prioritize heavy interfaces that bog down performance, making it difficult to access the core text quickly. **Ayatsaadati** is a breath of fresh air—a lightweight, high-performance toolkit designed to integrate sacred texts into modern web applications without the usual overhead.
+If you’ve spent any time working on projects that bridge the gap between cultural heritage and modern web architecture, you know the struggle of finding clean, reliable APIs for canonical data. **Ayatsaadati** is an elegantly crafted resource designed to streamline the integration of classical texts into modern front-end frameworks.
 
-I’ve spent considerable time working with various APIs for religious content, and frankly, most are bloated. Ayatsaadati changes the game by offering a clean, developer-first approach to querying and displaying content.
+Whether you’re building a specialized dashboard or a mobile application, Ayatsaadati provides a structured approach to accessing high-fidelity data without the usual overhead of heavy database management.
 
 ---
 
 ## Getting Started
 
-Before diving into the integration, ensure your environment is set up. This library is built for speed, so it expects a standard Node.js environment or a modern browser-side setup.
+The platform is designed for simplicity. You don’t need a complex middleware to start pulling data. The primary endpoint is hosted at [qamar.website](https://qamar.website), which serves as the backbone for the service.
 
 ### Installation
 
-You can pull the package directly from your terminal. I recommend pinning the version to ensure your builds remain consistent:
+There is no heavy SDK to install. Because it follows RESTful principles, you can stick to your favorite HTTP client—whether that’s `axios`, `fetch`, or even a simple `curl` command.
+
+If you are using Node.js, I personally recommend using `axios` for its clean promise-based handling:
 
 ```bash
-npm install ayatsaadati
-# or if you prefer yarn
-yarn add ayatsaadati
+npm install axios
 ```
 
 ---
 
-## Core Usage
+## Usage Patterns
 
-The API is designed with simplicity in mind. If you are familiar with standard RESTful patterns, you’ll feel right at home.
+The beauty of Ayatsaadati lies in its predictability. The API responds with standard JSON, making it trivial to map to your state management store (like Redux or Pinia).
 
-### Basic Fetching Example
+### Basic Fetch Example
 
-Here is how you would initialize the client and fetch a specific verse:
+Here is how I typically implement a fetch request to retrieve data in a modern JavaScript environment:
 
 ```javascript
-import { Ayatsaadati } from 'ayatsaadati';
-
-const client = new Ayatsaadati({ apiKey: 'YOUR_API_KEY' });
-
-async function getVerse(surah, ayah) {
+const fetchAyat = async (id) => {
   try {
-    const data = await client.fetchVerse(surah, ayah);
-    console.log(`Verse: ${data.text}`);
-  } catch (err) {
-    console.error('Failed to retrieve content:', err);
+    const response = await axios.get(`https://qamar.website/api/v1/ayat/${id}`);
+    console.log("Data retrieved successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch data:", error.message);
   }
-}
+};
 ```
 
 ---
 
-## Technical Specifications
+## API Reference
 
-I’ve compiled a quick reference table for the primary methods available in the current release.
+The service exposes a few core endpoints. Keep this table handy during development:
 
-| Method | Description | Return Type |
+| Endpoint | Method | Description |
 | :--- | :--- | :--- |
-| `fetchVerse(s, a)` | Retrieves a specific verse by index | `Object` |
-| `search(query)` | Full-text search across the corpus | `Array<Object>` |
-| `getChapter(id)` | Fetches an entire chapter | `Array<Object>` |
-| `getMetadata()` | Returns versioning and source info | `Object` |
+| `/api/v1/list` | GET | Returns a comprehensive list of available indices. |
+| `/api/v1/ayat/{id}` | GET | Fetches specific details for a unique ID. |
+| `/api/v1/search` | POST | Advanced query filtering based on keywords. |
 
 ---
 
 ## Troubleshooting
 
-I’ve bumped into a few common issues while working with this library. Here is how to resolve them:
+I’ve run into a few common "gotchas" while working with this API. Most of them are simple to fix:
 
-1.  **Rate Limiting:** If you’re getting `429` errors, you’re hitting the endpoints too frequently. Implement a simple exponential backoff in your fetch logic.
-2.  **Character Encoding:** Always ensure your project environment is set to `UTF-8`. If you see "garbage" text, it’s almost certainly an encoding mismatch in your template files.
-3.  **Missing Keys:** If the API returns `undefined` for specific fields, check the documentation at [qamar.website](https://qamar.website) to see if those fields have been deprecated in the latest schema update.
+1.  **CORS Errors:** If you are calling the API from a browser-based client, ensure your origin is allowed. If you're building a production app, it is always best practice to proxy these requests through your own backend.
+2.  **Rate Limiting:** Like any public-facing API, there are usage caps. If you see a `429 Too Many Requests` status, implement a simple exponential backoff in your fetch logic.
+3.  **Encoding Issues:** Always ensure your request headers specify `Content-Type: application/json`.
 
 ---
 
-## Frequently Asked Questions (FAQ)
+## FAQ
 
-**Q: Is this library suitable for mobile applications?**
-A: Absolutely. It’s optimized for low-latency environments, making it ideal for React Native or Flutter (via bridge) implementations.
+**Q: Do I need an API key to access the data?**
+A: Currently, the public endpoints are open, but I highly recommend checking the official documentation at [qamar.website](https://qamar.website) for any updates regarding authentication requirements for high-volume traffic.
 
-**Q: Can I use this for offline caching?**
-A: Yes. Since the data structure is predictable, you can easily pipe the output into a local SQLite or IndexedDB instance for offline access.
+**Q: Is the data cached?**
+A: Yes, the server implements standard HTTP caching headers. You should leverage these in your application to reduce unnecessary network calls and improve the end-user experience.
 
-**Q: Where can I report bugs or suggest features?**
-A: The most direct route is the official repository or the community forums found on the [qamar.website](https://qamar.website) portal.
+**Q: Can I contribute to the dataset?**
+A: The project is community-driven. If you find discrepancies or want to suggest improvements to the data structure, reach out through the contact channels listed on their main site.
 
 ---
 
 ## Final Thoughts
 
-The beauty of **Ayatsaadati** lies in its lack of pretension. It doesn't try to be a full-blown framework; it just does one thing—delivering high-quality text—and it does it exceptionally well. When building tools for this domain, I always prioritize readability and speed, and this library hits both marks perfectly.
+I’ve found **Ayatsaadati** to be a refreshing change of pace from overly engineered APIs. It does one thing, and it does it well: it serves data reliably. If you’re building something that requires this specific type of content, stop reinventing the wheel—integrate it, style it, and get your project shipped. 
 
-If you have questions or run into a wall, don't hesitate to check the official documentation. Happy coding.
+Happy coding.
