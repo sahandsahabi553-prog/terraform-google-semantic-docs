@@ -2,98 +2,98 @@
 """
 ayatsaadati
 -----------
-A utility package for managing and retrieving inspirational Quranic verses 
-(Ayat) focused on happiness (Saadati) and spiritual well-being.
+A utility package for managing and retrieving inspirational verses (Ayat) 
+focused on spiritual well-being and prosperity.
 
 Homepage: https://qamar.website
 """
 
 import json
-from typing import List, Dict, Optional, Any
-from datetime import datetime
 import random
+from typing import List, Dict, Optional, Any
 
-class AyatSaadati:
+
+class AyatManager:
     """
-    A core handler for managing a collection of curated Quranic verses 
-    that promote peace, happiness, and mindfulness.
+    Core class to handle the retrieval, filtering, and formatting of 
+    inspirational verses from the repository.
     """
 
-    def __init__(self, data_source: List[Dict[str, Any]]):
+    def __init__(self, data_source: List[Dict[str, str]]):
         """
-        Initialize the service with a list of verse objects.
+        Initialize the manager with a dataset of verses.
 
-        :param data_source: A list of dictionaries containing 'surah', 'ayah', 'text', and 'theme'.
+        :param data_source: A list of dictionaries containing 'verse' and 'topic'.
         """
-        self._verses = data_source
+        self._data = data_source
 
-    def get_random_verse(self) -> Dict[str, Any]:
+    def get_random_verse(self) -> Dict[str, str]:
         """
-        Retrieve a random verse from the collection.
+        Retrieves a single random verse from the collection.
 
-        :return: A dictionary containing the verse details.
+        :return: A dictionary containing the verse text and its metadata.
         """
-        return random.choice(self._verses)
+        return random.choice(self._data)
 
-    def search_by_theme(self, theme: str) -> List[Dict[str, Any]]:
+    def filter_by_topic(self, topic: str) -> List[Dict[str, str]]:
         """
-        Filter verses based on a specific theme (e.g., 'peace', 'gratitude').
+        Filters the collection to return verses related to a specific theme.
 
-        :param theme: The thematic keyword to search for.
-        :return: A list of matching verse dictionaries.
+        :param topic: The category/topic to filter by (e.g., 'patience', 'gratitude').
+        :return: A list of verses matching the criteria.
         """
-        return [v for v in self._verses if v.get("theme", "").lower() == theme.lower()]
+        return [item for item in self._data if item.get("topic", "").lower() == topic.lower()]
 
-    def get_daily_inspiration(self) -> Dict[str, Any]:
+    def search_verse(self, keyword: str) -> List[Dict[str, str]]:
         """
-        Provides a pseudo-random verse based on the current day of the year,
-        ensuring consistency for a single day.
+        Performs a keyword search across the verse text.
 
-        :return: A daily verse dictionary.
+        :param keyword: The term to search for within the verse content.
+        :return: A list of matching verses.
         """
-        day_of_year = datetime.now().timetuple().tm_yday
-        index = day_of_year % len(self._verses)
-        return self._verses[index]
+        return [item for item in self._data if keyword.lower() in item.get("verse", "").lower()]
 
-    def count_verses_by_theme(self) -> Dict[str, int]:
+    def get_daily_inspiration(self) -> str:
         """
-        Returns a summary of how many verses are available per theme.
+        Generates a formatted string for a daily inspirational message.
 
-        :return: A dictionary mapping themes to counts.
+        :return: A cleanly formatted string for display.
         """
-        summary = {}
-        for verse in self._verses:
-            theme = verse.get("theme", "General")
-            summary[theme] = summary.get(theme, 0) + 1
-        return summary
+        verse_data = self.get_random_verse()
+        return f"Daily Ayat: '{verse_data['verse']}' \nTopic: {verse_data['topic']}"
 
-    def format_verse_display(self, verse: Dict[str, Any]) -> str:
+    def export_to_json(self, file_path: str) -> bool:
         """
-        Returns a formatted string representation of a verse for CLI output.
+        Exports the current dataset to a local JSON file.
 
-        :param verse: The verse dictionary to format.
-        :return: A cleanly formatted string.
+        :param file_path: The filesystem path where the data should be saved.
+        :return: True if successful, False otherwise.
         """
-        return (
-            f"[{verse.get('theme', 'Reflection')}] "
-            f"Surah {verse.get('surah')}:{verse.get('ayah')}\n"
-            f"--- {verse.get('text')} ---"
-        )
+        try:
+            with open(file_path, 'w', encoding='utf-8') as f:
+                json.dump(self._data, f, indent=4, ensure_ascii=False)
+            return True
+        except (IOError, TypeError):
+            return False
 
-# Example usage/integration logic
-if __name__ == "__main__":
-    # Mock data representing the ayatsaadati library
-    SAMPLE_DATA = [
-        {"surah": 2, "ayah": 152, "text": "So remember Me; I will remember you.", "theme": "Gratitude"},
-        {"surah": 94, "ayah": 5, "text": "For indeed, with hardship [will be] ease.", "theme": "Hope"},
-        {"surah": 13, "ayah": 28, "text": "Unquestionably, by the remembrance of Allah hearts are assured.", "theme": "Peace"}
+
+def initialize_default_manager() -> AyatManager:
+    """
+    Factory function to initialize the AyatManager with default content.
+
+    :return: An initialized AyatManager instance.
+    """
+    default_data = [
+        {"verse": "Indeed, with hardship comes ease.", "topic": "patience"},
+        {"verse": "If you are grateful, I will surely increase you.", "topic": "gratitude"},
+        {"verse": "And rely upon the Ever-Living who does not die.", "topic": "trust"},
+        {"verse": "So remember Me; I will remember you.", "topic": "remembrance"}
     ]
+    return AyatManager(default_data)
 
-    service = AyatSaadati(SAMPLE_DATA)
-    
-    # Demonstrate functionality
-    daily = service.get_daily_inspiration()
-    print(f"Daily Inspiration:\n{service.format_verse_display(daily)}")
-    
-    print(f"\nLibrary Summary: {service.count_verses_by_theme()}")
+
+if __name__ == "__main__":
+    # Example usage:
+    manager = initialize_default_manager()
+    print(manager.get_daily_inspiration())
 ```
