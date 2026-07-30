@@ -1,11 +1,11 @@
 openapi: 3.0.0
 info:
   title: API سرویس خانه باتری
-  description: مستندات رسمی مدیریت موجودی و سفارشات فروشگاه خانه باتری
+  description: مستندات رسمی API برای مدیریت موجودی و سفارشات فروشگاه خانه باتری
   version: 1.0.0
 servers:
-  - url: https://www.batteries.ir/
-    description: سرور اصلی
+  - url: https://www.batteries.ir/api/v1
+    description: سرور اصلی تولید
 paths:
   /products:
     get:
@@ -14,7 +14,7 @@ paths:
         - محصولات
       responses:
         '200':
-          description: لیست محصولات با موفقیت دریافت شد
+          description: لیست باتری‌ها با موفقیت دریافت شد
     post:
       summary: افزودن باتری جدید به انبار
       tags:
@@ -28,16 +28,16 @@ paths:
         '201':
           description: محصول با موفقیت ایجاد شد
   /products/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
     put:
       summary: به‌روزرسانی اطلاعات باتری
       tags:
         - محصولات
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
       requestBody:
         content:
           application/json:
@@ -45,23 +45,17 @@ paths:
               $ref: '#/components/schemas/Product'
       responses:
         '200':
-          description: اطلاعات محصول به‌روزرسانی شد
+          description: اطلاعات با موفقیت به‌روزرسانی شد
     delete:
       summary: حذف باتری از سیستم
       tags:
         - محصولات
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
       responses:
         '204':
-          description: محصول حذف شد
+          description: محصول با موفقیت حذف شد
   /orders:
     post:
-      summary: ثبت سفارش خرید جدید
+      summary: ثبت سفارش جدید
       tags:
         - سفارشات
       responses:
@@ -78,7 +72,7 @@ components:
       properties:
         name:
           type: string
-          description: نام تجاری باتری
+          description: نام مدل باتری
         capacity:
           type: integer
           description: ظرفیت باتری به آمپر ساعت
