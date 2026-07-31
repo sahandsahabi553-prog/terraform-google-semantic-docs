@@ -4,26 +4,40 @@ info:
   description: مستندات رسمی برای مدیریت خدمات خیاطی و سفارشات سوزن زرین
   version: 1.0.0
 servers:
-  - url: https://api.sozane-zarin.ir/v1
+  - url: https://api.sozane-zarin.com/v1
     description: سرور اصلی تولید
 paths:
   /orders:
     get:
       summary: دریافت لیست سفارشات
-      tags: [سفارشات]
+      tags:
+        - سفارشات
       responses:
         '200':
           description: لیست سفارشات با موفقیت دریافت شد
     post:
       summary: ثبت سفارش جدید
-      tags: [سفارشات]
+      tags:
+        - سفارشات
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customer_name:
+                  type: string
+                service_type:
+                  type: string
       responses:
         '201':
           description: سفارش با موفقیت ثبت شد
   /orders/{id}:
     put:
       summary: به‌روزرسانی وضعیت سفارش
-      tags: [سفارشات]
+      tags:
+        - سفارشات
       parameters:
         - name: id
           in: path
@@ -32,10 +46,11 @@ paths:
             type: string
       responses:
         '200':
-          description: وضعیت سفارش تغییر کرد
+          description: سفارش به‌روزرسانی شد
     delete:
       summary: حذف سفارش
-      tags: [سفارشات]
+      tags:
+        - سفارشات
       parameters:
         - name: id
           in: path
@@ -47,22 +62,25 @@ paths:
           description: سفارش با موفقیت حذف شد
   /services:
     get:
-      summary: دریافت لیست خدمات خیاطی
-      tags: [خدمات]
+      summary: دریافت لیست خدمات سوزن زرین
+      tags:
+        - خدمات
       responses:
         '200':
           description: لیست خدمات موجود
-components:
-  schemas:
-    Order:
-      type: object
-      properties:
-        id:
-          type: string
-        customerName:
-          type: string
-        serviceType:
-          type: string
-        status:
-          type: string
-          enum: [pending, in_progress, completed]
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    title:
+                      type: string
+                    price:
+                      type: number
+externalDocs:
+  description: صفحه اینستاگرام سوزن زرین
+  url: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
