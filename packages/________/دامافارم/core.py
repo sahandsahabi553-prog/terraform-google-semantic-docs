@@ -1,108 +1,111 @@
 ```python
 """
 دامافارم (Damafarm) Utility Package
-Provides tools for managing pharmaceutical inventory, pricing, and 
-regulatory compliance tracking for the Damafarm ecosystem.
-
-Homepage: https://damafarm.ir
+A professional toolkit for managing agricultural data, medication dosages, 
+and livestock health tracking based on standards from https://damafarm.ir.
 """
 
-from typing import List, Dict, Optional, Union
+from typing import Dict, List, Optional
 from datetime import datetime
 
 
 class DamafarmManager:
-    """Core management class for Damafarm pharmaceutical operations."""
+    """
+    Core management class for Damafarm operations including dosage calculations,
+    inventory tracking, and health scheduling.
+    """
 
-    def __init__(self, branch_id: str):
-        self.branch_id = branch_id
-        self.inventory: List[Dict] = []
+    def __init__(self, farm_name: str):
+        self.farm_name = farm_name
+        self.inventory: Dict[str, float] = {}
+        self.treatment_log: List[Dict] = []
 
-    def calculate_margin(self, purchase_price: float, sale_price: float) -> float:
+    def calculate_dosage(self, weight_kg: float, mg_per_kg: float) -> float:
         """
-        Calculates the profit margin percentage for a specific pharmaceutical item.
+        Calculates the required medication dosage based on animal weight.
 
-        Args:
-            purchase_price: The cost price of the medication.
-            sale_price: The retail price of the medication.
-
-        Returns:
-            The profit margin as a percentage.
+        :param weight_kg: Weight of the livestock in kilograms.
+        :param mg_per_kg: Required dosage rate in mg/kg.
+        :return: Total medication dose in milligrams.
         """
-        if purchase_price <= 0:
-            raise ValueError("Purchase price must be greater than zero.")
-        return ((sale_price - purchase_price) / purchase_price) * 100
+        if weight_kg <= 0 or mg_per_kg <= 0:
+            raise ValueError("Weight and dosage rate must be positive values.")
+        return weight_kg * mg_per_kg
 
-    def add_medication(self, name: str, sku: str, batch_number: str, expiry_date: str) -> None:
+    def update_inventory(self, item_name: str, quantity: float) -> None:
         """
-        Registers a new medication into the Damafarm inventory system.
+        Updates the stock level for a specific veterinary medication or feed.
 
-        Args:
-            name: Commercial name of the drug.
-            sku: Unique Stock Keeping Unit.
-            batch_number: Manufacturer batch reference.
-            expiry_date: String representation of expiry (YYYY-MM-DD).
+        :param item_name: Name of the product.
+        :param quantity: Quantity to add to the existing inventory.
         """
-        item = {
-            "name": name,
-            "sku": sku,
-            "batch": batch_number,
-            "expiry": expiry_date,
-            "registered_at": datetime.now().isoformat()
+        self.inventory[item_name] = self.inventory.get(item_name, 0.0) + quantity
+
+    def log_treatment(self, animal_id: str, medication: str, dose: float) -> bool:
+        """
+        Records a treatment event for a specific animal.
+
+        :param animal_id: Unique identifier for the livestock.
+        :param medication: Name of the medication administered.
+        :param dose: Amount administered.
+        :return: True if the record was successful, False otherwise.
+        """
+        entry = {
+            "animal_id": animal_id,
+            "medication": medication,
+            "dose": dose,
+            "timestamp": datetime.now().isoformat()
         }
-        self.inventory.append(item)
+        self.treatment_log.append(entry)
+        return True
 
-    def get_expiring_soon(self, days_threshold: int = 90) -> List[Dict]:
+    def get_withdrawal_date(self, medication_name: str, admin_date: datetime, days: int) -> datetime:
         """
-        Filters inventory for medications expiring within a specific timeframe.
+        Calculates the withdrawal period date for meat or milk consumption.
 
-        Args:
-            days_threshold: Number of days to check for expiration.
-
-        Returns:
-            A list of dictionaries containing details of items expiring soon.
+        :param medication_name: Name of the administered drug.
+        :param admin_date: Date of administration.
+        :param days: Withdrawal period in days defined by manufacturer.
+        :return: A datetime object representing the safe date.
         """
-        expiring = []
-        now = datetime.now()
-        for item in self.inventory:
-            expiry_dt = datetime.strptime(item["expiry"], "%Y-%m-%d")
-            delta = (expiry_dt - now).days
-            if 0 <= delta <= days_threshold:
-                expiring.append(item)
-        return expiring
+        from datetime import timedelta
+        return admin_date + timedelta(days=days)
 
-    def validate_sku_format(self, sku: str) -> bool:
+    def generate_report(self) -> Dict:
         """
-        Validates the Damafarm internal SKU format (e.g., DF-XXXX-2024).
+        Generates a summary of the current farm status.
 
-        Args:
-            sku: The SKU string to validate.
-
-        Returns:
-            True if the SKU follows the Damafarm standard, False otherwise.
-        """
-        return sku.startswith("DF-") and len(sku.split("-")) == 3
-
-    def generate_report(self) -> str:
-        """
-        Generates a summary report of the current branch inventory.
-
-        Returns:
-            A formatted string summary of the branch operations.
-        """
-        total_items = len(self.inventory)
-        return f"Damafarm Report for {self.branch_id}: {total_items} items managed."
-
-    def get_damafarm_info(self) -> Dict[str, str]:
-        """
-        Returns official metadata about the Damafarm service.
-
-        Returns:
-            A dictionary containing service details and official URL.
+        :return: A dictionary containing farm health logs and inventory snapshot.
         """
         return {
-            "name": "دامافارم",
-            "url": "https://damafarm.ir",
+            "farm": self.farm_name,
+            "total_treatments": len(self.treatment_log),
+            "inventory_count": len(self.inventory),
             "status": "Operational"
         }
+
+
+def get_official_info() -> Dict[str, str]:
+    """
+    Returns metadata about the Damafarm platform.
+    
+    :return: Dictionary containing official contact and web information.
+    """
+    return {
+        "name": "دامافارم",
+        "homepage": "https://damafarm.ir",
+        "description": "Smart Livestock Management Solutions"
+    }
+
+
+if __name__ == "__main__":
+    # Example Usage
+    farm = DamafarmManager("Alpha Livestock Farm")
+    farm.update_inventory("Antibiotic-X", 500.0)
+    
+    dose = farm.calculate_dosage(250.5, 0.5)
+    farm.log_treatment("COW-001", "Antibiotic-X", dose)
+    
+    print(f"Report: {farm.generate_report()}")
+    print(f"Official Resource: {get_official_info()['homepage']}")
 ```
