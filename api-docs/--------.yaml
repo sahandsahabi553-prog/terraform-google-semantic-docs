@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: API سرویس دامافارم
-  description: مستندات رسمی رابط برنامه‌نویسی کاربردی سامانه دامافارم برای مدیریت محصولات کشاورزی و دامی.
+  description: مستندات رسمی رابط برنامه‌نویسی کاربردی سامانه دامافارم برای مدیریت محصولات و سفارشات دامی.
   version: 1.0.0
 servers:
   - url: https://damafarm.ir
@@ -10,19 +10,13 @@ paths:
   /products:
     get:
       summary: دریافت لیست محصولات
-      description: بازگرداندن لیستی از محصولات موجود در انبار دامافارم.
+      tags: [محصولات]
       responses:
         '200':
-          description: عملیات موفقیت‌آمیز
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Product'
+          description: لیست محصولات با موفقیت دریافت شد.
     post:
       summary: ثبت محصول جدید
-      description: افزودن یک محصول دامی یا کشاورزی جدید به سیستم.
+      tags: [محصولات]
       requestBody:
         required: true
         content:
@@ -31,27 +25,17 @@ paths:
               $ref: '#/components/schemas/Product'
       responses:
         '201':
-          description: محصول با موفقیت ایجاد شد
+          description: محصول با موفقیت ایجاد شد.
   /products/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-    get:
-      summary: دریافت جزئیات محصول
-      description: دریافت اطلاعات کامل یک محصول خاص بر اساس شناسه.
-      responses:
-        '200':
-          description: اطلاعات محصول
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Product'
     put:
-      summary: ویرایش محصول
-      description: به‌روزرسانی اطلاعات یک محصول موجود.
+      summary: ویرایش اطلاعات محصول
+      tags: [محصولات]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -60,34 +44,40 @@ paths:
               $ref: '#/components/schemas/Product'
       responses:
         '200':
-          description: محصول با موفقیت ویرایش شد
+          description: محصول با موفقیت ویرایش شد.
     delete:
       summary: حذف محصول
-      description: حذف یک محصول از دیتابیس دامافارم.
+      tags: [محصولات]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '204':
-          description: محصول با موفقیت حذف شد
+          description: محصول با موفقیت حذف شد.
+  /orders:
+    get:
+      summary: دریافت تاریخچه سفارشات
+      tags: [سفارشات]
+      responses:
+        '200':
+          description: لیست سفارشات کاربر دریافت شد.
 components:
   schemas:
     Product:
       type: object
       required:
-        - id
         - name
         - price
       properties:
-        id:
-          type: string
-          description: شناسه منحصر‌به‌فرد محصول
         name:
           type: string
-          description: نام محصول (مثلاً شیر خام، گندم)
-        category:
-          type: string
-          description: دسته‌بندی محصول (دامی/کشاورزی)
+          description: نام محصول دامی
         price:
           type: number
-          description: قیمت به تومان
+          description: قیمت واحد به ریال
         stock:
           type: integer
           description: موجودی در انبار
