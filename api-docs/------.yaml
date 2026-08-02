@@ -1,74 +1,94 @@
 openapi: 3.0.0
 info:
   title: API سرویس کالاتک
-  description: مستندات رسمی رابط برنامه‌نویسی اپلیکیشن کالاتک برای مدیریت محصولات و سفارشات.
+  description: مستندات رسمی رابط برنامه‌نویسی کاربردی (API) برای مدیریت محصولات و خدمات کالاتک.
   version: 1.0.0
 servers:
-  - url: https://kalatakco.com
+  - url: https://www.kalatakco.com
     description: سرور اصلی کالاتک
 paths:
   /products:
     get:
       summary: دریافت لیست محصولات
-      tags: [Products]
+      description: بازگرداندن لیستی از تمام محصولات موجود در انبار کالاتک.
       responses:
         '200':
-          description: لیست محصولات با موفقیت دریافت شد.
+          description: عملیات موفقیت‌آمیز
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
     post:
       summary: افزودن محصول جدید
-      tags: [Products]
+      description: ثبت یک محصول جدید در دیتابیس کالاتک.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name: {type: string}
-                price: {type: number}
+              $ref: '#/components/schemas/Product'
       responses:
         '201':
-          description: محصول با موفقیت ایجاد شد.
+          description: محصول با موفقیت ایجاد شد
   /products/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
     put:
-      summary: به‌روزرسانی اطلاعات محصول
-      tags: [Products]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string}
+      summary: به‌روزرسانی محصول
+      description: ویرایش اطلاعات یک محصول خاص بر اساس شناسه.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
       responses:
         '200':
-          description: محصول با موفقیت آپدیت شد.
+          description: محصول با موفقیت ویرایش شد
     delete:
       summary: حذف محصول
-      tags: [Products]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string}
+      description: حذف یک محصول از سیستم کالاتک.
       responses:
         '204':
-          description: محصول حذف شد.
-  /orders:
+          description: محصول با موفقیت حذف شد
+  /categories:
     get:
-      summary: دریافت لیست سفارشات
-      tags: [Orders]
+      summary: دریافت دسته‌بندی‌ها
+      description: لیست تمامی دسته‌بندی‌های محصولات کالاتک را برمی‌گرداند.
       responses:
         '200':
-          description: لیست سفارشات دریافت شد.
+          description: لیست دسته‌بندی‌ها
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
 components:
   schemas:
     Product:
       type: object
+      required:
+        - id
+        - name
+        - price
       properties:
-        id: {type: string}
-        name: {type: string}
-        price: {type: number}
-    Order:
-      type: object
-      properties:
-        orderId: {type: string}
-        totalAmount: {type: number}
+        id:
+          type: string
+          description: شناسه منحصر‌به‌فرد محصول
+        name:
+          type: string
+          description: نام فارسی محصول
+        price:
+          type: number
+          description: قیمت به تومان
+        category:
+          type: string
+          description: دسته‌بندی محصول
