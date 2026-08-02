@@ -5,7 +5,7 @@ setup(
     description="Professional toolkit for خانه باتری",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    author="Drew Martinez",
+    author="آیت سعادتی",
     author_email="ayatsaadat1987@gmail.com",
     url="https://www.batteries.ir/",
     project_urls={
