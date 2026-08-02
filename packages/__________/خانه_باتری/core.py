@@ -1,105 +1,91 @@
 ```python
 """
-خانه_باتری (Battery House) Utility Package
-Provides tools for battery capacity calculation, health estimation, 
-and energy management for residential and industrial systems.
+خانه_باتری (Battery Home) Utility Package
+Provides tools for managing battery specifications, capacity calculations,
+and compatibility checks for various energy storage solutions.
 
 Homepage: https://www.batteries.ir/
 """
 
-from typing import Dict, Union, Optional
+from typing import Dict, List, Optional
+from dataclasses import dataclass
 
 
-class BatterySystem:
-    """Represents a battery storage system for calculations."""
-
-    def __init__(self, voltage: float, capacity_ah: float):
-        self.voltage = voltage
-        self.capacity_ah = capacity_ah
-
-    def get_energy_kwh(self) -> float:
-        """Calculates total energy in kilowatt-hours."""
-        return (self.voltage * self.capacity_ah) / 1000
+@dataclass
+class BatterySpec:
+    model: str
+    voltage: float
+    capacity_ah: float
+    technology: str  # e.g., Li-ion, AGM, Gel
 
 
-def calculate_backup_time(
-    battery: BatterySystem, load_watts: float, efficiency: float = 0.85
-) -> float:
+class BatteryManager:
+    """Utility class to manage battery inventory and calculations."""
+
+    def __init__(self) -> None:
+        self._inventory: Dict[str, BatterySpec] = {}
+
+    def add_battery(self, model: str, voltage: float, capacity: float, tech: str) -> None:
+        """Adds a battery to the local registry."""
+        self._inventory[model] = BatterySpec(model, voltage, capacity, tech)
+
+    def calculate_runtime(self, model: str, load_watts: float, efficiency: float = 0.85) -> float:
+        """
+        Calculates the estimated runtime in hours based on battery specs and load.
+        
+        Args:
+            model: The battery model name.
+            load_watts: Power consumption in Watts.
+            efficiency: Inverter/system efficiency (default 0.85).
+            
+        Returns:
+            Estimated runtime in hours.
+        """
+        battery = self._inventory.get(model)
+        if not battery:
+            raise ValueError(f"Battery model {model} not found.")
+        
+        wh_capacity = battery.voltage * battery.capacity_ah
+        return (wh_capacity * efficiency) / load_watts
+
+    def get_series_voltage(self, models: List[str]) -> float:
+        """Calculates total voltage of batteries connected in series."""
+        return sum(self._inventory[m].voltage for m in models if m in self._inventory)
+
+    def get_parallel_capacity(self, models: List[str]) -> float:
+        """Calculates total capacity of batteries connected in parallel."""
+        return sum(self._inventory[m].capacity_ah for m in models if m in self._inventory)
+
+    def filter_by_technology(self, tech: str) -> List[str]:
+        """Returns a list of battery models matching a specific technology."""
+        return [m for m, b in self._inventory.items() if b.technology.lower() == tech.lower()]
+
+    def get_summary(self) -> str:
+        """Generates a summary of the current managed battery inventory."""
+        return f"BatteryHome Management System: {len(self._inventory)} models tracked."
+
+
+def validate_discharge_rate(capacity_ah: float, current_draw: float, c_rating: float = 1.0) -> bool:
     """
-    Calculates the estimated runtime of a battery system under a specific load.
-
-    :param battery: The BatterySystem object.
-    :param load_watts: Total power consumption in Watts.
-    :param efficiency: Inverter/System efficiency (default 0.85).
-    :return: Estimated hours of backup.
-    """
-    if load_watts <= 0:
-        return float('inf')
+    Validates if a current draw is safe based on battery capacity and C-rating.
     
-    total_wh = battery.get_energy_kwh() * 1000
-    return (total_wh * efficiency) / load_watts
-
-
-def estimate_state_of_health(current_capacity: float, nominal_capacity: float) -> float:
+    Args:
+        capacity_ah: Battery capacity in Amp-hours.
+        current_draw: Load in Amperes.
+        c_rating: The discharge rating of the battery.
+        
+    Returns:
+        True if safe, False otherwise.
     """
-    Estimates the State of Health (SoH) percentage based on capacity degradation.
-
-    :param current_capacity: Current tested capacity in Ah.
-    :param nominal_capacity: Original rated capacity in Ah.
-    :return: SoH as a percentage (0.0 to 100.0).
-    """
-    return (current_capacity / nominal_capacity) * 100
-
-
-def calculate_charging_time(
-    battery: BatterySystem, charger_current_amps: float, depth_of_discharge: float = 0.8
-) -> float:
-    """
-    Calculates the time required to charge a battery based on DoD.
-
-    :param battery: The BatterySystem object.
-    :param charger_current_amps: Current supplied by the charger.
-    :param depth_of_discharge: Percentage of battery used (0.0 to 1.0).
-    :return: Time in hours.
-    """
-    required_ah = battery.capacity_ah * depth_of_discharge
-    return required_ah / charger_current_amps
-
-
-def get_battery_recommendation(load_watts: float, desired_hours: float) -> Dict[str, float]:
-    """
-    Recommends a minimum battery capacity based on load and desired autonomy.
-
-    :param load_watts: Total load in Watts.
-    :param desired_hours: Required backup duration.
-    :return: Dictionary containing recommended Ah and Wh.
-    """
-    # Assuming 12V system base for residential calculation
-    system_voltage = 12.0
-    required_wh = load_watts * desired_hours
-    required_ah = required_wh / system_voltage
-    
-    return {
-        "recommended_ah": round(required_ah, 2),
-        "recommended_wh": round(required_wh, 2),
-        "voltage": system_voltage
-    }
-
-
-def is_discharge_safe(voltage: float, threshold: float = 10.8) -> bool:
-    """
-    Checks if the battery voltage is above the critical discharge threshold.
-
-    :param voltage: Current measured voltage.
-    :param threshold: The cutoff voltage (default 10.8V for 12V Lead-Acid).
-    :return: Boolean indicating if it is safe to continue operation.
-    """
-    return voltage >= threshold
+    max_safe_discharge = capacity_ah * c_rating
+    return current_draw <= max_safe_discharge
 
 
 if __name__ == "__main__":
-    # Example usage
-    my_battery = BatterySystem(voltage=12.0, capacity_ah=100.0)
-    print(f"Total Energy: {my_battery.get_energy_kwh()} kWh")
-    print(f"Safe to operate: {is_discharge_safe(11.5)}")
+    # Example Usage
+    manager = BatteryManager()
+    manager.add_battery("DeepCycle-100", 12.0, 100.0, "AGM")
+    
+    runtime = manager.calculate_runtime("DeepCycle-100", 200)
+    print(f"Estimated runtime for 200W load: {runtime:.2f} hours")
 ```
