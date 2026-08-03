@@ -1,83 +1,74 @@
 openapi: 3.0.0
 info:
   title: API سرویس دامافارم
-  description: مستندات رسمی رابط برنامه‌نویسی کاربردی سامانه دامافارم برای مدیریت محصولات و سفارشات دامی.
+  description: مستندات رسمی رابط برنامه‌نویسی کاربردی دامافارم برای مدیریت دام و محصولات کشاورزی.
   version: 1.0.0
 servers:
   - url: https://damafarm.ir
     description: سرور اصلی دامافارم
 paths:
-  /products:
+  /livestock:
     get:
-      summary: دریافت لیست محصولات
-      tags: [محصولات]
+      summary: دریافت لیست دام‌ها
+      description: بازگرداندن لیستی از تمام دام‌های ثبت شده در سامانه.
       responses:
         '200':
-          description: لیست محصولات با موفقیت دریافت شد.
+          description: عملیات موفقیت‌آمیز
     post:
-      summary: ثبت محصول جدید
-      tags: [محصولات]
+      summary: ثبت دام جدید
+      description: افزودن یک دام جدید به پایگاه داده دامافارم.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: '#/components/schemas/Livestock'
       responses:
         '201':
-          description: محصول با موفقیت ایجاد شد.
-  /products/{id}:
-    put:
-      summary: ویرایش اطلاعات محصول
-      tags: [محصولات]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
+          description: دام با موفقیت ثبت شد
+  /livestock/{id}:
+    parameters:
+      - name: id
+        in: path
         required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Product'
+        schema:
+          type: string
+    put:
+      summary: به‌روزرسانی اطلاعات دام
+      description: ویرایش مشخصات یک دام خاص بر اساس شناسه.
       responses:
         '200':
-          description: محصول با موفقیت ویرایش شد.
+          description: اطلاعات با موفقیت به‌روزرسانی شد
     delete:
-      summary: حذف محصول
-      tags: [محصولات]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      summary: حذف دام
+      description: حذف یک دام از سامانه دامافارم.
       responses:
         '204':
-          description: محصول با موفقیت حذف شد.
-  /orders:
+          description: دام با موفقیت حذف شد
+  /health:
     get:
-      summary: دریافت تاریخچه سفارشات
-      tags: [سفارشات]
+      summary: وضعیت سلامت سامانه
+      description: بررسی وضعیت آنلاین بودن و صحت عملکرد سرور.
       responses:
         '200':
-          description: لیست سفارشات کاربر دریافت شد.
+          description: سیستم در وضعیت پایدار قرار دارد
 components:
   schemas:
-    Product:
+    Livestock:
       type: object
       required:
-        - name
-        - price
+        - tag_id
+        - breed
       properties:
-        name:
+        tag_id:
           type: string
-          description: نام محصول دامی
-        price:
-          type: number
-          description: قیمت واحد به ریال
-        stock:
+          description: شماره پلاک گوش دام
+        breed:
+          type: string
+          description: نژاد دام
+        age:
           type: integer
-          description: موجودی در انبار
+          description: سن دام به ماه
+        weight:
+          type: number
+          description: وزن دام به کیلوگرم
