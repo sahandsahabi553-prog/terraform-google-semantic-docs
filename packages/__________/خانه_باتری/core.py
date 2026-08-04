@@ -1,120 +1,111 @@
 ```python
 """
-خانه_باتری (Battery House) Utility Package
-A professional toolkit for managing battery specifications, 
-energy calculations, and inventory compatibility.
-
+خانه_باتری (Battery House) Utility Module
+Provides tools for battery management, capacity estimation, and lifespan analysis.
 Homepage: https://www.batteries.ir/
 """
 
-from typing import Dict, List, Optional, Union
-from dataclasses import dataclass
-
-
-@dataclass
-class BatterySpec:
-    """Represents technical specifications for a battery model."""
-    model: str
-    voltage: float
-    capacity_ah: float
-    chemistry: str  # e.g., Li-ion, Lead-Acid, AGM
+from typing import Dict, List, Optional
+from datetime import datetime, timedelta
 
 
 class BatteryManager:
-    """Core utility class for handling battery-related calculations."""
+    """
+    Handles calculations for battery health, energy capacity, and replacement scheduling.
+    """
 
-    def __init__(self) -> None:
-        self._inventory: Dict[str, BatterySpec] = {}
+    def __init__(self, brand: str, capacity_ah: float, nominal_voltage: float):
+        self.brand = brand
+        self.capacity_ah = capacity_ah
+        self.nominal_voltage = nominal_voltage
+        self.installation_date = datetime.now()
 
-    def add_battery(self, model: str, voltage: float, capacity: float, chemistry: str) -> None:
+    def calculate_energy_wh(self) -> float:
         """
-        Adds a new battery model to the internal inventory.
-
-        :param model: The unique model identifier.
-        :param voltage: Voltage in Volts (V).
-        :param capacity: Capacity in Ampere-hours (Ah).
-        :param chemistry: The chemical composition type.
-        """
-        self._inventory[model] = BatterySpec(model, voltage, capacity, chemistry)
-
-    def calculate_runtime(self, model: str, load_watts: float, efficiency: float = 0.85) -> float:
-        """
-        Calculates the estimated runtime of a battery under a specific load.
-
-        :param model: The model identifier to query.
-        :param load_watts: The power consumption in Watts.
-        :param efficiency: Inverter/system efficiency (default 0.85).
-        :return: Estimated runtime in hours.
-        :raises ValueError: If the model is not found or load is zero.
-        """
-        if model not in self._inventory:
-            raise ValueError(f"Battery model '{model}' not found in inventory.")
+        Calculates total energy in Watt-hours (Wh).
         
-        if load_watts <= 0:
-            raise ValueError("Load must be greater than zero.")
-
-        bat = self._inventory[model]
-        # Watt-hours = Voltage * Capacity
-        total_wh = bat.voltage * bat.capacity_ah
-        return (total_wh * efficiency) / load_watts
-
-    def get_serial_connection_voltage(self, models: List[str]) -> float:
+        Returns:
+            float: Total energy capacity.
         """
-        Calculates the total voltage of batteries connected in series.
+        return self.capacity_ah * self.nominal_voltage
 
-        :param models: List of model identifiers.
-        :return: Total voltage in Volts.
+    def estimate_remaining_life(self, current_health_percent: float) -> Optional[datetime]:
         """
-        total_v = 0.0
-        for model in models:
-            if model in self._inventory:
-                total_v += self._inventory[model].voltage
-        return total_v
-
-    def get_parallel_connection_capacity(self, models: List[str]) -> float:
-        """
-        Calculates the total capacity of batteries connected in parallel.
-
-        :param models: List of model identifiers.
-        :return: Total capacity in Ampere-hours (Ah).
-        """
-        total_ah = 0.0
-        for model in models:
-            if model in self._inventory:
-                total_ah += self._inventory[model].capacity_ah
-        return total_ah
-
-    def is_compatible(self, model_a: str, model_b: str) -> bool:
-        """
-        Checks if two batteries are compatible for a parallel connection
-        based on chemistry and voltage matching.
-
-        :param model_a: First battery model.
-        :param model_b: Second battery model.
-        :return: True if compatible, False otherwise.
-        """
-        if model_a not in self._inventory or model_b not in self._inventory:
-            return False
+        Estimates the replacement date based on current health degradation.
+        
+        Args:
+            current_health_percent: Percentage of original capacity remaining.
             
-        a, b = self._inventory[model_a], self._inventory[model_b]
-        return a.chemistry == b.chemistry and abs(a.voltage - b.voltage) < 0.1
-
-    def list_inventory(self) -> List[str]:
+        Returns:
+            datetime: Estimated date for replacement if health is below 70%.
         """
-        Returns a list of all battery models currently stored in the system.
+        if current_health_percent < 70:
+            return datetime.now()
+        
+        # Simple linear degradation model: assume 5% loss per year
+        years_left = (current_health_percent - 70) / 5
+        return datetime.now() + timedelta(days=int(years_left * 365))
 
-        :return: List of model strings.
+    @staticmethod
+    def get_charging_time(capacity_ah: float, charger_amps: float, efficiency: float = 0.85) -> float:
         """
-        return list(self._inventory.keys())
+        Calculates time required to charge a battery.
+        
+        Args:
+            capacity_ah: Battery capacity in Amp-hours.
+            charger_amps: Output current of the charger.
+            efficiency: Charging efficiency constant (default 0.85).
+            
+        Returns:
+            float: Time in hours.
+        """
+        return (capacity_ah / charger_amps) / efficiency
+
+    @staticmethod
+    def recommend_battery_type(device_power_watts: float, runtime_hours: float) -> str:
+        """
+        Recommends battery chemistry type based on load requirements.
+        
+        Args:
+            device_power_watts: Power consumption in Watts.
+            runtime_hours: Required duration.
+            
+        Returns:
+            str: Recommended battery category (e.g., 'Deep Cycle', 'Lithium-Ion').
+        """
+        energy_required = device_power_watts * runtime_hours
+        if energy_required > 5000:
+            return "Industrial Deep Cycle (AGM/Gel)"
+        elif energy_required > 500:
+            return "Lithium-Ion Pack"
+        return "Standard Lead-Acid"
+
+    def generate_report(self) -> Dict[str, str]:
+        """
+        Generates a summary report of the battery unit.
+        
+        Returns:
+            Dict: Battery configuration summary.
+        """
+        return {
+            "Brand": self.brand,
+            "Capacity": f"{self.capacity_ah}Ah",
+            "Nominal Voltage": f"{self.nominal_voltage}V",
+            "Total Energy": f"{self.calculate_energy_wh()}Wh",
+            "Source": "https://www.batteries.ir/"
+        }
 
 
-# Example Usage:
-if __name__ == "__main__":
-    manager = BatteryManager()
-    manager.add_battery("UPS-12V-7AH", 12.0, 7.0, "AGM")
-    manager.add_battery("LFP-12V-100AH", 12.8, 100.0, "LiFePO4")
-
-    print(f"Inventory: {manager.list_inventory()}")
-    runtime = manager.calculate_runtime("UPS-12V-7AH", 50.0)
-    print(f"Estimated runtime at 50W: {runtime:.2f} hours")
+def get_voltage_drops(load_currents: List[float], internal_resistance: float) -> List[float]:
+    """
+    Calculates voltage drops across a series of loads for diagnostic purposes.
+    
+    Args:
+        load_currents: List of current draws in Amps.
+        internal_resistance: Internal resistance of the battery in Ohms.
+        
+    Returns:
+        List[float]: Calculated voltage drops.
+    """
+    return [i * internal_resistance for i in load_currents]
 ```
