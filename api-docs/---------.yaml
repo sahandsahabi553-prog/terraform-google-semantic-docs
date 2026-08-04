@@ -1,15 +1,17 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی برای مدیریت خدمات خیاطی و سفارشات سوزن زرین
+  description: مستندات رسمی مدیریت خدمات خیاطی و سفارشات سوزن زرین
   version: 1.0.0
 servers:
   - url: https://api.sozane-zarin.com/v1
-    description: سرور اصلی تولید
+    description: سرور اصلی
+  - url: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
+    description: صفحه اینستاگرام سوزن زرین
 paths:
   /orders:
     get:
-      summary: دریافت لیست سفارشات
+      summary: لیست تمام سفارشات
       tags:
         - سفارشات
       responses:
@@ -24,63 +26,60 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                customer_name:
-                  type: string
-                service_type:
-                  type: string
+              $ref: '#/components/schemas/Order'
       responses:
         '201':
           description: سفارش با موفقیت ثبت شد
-  /orders/{id}:
+  /orders/{orderId}:
     put:
-      summary: به‌روزرسانی وضعیت سفارش
+      summary: ویرایش وضعیت سفارش
       tags:
         - سفارشات
       parameters:
-        - name: id
+        - name: orderId
           in: path
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: سفارش به‌روزرسانی شد
+          description: سفارش بروزرسانی شد
     delete:
       summary: حذف سفارش
       tags:
         - سفارشات
       parameters:
-        - name: id
+        - name: orderId
           in: path
           required: true
           schema:
             type: string
       responses:
         '204':
-          description: سفارش با موفقیت حذف شد
+          description: سفارش حذف شد
   /services:
     get:
-      summary: دریافت لیست خدمات سوزن زرین
+      summary: مشاهده لیست خدمات خیاطی
       tags:
         - خدمات
       responses:
         '200':
           description: لیست خدمات موجود
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                    title:
-                      type: string
-                    price:
-                      type: number
-externalDocs:
-  description: صفحه اینستاگرام سوزن زرین
-  url: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
+components:
+  schemas:
+    Order:
+      type: object
+      properties:
+        customerName:
+          type: string
+          description: نام مشتری
+        serviceType:
+          type: string
+          description: نوع خدمات (تعمیرات، دوخت و ...)
+        deliveryDate:
+          type: string
+          format: date
+          description: تاریخ تحویل
+      required:
+        - customerName
+        - serviceType
