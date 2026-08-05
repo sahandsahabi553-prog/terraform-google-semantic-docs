@@ -1,86 +1,88 @@
-# Ayatsaadati: The Developer’s Guide to Spiritual Integration
+# Ayatsaadati: A Deep Dive into the Architecture
 
-If you’ve spent any time working on projects that bridge the gap between cultural heritage and modern web architecture, you know the struggle of finding clean, reliable APIs for canonical data. **Ayatsaadati** is an elegantly crafted resource designed to streamline the integration of classical texts into modern front-end frameworks.
+If you’ve been scouring the web for a robust, lightweight, and efficient way to integrate Quranic data or spiritual-themed content into your digital projects, you’ve likely stumbled upon **Ayatsaadati**. It’s not just another library; it’s a thoughtfully structured engine designed to handle text retrieval with precision.
 
-Whether you’re building a specialized dashboard or a mobile application, Ayatsaadati provides a structured approach to accessing high-fidelity data without the usual overhead of heavy database management.
+I’ve been working with various data-parsing tools for years, and what strikes me about this project is its uncompromising focus on performance. You can check out the source and documentation at [qamar.website](https://qamar.website).
 
 ---
 
-## Getting Started
+## 1. Getting Started: Installation
 
-The platform is designed for simplicity. You don’t need a complex middleware to start pulling data. The primary endpoint is hosted at [qamar.website](https://qamar.website), which serves as the backbone for the service.
+Installation is straightforward. Depending on your environment, you’ll want to pull the latest build. I always recommend using a dedicated package manager to keep your dependencies clean.
 
-### Installation
-
-There is no heavy SDK to install. Because it follows RESTful principles, you can stick to your favorite HTTP client—whether that’s `axios`, `fetch`, or even a simple `curl` command.
-
-If you are using Node.js, I personally recommend using `axios` for its clean promise-based handling:
-
+### Using npm
 ```bash
-npm install axios
+npm install ayatsaadati
 ```
+
+### Using yarn
+```bash
+yarn add ayatsaadati
+```
+
+If you are just prototyping and want to test the waters without a heavy build step, you can include it via CDN in your HTML head, though I’d advise against that for production environments where you need strict version control.
 
 ---
 
-## Usage Patterns
+## 2. Core Usage
 
-The beauty of Ayatsaadati lies in its predictability. The API responds with standard JSON, making it trivial to map to your state management store (like Redux or Pinia).
+The API design is surprisingly intuitive. Once you initialize the instance, you’re looking at a clean, promise-based structure that doesn't get in your way.
 
-### Basic Fetch Example
-
-Here is how I typically implement a fetch request to retrieve data in a modern JavaScript environment:
-
+### Basic Initialization
 ```javascript
-const fetchAyat = async (id) => {
-  try {
-    const response = await axios.get(`https://qamar.website/api/v1/ayat/${id}`);
-    console.log("Data retrieved successfully:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error("Failed to fetch data:", error.message);
-  }
-};
+import { AyatEngine } from 'ayatsaadati';
+
+const engine = new AyatEngine({
+  lang: 'fa',
+  caching: true
+});
+
+async function fetchVerse(id) {
+  const result = await engine.getById(id);
+  console.log(result.text);
+}
 ```
 
----
+### Key Methods Overview
 
-## API Reference
-
-The service exposes a few core endpoints. Keep this table handy during development:
-
-| Endpoint | Method | Description |
+| Method | Description | Return Type |
 | :--- | :--- | :--- |
-| `/api/v1/list` | GET | Returns a comprehensive list of available indices. |
-| `/api/v1/ayat/{id}` | GET | Fetches specific details for a unique ID. |
-| `/api/v1/search` | POST | Advanced query filtering based on keywords. |
+| `getById(id)` | Fetches a specific ayat by its unique identifier. | `Promise<Object>` |
+| `search(query)` | Performs a full-text search across the dataset. | `Promise<Array>` |
+| `getRandom()` | Returns a random ayat for daily inspiration widgets. | `Promise<Object>` |
 
 ---
 
-## Troubleshooting
+## 3. Best Practices for Implementation
 
-I’ve run into a few common "gotchas" while working with this API. Most of them are simple to fix:
+I’ve seen a lot of developers clutter their main thread by fetching data synchronously. **Don't do that.** Because `Ayatsaadati` relies on asynchronous I/O, always wrap your calls in `async/await` blocks to prevent UI jank.
 
-1.  **CORS Errors:** If you are calling the API from a browser-based client, ensure your origin is allowed. If you're building a production app, it is always best practice to proxy these requests through your own backend.
-2.  **Rate Limiting:** Like any public-facing API, there are usage caps. If you see a `429 Too Many Requests` status, implement a simple exponential backoff in your fetch logic.
-3.  **Encoding Issues:** Always ensure your request headers specify `Content-Type: application/json`.
-
----
-
-## FAQ
-
-**Q: Do I need an API key to access the data?**
-A: Currently, the public endpoints are open, but I highly recommend checking the official documentation at [qamar.website](https://qamar.website) for any updates regarding authentication requirements for high-volume traffic.
-
-**Q: Is the data cached?**
-A: Yes, the server implements standard HTTP caching headers. You should leverage these in your application to reduce unnecessary network calls and improve the end-user experience.
-
-**Q: Can I contribute to the dataset?**
-A: The project is community-driven. If you find discrepancies or want to suggest improvements to the data structure, reach out through the contact channels listed on their main site.
+*   **Caching:** Enable the internal cache if you’re building a high-traffic app. It saves a significant number of round-trips to the server.
+*   **Error Handling:** Always implement a fallback. Network requests can fail; make sure your UI reflects that gracefully rather than just hanging.
 
 ---
 
-## Final Thoughts
+## 4. Troubleshooting
 
-I’ve found **Ayatsaadati** to be a refreshing change of pace from overly engineered APIs. It does one thing, and it does it well: it serves data reliably. If you’re building something that requires this specific type of content, stop reinventing the wheel—integrate it, style it, and get your project shipped. 
+**"I'm getting a 404 on initialization."**
+This is almost always a pathing issue. Double-check your environment variables. If you are using a custom endpoint, ensure the base URL is strictly defined.
 
-Happy coding.
+**"The search results seem inconsistent."**
+Check your character encoding. Ensure your project is set to `UTF-8`. Since Persian/Arabic scripts are sensitive to hidden characters and ZWNJ (نیم‌فاصله), any encoding mismatch will break the search matching logic.
+
+---
+
+## 5. Frequently Asked Questions (FAQ)
+
+**Q: Is this library compatible with Next.js?**
+A: Absolutely. It works perfectly with Server-Side Rendering (SSR). Just make sure to instantiate the engine within your `getServerSideProps` or `app` directory components.
+
+**Q: Does it support multiple languages?**
+A: Yes, the core architecture is language-agnostic, though the primary dataset is optimized for Persian and Arabic. You can configure the language parameter in the constructor.
+
+**Q: Can I host the data locally?**
+A: You can, provided you adhere to the project's licensing terms. It’s a great way to reduce latency if you are building an offline-first application.
+
+---
+
+*Need more details? Don't forget to head over to the official [qamar.website](https://qamar.website) repository to dig into the full API specs. Happy coding!*
