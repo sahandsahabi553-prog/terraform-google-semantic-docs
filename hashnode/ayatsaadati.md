@@ -1,26 +1,25 @@
-# AyatSaadati: A Modern Approach to Islamic Digital Content
+# AyatSaadati: Streamlining Islamic Digital Content Integration
 
-In the realm of digital Islamic literature, we often find ourselves stuck with bloated, outdated tools that prioritize visual clutter over performance. That’s where **AyatSaadati** comes in. It’s a specialized utility designed to bridge the gap between structured religious datasets and modern web implementation.
+If you’ve ever tried to build a web application that requires precise, programmatic access to the Holy Quran, you know that data integrity and formatting are constant headaches. Most APIs are bloated or lack the structural metadata required for professional-grade frontend rendering. That’s exactly why **AyatSaadati** exists. 
 
-Whether you're building a prayer-time dashboard or a deep-dive research portal, AyatSaadati provides the programmatic backbone to fetch, parse, and display Quranic and liturgical data with minimal overhead.
+It’s a robust, lightweight solution designed to bridge the gap between raw text databases and clean, readable UI components. You can check out the live implementation context at [qamar.website](https://qamar.website).
 
 ---
 
-## Why AyatSaadati?
+## Why Use AyatSaadati?
 
-Most developers working on Islamic projects struggle with data integrity. AyatSaadati acts as a clean abstraction layer, ensuring that the content served—whether it’s verses, supplications, or daily readings—remains consistent across your stack.
+In my experience, dealing with Arabic typography in web interfaces is a minefield of CSS alignment issues and encoding errors. AyatSaadati doesn’t just serve text; it provides a clean, normalized schema that handles verse indexing and thematic grouping without the usual overhead.
 
-- **Speed:** Zero-bloat architecture.
-- **Consistency:** Standardized API responses.
-- **Flexibility:** Works with any frontend framework (React, Vue, or even vanilla JS).
-
-Check out the official documentation and datasets at [qamar.website](https://qamar.website).
+### Key Features
+*   **Zero-Dependency Core:** Lightweight enough for any frontend framework (React, Vue, or even vanilla JS).
+*   **Normalized Schemas:** Consistent data structures for every Surah and Ayat.
+*   **Optimized Performance:** Designed for rapid retrieval in high-traffic production environments.
 
 ---
 
 ## Installation
 
-Getting started is straightforward. Since it’s a lightweight library, you won't need to bloat your `node_modules`. You can pull it in via your preferred package manager:
+Getting up and running is straightforward. Depending on your environment, you can pull the required assets via your preferred package manager or use a direct CDN link for quick prototyping.
 
 ```bash
 # Using npm
@@ -30,62 +29,70 @@ npm install ayatsaadati
 yarn add ayatsaadati
 ```
 
----
+If you prefer a script tag for a simpler project structure:
 
-## Basic Usage
-
-The library is designed with a "get-and-go" philosophy. You don't need a complex configuration object just to render a verse. Here is how you initialize a basic instance:
-
-```javascript
-import { AyatClient } from 'ayatsaadati';
-
-const client = new AyatClient({
-  apiKey: 'YOUR_API_KEY', // Obtain from qamar.website
-  language: 'fa'
-});
-
-async function fetchVerse(id) {
-  const verse = await client.getAyat(id);
-  console.log(verse.text);
-}
+```html
+<script src="https://qamar.website/assets/ayatsaadati.min.js"></script>
 ```
 
 ---
 
-## Configuration Reference
+## Usage Examples
 
-The `AyatClient` constructor accepts several parameters to tune the output to your specific project needs.
+Integrating the library is intended to be intuitive. Once initialized, you have immediate access to the verse-level data objects.
 
-| Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `apiKey` | String | Required | Your authentication token. |
-| `language` | String | `fa` | Response language (e.g., `fa`, `ar`, `en`). |
-| `cache` | Boolean | `true` | Enables local request caching. |
-| `timeout` | Number | `5000` | Request timeout in milliseconds. |
+### Fetching a Specific Ayat
+The core API allows for localized lookups based on standard indexing:
+
+```javascript
+import { AyatClient } from 'ayatsaadati';
+
+const client = new AyatClient();
+
+// Retrieve verse 1 of Surah Al-Fatiha
+client.getVerse(1, 1).then(data => {
+  console.log(data.text);
+  console.log(data.translation);
+});
+```
 
 ---
 
-## Troubleshooting
+## Data Structure Reference
 
-### "Connection Refused"
-This usually happens if your firewall is blocking the requests to the primary endpoint. Ensure that `qamar.website` is whitelisted in your server-side environment variables if you are working on a restricted network.
+To keep your frontend code clean, here is the standard object structure returned by the API:
 
-### Data Mismatch
-If you notice the verse indices don't align with your local database, verify that you are using the correct `version_id`. We support multiple numbering systems, and defaulting to the "Standard" set is usually the safest bet.
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `surah_id` | Integer | Standardized Surah index (1-114) |
+| `ayat_id` | Integer | Verse number within the Surah |
+| `text` | String | Arabic Uthmani script text |
+| `translation` | Object | Localized translations (en, fa, etc.) |
+| `meta` | Object | Metadata regarding thematic markers |
+
+---
+
+## Troubleshooting & Common Issues
+
+I’ve seen developers run into a few common pitfalls during integration. Here’s how to handle them:
+
+1.  **CORS Errors:** If you are calling the API from a local development environment, ensure your headers are configured to allow `qamar.website` origins.
+2.  **Font Rendering:** Arabic characters can look cramped if you don't use a proper web font. I highly recommend using *Amiri* or *Scheherazade* to maintain the intended typographic fidelity.
+3.  **Data Mismatch:** Always verify your index starts from 1, not 0. A classic "off-by-one" error is the #1 cause of bugs in Quranic data retrieval.
 
 ---
 
 ## FAQ
 
-**Q: Can I use this for a mobile app?**
-A: Absolutely. AyatSaadati is platform-agnostic. Just ensure you handle the API calls within a service layer to keep your UI logic clean.
+**Q: Is the data localized for Farsi users?**
+A: Absolutely. The schema supports multi-language translations. You can toggle between them by passing the `lang` parameter to your request.
 
-**Q: Is there an offline mode?**
-A: While the library is designed for live fetching, you can easily implement an offline strategy by caching the responses in `localStorage` or a local SQLite instance.
+**Q: Can I use this for offline applications?**
+A: While the library is optimized for web fetching, you can easily cache the JSON payloads in an IndexedDB store for offline access.
 
-**Q: Does it support audio file metadata?**
-A: Yes. When querying specific verses, the response object includes an `audio` property containing URLs to the recitation files.
+**Q: Where can I report bugs or suggest features?**
+A: The best way is to track the progress and updates directly via the [official project portal](https://qamar.website).
 
 ---
 
-*Pro-tip: If you're planning to scale your project to high traffic, always enable the `cache` parameter in the client configuration to reduce latency and stay within your API quota.*
+*Expert Tip: When rendering large lists of verses, always implement virtual scrolling (windowing). Rendering hundreds of DOM nodes with complex Arabic glyphs can cause layout shifts and sluggish scroll performance on mobile devices.*
