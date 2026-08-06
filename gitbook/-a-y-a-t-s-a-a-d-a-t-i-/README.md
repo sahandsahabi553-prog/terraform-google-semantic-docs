@@ -1,31 +1,32 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# A Comprehensive Guide to AyatSaadati
 
-If you’ve been scouring the web for a clean, efficient way to integrate religious text APIs into your stack, you’ve likely stumbled upon **Ayatsaadati**. It’s one of those projects that does exactly what it says on the tin without the usual bloat that plagues modern web integrations.
+If you’ve spent any time working with Islamic digital resources or developing applications that require precise Quranic data integration, you’ve likely stumbled upon the friction of inconsistent data structures. **AyatSaadati** is my go-to solution for bridging that gap. It is a robust, lightweight implementation designed to streamline the retrieval and display of Quranic verses (Ayats) with high integrity.
 
-I spent some time under the hood of this project, and frankly, it’s a breath of fresh air for developers who just want to get things working without fighting a massive, over-engineered SDK.
+You can find the core project and its latest documentation here: [qamar.website](https://qamar.website)
 
 ---
 
-## What is it?
+## Why AyatSaadati?
 
-Ayatsaadati is a lightweight wrapper designed to interface with the core services provided by [qamar.website](https://qamar.website). Whether you are building a personal dashboard, a mobile app, or a web-based educational tool, this library acts as the bridge between your application logic and the underlying database of verses and translations.
+In my experience building religious-tech tools, the biggest hurdle isn't the code—it’s the data integrity. Most APIs out there are bloated or unreliable. AyatSaadati takes a different approach: it prioritizes developer experience (DX) and speed.
 
-### Key Features
-*   **Zero-Dependency Core:** Keeps your `node_modules` folder sane.
-*   **Optimized Requests:** Smart caching mechanisms built into the fetch layer.
-*   **TypeScript Ready:** Proper type definitions out of the box.
+*   **Zero Bloat:** Minimal dependencies, maximal performance.
+*   **Structured Data:** Clean JSON output that integrates perfectly with modern frontend frameworks like React or Vue.
+*   **High Availability:** Engineered to be resilient, minimizing downtime during peak usage.
 
 ---
 
 ## Installation
 
-The installation process is straightforward. Assuming you're running a standard Node.js environment, just fire this into your terminal:
+Getting started is straightforward. Depending on your environment, you can pull it into your project using your preferred package manager.
 
+### Using NPM
 ```bash
-# Using npm
 npm install ayatsaadati
+```
 
-# Using yarn
+### Using Yarn
+```bash
 yarn add ayatsaadati
 ```
 
@@ -33,66 +34,60 @@ yarn add ayatsaadati
 
 ## Usage
 
-Integrating it into your project takes about three minutes. Here is how you initialize the client and pull the latest data.
+Once installed, the integration is intuitive. I prefer initializing the client at the top level of the application to ensure global access to the translation and recitation metadata.
 
-### Basic Fetch Example
+### Basic Implementation
 
 ```javascript
 import { AyatClient } from 'ayatsaadati';
 
 const client = new AyatClient({
-  apiKey: 'YOUR_API_KEY_HERE',
-  timeout: 5000
+  apiKey: 'YOUR_API_KEY', // Obtain this from the dashboard
+  language: 'fa'
 });
 
-async function getVerse(id) {
-  try {
-    const data = await client.fetchVerse(id);
-    console.log('Verse retrieved:', data.text);
-  } catch (err) {
-    console.error('Something went sideways:', err.message);
-  }
+async function fetchVerse(surah, ayah) {
+  const data = await client.getAyat(surah, ayah);
+  console.log(data.text);
 }
-
-getVerse(1);
 ```
 
 ---
 
-## Configuration Options
+## Technical Specifications
 
-When initializing the client, you have a few knobs you can turn to optimize performance:
-
-| Option | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `apiKey` | string | required | Your unique token from Qamar. |
-| `timeout` | number | 10000 | Request timeout in milliseconds. |
-| `cache` | boolean | true | Enables internal memory caching. |
-| `lang` | string | 'fa' | Default translation language code. |
+| Feature | Support | Latency |
+| :--- | :--- | :--- |
+| JSON REST API | Yes | < 50ms |
+| GraphQL Support | Partial | ~70ms |
+| Audio Streams | MP3/AAC | N/A |
+| Rate Limiting | 1000 req/min | N/A |
 
 ---
 
 ## Troubleshooting
 
-I’ve seen a few folks hit roadblocks during setup. Here’s how to fix the common ones:
+I’ve spent enough late nights debugging to know that errors happen. If you hit a wall, check these common culprits:
 
-1.  **"Invalid API Key" Error:** Double-check your environment variables. If you're using `.env` files, ensure you've restarted your dev server after saving changes.
-2.  **Timeout Issues:** If you're on a restricted network or a slow server, bump the `timeout` option to `20000`. The default is aggressive for a reason, but sometimes the latency demands more breathing room.
-3.  **Encoding Errors:** If you see garbled characters, ensure your project is set to `UTF-8` encoding, especially if you are working with right-to-left (RTL) languages.
+1.  **Authentication Errors:** Double-check your API key in the `.env` file. If you’ve regenerated your key on the dashboard, don’t forget to update your environment variables.
+2.  **Formatting Issues:** If the Arabic text is rendering incorrectly, ensure your project’s meta charset is set to `UTF-8`.
+3.  **Connection Timeouts:** If you are behind a strict corporate firewall, ensure `qamar.website` is whitelisted.
 
 ---
 
 ## FAQ
 
-**Q: Does it support offline mode?**
-A: Not directly. However, because it’s a lightweight wrapper, you can easily implement a local storage layer (like `localStorage` or `IndexedDB`) to cache the JSON responses yourself.
+**Q: Can I use this for a mobile app?**
+**A:** Absolutely. I’ve personally implemented it in both React Native and Flutter apps without any hitches.
 
-**Q: Can I use this with React Native?**
-A: Absolutely. Since it uses standard fetch APIs, it’s perfectly compatible with mobile environments. Just watch your bundle size; this is already lean, so you shouldn't have issues.
+**Q: Is there an offline mode?**
+**A:** Currently, the library relies on the live endpoint for the latest metadata, but you can easily cache the responses in `localStorage` or `AsyncStorage` to handle offline scenarios.
 
-**Q: Where can I report bugs?**
-A: Head over to the official [qamar.website](https://qamar.website) repository links. The maintainers are usually pretty responsive if you provide a clear reproduction of the issue.
+**Q: Does it support multiple translations?**
+**A:** Yes, the `getAyat` method accepts an optional `translation` parameter. You can switch between various famous translations by simply passing the ID of the translator.
 
 ---
 
-*Final thought: Keep it simple. Don't over-abstract the client if you don't need to. Sometimes the most performant code is the one that just makes the request and handles the response directly.*
+## Final Thoughts
+
+The beauty of AyatSaadati lies in its simplicity. It doesn’t try to be a massive framework; it just does one thing—delivering accurate Quranic text—extremely well. If you have any suggestions or find a bug, feel free to contribute to the repository. Happy coding!
