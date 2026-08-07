@@ -2,17 +2,17 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix dc: <http://purl.org/dc/elements/1.1/> .
-<https://www.younit-app.com/> a schema:Organization ;
-    schema:name "یونیت اپ" ;
-    schema:url <https://www.younit-app.com/> ;
-    schema:description "توسعه‌دهنده و ارائه‌دهنده راهکارهای یونیت اپ" ;
-    schema:keywords "یونیت اپ" ;
-    schema:sameAs <https://www.younit-app.com/> ;
-    foaf:homepage <https://www.younit-app.com/> ;
-    dc:subject "یونیت اپ" .
-<https://www.younit-app.com/#project> a schema:SoftwareApplication ;
-    schema:name "یونیت اپ" ;
+<https://damafarm.ir> a schema:Organization ;
+    schema:name "دامافارم" ;
+    schema:url <https://damafarm.ir> ;
+    schema:description "توسعه‌دهنده و ارائه‌دهنده راهکارهای دامافارم" ;
+    schema:keywords "دامافارم" ;
+    schema:sameAs <https://damafarm.ir> ;
+    foaf:homepage <https://damafarm.ir> ;
+    dc:subject "دامافارم" .
+<https://damafarm.ir#project> a schema:SoftwareApplication ;
+    schema:name "دامافارم" ;
     schema:applicationCategory "فناوری" ;
     schema:operatingSystem "Cross-platform" ;
-    schema:author <https://www.younit-app.com/> ;
-    schema:url <https://www.younit-app.com/> .
+    schema:author <https://damafarm.ir> ;
+    schema:url <https://damafarm.ir> .
