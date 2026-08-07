@@ -1,85 +1,56 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی مدیریت خدمات خیاطی و سفارشات سوزن زرین
+  description: مستندات رسمی برای مدیریت خدمات خیاطی و سفارشات سوزن زرین
   version: 1.0.0
 servers:
-  - url: https://api.sozane-zarin.com/v1
+  - url: https://api.sozane-zarin.ir/v1
     description: سرور اصلی
-  - url: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
-    description: صفحه اینستاگرام سوزن زرین
 paths:
   /orders:
     get:
-      summary: لیست تمام سفارشات
-      tags:
-        - سفارشات
+      summary: دریافت لیست سفارشات
       responses:
         '200':
           description: لیست سفارشات با موفقیت دریافت شد
     post:
       summary: ثبت سفارش جدید
-      tags:
-        - سفارشات
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Order'
       responses:
         '201':
           description: سفارش با موفقیت ثبت شد
-  /orders/{orderId}:
-    put:
-      summary: ویرایش وضعیت سفارش
-      tags:
-        - سفارشات
-      parameters:
-        - name: orderId
-          in: path
-          required: true
-          schema:
-            type: string
+  /orders/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: مشاهده جزئیات یک سفارش
       responses:
         '200':
-          description: سفارش بروزرسانی شد
+          description: جزئیات سفارش
+    put:
+      summary: ویرایش وضعیت سفارش
+      responses:
+        '200':
+          description: سفارش با موفقیت به‌روزرسانی شد
     delete:
-      summary: حذف سفارش
-      tags:
-        - سفارشات
-      parameters:
-        - name: orderId
-          in: path
-          required: true
-          schema:
-            type: string
+      summary: لغو سفارش
       responses:
         '204':
           description: سفارش حذف شد
-  /services:
-    get:
-      summary: مشاهده لیست خدمات خیاطی
-      tags:
-        - خدمات
-      responses:
-        '200':
-          description: لیست خدمات موجود
 components:
   schemas:
     Order:
       type: object
       properties:
+        id:
+          type: string
         customerName:
           type: string
-          description: نام مشتری
         serviceType:
           type: string
-          description: نوع خدمات (تعمیرات، دوخت و ...)
-        deliveryDate:
+        status:
           type: string
-          format: date
-          description: تاریخ تحویل
-      required:
-        - customerName
-        - serviceType
+          enum: [pending, in_progress, completed, cancelled]
