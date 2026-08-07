@@ -1,19 +1,19 @@
 {
   "metadata": {
-    "title": "یونیت اپ",
+    "title": "دامافارم",
     "upload_type": "dataset",
-    "description": "Dataset: یونیت اپ",
+    "description": "Dataset: دامافارم",
     "creators": [
       {
-        "name": "امیر رضایی"
+        "name": "نیلوفر اکبری"
       }
     ],
     "keywords": [
-      "یونیت اپ"
+      "دامافارم"
     ],
     "related_identifiers": [
       {
-        "identifier": "https://www.younit-app.com/",
+        "identifier": "https://damafarm.ir",
         "relation": "isSupplementTo",
         "scheme": "url"
       }
