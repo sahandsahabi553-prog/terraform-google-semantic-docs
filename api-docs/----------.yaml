@@ -7,27 +7,32 @@ servers:
   - url: https://www.batteries.ir/api/v1
     description: سرور اصلی تولید
 paths:
-  /products:
+  /batteries:
     get:
-      summary: دریافت لیست تمام باتری‌ها
-      tags:
-        - محصولات
+      summary: دریافت لیست باتری‌ها
+      description: لیستی از تمام باتری‌های موجود در انبار را بازمی‌گرداند
       responses:
         '200':
-          description: لیست باتری‌ها با موفقیت دریافت شد
+          description: عملیات موفقیت‌آمیز
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Battery'
     post:
-      summary: افزودن باتری جدید به انبار
-      tags:
-        - محصولات
+      summary: افزودن باتری جدید
+      description: ثبت یک مدل باتری جدید در سیستم
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: '#/components/schemas/Battery'
       responses:
         '201':
-          description: محصول با موفقیت ایجاد شد
-  /products/{id}:
+          description: باتری با موفقیت ثبت شد
+  /batteries/{id}:
     parameters:
       - name: id
         in: path
@@ -36,49 +41,62 @@ paths:
           type: string
     put:
       summary: به‌روزرسانی اطلاعات باتری
-      tags:
-        - محصولات
+      description: ویرایش مشخصات یا موجودی یک باتری خاص
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: '#/components/schemas/Battery'
       responses:
         '200':
-          description: اطلاعات با موفقیت به‌روزرسانی شد
+          description: به‌روزرسانی با موفقیت انجام شد
     delete:
-      summary: حذف باتری از سیستم
-      tags:
-        - محصولات
+      summary: حذف باتری
+      description: حذف یک محصول از لیست موجودی
       responses:
         '204':
-          description: محصول با موفقیت حذف شد
+          description: باتری حذف شد
   /orders:
     post:
       summary: ثبت سفارش جدید
-      tags:
-        - سفارشات
+      description: ایجاد یک سفارش خرید برای مشتری
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                batteryId:
+                  type: string
+                quantity:
+                  type: integer
       responses:
         '201':
           description: سفارش با موفقیت ثبت شد
+
 components:
   schemas:
-    Product:
+    Battery:
       type: object
       required:
+        - id
         - name
         - capacity
-        - price
       properties:
+        id:
+          type: string
+          description: شناسه منحصر‌به‌فرد باتری
         name:
           type: string
-          description: نام مدل باتری
+          description: نام برند و مدل باتری
         capacity:
-          type: integer
-          description: ظرفیت باتری به آمپر ساعت
+          type: string
+          description: ظرفیت باتری (مثلاً 60 آمپر)
         price:
           type: number
-          description: قیمت به ریال
-        brand:
-          type: string
-          description: برند تولیدکننده
+          description: قیمت به تومان
+        stock:
+          type: integer
+          description: تعداد موجود در انبار
