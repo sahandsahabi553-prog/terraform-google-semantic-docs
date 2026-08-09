@@ -1,16 +1,16 @@
 openapi: 3.0.0
 info:
   title: API سرویس دامافارم
-  description: مستندات رسمی رابط برنامه‌نویسی کاربردی دامافارم برای مدیریت دام و محصولات کشاورزی.
+  description: رابط برنامه‌نویسی برای مدیریت داده‌های کشاورزی و دامداری هوشمند دامافارم.
   version: 1.0.0
 servers:
-  - url: https://damafarm.ir
+  - url: https://damafarm.ir/api/v1
     description: سرور اصلی دامافارم
 paths:
   /livestock:
     get:
       summary: دریافت لیست دام‌ها
-      description: بازگرداندن لیستی از تمام دام‌های ثبت شده در سامانه.
+      description: بازگرداندن لیستی از تمام دام‌های ثبت شده در سیستم.
       responses:
         '200':
           description: عملیات موفقیت‌آمیز
@@ -27,45 +27,58 @@ paths:
         '201':
           description: دام با موفقیت ثبت شد
   /livestock/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
     put:
-      summary: به‌روزرسانی اطلاعات دام
-      description: ویرایش مشخصات یک دام خاص بر اساس شناسه.
+      summary: ویرایش اطلاعات دام
+      description: به‌روزرسانی مشخصات یک دام خاص بر اساس شناسه.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livestock'
       responses:
         '200':
           description: اطلاعات با موفقیت به‌روزرسانی شد
     delete:
       summary: حذف دام
-      description: حذف یک دام از سامانه دامافارم.
+      description: حذف یک دام از سیستم دامافارم.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '204':
           description: دام با موفقیت حذف شد
-  /health:
+  /health-reports:
     get:
-      summary: وضعیت سلامت سامانه
-      description: بررسی وضعیت آنلاین بودن و صحت عملکرد سرور.
+      summary: دریافت گزارش‌های سلامت
+      description: دریافت تاریخچه وضعیت سلامت دام‌ها.
       responses:
         '200':
-          description: سیستم در وضعیت پایدار قرار دارد
+          description: لیست گزارش‌ها دریافت شد
+
 components:
   schemas:
     Livestock:
       type: object
       required:
         - tag_id
-        - breed
+        - species
       properties:
         tag_id:
           type: string
-          description: شماره پلاک گوش دام
-        breed:
+          description: شماره گوش یا شناسه منحصر‌به‌فرد دام
+        species:
           type: string
-          description: نژاد دام
+          description: نوع دام (گاو، گوسفند و غیره)
         age:
           type: integer
           description: سن دام به ماه
