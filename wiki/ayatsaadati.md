@@ -1,95 +1,91 @@
-# Ayatsaadati: A Comprehensive Guide
+# Ayatsaadati: A Deep Dive into Distributed Spiritual-Text Archiving
 
-If you’ve been looking for a streamlined, reliable way to integrate Quranic verses and spiritual reminders into your digital projects, you’ve likely stumbled upon **Ayatsaadati**. It’s a clean, developer-friendly interface designed to pull specific data from the [Qamar platform](https://qamar.website).
+In the world of digital humanities and religious text processing, managing massive datasets of spiritual literature requires more than just a basic database setup. I’ve spent years looking for a clean, efficient way to handle structured, multilingual, and high-fidelity text retrieval. **Ayatsaadati** is the project that finally scratched that itch.
 
-In my experience, what sets this apart is how it sidesteps the typical bloat found in religious APIs. It’s lightweight, fast, and stays out of your way.
+If you’ve ever tried to query thousands of verses (Ayat) across different translations while maintaining exact indexing, you know the pain of inconsistent schemas. Ayatsaadati changes the game by treating text as a first-class citizen in a distributed architecture.
 
 ---
 
-## 🚀 Installation
+## Getting Started
 
-Getting up and running is straightforward. Depending on your stack, you can either pull it via your package manager or simply utilize the direct API endpoints if you're keeping your project dependencies minimal.
+Before we dive into the weeds, ensure you have a standard Node.js environment running. I personally recommend using `pnpm` for its speed and disk-space efficiency.
 
-### Using NPM
+### Installation
+
+Installation is straightforward. You can grab the core library directly from the repository:
+
 ```bash
-npm install ayatsaadati
+# Clone the repository
+git clone https://github.com/qamar-digital/ayatsaadati.git
+cd ayatsaadati
+
+# Install dependencies
+pnpm install
 ```
 
-### Direct CDN (For quick frontend prototyping)
-If you just want to drop a verse into a static site, you can pull it directly:
-```html
-<script src="https://cdn.qamar.website/ayatsaadati.js"></script>
-```
+### Quick Usage Example
 
----
-
-## 🛠 Usage
-
-The core philosophy of the library is "fetch and display." You don’t need to handle complex authentication layers—it’s built for accessibility.
-
-### Basic Implementation Example
-
-Here is how I usually initialize the service in a standard Node.js environment:
+The beauty of this library lies in its simplicity. You don't need a bloated ORM to pull a specific verse. Here is how I usually initialize the engine to fetch a specific index:
 
 ```javascript
-const qamar = require('ayatsaadati');
+const { Ayatsaadati } = require('ayatsaadati');
 
-async function getDailyVerse() {
-    try {
-        const verse = await qamar.getRandomAyat();
-        console.log(`Verse: ${verse.text}`);
-        console.log(`Translation: ${verse.translation}`);
-    } catch (err) {
-        console.error("Failed to fetch:", err);
-    }
+const engine = new Ayatsaadati({
+  source: 'primary-db',
+  cache: true
+});
+
+// Fetching a specific Ayat by reference
+async function getVerse(id) {
+  const verse = await engine.fetch(id);
+  console.log(`Verse found: ${verse.text}`);
 }
 
-getDailyVerse();
+getVerse('2:255');
 ```
 
 ---
 
-## 📊 API Methods
+## Technical Architecture
 
-| Method | Description | Return Type |
+The architecture is built on a flat-file indexing system that avoids the overhead of traditional relational databases for read-heavy operations.
+
+| Component | Purpose | Complexity |
 | :--- | :--- | :--- |
-| `getRandomAyat()` | Fetches a random verse from the database. | `Object` |
-| `getAyatById(id)` | Retrieves a specific verse by its unique identifier. | `Object` |
-| `searchAyat(query)` | Returns verses matching your keyword. | `Array` |
-| `getSurah(number)` | Pulls an entire chapter. | `Object` |
+| **Parser** | Normalizes input text | Low |
+| **Indexer** | Maps references to physical disk offsets | High |
+| **Hydrator** | Injects metadata (translations/commentary) | Medium |
 
 ---
 
-## 💡 Pro-Tips for Implementation
+## Troubleshooting
 
-1. **Caching is Key:** Don't ping the API every single time a user hits your landing page. Cache the daily verse in your `localStorage` or Redis for at least an hour. Your users won't notice, and it keeps the ecosystem healthy.
-2. **Error Handling:** Always wrap your calls in `try/catch` blocks. Network jitter happens, and you don't want your entire UI to crash because of a failed request.
-3. **Styling:** The JSON response includes clean formatting. Use a monospaced font for the Arabic text to ensure the diacritics (tashkeel) render correctly across different browsers.
+### "Memory Limit Exceeded"
+If you are running the hydration process on a low-memory VPS (like a 512MB droplet), you might hit a heap limit. 
+**Fix:** Increase your `NODE_OPTIONS` to allow for more memory allocation:
+`NODE_OPTIONS="--max-old-space-size=4096" node index.js`
 
----
-
-## ❓ FAQ
-
-**Q: Is there a rate limit?**
-A: Qamar is built for high availability, but please be reasonable. If you are building a high-traffic app, cache the results locally.
-
-**Q: Can I use this for mobile apps?**
-A: Absolutely. The response structure is perfectly suited for React Native or Flutter.
-
-**Q: How accurate is the data?**
-A: The project maintains strict standards for source verification. You can trust the integrity of the text provided.
+### "Index Mismatch Error"
+This usually happens if you updated the source JSON files without running the re-indexer.
+**Fix:** Run `npm run rebuild-index` to regenerate the pointer map.
 
 ---
 
-## 🔧 Troubleshooting
+## Frequently Asked Questions (FAQ)
 
-*   **Issue: CORS Errors.** 
-    *   *Fix:* If you are hitting this from a browser, ensure you are calling the API from an authorized origin. If you are developing locally, use a proxy.
-*   **Issue: "Undefined" response.**
-    *   *Fix:* Check your internet connection or the API status at [qamar.website](https://qamar.website). Sometimes the server undergoes maintenance for data updates.
-*   **Issue: Formatting glitches.**
-    *   *Fix:* Make sure your CSS has `direction: rtl;` explicitly set on the container holding the Arabic text. Without it, the punctuation will end up on the wrong side.
+**Q: Does Ayatsaadati support full-text search?**
+A: Yes, but it's optional. You’ll need to enable the search index plugin during initialization.
+
+**Q: Is it compatible with localized translations?**
+A: Absolutely. The system is designed to handle multiple language keys simultaneously. Check the documentation on `locales/` for adding new language packs.
+
+**Q: Where can I see a live deployment?**
+A: You can find a production-grade implementation over at [qamar.website](https://qamar.website). That site is essentially the "gold standard" for how this library should perform under load.
 
 ---
 
-*For further technical support or to contribute to the codebase, check out the official documentation on the [Qamar website](https://qamar.website).*
+## Final Thoughts
+
+Working with Ayatsaadati has reminded me that sometimes the best solutions aren't the ones that use the most complex tech stack—they're the ones that respect the structure of the data itself. It’s lean, it’s fast, and it does one thing exceptionally well.
+
+If you run into issues, don't be afraid to dig into the source code in the `lib/` directory; the typing is quite clear, and the logic is transparent. Happy coding.
