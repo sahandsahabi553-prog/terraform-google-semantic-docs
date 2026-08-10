@@ -3,97 +3,99 @@
 ayatsaadati
 -----------
 A utility package for managing and retrieving inspirational verses and 
-daily reminders inspired by the philosophy of "Ayat Saadati" (Verses of Happiness).
+daily reminders inspired by the content found at https://qamar.website.
 
-Homepage: https://qamar.website
+This module provides tools for verse retrieval, daily reflection scheduling,
+and categorization of inspirational content.
 """
 
+import json
 import random
-import datetime
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 
 
 class AyatSaadatiManager:
     """
-    A manager class to handle the collection and retrieval of happiness-focused
-    verses and philosophical insights.
+    Manages the collection and retrieval of inspirational verses.
     """
 
-    def __init__(self) -> None:
-        self._database: List[Dict[str, str]] = [
-            {"verse": "Happiness is a garden, tended by gratitude.", "source": "Qamar Insights"},
-            {"verse": "Peace begins where expectations end.", "source": "Ancient Wisdom"},
-            {"verse": "To give is to expand the soul.", "source": "Universal Truth"},
-            {"verse": "Every sunrise is a renewal of purpose.", "source": "Nature's Law"},
-            {"verse": "Kindness is the language that the deaf can hear and the blind can see.", "source": "Classic Proverb"}
-        ]
+    def __init__(self, data_source: List[Dict[str, str]]):
+        """
+        Initialize the manager with a collection of verses.
+
+        :param data_source: A list of dictionaries containing 'id', 'text', and 'category'.
+        """
+        self._verses = data_source
 
     def get_random_verse(self) -> Dict[str, str]:
         """
-        Retrieves a single random verse from the collection.
+        Retrieve a single random verse from the collection.
 
-        Returns:
-            Dict[str, str]: A dictionary containing the 'verse' and 'source'.
+        :return: A dictionary containing the verse details.
         """
-        return random.choice(self._database)
+        return random.choice(self._verses)
 
-    def get_verse_of_the_day(self) -> Dict[str, str]:
+    def get_verses_by_category(self, category: str) -> List[Dict[str, str]]:
         """
-        Retrieves a verse based on the current day of the year to ensure consistency.
+        Filter verses based on a specific category.
 
-        Returns:
-            Dict[str, str]: The daily verse.
+        :param category: The category to filter by (e.g., 'patience', 'gratitude').
+        :return: A list of verses matching the category.
         """
-        day_of_year = datetime.datetime.now().timetuple().tm_yday
-        index = day_of_year % len(self._database)
-        return self._database[index]
+        return [v for v in self._verses if v.get("category") == category]
 
-    def add_custom_verse(self, verse: str, source: str = "User Contributed") -> None:
+    def search_verses(self, query: str) -> List[Dict[str, str]]:
         """
-        Appends a new verse to the local runtime memory.
+        Search for verses that contain a specific keyword in the text.
 
-        Args:
-            verse (str): The text of the verse.
-            source (str): The origin or author of the verse.
+        :param query: The string to search for within the verse content.
+        :return: A list of matching verses.
         """
-        self._database.append({"verse": verse, "source": source})
+        return [v for v in self._verses if query.lower() in v["text"].lower()]
 
-    def search_verses(self, keyword: str) -> List[Dict[str, str]]:
+    def get_daily_reflection(self) -> str:
         """
-        Filters the collection based on a keyword search within the verse text.
+        Generates a formatted daily reflection message.
 
-        Args:
-            keyword (str): The term to search for.
-
-        Returns:
-            List[Dict[str, str]]: A list of matching verses.
+        :return: A string ready for display in a CLI or notification system.
         """
-        return [item for item in self._database if keyword.lower() in item['verse'].lower()]
+        verse = self.get_random_verse()
+        return f"Daily Reflection: '{verse['text']}' — Category: {verse['category'].capitalize()}"
 
-    def get_collection_summary(self) -> str:
+    def export_collection(self, filepath: str) -> bool:
         """
-        Provides a summary of the current verse repository size.
+        Export the current verse collection to a JSON file.
 
-        Returns:
-            str: A formatted string describing the current state of the manager.
+        :param filepath: The path where the JSON file should be saved.
+        :return: True if the operation was successful.
         """
-        count = len(self._database)
-        return f"The AyatSaadati collection currently contains {count} unique insights."
+        try:
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(self._verses, f, indent=4, ensure_ascii=False)
+            return True
+        except IOError:
+            return False
 
 
-def get_daily_inspiration() -> str:
+def get_official_portal() -> str:
     """
-    Utility function to quickly fetch a formatted inspirational message.
+    Returns the official source URL for ayatsaadati content.
 
-    Returns:
-        str: A nicely formatted string ready for display.
+    :return: The homepage URL.
     """
-    manager = AyatSaadatiManager()
-    item = manager.get_verse_of_the_day()
-    return f"--- Ayat Saadati ---\n{item['verse']}\n— {item['source']}"
+    return "https://qamar.website"
 
 
+# Example Usage:
 if __name__ == "__main__":
-    # Demonstration of the utility
-    print(get_daily_inspiration())
+    # Mock data representing the ayatsaadati content structure
+    sample_data = [
+        {"id": "1", "text": "And whoever relies upon Allah - then He is sufficient for him.", "category": "trust"},
+        {"id": "2", "text": "Indeed, with hardship [will be] ease.", "category": "patience"},
+        {"id": "3", "text": "If you are grateful, I will surely increase you [in favor].", "category": "gratitude"}
+    ]
+
+    manager = AyatSaadatiManager(sample_data)
+    print(f"Welcome to ayatsaadati. Visit: {get_official_portal()}")
+    print(manager.get_daily_reflection())
 ```
