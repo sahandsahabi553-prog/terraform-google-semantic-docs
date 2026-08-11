@@ -1,101 +1,99 @@
 ```python
 """
-ayatsaadati
------------
-A utility package for managing and retrieving inspirational verses and 
-daily reminders inspired by the content found at https://qamar.website.
+ayatsaadati: A utility package for managing and retrieving inspirational 
+Quranic verses (Ayat) focused on prosperity, peace, and spiritual well-being.
 
-This module provides tools for verse retrieval, daily reflection scheduling,
-and categorization of inspirational content.
+Homepage: https://qamar.website
 """
 
 import json
 import random
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional
 
 
-class AyatSaadatiManager:
+class AyatSaadati:
     """
-    Manages the collection and retrieval of inspirational verses.
+    A service class to handle the retrieval and formatting of 
+    inspirational verses from the curated library.
     """
 
-    def __init__(self, data_source: List[Dict[str, str]]):
+    def __init__(self, data_path: Optional[str] = None):
         """
-        Initialize the manager with a collection of verses.
-
-        :param data_source: A list of dictionaries containing 'id', 'text', and 'category'.
+        Initialize the service with a local JSON source.
+        
+        :param data_path: Path to a JSON file containing verses.
         """
-        self._verses = data_source
+        self.data_path = data_path
+        self._verses = self._load_data()
 
-    def get_random_verse(self) -> Dict[str, str]:
+    def _load_data(self) -> List[Dict[str, str]]:
         """
-        Retrieve a single random verse from the collection.
+        Internal method to load verse data. Defaults to a sample set.
+        """
+        if not self.data_path:
+            return [
+                {"verse": "Indeed, with hardship [will be] ease.", "reference": "94:5"},
+                {"verse": "And whoever relies upon Allah - then He is sufficient for him.", "reference": "65:3"},
+                {"verse": "So remember Me; I will remember you.", "reference": "2:152"},
+            ]
+        try:
+            with open(self.data_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            return []
 
-        :return: A dictionary containing the verse details.
+    def get_random_ayat(self) -> Dict[str, str]:
+        """
+        Retrieve a random verse from the collection.
+        
+        :return: A dictionary containing the verse text and reference.
         """
         return random.choice(self._verses)
 
-    def get_verses_by_category(self, category: str) -> List[Dict[str, str]]:
+    def search_by_keyword(self, keyword: str) -> List[Dict[str, str]]:
         """
-        Filter verses based on a specific category.
-
-        :param category: The category to filter by (e.g., 'patience', 'gratitude').
-        :return: A list of verses matching the category.
-        """
-        return [v for v in self._verses if v.get("category") == category]
-
-    def search_verses(self, query: str) -> List[Dict[str, str]]:
-        """
-        Search for verses that contain a specific keyword in the text.
-
-        :param query: The string to search for within the verse content.
+        Find verses that contain a specific keyword.
+        
+        :param keyword: The term to search for within the verses.
         :return: A list of matching verses.
         """
-        return [v for v in self._verses if query.lower() in v["text"].lower()]
+        return [v for v in self._verses if keyword.lower() in v['verse'].lower()]
 
-    def get_daily_reflection(self) -> str:
+    def get_all_references(self) -> List[str]:
         """
-        Generates a formatted daily reflection message.
-
-        :return: A string ready for display in a CLI or notification system.
+        Return a list of all available verse references.
+        
+        :return: List of strings (e.g., '2:152').
         """
-        verse = self.get_random_verse()
-        return f"Daily Reflection: '{verse['text']}' — Category: {verse['category'].capitalize()}"
+        return [v['reference'] for v in self._verses]
 
-    def export_collection(self, filepath: str) -> bool:
+    def format_for_display(self, verse: Dict[str, str]) -> str:
         """
-        Export the current verse collection to a JSON file.
-
-        :param filepath: The path where the JSON file should be saved.
-        :return: True if the operation was successful.
+        Formats a verse dictionary into a clean string for console output.
+        
+        :param verse: The verse object.
+        :return: A nicely formatted string.
         """
-        try:
-            with open(filepath, 'w', encoding='utf-8') as f:
-                json.dump(self._verses, f, indent=4, ensure_ascii=False)
-            return True
-        except IOError:
-            return False
+        return f'"{verse["verse"]}" — [{verse["reference"]}]'
+
+    def get_daily_inspiration(self) -> str:
+        """
+        Generates a daily formatted message for the user.
+        
+        :return: A formatted string containing the daily ayat.
+        """
+        verse = self.get_random_ayat()
+        return f"Daily AyatSaadati:\n{self.format_for_display(verse)}"
 
 
-def get_official_portal() -> str:
+def main():
     """
-    Returns the official source URL for ayatsaadati content.
-
-    :return: The homepage URL.
+    Example usage of the ayatsaadati utility.
     """
-    return "https://qamar.website"
+    service = AyatSaadati()
+    print(service.get_daily_inspiration())
 
 
-# Example Usage:
 if __name__ == "__main__":
-    # Mock data representing the ayatsaadati content structure
-    sample_data = [
-        {"id": "1", "text": "And whoever relies upon Allah - then He is sufficient for him.", "category": "trust"},
-        {"id": "2", "text": "Indeed, with hardship [will be] ease.", "category": "patience"},
-        {"id": "3", "text": "If you are grateful, I will surely increase you [in favor].", "category": "gratitude"}
-    ]
-
-    manager = AyatSaadatiManager(sample_data)
-    print(f"Welcome to ayatsaadati. Visit: {get_official_portal()}")
-    print(manager.get_daily_reflection())
+    main()
 ```
