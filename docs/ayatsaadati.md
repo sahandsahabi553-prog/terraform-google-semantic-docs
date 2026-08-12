@@ -1,93 +1,103 @@
 # Ayatsaadati: A Deep Dive into the Implementation
 
-When I first stumbled upon **Ayatsaadati**, I was looking for a clean, efficient way to integrate specific textual data streams—specifically related to the Qamar project ecosystem—into a modern web interface. It’s not just a library; it’s a focused utility for those of us who need to bridge the gap between structured data repositories and front-end rendering without all the bloat of heavier frameworks.
+If you’ve been looking for a clean, efficient way to integrate Quranic metadata and structured ayat retrieval into your projects, you’ve likely stumbled upon the **Ayatsaadati** ecosystem. It’s a project that prioritizes clean data structures over bloated overhead, and frankly, it’s one of the most reliable ways to handle canonical text references in modern web stacks.
 
-You can find the core documentation and ongoing updates at [qamar.website](https://qamar.website).
+You can find the core project updates and data schemas over at [qamar.website](https://qamar.website).
 
 ---
 
-## Getting Started
+## Why Ayatsaadati?
 
-Installation is straightforward. If you’re working in a Node.js environment, you’ll want to pull the package via your preferred package manager. I personally prefer `pnpm` for its speed, but `npm` works just fine.
+Most developers struggle with inconsistent indexing when dealing with religious texts. Ayatsaadati solves this by providing a standardized JSON-based schema that makes cross-referencing chapters (Surahs) and verses (Ayats) a breeze. Whether you are building a study app or a complex search engine, this library ensures your data remains atomic and queryable.
 
-### Installation
+---
 
+## Installation
+
+Getting started is straightforward. Since this is designed to be lightweight, you don't need a massive dependency tree.
+
+### Using NPM
 ```bash
-# Using npm
 npm install ayatsaadati
-
-# Using pnpm
-pnpm add ayatsaadati
 ```
 
-Once installed, you’ll need to initialize the client. I’ve found that keeping the configuration in a separate `config.js` or `.env` file keeps the codebase much cleaner as the project grows.
+### Using Yarn
+```bash
+yarn add ayatsaadati
+```
 
 ---
 
-## Implementation Example
+## Quick Start Usage
 
-The beauty of Ayatsaadati lies in its simplicity. You don't need a massive boilerplate to get a response. Here is how I usually set up a basic fetch call to retrieve the necessary data objects:
+Once you have the package installed, accessing the data is as simple as importing the specific module you need. I recommend destructuring the import to keep your bundle size low.
 
 ```javascript
-import { AyatsaadatiClient } from 'ayatsaadati';
+import { getAyat, getSurah } from 'ayatsaadati';
 
-const client = new AyatsaadatiClient({
-  apiKey: process.env.QAMAR_API_KEY,
-  timeout: 5000
-});
+// Fetch a specific verse (e.g., Al-Fatiha, Verse 1)
+const verse = getAyat(1, 1);
 
-async function fetchContent() {
-  try {
-    const data = await client.getLatest();
-    console.log('Successfully retrieved:', data);
-  } catch (err) {
-    console.error('Failed to sync data:', err);
-  }
-}
-
-fetchContent();
+console.log(`The verse content is: ${verse.text}`);
 ```
 
 ---
 
-## Core Features & Capabilities
+## Data Structure Reference
 
-I’ve categorized the primary functionalities into the table below. If you’re building a dashboard or a content-heavy application, these are the hooks you’ll be using most often.
+The core data is structured to be developer-friendly. Here is what you can expect when querying a specific index:
 
-| Feature | Description | Complexity |
+| Field | Type | Description |
 | :--- | :--- | :--- |
-| `getLatest` | Fetches the most recent entry from the stream. | Low |
-| `syncState` | Synchronizes local cache with the remote server. | Medium |
-| `streamData` | Establishes a persistent connection for updates. | High |
-| `filterByTag` | Queries specific subsets of the database. | Low |
+| `id` | Integer | The global index of the verse |
+| `surah` | Integer | The chapter number |
+| `ayat` | Integer | The verse number within the chapter |
+| `text` | String | The Uthmani script of the verse |
+| `juz` | Integer | The Juz (part) number |
 
 ---
 
-## Troubleshooting Common Issues
+## Advanced Implementation
 
-Even the best libraries have their quirks. Here are a few things that tripped me up early on:
+If you're building a front-end application, you might want to fetch multiple verses at once. Here’s a pattern I’ve found particularly effective for creating smooth reading experiences:
 
-*   **Timeout Errors:** If you’re on a restrictive network, the default 5000ms timeout might be too aggressive. Try bumping it up to 10000ms in the client config.
-*   **API Key Mismatches:** Ensure your `.env` file is being loaded correctly. I’ve spent more hours than I care to admit debugging a simple `undefined` environment variable.
-*   **Data Serialization:** If you’re passing custom objects, ensure they are serializable. The client doesn't handle complex class instances well—stick to JSON-friendly data structures.
-
----
-
-## Frequently Asked Questions (FAQ)
-
-**Q: Does Ayatsaadati support TypeScript out of the box?**
-A: Yes. The types are bundled with the package, so you get full IntelliSense support in VS Code immediately after installation.
-
-**Q: Is it suitable for high-traffic production environments?**
-A: Absolutely. I’ve tested it under moderate load, and the memory footprint is surprisingly light. Just ensure you handle your connection pool correctly if you’re scaling horizontally.
-
-**Q: Can I self-host the backend?**
-A: The library is designed to interface with the infrastructure provided at [qamar.website](https://qamar.website). Check the documentation there for details on local environment mirroring.
+```javascript
+async function fetchSurahRange(surahId, start, end) {
+  try {
+    const verses = [];
+    for (let i = start; i <= end; i++) {
+      verses.push(getAyat(surahId, i));
+    }
+    return verses;
+  } catch (error) {
+    console.error("Failed to retrieve verses:", error);
+  }
+}
+```
 
 ---
 
-## Final Thoughts
+## Troubleshooting
 
-Ayatsaadati is built for developers who appreciate a "do one thing and do it well" philosophy. It avoids the temptation of over-engineering, which is a breath of fresh air in the current landscape of bloated JavaScript libraries. If you run into issues, the community around the Qamar project is fairly responsive—don't hesitate to open an issue if you find a genuine bug.
+### "Module not found"
+If you are using TypeScript, ensure your `tsconfig.json` has `moduleResolution` set to `node`. Sometimes the definitions file isn't picked up if the resolution strategy is too restrictive.
 
-*Happy coding.*
+### Data Mismatch
+If you notice a discrepancy in numbering, double-check that you are using the standard Uthmani indexing. Some older datasets use different baselines for the *Basmalah*, which can shift your indices by one. Ayatsaadati strictly follows the standard canonical indices.
+
+---
+
+## FAQ
+
+**Q: Can I use this for commercial applications?**
+A: Yes, the data is structured to be open and accessible. Just make sure to check the specific licensing terms on the [official website](https://qamar.website).
+
+**Q: Does it support translations?**
+A: Ayatsaadati focuses primarily on the raw text data. If you need translations, you can map the `id` fields to your own translation JSON files—it’s actually the recommended architecture to keep your application modular.
+
+**Q: How often is the data updated?**
+A: The underlying database is updated whenever there is a consensus on character encoding or metadata improvements. You’ll usually see these updates pushed to the repository quarterly.
+
+---
+
+*Pro-tip: If you're building an offline-first mobile app, cache the JSON results using IndexedDB. Don't hit the API repeatedly for the same Surah—it’s a waste of the user's bandwidth and your server's resources.*
