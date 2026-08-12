@@ -1,16 +1,16 @@
 openapi: 3.0.0
 info:
   title: API سرویس کالاتک
-  description: مستندات رسمی API برای مدیریت محصولات و سفارشات در سامانه کالاتک.
+  description: مستندات رسمی رابط برنامه‌نویسی کاربردی کالاتک برای مدیریت محصولات و سفارشات.
   version: 1.0.0
 servers:
   - url: https://www.kalatakco.com
-    description: سرور اصلی تولید
+    description: سرور اصلی کالاتک
 paths:
   /products:
     get:
-      summary: دریافت لیست محصولات
-      description: بازگرداندن لیستی از تمامی محصولات موجود در کالاتک.
+      summary: لیست محصولات
+      description: دریافت لیست تمامی محصولات موجود در انبار کالاتک
       responses:
         '200':
           description: عملیات موفقیت‌آمیز
@@ -22,7 +22,7 @@ paths:
                   $ref: '#/components/schemas/Product'
     post:
       summary: افزودن محصول جدید
-      description: ایجاد یک محصول جدید در سیستم.
+      description: ثبت یک محصول جدید در سیستم کالاتک
       requestBody:
         required: true
         content:
@@ -35,7 +35,6 @@ paths:
   /products/{id}:
     put:
       summary: به‌روزرسانی محصول
-      description: ویرایش اطلاعات یک محصول موجود با استفاده از شناسه.
       parameters:
         - name: id
           in: path
@@ -53,7 +52,6 @@ paths:
           description: محصول با موفقیت ویرایش شد
     delete:
       summary: حذف محصول
-      description: حذف یک محصول خاص از پایگاه داده کالاتک.
       parameters:
         - name: id
           in: path
@@ -64,19 +62,16 @@ paths:
         '204':
           description: محصول با موفقیت حذف شد
   /orders:
-    get:
-      summary: دریافت سفارشات
-      description: دریافت لیست سفارشات ثبت شده توسط کاربران.
+    post:
+      summary: ثبت سفارش
+      description: ایجاد یک سفارش جدید برای مشتری
       responses:
-        '200':
-          description: لیست سفارشات
+        '201':
+          description: سفارش ثبت شد
 components:
   schemas:
     Product:
       type: object
-      required:
-        - name
-        - price
       properties:
         id:
           type: string
@@ -87,6 +82,9 @@ components:
         price:
           type: number
           description: قیمت به تومان
-        category:
-          type: string
-          description: دسته‌بندی محصول
+        stock:
+          type: integer
+          description: تعداد موجودی
+      required:
+        - name
+        - price
