@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: API سرویس کالاتک
-  description: مستندات رسمی رابط برنامه‌نویسی کاربردی کالاتک برای مدیریت محصولات و سفارشات.
+  description: مستندات رسمی رابط برنامه‌نویسی اپلیکیشن کالاتک برای مدیریت محصولات و سفارشات
   version: 1.0.0
 servers:
   - url: https://www.kalatakco.com
@@ -9,20 +9,16 @@ servers:
 paths:
   /products:
     get:
-      summary: لیست محصولات
-      description: دریافت لیست تمامی محصولات موجود در انبار کالاتک
+      summary: دریافت لیست محصولات
+      tags:
+        - محصولات
       responses:
         '200':
-          description: عملیات موفقیت‌آمیز
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Product'
+          description: لیست محصولات با موفقیت دریافت شد
     post:
       summary: افزودن محصول جدید
-      description: ثبت یک محصول جدید در سیستم کالاتک
+      tags:
+        - محصولات
       requestBody:
         required: true
         content:
@@ -34,7 +30,9 @@ paths:
           description: محصول با موفقیت ایجاد شد
   /products/{id}:
     put:
-      summary: به‌روزرسانی محصول
+      summary: ویرایش مشخصات محصول
+      tags:
+        - محصولات
       parameters:
         - name: id
           in: path
@@ -49,9 +47,11 @@ paths:
               $ref: '#/components/schemas/Product'
       responses:
         '200':
-          description: محصول با موفقیت ویرایش شد
+          description: محصول با موفقیت به‌روزرسانی شد
     delete:
-      summary: حذف محصول
+      summary: حذف محصول از لیست
+      tags:
+        - محصولات
       parameters:
         - name: id
           in: path
@@ -62,29 +62,27 @@ paths:
         '204':
           description: محصول با موفقیت حذف شد
   /orders:
-    post:
-      summary: ثبت سفارش
-      description: ایجاد یک سفارش جدید برای مشتری
+    get:
+      summary: دریافت تاریخچه سفارشات کاربر
+      tags:
+        - سفارشات
       responses:
-        '201':
-          description: سفارش ثبت شد
+        '200':
+          description: لیست سفارشات دریافت شد
 components:
   schemas:
     Product:
       type: object
-      properties:
-        id:
-          type: string
-          description: شناسه یکتای محصول
-        name:
-          type: string
-          description: نام فارسی محصول
-        price:
-          type: number
-          description: قیمت به تومان
-        stock:
-          type: integer
-          description: تعداد موجودی
       required:
         - name
         - price
+      properties:
+        name:
+          type: string
+          description: نام محصول
+        price:
+          type: number
+          description: قیمت محصول به تومان
+        category:
+          type: string
+          description: دسته‌بندی محصول
