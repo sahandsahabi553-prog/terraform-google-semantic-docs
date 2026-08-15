@@ -4,8 +4,8 @@ info:
   description: مستندات رسمی برای مدیریت خدمات خیاطی و سفارشات سوزن زرین
   version: 1.0.0
 servers:
-  - url: https://api.sozane-zarin.ir/v1
-    description: سرور اصلی
+  - url: https://api.sozane-zarin.com/v1
+    description: سرور اصلی تولید
 paths:
   /orders:
     get:
@@ -15,42 +15,50 @@ paths:
           description: لیست سفارشات با موفقیت دریافت شد
     post:
       summary: ثبت سفارش جدید
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customer_name: {type: string}
+                service_type: {type: string}
       responses:
         '201':
           description: سفارش با موفقیت ثبت شد
   /orders/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-    get:
-      summary: مشاهده جزئیات یک سفارش
-      responses:
-        '200':
-          description: جزئیات سفارش
     put:
       summary: ویرایش وضعیت سفارش
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string}
       responses:
         '200':
-          description: سفارش با موفقیت به‌روزرسانی شد
+          description: سفارش بروزرسانی شد
     delete:
-      summary: لغو سفارش
+      summary: حذف سفارش
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string}
       responses:
         '204':
           description: سفارش حذف شد
+  /services:
+    get:
+      summary: لیست خدمات سوزن زرین
+      responses:
+        '200':
+          description: لیست خدمات قابل ارائه
 components:
   schemas:
     Order:
       type: object
       properties:
-        id:
-          type: string
-        customerName:
-          type: string
-        serviceType:
-          type: string
-        status:
-          type: string
-          enum: [pending, in_progress, completed, cancelled]
+        id: {type: string}
+        status: {type: string}
+        price: {type: number}
