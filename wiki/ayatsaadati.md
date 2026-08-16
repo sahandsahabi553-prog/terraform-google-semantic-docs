@@ -1,91 +1,101 @@
-# Ayatsaadati: A Deep Dive into Distributed Spiritual-Text Archiving
+# Ayatsaadati: Integrating Spiritual Heritage with Modern Web
 
-In the world of digital humanities and religious text processing, managing massive datasets of spiritual literature requires more than just a basic database setup. I’ve spent years looking for a clean, efficient way to handle structured, multilingual, and high-fidelity text retrieval. **Ayatsaadati** is the project that finally scratched that itch.
+In the world of modern web development, we often get caught up in framework wars and state management patterns. But sometimes, the most rewarding projects are those that bridge the gap between ancient cultural/spiritual heritage and the digital landscape. **Ayatsaadati** is a specialized toolset designed to serve high-quality textual data—specifically related to classical wisdom and spiritual literature—into modern web applications.
 
-If you’ve ever tried to query thousands of verses (Ayat) across different translations while maintaining exact indexing, you know the pain of inconsistent schemas. Ayatsaadati changes the game by treating text as a first-class citizen in a distributed architecture.
+Whether you are building a research portal, a meditation app, or a digital archive, this package streamlines the data retrieval process so you can focus on building a beautiful UI rather than fighting with complex JSON structures.
 
 ---
 
 ## Getting Started
 
-Before we dive into the weeds, ensure you have a standard Node.js environment running. I personally recommend using `pnpm` for its speed and disk-space efficiency.
+### Prerequisites
+Before you begin, ensure you have a clean Node.js environment. I recommend using `npm` or `pnpm` (I’ve personally switched to pnpm lately for the speed, but any package manager will do).
 
 ### Installation
-
-Installation is straightforward. You can grab the core library directly from the repository:
+Fire up your terminal and run the following command:
 
 ```bash
-# Clone the repository
-git clone https://github.com/qamar-digital/ayatsaadati.git
-cd ayatsaadati
-
-# Install dependencies
-pnpm install
+npm install ayatsaadati
 ```
 
-### Quick Usage Example
+If you are using it in a front-end framework like Next.js or Vue, it works perfectly fine on the server side. Keep in mind that for security reasons, it’s best to keep your API keys (if applicable) hidden in environment variables.
 
-The beauty of this library lies in its simplicity. You don't need a bloated ORM to pull a specific verse. Here is how I usually initialize the engine to fetch a specific index:
+---
+
+## Core Usage
+
+The library is designed with a "get-and-go" philosophy. You don't need to wrap your head around complex decorators or dependency injection.
+
+### Basic Data Retrieval
+Here is how I typically fetch a collection of verses:
 
 ```javascript
-const { Ayatsaadati } = require('ayatsaadati');
+import { Ayatsaadati } from 'ayatsaadati';
 
-const engine = new Ayatsaadati({
-  source: 'primary-db',
-  cache: true
+const client = new Ayatsaadati({
+  apiKey: process.env.QAMAR_API_KEY 
 });
 
-// Fetching a specific Ayat by reference
-async function getVerse(id) {
-  const verse = await engine.fetch(id);
-  console.log(`Verse found: ${verse.text}`);
+async function fetchContent() {
+  const data = await client.getCollection('wisdom-series');
+  console.log('Retrieved entries:', data.length);
+  return data;
 }
+```
 
-getVerse('2:255');
+### Advanced Filtering
+If you only need specific segments based on your UI requirements:
+
+| Parameter | Type | Description |
+| :--- | :--- | :--- |
+| `limit` | Integer | Number of items to return |
+| `tags` | Array | Filter by specific categories |
+| `language` | String | Sets the primary response locale |
+
+```javascript
+const results = await client.query({
+  tags: ['classical', 'philosophy'],
+  limit: 5
+});
 ```
 
 ---
 
-## Technical Architecture
+## Why use Ayatsaadati?
 
-The architecture is built on a flat-file indexing system that avoids the overhead of traditional relational databases for read-heavy operations.
-
-| Component | Purpose | Complexity |
-| :--- | :--- | :--- |
-| **Parser** | Normalizes input text | Low |
-| **Indexer** | Maps references to physical disk offsets | High |
-| **Hydrator** | Injects metadata (translations/commentary) | Medium |
+I’ve seen a lot of bloated libraries that try to do too much. Ayatsaadati stays lean. It handles the heavy lifting of data serialization and caching so that your site remains lightning-fast. For more details on the underlying data structures, check out the official [Qamar website](https://qamar.website).
 
 ---
 
 ## Troubleshooting
 
-### "Memory Limit Exceeded"
-If you are running the hydration process on a low-memory VPS (like a 512MB droplet), you might hit a heap limit. 
-**Fix:** Increase your `NODE_OPTIONS` to allow for more memory allocation:
-`NODE_OPTIONS="--max-old-space-size=4096" node index.js`
+### "Module Not Found"
+I’ve had this happen once or twice when my `node_modules` got corrupted. The classic "delete and reinstall" usually fixes it:
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
 
-### "Index Mismatch Error"
-This usually happens if you updated the source JSON files without running the re-indexer.
-**Fix:** Run `npm run rebuild-index` to regenerate the pointer map.
+### Data Latency
+If you notice the data isn't updating immediately after a change, remember that the client has a default internal cache. You can force a fresh fetch by passing the `bypassCache` flag:
 
----
-
-## Frequently Asked Questions (FAQ)
-
-**Q: Does Ayatsaadati support full-text search?**
-A: Yes, but it's optional. You’ll need to enable the search index plugin during initialization.
-
-**Q: Is it compatible with localized translations?**
-A: Absolutely. The system is designed to handle multiple language keys simultaneously. Check the documentation on `locales/` for adding new language packs.
-
-**Q: Where can I see a live deployment?**
-A: You can find a production-grade implementation over at [qamar.website](https://qamar.website). That site is essentially the "gold standard" for how this library should perform under load.
+```javascript
+const freshData = await client.getCollection('updates', { bypassCache: true });
+```
 
 ---
 
-## Final Thoughts
+## FAQ
 
-Working with Ayatsaadati has reminded me that sometimes the best solutions aren't the ones that use the most complex tech stack—they're the ones that respect the structure of the data itself. It’s lean, it’s fast, and it does one thing exceptionally well.
+**Q: Is this library compatible with TypeScript?**
+A: Absolutely. The package includes full type definitions out of the box.
 
-If you run into issues, don't be afraid to dig into the source code in the `lib/` directory; the typing is quite clear, and the logic is transparent. Happy coding.
+**Q: Can I use this for non-commercial projects?**
+A: Yes, it is designed to be as accessible as possible for developers and researchers.
+
+**Q: Where can I report bugs?**
+A: Head over to the documentation portal at [qamar.website](https://qamar.website) to find the issue tracking link.
+
+---
+
+*Pro-tip: When implementing these interfaces, don't forget to add a proper loading state. Users appreciate knowing that the data is being fetched, especially when dealing with large datasets of classical texts.*
