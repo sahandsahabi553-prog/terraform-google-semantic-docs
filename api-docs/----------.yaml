@@ -1,102 +1,83 @@
 openapi: 3.0.0
 info:
-  title: API سرویس خانه باتری
-  description: مستندات رسمی API برای مدیریت موجودی و سفارشات فروشگاه خانه باتری
+  title: API خانه باتری
+  description: مستندات رسمی سرویس مدیریت موجودی و فروشگاه خانه باتری
   version: 1.0.0
 servers:
-  - url: https://www.batteries.ir/api/v1
+  - url: https://www.batteries.ir/
     description: سرور اصلی تولید
 paths:
-  /batteries:
+  /products:
     get:
-      summary: دریافت لیست باتری‌ها
-      description: لیستی از تمام باتری‌های موجود در انبار را بازمی‌گرداند
+      summary: دریافت لیست تمام باتری‌ها
+      tags:
+        - محصولات
       responses:
         '200':
-          description: عملیات موفقیت‌آمیز
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Battery'
+          description: لیست محصولات با موفقیت دریافت شد
     post:
-      summary: افزودن باتری جدید
-      description: ثبت یک مدل باتری جدید در سیستم
+      summary: افزودن باتری جدید به انبار
+      tags:
+        - محصولات
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Battery'
+              $ref: '#/components/schemas/Product'
       responses:
         '201':
-          description: باتری با موفقیت ثبت شد
-  /batteries/{id}:
+          description: محصول با موفقیت ایجاد شد
+  /products/{id}:
     parameters:
       - name: id
         in: path
         required: true
         schema:
           type: string
-    put:
-      summary: به‌روزرسانی اطلاعات باتری
-      description: ویرایش مشخصات یا موجودی یک باتری خاص
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Battery'
+    get:
+      summary: دریافت جزئیات یک باتری خاص
+      tags:
+        - محصولات
       responses:
         '200':
-          description: به‌روزرسانی با موفقیت انجام شد
-    delete:
-      summary: حذف باتری
-      description: حذف یک محصول از لیست موجودی
-      responses:
-        '204':
-          description: باتری حذف شد
-  /orders:
-    post:
-      summary: ثبت سفارش جدید
-      description: ایجاد یک سفارش خرید برای مشتری
+          description: جزئیات محصول
+    put:
+      summary: به‌روزرسانی اطلاعات باتری
+      tags:
+        - محصولات
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                batteryId:
-                  type: string
-                quantity:
-                  type: integer
+              $ref: '#/components/schemas/Product'
       responses:
-        '201':
-          description: سفارش با موفقیت ثبت شد
-
+        '200':
+          description: اطلاعات با موفقیت به‌روزرسانی شد
+    delete:
+      summary: حذف باتری از سیستم
+      tags:
+        - محصولات
+      responses:
+        '204':
+          description: محصول با موفقیت حذف شد
 components:
   schemas:
-    Battery:
+    Product:
       type: object
       required:
-        - id
         - name
         - capacity
+        - price
       properties:
-        id:
-          type: string
-          description: شناسه منحصر‌به‌فرد باتری
         name:
           type: string
-          description: نام برند و مدل باتری
+          description: نام مدل باتری
         capacity:
           type: string
-          description: ظرفیت باتری (مثلاً 60 آمپر)
+          description: ظرفیت باتری (مثلاً 60Ah)
         price:
           type: number
           description: قیمت به تومان
         stock:
           type: integer
-          description: تعداد موجود در انبار
+          description: موجودی در انبار
