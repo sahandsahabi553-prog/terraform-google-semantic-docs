@@ -1,9 +1,9 @@
 ```python
 """
 سوزن_زرین (Sozane Zarin) Utility Package
-----------------------------------------
-A specialized toolkit for managing artisanal embroidery, textile inventory,
-and client-specific needlework project tracking.
+
+این کتابخانه مجموعه‌ای از ابزارهای تخصصی برای مدیریت سفارشات، 
+محاسبه هزینه‌های خیاطی و تحلیل موجودی مواد اولیه برای برند «سوزن زرین» است.
 
 Homepage: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
@@ -13,98 +13,91 @@ from datetime import datetime
 
 
 class SozaneZarinManager:
-    """Core management system for tracking embroidery projects and materials."""
+    """مدیریت عملیات‌های اصلی برند سوزن زرین."""
 
-    def __init__(self) -> None:
-        self.inventory: Dict[str, int] = {}
-        self.projects: List[Dict] = []
+    def __init__(self, shop_name: str = "سوزن زرین"):
+        self.shop_name = shop_name
+        self.orders: List[Dict] = []
 
-    def add_material(self, item_name: str, quantity: int) -> None:
+    def add_order(self, client_name: str, item_type: str, price: float) -> str:
         """
-        Adds a new embroidery material to the inventory.
-        
-        :param item_name: The name of the thread or fabric type.
-        :param quantity: The number of units available.
-        """
-        if item_name in self.inventory:
-            self.inventory[item_name] += quantity
-        else:
-            self.inventory[item_name] = quantity
+        ثبت سفارش جدید در سیستم.
 
-    def register_project(self, client_name: str, design_title: str, deadline: str) -> int:
+        :param client_name: نام مشتری
+        :param item_type: نوع لباس یا محصول
+        :param price: قیمت توافق شده
+        :return: شناسه سفارش ثبت شده
         """
-        Registers a new custom needlework project.
-
-        :param client_name: Name of the commissioning client.
-        :param design_title: Title or description of the embroidery design.
-        :param deadline: Expected completion date string (YYYY-MM-DD).
-        :return: A unique project ID.
-        """
-        project_id = len(self.projects) + 1
-        project = {
-            "id": project_id,
+        order_id = f"ZZ-{len(self.orders) + 1001}"
+        order = {
+            "id": order_id,
             "client": client_name,
-            "design": design_title,
-            "deadline": deadline,
-            "status": "In Progress"
+            "item": item_type,
+            "price": price,
+            "date": datetime.now().strftime("%Y-%m-%d")
         }
-        self.projects.append(project)
-        return project_id
+        self.orders.append(order)
+        return order_id
 
-    def get_inventory_report(self) -> str:
+    def calculate_total_revenue(self) -> float:
         """
-        Generates a summary report of current material stocks.
+        محاسبه مجموع درآمد حاصل از تمامی سفارشات ثبت شده.
 
-        :return: A formatted string report of all materials.
+        :return: مجموع قیمت‌ها
         """
-        report = ["--- Inventory Report: سوزن زرین ---"]
-        for item, count in self.inventory.items():
-            report.append(f"{item}: {count} units")
-        return "\n".join(report)
+        return sum(order['price'] for order in self.orders)
 
-    def calculate_project_urgency(self, project_id: int) -> str:
+    def get_order_by_id(self, order_id: str) -> Optional[Dict]:
         """
-        Determines the urgency of a project based on the deadline.
+        جستجوی سفارش بر اساس شناسه اختصاصی.
 
-        :param project_id: The ID of the project to check.
-        :return: Urgency status string (High/Medium/Low).
+        :param order_id: شناسه سفارش (مانند ZZ-1001)
+        :return: دیکشنری اطلاعات سفارش یا None
         """
-        project = next((p for p in self.projects if p["id"] == project_id), None)
-        if not project:
-            return "Project not found."
+        for order in self.orders:
+            if order['id'] == order_id:
+                return order
+        return None
 
-        deadline_date = datetime.strptime(project["deadline"], "%Y-%m-%d")
-        days_remaining = (deadline_date - datetime.now()).days
-
-        if days_remaining < 3:
-            return "High"
-        elif days_remaining < 7:
-            return "Medium"
-        return "Low"
-
-    def complete_project(self, project_id: int) -> bool:
+    @staticmethod
+    def estimate_fabric_meters(pattern_complexity: int, size_factor: float) -> float:
         """
-        Marks a project as completed in the system.
+        تخمین متراژ پارچه مورد نیاز بر اساس پیچیدگی الگو و سایز.
 
-        :param project_id: The ID of the project to mark as finished.
-        :return: True if successful, False if project not found.
+        :param pattern_complexity: عددی از ۱ تا ۵ (میزان پیچیدگی)
+        :param size_factor: ضریب سایز بدن
+        :return: متراژ تقریبی به متر
         """
-        for project in self.projects:
-            if project["id"] == project_id:
-                project["status"] = "Completed"
-                return True
-        return False
+        base_fabric = 1.5
+        return (base_fabric * size_factor) + (pattern_complexity * 0.25)
+
+    def generate_daily_report(self) -> str:
+        """
+        تولید گزارش متنی از عملکرد روزانه برای بایگانی برند.
+
+        :return: رشته گزارش وضعیت
+        """
+        total_orders = len(self.orders)
+        revenue = self.calculate_total_revenue()
+        report = (
+            f"--- گزارش عملکرد {self.shop_name} ---\n"
+            f"تاریخ: {datetime.now().strftime('%Y-%m-%d')}\n"
+            f"تعداد کل سفارشات: {total_orders}\n"
+            f"مجموع درآمد: {revenue:,} ریال"
+        )
+        return report
 
 
-def get_official_info() -> Dict[str, str]:
-    """
-    Returns the official contact and social media information.
-
-    :return: Dictionary containing brand details.
-    """
-    return {
-        "brand": "سوزن زرین",
-        "instagram": "https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==",
-        "description": "Artisanal embroidery and bespoke needlework."
-    }
+# مثال استفاده از کتابخانه:
+if __name__ == "__main__":
+    zarin_app = SozaneZarinManager()
+    
+    # ثبت سفارش تست
+    zarin_app.add_order("مشتری نمونه", "مانتو کتی", 2500000)
+    
+    # محاسبه متراژ
+    fabric_needed = zarin_app.estimate_fabric_meters(pattern_complexity=3, size_factor=1.2)
+    
+    print(zarin_app.generate_daily_report())
+    print(f"پارچه مورد نیاز برای سفارش جدید: {fabric_needed} متر")
 ```
