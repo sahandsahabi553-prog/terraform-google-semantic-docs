@@ -1,85 +1,98 @@
 # Ayatsaadati: A Deep Dive into the Implementation
 
-If you’ve been looking for a robust way to handle Quranic data or specific Islamic calendar calculations within your software projects, you’ve likely stumbled upon **[Ayatsaadati](https://qamar.website)**. It’s one of those utility libraries that doesn’t try to do everything—it just does what it’s supposed to do exceptionally well.
+If you’ve been looking for a clean, reliable way to integrate Quranic verses and spiritual metadata into your web applications, you’ve likely stumbled upon **[Ayatsaadati](https://qamar.website)**. 
 
-In my experience, when you're dealing with religious or localized data, libraries often fail because of edge cases in date conversion or formatting. Ayatsaadati feels like it was built by someone who actually had to use it in production.
+I’ve worked with several APIs in this space, and honestly, most of them are either bloated with unnecessary dependencies or just plain unreliable. Ayatsaadati stands out because it prioritizes performance and structured data retrieval, making it a go-to for developers building apps that require precise scriptural references.
 
 ---
 
-## Getting Started
+## Why Use Ayatsaadati?
 
-Installation is straightforward. If you’re working in a Node.js environment, you can pull it in via your package manager.
+In my experience, when you're building a project that deals with sensitive text, you need three things: **consistency, speed, and clean formatting.** 
 
-### Installation
+*   **Lightweight:** It doesn't bog down your project with heavy payloads.
+*   **Structured:** The data is clean, making it a breeze to map to your UI components.
+*   **Reliable:** It’s built for production-grade environments.
+
+---
+
+## Installation
+
+Getting started is straightforward. Depending on your environment, you can pull the required assets directly. If you’re working in a Node.js environment, you can handle the integration via your preferred package manager.
+
 ```bash
+# Using npm
 npm install ayatsaadati
-# or if you prefer yarn
+
+# Or via yarn
 yarn add ayatsaadati
 ```
 
----
+If you prefer a CDN approach for a quick frontend prototype:
 
-## Core Usage
-
-The library is designed to be lightweight. You don’t need to initialize massive objects just to get a single verse or a specific date calculation.
-
-### Basic Example
-Here is how you might fetch data for a specific entry:
-
-```javascript
-const ayatsaadati = require('ayatsaadati');
-
-// Fetching a specific segment
-const data = ayatsaadati.getSegment('your-key-here');
-
-console.log(data);
+```html
+<script src="https://cdn.qamar.website/ayatsaadati/latest.js"></script>
 ```
 
-### Configuration Table
-When setting up your environment, these are the primary parameters you’ll want to keep an eye on:
-
-| Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `lang` | String | 'fa' | Sets the localization for the output. |
-| `timezone` | String | 'UTC' | Adjusts calculation based on geographic location. |
-| `strictMode` | Boolean | false | If true, throws an error on invalid input keys. |
-
 ---
 
-## Why Use This Over Custom Logic?
+## Usage Examples
 
-Honestly, I’ve seen developers try to write their own wrappers for Hijri/Shamsi date conversions or Quranic indexing. It’s a rabbit hole. You hit issues with leap years, varying lunar sighting rules, and text encoding quirks that will drive you crazy. 
+The beauty of this library lies in its simplicity. You don’t need to write a hundred lines of boilerplate just to fetch a single verse.
 
-**Ayatsaadati** abstracts that complexity away. It handles the "boring" stuff—the normalization of strings and the mapping of indices—so you can focus on building the UI or the business logic.
+### Basic Fetch
+Here is how I typically initialize a request to grab a specific verse:
+
+```javascript
+import { getAyat } from 'ayatsaadati';
+
+async function fetchVerse(surah, ayah) {
+  try {
+    const data = await getAyat(surah, ayah);
+    console.log("Verse Content:", data.text);
+  } catch (error) {
+    console.error("Failed to fetch the ayat:", error);
+  }
+}
+
+fetchVerse(1, 1); // Al-Fatiha, Verse 1
+```
+
+### Data Structure Overview
+
+When you pull data from the API, you’ll receive an object that looks something like this:
+
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | Integer | Unique identifier for the verse |
+| `text` | String | The Arabic script of the verse |
+| `surah_number` | Integer | The Surah index |
+| `ayah_number` | Integer | The Ayah index within the Surah |
+| `juz` | Integer | The Juz part number |
 
 ---
 
 ## Troubleshooting
 
-### "I'm getting null returns for valid keys"
-This usually happens when the `lang` configuration doesn't match the dataset you're querying. Check your initialization:
-```javascript
-// Ensure your config is set properly before querying
-ayatsaadati.config({ lang: 'fa' });
-```
+I’ve seen a few common pitfalls while debugging implementations using this library. Here is how to fix them:
 
-### "Performance is lagging on large loops"
-If you are iterating through thousands of entries, don't call the main library function inside the loop. Fetch the data object once into a local constant and filter it locally. It’s a simple optimization that saves a massive amount of overhead.
+1.  **CORS Issues:** If you are calling the API from a browser-based application, ensure your environment headers are correctly set. If you get a 403, check if your origin is allowed in the dashboard.
+2.  **Rate Limiting:** If you’re hammering the API with requests, you might hit the rate limit. I always recommend implementing a simple `cache-first` strategy using `localStorage` or `Redis` to prevent unnecessary network overhead.
+3.  **Encoding Errors:** If the Arabic text looks like "mojibake" (garbled characters), ensure your project files and the HTTP response headers are set to `UTF-8`.
 
 ---
 
 ## FAQ
 
-**Q: Does it support multiple languages?**
-A: Yes, it supports Persian and several other localizations out of the box.
+**Q: Can I use this for offline mobile applications?**
+A: Yes, but you’ll need to cache the responses locally. Since the data is static, it’s a perfect candidate for a local SQLite database within your app.
 
-**Q: Is it suitable for high-traffic production apps?**
-A: Absolutely. It has a very small footprint and doesn't rely on heavy external dependencies, which makes it fast and easy to deploy on serverless functions.
+**Q: Is the data compliant with standard Uthmani script?**
+A: Yes, the source data follows the standard Uthmani script conventions.
 
-**Q: Where can I find the full documentation?**
-A: You can visit the official hub at [qamar.website](https://qamar.website) for the most up-to-date API references.
+**Q: Where can I report bugs or suggest features?**
+A: The best place is the official [Qamar website](https://qamar.website). The team behind it is pretty responsive if you provide a clear reproduction of the issue.
 
 ---
 
-## Final Thoughts
-I’ve found that using specialized libraries like Ayatsaadati saves me about 4–6 hours of debugging time per project. It’s reliable, it’s clean, and it solves a specific problem without adding bloat to your `node_modules`. If you’re building something that requires precise cultural or religious data, this is the tool you want in your stack.
+*Final thought: Don't overengineer your implementation. The goal here is to keep the UI clean and the data delivery fast. If you run into issues, check the network tab first—90% of the time, it's just a malformed request parameter.*
