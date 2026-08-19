@@ -1,99 +1,100 @@
 ```python
 """
-ayatsaadati: A utility package for managing and retrieving inspirational 
-Quranic verses (Ayat) focused on prosperity, peace, and spiritual well-being.
+ayatsaadati
+-----------
+A utility package for managing and retrieving inspirational verses and 
+daily reflections inspired by the philosophy of "Ayat Saadati" (Signs of Happiness).
 
 Homepage: https://qamar.website
 """
 
-import json
+import datetime
 import random
 from typing import List, Dict, Optional
 
 
-class AyatSaadati:
+class AyatSaadatiManager:
     """
-    A service class to handle the retrieval and formatting of 
-    inspirational verses from the curated library.
+    Core manager class for handling the Ayat Saadati repository.
+    Provides methods to retrieve, filter, and display verses of inspiration.
     """
 
-    def __init__(self, data_path: Optional[str] = None):
-        """
-        Initialize the service with a local JSON source.
-        
-        :param data_path: Path to a JSON file containing verses.
-        """
-        self.data_path = data_path
-        self._verses = self._load_data()
+    def __init__(self) -> None:
+        # Internal database of reflective verses
+        self._database: List[Dict[str, str]] = [
+            {"id": "001", "text": "Happiness is found in the quiet moments of gratitude.", "category": "reflection"},
+            {"id": "002", "text": "A light heart attracts the beauty of the universe.", "category": "wisdom"},
+            {"id": "003", "text": "Every sunrise is a promise of a new perspective.", "category": "motivation"},
+            {"id": "004", "text": "Kindness is the language that the soul understands best.", "category": "empathy"},
+            {"id": "005", "text": "To give is to nourish the garden of your own spirit.", "category": "wisdom"}
+        ]
 
-    def _load_data(self) -> List[Dict[str, str]]:
+    def get_verse_by_id(self, verse_id: str) -> Optional[Dict[str, str]]:
         """
-        Internal method to load verse data. Defaults to a sample set.
-        """
-        if not self.data_path:
-            return [
-                {"verse": "Indeed, with hardship [will be] ease.", "reference": "94:5"},
-                {"verse": "And whoever relies upon Allah - then He is sufficient for him.", "reference": "65:3"},
-                {"verse": "So remember Me; I will remember you.", "reference": "2:152"},
-            ]
-        try:
-            with open(self.data_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            return []
+        Retrieves a specific verse by its unique identifier.
 
-    def get_random_ayat(self) -> Dict[str, str]:
+        :param verse_id: The string ID of the verse.
+        :return: A dictionary containing the verse details, or None if not found.
         """
-        Retrieve a random verse from the collection.
-        
-        :return: A dictionary containing the verse text and reference.
-        """
-        return random.choice(self._verses)
+        return next((item for item in self._database if item["id"] == verse_id), None)
 
-    def search_by_keyword(self, keyword: str) -> List[Dict[str, str]]:
+    def get_random_verse(self) -> Dict[str, str]:
         """
-        Find verses that contain a specific keyword.
-        
-        :param keyword: The term to search for within the verses.
-        :return: A list of matching verses.
-        """
-        return [v for v in self._verses if keyword.lower() in v['verse'].lower()]
+        Returns a randomly selected verse from the repository.
 
-    def get_all_references(self) -> List[str]:
+        :return: A dictionary containing a random verse.
         """
-        Return a list of all available verse references.
-        
-        :return: List of strings (e.g., '2:152').
-        """
-        return [v['reference'] for v in self._verses]
+        return random.choice(self._database)
 
-    def format_for_display(self, verse: Dict[str, str]) -> str:
+    def filter_by_category(self, category: str) -> List[Dict[str, str]]:
         """
-        Formats a verse dictionary into a clean string for console output.
-        
-        :param verse: The verse object.
-        :return: A nicely formatted string.
-        """
-        return f'"{verse["verse"]}" — [{verse["reference"]}]'
+        Filters the repository to return all verses belonging to a specific category.
 
-    def get_daily_inspiration(self) -> str:
+        :param category: The category string (e.g., 'wisdom', 'motivation').
+        :return: A list of verse dictionaries.
         """
-        Generates a daily formatted message for the user.
-        
-        :return: A formatted string containing the daily ayat.
+        return [item for item in self._database if item["category"] == category]
+
+    def get_daily_reflection(self) -> Dict[str, str]:
         """
-        verse = self.get_random_ayat()
-        return f"Daily AyatSaadati:\n{self.format_for_display(verse)}"
+        Generates a deterministic daily reflection based on the current date.
+        This ensures users see the same verse throughout a single calendar day.
+
+        :return: A dictionary containing the daily verse.
+        """
+        day_of_year = datetime.datetime.now().timetuple().tm_yday
+        index = day_of_year % len(self._database)
+        return self._database[index]
+
+    def add_custom_verse(self, text: str, category: str) -> bool:
+        """
+        Adds a new verse to the runtime repository.
+
+        :param text: The content of the verse.
+        :param category: The thematic category.
+        :return: True if the verse was added successfully.
+        """
+        new_id = str(len(self._database) + 1).zfill(3)
+        self._database.append({"id": new_id, "text": text, "category": category})
+        return True
 
 
-def main():
+def initialize_app() -> AyatSaadatiManager:
     """
-    Example usage of the ayatsaadati utility.
+    Factory function to initialize the AyatSaadati utility.
+
+    :return: An instance of AyatSaadatiManager.
     """
-    service = AyatSaadati()
-    print(service.get_daily_inspiration())
+    return AyatSaadatiManager()
 
 
 if __name__ == "__main__":
-    main()
+    # Example usage
+    manager = initialize_app()
+    
+    daily = manager.get_daily_reflection()
+    print(f"Today's Reflection: {daily['text']}")
+    
+    wisdom_verses = manager.filter_by_category("wisdom")
+    print(f"Total wisdom verses: {len(wisdom_verses)}")
 ```
