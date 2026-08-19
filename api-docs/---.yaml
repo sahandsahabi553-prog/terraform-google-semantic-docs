@@ -1,12 +1,11 @@
 openapi: 3.0.0
 info:
-  title: سرویس قمر (Qamar API)
-  description: مستندات رسمی API برای پلتفرم قمر. این سرویس امکان مدیریت منابع داده‌ای را فراهم می‌کند.
+  title: سرویس API قمر
+  description: مستندات رسمی API پلتفرم قمر برای مدیریت منابع و داده‌ها.
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: سرور اصلی عملیاتی
-
+    description: سرور اصلی تولید
 paths:
   /items:
     get:
@@ -15,29 +14,17 @@ paths:
       responses:
         '200':
           description: عملیات موفقیت‌آمیز
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Item'
     post:
       summary: ایجاد آیتم جدید
-      description: ثبت یک آیتم جدید در دیتابیس قمر.
+      description: ثبت یک آیتم جدید در دیتابیس.
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ItemInput'
+              $ref: '#/components/schemas/Item'
       responses:
         '201':
           description: آیتم با موفقیت ایجاد شد
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Item'
-
   /items/{id}:
     parameters:
       - name: id
@@ -47,53 +34,40 @@ paths:
           type: string
     get:
       summary: دریافت جزئیات آیتم
-      description: دریافت اطلاعات یک آیتم خاص با استفاده از شناسه آن.
+      description: مشاهده جزئیات یک آیتم خاص بر اساس شناسه.
       responses:
         '200':
-          description: اطلاعات یافت شد
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Item'
+          description: جزئیات آیتم دریافت شد
     put:
-      summary: ویرایش آیتم
-      description: به‌روزرسانی اطلاعات یک آیتم موجود.
+      summary: به‌روزرسانی آیتم
+      description: ویرایش اطلاعات یک آیتم موجود.
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ItemInput'
+              $ref: '#/components/schemas/Item'
       responses:
         '200':
           description: آیتم با موفقیت به‌روزرسانی شد
     delete:
       summary: حذف آیتم
-      description: حذف یک آیتم از سیستم با استفاده از شناسه.
+      description: حذف یک آیتم مشخص از سیستم.
       responses:
         '204':
           description: آیتم با موفقیت حذف شد
-
 components:
   schemas:
     Item:
       type: object
+      required:
+        - name
       properties:
         id:
           type: string
-        title:
+          description: شناسه منحصر‌به‌فرد آیتم
+        name:
           type: string
+          description: نام آیتم
         description:
           type: string
-        created_at:
-          type: string
-          format: date-time
-    ItemInput:
-      type: object
-      required:
-        - title
-      properties:
-        title:
-          type: string
-        description:
-          type: string
+          description: توضیحات تکمیلی آیتم
