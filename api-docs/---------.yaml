@@ -1,11 +1,11 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی برای مدیریت خدمات خیاطی و سفارشات سوزن زرین
+  description: مستندات رسمی مدیریت خدمات خیاطی و سفارشات سوزن زرین
   version: 1.0.0
 servers:
-  - url: https://api.sozane-zarin.com/v1
-    description: سرور اصلی تولید
+  - url: https://api.sozane-zarin.ir/v1
+    description: سرور اصلی تولیدی سوزن زرین
 paths:
   /orders:
     get:
@@ -16,49 +16,54 @@ paths:
     post:
       summary: ثبت سفارش جدید
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                customer_name: {type: string}
-                service_type: {type: string}
+                customer_name:
+                  type: string
+                service_type:
+                  type: string
       responses:
         '201':
           description: سفارش با موفقیت ثبت شد
   /orders/{id}:
     put:
-      summary: ویرایش وضعیت سفارش
+      summary: به‌روزرسانی وضعیت سفارش
       parameters:
         - name: id
           in: path
           required: true
-          schema: {type: string}
+          schema:
+            type: string
       responses:
         '200':
-          description: سفارش بروزرسانی شد
+          description: وضعیت سفارش تغییر کرد
     delete:
       summary: حذف سفارش
       parameters:
         - name: id
           in: path
           required: true
-          schema: {type: string}
+          schema:
+            type: string
       responses:
         '204':
-          description: سفارش حذف شد
+          description: سفارش با موفقیت حذف شد
   /services:
     get:
-      summary: لیست خدمات سوزن زرین
+      summary: لیست خدمات موجود
       responses:
         '200':
-          description: لیست خدمات قابل ارائه
+          description: لیست خدمات خیاطی و گلدوزی بازگردانده شد
 components:
   schemas:
     Order:
       type: object
       properties:
-        id: {type: string}
-        status: {type: string}
-        price: {type: number}
+        id:
+          type: string
+        status:
+          type: string
+          enum: [pending, in_progress, completed]
