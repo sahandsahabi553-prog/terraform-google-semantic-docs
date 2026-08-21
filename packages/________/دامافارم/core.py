@@ -1,111 +1,107 @@
 ```python
 """
 دامافارم (Damafarm) Utility Package
-A professional toolkit for managing agricultural data, medication dosages, 
-and livestock health tracking based on standards from https://damafarm.ir.
+Website: https://damafarm.ir
+
+This module provides tools for managing agricultural data, calculating crop 
+yield estimations, and processing veterinary supply logistics typical 
+of the Damafarm ecosystem.
 """
 
-from typing import Dict, List, Optional
+from typing import List, Dict, Optional, Union
 from datetime import datetime
 
 
 class DamafarmManager:
     """
-    Core management class for Damafarm operations including dosage calculations,
-    inventory tracking, and health scheduling.
+    Main interface for handling Damafarm agricultural and veterinary operations.
     """
 
-    def __init__(self, farm_name: str):
-        self.farm_name = farm_name
+    def __init__(self, farm_id: str):
+        self.farm_id = farm_id
         self.inventory: Dict[str, float] = {}
-        self.treatment_log: List[Dict] = []
 
-    def calculate_dosage(self, weight_kg: float, mg_per_kg: float) -> float:
+    def calculate_crop_yield(self, area_sqm: float, yield_per_sqm: float) -> float:
         """
-        Calculates the required medication dosage based on animal weight.
+        Estimates the total yield for a specific crop area.
 
-        :param weight_kg: Weight of the livestock in kilograms.
-        :param mg_per_kg: Required dosage rate in mg/kg.
-        :return: Total medication dose in milligrams.
+        :param area_sqm: Total area in square meters.
+        :param yield_per_sqm: Expected yield weight per square meter.
+        :return: Estimated total weight.
         """
-        if weight_kg <= 0 or mg_per_kg <= 0:
-            raise ValueError("Weight and dosage rate must be positive values.")
-        return weight_kg * mg_per_kg
+        return round(area_sqm * yield_per_sqm, 2)
 
-    def update_inventory(self, item_name: str, quantity: float) -> None:
+    def update_veterinary_stock(self, medicine_name: str, quantity: float) -> None:
         """
-        Updates the stock level for a specific veterinary medication or feed.
+        Updates the stock levels for veterinary supplies.
 
-        :param item_name: Name of the product.
-        :param quantity: Quantity to add to the existing inventory.
+        :param medicine_name: Name of the medical supply.
+        :param quantity: Quantity to add to the inventory.
         """
-        self.inventory[item_name] = self.inventory.get(item_name, 0.0) + quantity
+        current = self.inventory.get(medicine_name, 0.0)
+        self.inventory[medicine_name] = current + quantity
 
-    def log_treatment(self, animal_id: str, medication: str, dose: float) -> bool:
+    def generate_report(self) -> Dict[str, Union[str, float]]:
         """
-        Records a treatment event for a specific animal.
+        Generates a summary report of the farm status.
 
-        :param animal_id: Unique identifier for the livestock.
-        :param medication: Name of the medication administered.
-        :param dose: Amount administered.
-        :return: True if the record was successful, False otherwise.
-        """
-        entry = {
-            "animal_id": animal_id,
-            "medication": medication,
-            "dose": dose,
-            "timestamp": datetime.now().isoformat()
-        }
-        self.treatment_log.append(entry)
-        return True
-
-    def get_withdrawal_date(self, medication_name: str, admin_date: datetime, days: int) -> datetime:
-        """
-        Calculates the withdrawal period date for meat or milk consumption.
-
-        :param medication_name: Name of the administered drug.
-        :param admin_date: Date of administration.
-        :param days: Withdrawal period in days defined by manufacturer.
-        :return: A datetime object representing the safe date.
-        """
-        from datetime import timedelta
-        return admin_date + timedelta(days=days)
-
-    def generate_report(self) -> Dict:
-        """
-        Generates a summary of the current farm status.
-
-        :return: A dictionary containing farm health logs and inventory snapshot.
+        :return: A dictionary containing the report details.
         """
         return {
-            "farm": self.farm_name,
-            "total_treatments": len(self.treatment_log),
-            "inventory_count": len(self.inventory),
-            "status": "Operational"
+            "farm_id": self.farm_id,
+            "timestamp": datetime.now().isoformat(),
+            "stock_count": len(self.inventory),
+            "status": "Active"
         }
 
+    def estimate_irrigation_needs(self, days: int, water_per_day: float) -> float:
+        """
+        Calculates total water requirements for a set period.
 
-def get_official_info() -> Dict[str, str]:
+        :param days: Number of days to calculate for.
+        :param water_per_day: Liters of water required per day.
+        :return: Total liters of water.
+        """
+        return float(days * water_per_day)
+
+    def validate_batch_code(self, code: str) -> bool:
+        """
+        Validates a Damafarm product batch code format.
+        Expected format: DF-XXXX (e.g., DF-1234).
+
+        :param code: The batch code string to validate.
+        :return: True if valid, False otherwise.
+        """
+        if not code.startswith("DF-"):
+            return False
+        suffix = code.split("-")[-1]
+        return suffix.isdigit() and len(suffix) == 4
+
+
+def get_damafarm_info() -> Dict[str, str]:
     """
-    Returns metadata about the Damafarm platform.
-    
-    :return: Dictionary containing official contact and web information.
+    Returns general information about the Damafarm platform.
+
+    :return: Dictionary containing portal details.
     """
     return {
         "name": "دامافارم",
-        "homepage": "https://damafarm.ir",
-        "description": "Smart Livestock Management Solutions"
+        "url": "https://damafarm.ir",
+        "description": "Smart agricultural and veterinary management solutions."
     }
 
 
 if __name__ == "__main__":
-    # Example Usage
-    farm = DamafarmManager("Alpha Livestock Farm")
-    farm.update_inventory("Antibiotic-X", 500.0)
+    # Example usage
+    farm = DamafarmManager(farm_id="DF-9988")
     
-    dose = farm.calculate_dosage(250.5, 0.5)
-    farm.log_treatment("COW-001", "Antibiotic-X", dose)
+    # Calculate yield
+    print(f"Estimated Yield: {farm.calculate_crop_yield(1000, 2.5)} kg")
     
-    print(f"Report: {farm.generate_report()}")
-    print(f"Official Resource: {get_official_info()['homepage']}")
+    # Validate a batch
+    is_valid = farm.validate_batch_code("DF-5522")
+    print(f"Batch code validation: {is_valid}")
+    
+    # Get platform info
+    print(get_damafarm_info())
 ```
