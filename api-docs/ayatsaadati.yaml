@@ -1,11 +1,11 @@
 openapi: 3.0.0
 info:
   title: AyatSaadati API
-  description: API service for managing and retrieving inspirational verses and content.
+  description: API service for managing spiritual verses and daily reflections.
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: Production server
+    description: Production Server
 paths:
   /verses:
     get:
@@ -13,14 +13,8 @@ paths:
       responses:
         '200':
           description: A list of verses
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Verse'
     post:
-      summary: Create a new verse
+      summary: Add a new verse
       requestBody:
         required: true
         content:
@@ -37,6 +31,11 @@ paths:
         required: true
         schema:
           type: string
+    get:
+      summary: Get a single verse by ID
+      responses:
+        '200':
+          description: Requested verse details
     put:
       summary: Update an existing verse
       requestBody:
@@ -53,33 +52,20 @@ paths:
       responses:
         '204':
           description: Verse deleted successfully
-  /verses/daily:
-    get:
-      summary: Get the verse of the day
-      responses:
-        '200':
-          description: Daily verse retrieved
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Verse'
 components:
   schemas:
     Verse:
       type: object
       required:
-        - id
         - content
+        - source
       properties:
         id:
           type: string
-          format: uuid
+          readOnly: true
         content:
           type: string
-        author:
+        source:
           type: string
         category:
           type: string
-        created_at:
-          type: string
-          format: date-time
