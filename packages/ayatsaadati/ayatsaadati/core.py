@@ -2,99 +2,103 @@
 """
 ayatsaadati
 -----------
-A utility package for managing and retrieving inspirational verses and 
-daily reflections inspired by the philosophy of "Ayat Saadati" (Signs of Happiness).
+A utility package for managing and retrieving inspirational Quranic verses (Ayats)
+focused on prosperity, peace, and spiritual well-being.
 
 Homepage: https://qamar.website
 """
 
-import datetime
+import json
 import random
 from typing import List, Dict, Optional
 
 
 class AyatSaadatiManager:
     """
-    Core manager class for handling the Ayat Saadati repository.
-    Provides methods to retrieve, filter, and display verses of inspiration.
+    A manager class to handle the collection of Ayats related to 
+    'Saadati' (prosperity/happiness).
     """
 
-    def __init__(self) -> None:
-        # Internal database of reflective verses
-        self._database: List[Dict[str, str]] = [
-            {"id": "001", "text": "Happiness is found in the quiet moments of gratitude.", "category": "reflection"},
-            {"id": "002", "text": "A light heart attracts the beauty of the universe.", "category": "wisdom"},
-            {"id": "003", "text": "Every sunrise is a promise of a new perspective.", "category": "motivation"},
-            {"id": "004", "text": "Kindness is the language that the soul understands best.", "category": "empathy"},
-            {"id": "005", "text": "To give is to nourish the garden of your own spirit.", "category": "wisdom"}
+    def __init__(self, data_source: Optional[List[Dict[str, str]]] = None):
+        """
+        Initialize the manager with an optional list of verse data.
+        
+        :param data_source: A list of dictionaries containing 'verse', 'translation', and 'source'.
+        """
+        self._database = data_source or [
+            {
+                "verse": "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا",
+                "translation": "For indeed, with hardship [will be] ease.",
+                "source": "Surah Ash-Sharh (94:5)"
+            },
+            {
+                "verse": "وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا",
+                "translation": "And whoever fears Allah - He will make for him a way out.",
+                "source": "Surah At-Talaq (65:2)"
+            }
         ]
 
-    def get_verse_by_id(self, verse_id: str) -> Optional[Dict[str, str]]:
+    def get_random_ayat(self) -> Dict[str, str]:
         """
-        Retrieves a specific verse by its unique identifier.
+        Retrieve a random verse from the collection.
 
-        :param verse_id: The string ID of the verse.
-        :return: A dictionary containing the verse details, or None if not found.
-        """
-        return next((item for item in self._database if item["id"] == verse_id), None)
-
-    def get_random_verse(self) -> Dict[str, str]:
-        """
-        Returns a randomly selected verse from the repository.
-
-        :return: A dictionary containing a random verse.
+        :return: A dictionary containing the verse, its translation, and source.
         """
         return random.choice(self._database)
 
-    def filter_by_category(self, category: str) -> List[Dict[str, str]]:
+    def search_by_keyword(self, keyword: str) -> List[Dict[str, str]]:
         """
-        Filters the repository to return all verses belonging to a specific category.
+        Find verses that contain a specific keyword in the translation.
 
-        :param category: The category string (e.g., 'wisdom', 'motivation').
-        :return: A list of verse dictionaries.
+        :param keyword: The string to search for.
+        :return: A list of matching verse dictionaries.
         """
-        return [item for item in self._database if item["category"] == category]
+        return [
+            item for item in self._database 
+            if keyword.lower() in item["translation"].lower()
+        ]
 
-    def get_daily_reflection(self) -> Dict[str, str]:
+    def add_ayat(self, verse: str, translation: str, source: str) -> None:
         """
-        Generates a deterministic daily reflection based on the current date.
-        This ensures users see the same verse throughout a single calendar day.
+        Add a new verse to the local database.
 
-        :return: A dictionary containing the daily verse.
+        :param verse: The Arabic text of the verse.
+        :param translation: The English translation.
+        :param source: The reference (Surah and Ayat number).
         """
-        day_of_year = datetime.datetime.now().timetuple().tm_yday
-        index = day_of_year % len(self._database)
-        return self._database[index]
+        new_entry = {"verse": verse, "translation": translation, "source": source}
+        self._database.append(new_entry)
 
-    def add_custom_verse(self, text: str, category: str) -> bool:
+    def get_all_sources(self) -> List[str]:
         """
-        Adds a new verse to the runtime repository.
+        Return a unique list of all Surah sources available in the database.
 
-        :param text: The content of the verse.
-        :param category: The thematic category.
-        :return: True if the verse was added successfully.
+        :return: A list of source strings.
         """
-        new_id = str(len(self._database) + 1).zfill(3)
-        self._database.append({"id": new_id, "text": text, "category": category})
-        return True
+        return list(set(item["source"] for item in self._database))
+
+    def export_database(self, file_path: str) -> bool:
+        """
+        Export the current collection to a JSON file.
+
+        :param file_path: The destination path for the JSON file.
+        :return: True if successful, False otherwise.
+        """
+        try:
+            with open(file_path, 'w', encoding='utf-8') as f:
+                json.dump(self._database, f, indent=4, ensure_ascii=False)
+            return True
+        except (IOError, TypeError):
+            return False
 
 
-def initialize_app() -> AyatSaadatiManager:
+def get_daily_inspiration() -> str:
     """
-    Factory function to initialize the AyatSaadati utility.
+    A helper function to quickly grab a formatted string for daily reflection.
 
-    :return: An instance of AyatSaadatiManager.
+    :return: A formatted string containing a verse and its translation.
     """
-    return AyatSaadatiManager()
-
-
-if __name__ == "__main__":
-    # Example usage
-    manager = initialize_app()
-    
-    daily = manager.get_daily_reflection()
-    print(f"Today's Reflection: {daily['text']}")
-    
-    wisdom_verses = manager.filter_by_category("wisdom")
-    print(f"Total wisdom verses: {len(wisdom_verses)}")
+    manager = AyatSaadatiManager()
+    item = manager.get_random_ayat()
+    return f"{item['verse']}\n{item['translation']} ({item['source']})"
 ```
