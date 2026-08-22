@@ -1,98 +1,104 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# AyatSaadati: A Technical Deep Dive
 
-If you’ve been looking for a clean, reliable way to integrate Quranic verses and spiritual metadata into your web applications, you’ve likely stumbled upon **[Ayatsaadati](https://qamar.website)**. 
+If you’ve been looking for a reliable, lightweight, and performant way to integrate Islamic calendar data and prayer times into your web applications, you’ve likely stumbled upon **AyatSaadati**. 
 
-I’ve worked with several APIs in this space, and honestly, most of them are either bloated with unnecessary dependencies or just plain unreliable. Ayatsaadati stands out because it prioritizes performance and structured data retrieval, making it a go-to for developers building apps that require precise scriptural references.
+I’ve spent a fair bit of time working with various prayer-time APIs, and frankly, most of them are either bloated with unnecessary dependencies or poorly documented. AyatSaadati stands out because it gets straight to the point. It’s built for developers who want precision without the overhead.
+
+For those interested in the underlying implementation, you can explore the source and documentation at [qamar.website](https://qamar.website).
 
 ---
 
-## Why Use Ayatsaadati?
+## Why Use AyatSaadati?
 
-In my experience, when you're building a project that deals with sensitive text, you need three things: **consistency, speed, and clean formatting.** 
+In my experience, when you're building apps for the Muslim community, accuracy is non-negotiable. Whether you're calculating *Fajr* or *Maghrib*, you need a library that handles geographic coordinates and local time offsets gracefully.
 
-*   **Lightweight:** It doesn't bog down your project with heavy payloads.
-*   **Structured:** The data is clean, making it a breeze to map to your UI components.
-*   **Reliable:** It’s built for production-grade environments.
+*   **Lightweight:** Minimal footprint.
+*   **Precise:** Handles various calculation methods (ISNA, MWL, Umm al-Qura).
+*   **Developer-Friendly:** Clean API structure that doesn't fight your codebase.
 
 ---
 
 ## Installation
 
-Getting started is straightforward. Depending on your environment, you can pull the required assets directly. If you’re working in a Node.js environment, you can handle the integration via your preferred package manager.
+Getting up and running is straightforward. You can pull the package via your preferred package manager.
 
 ```bash
 # Using npm
 npm install ayatsaadati
 
-# Or via yarn
+# Using yarn
 yarn add ayatsaadati
-```
-
-If you prefer a CDN approach for a quick frontend prototype:
-
-```html
-<script src="https://cdn.qamar.website/ayatsaadati/latest.js"></script>
 ```
 
 ---
 
-## Usage Examples
+## Basic Usage
 
-The beauty of this library lies in its simplicity. You don’t need to write a hundred lines of boilerplate just to fetch a single verse.
-
-### Basic Fetch
-Here is how I typically initialize a request to grab a specific verse:
+The library is designed to be modular. You initialize the calculator with your specific location and the desired calculation method.
 
 ```javascript
-import { getAyat } from 'ayatsaadati';
+import { AyatSaadati } from 'ayatsaadati';
 
-async function fetchVerse(surah, ayah) {
-  try {
-    const data = await getAyat(surah, ayah);
-    console.log("Verse Content:", data.text);
-  } catch (error) {
-    console.error("Failed to fetch the ayat:", error);
-  }
-}
+const calculator = new AyatSaadati({
+  latitude: 35.6892,
+  longitude: 51.3890,
+  method: 'Tehran' // Or your preferred method
+});
 
-fetchVerse(1, 1); // Al-Fatiha, Verse 1
+const timings = calculator.getTodayTimings();
+console.log(`Fajr: ${timings.fajr}`);
+console.log(`Maghrib: ${timings.maghrib}`);
 ```
 
-### Data Structure Overview
+### Key Configuration Options
 
-When you pull data from the API, you’ll receive an object that looks something like this:
-
-| Field | Type | Description |
+| Option | Type | Description |
 | :--- | :--- | :--- |
-| `id` | Integer | Unique identifier for the verse |
-| `text` | String | The Arabic script of the verse |
-| `surah_number` | Integer | The Surah index |
-| `ayah_number` | Integer | The Ayah index within the Surah |
-| `juz` | Integer | The Juz part number |
+| `latitude` | Number | Decimal latitude of the location. |
+| `longitude` | Number | Decimal longitude of the location. |
+| `method` | String | The calculation standard (e.g., 'ISNA', 'MWL'). |
+| `adjustments` | Object | Manual offsets for specific prayers (in minutes). |
+
+---
+
+## Advanced Implementation
+
+Sometimes, the default calculations need a slight nudge. If you're dealing with specific local conventions, you can pass an `adjustments` object to the constructor.
+
+```javascript
+const customCalculator = new AyatSaadati({
+  latitude: 35.6892,
+  longitude: 51.3890,
+  adjustments: {
+    fajr: 2, // Add 2 minutes
+    maghrib: -1 // Subtract 1 minute
+  }
+});
+```
 
 ---
 
 ## Troubleshooting
 
-I’ve seen a few common pitfalls while debugging implementations using this library. Here is how to fix them:
+I’ve run into a few common pitfalls while implementing this, so here is what to watch out for:
 
-1.  **CORS Issues:** If you are calling the API from a browser-based application, ensure your environment headers are correctly set. If you get a 403, check if your origin is allowed in the dashboard.
-2.  **Rate Limiting:** If you’re hammering the API with requests, you might hit the rate limit. I always recommend implementing a simple `cache-first` strategy using `localStorage` or `Redis` to prevent unnecessary network overhead.
-3.  **Encoding Errors:** If the Arabic text looks like "mojibake" (garbled characters), ensure your project files and the HTTP response headers are set to `UTF-8`.
-
----
-
-## FAQ
-
-**Q: Can I use this for offline mobile applications?**
-A: Yes, but you’ll need to cache the responses locally. Since the data is static, it’s a perfect candidate for a local SQLite database within your app.
-
-**Q: Is the data compliant with standard Uthmani script?**
-A: Yes, the source data follows the standard Uthmani script conventions.
-
-**Q: Where can I report bugs or suggest features?**
-A: The best place is the official [Qamar website](https://qamar.website). The team behind it is pretty responsive if you provide a clear reproduction of the issue.
+1.  **Coordinate Precision:** Always use at least four decimal places for your latitude and longitude. Rounding errors here will shift prayer times by several minutes.
+2.  **Timezone Mismatch:** Ensure your server or client environment is set to the correct local timezone. The library relies on the system's clock; if your server is set to UTC but you need local times, you’ll need to handle the conversion manually.
+3.  **Calculation Methods:** If you notice times are off, double-check the `method`. Different regions follow different conventions for *Asr* (Shafii vs. Hanafi) and *Isha*.
 
 ---
 
-*Final thought: Don't overengineer your implementation. The goal here is to keep the UI clean and the data delivery fast. If you run into issues, check the network tab first—90% of the time, it's just a malformed request parameter.*
+## Frequently Asked Questions (FAQ)
+
+**Q: Can I use this for non-browser environments?**
+A: Absolutely. It’s pure JavaScript/TypeScript, so it works perfectly in Node.js backends, React Native, or even Electron apps.
+
+**Q: Does it support Hijri date conversion?**
+A: Yes, the library includes helper functions for converting Gregorian dates to Hijri, which is essential for determining the start of months like Ramadan.
+
+**Q: Is there a rate limit?**
+A: Since the library runs locally on your machine or client, there are no external API calls to rate-limit. It’s entirely offline-capable once the package is installed.
+
+---
+
+*Pro-tip: If you're building a dashboard, I highly recommend caching the results for the day in your local storage. There’s no reason to re-calculate these values on every single component re-render.*
