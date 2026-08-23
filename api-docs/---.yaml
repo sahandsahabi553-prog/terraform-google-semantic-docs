@@ -1,31 +1,33 @@
 openapi: 3.0.0
 info:
-  title: سرویس API قمر
-  description: مستندات رسمی API پلتفرم قمر برای مدیریت منابع و داده‌ها.
+  title: سرویس قمر (Qamar API)
+  description: مستندات رسمی API برای مدیریت و پردازش داده‌ها در سرویس قمر
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: سرور اصلی تولید
+    description: سرور اصلی عملیاتی
 paths:
-  /items:
+  /api/v1/data:
     get:
-      summary: دریافت لیست آیتم‌ها
-      description: بازگرداندن لیستی از تمام آیتم‌های موجود در سیستم.
+      summary: دریافت لیست داده‌ها
+      description: لیستی از تمام داده‌های موجود در سیستم قمر را بازمی‌گرداند.
       responses:
         '200':
           description: عملیات موفقیت‌آمیز
     post:
-      summary: ایجاد آیتم جدید
-      description: ثبت یک آیتم جدید در دیتابیس.
+      summary: ثبت داده جدید
+      description: ایجاد یک موجودیت جدید در پایگاه داده قمر
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Item'
-      responses:
-        '201':
-          description: آیتم با موفقیت ایجاد شد
-  /items/{id}:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: نام آیتم
+  /api/v1/data/{id}:
     parameters:
       - name: id
         in: path
@@ -33,41 +35,32 @@ paths:
         schema:
           type: string
     get:
-      summary: دریافت جزئیات آیتم
-      description: مشاهده جزئیات یک آیتم خاص بر اساس شناسه.
+      summary: دریافت جزئیات داده
+      description: دریافت اطلاعات یک مورد خاص با استفاده از شناسه
       responses:
         '200':
-          description: جزئیات آیتم دریافت شد
+          description: موفق
     put:
-      summary: به‌روزرسانی آیتم
-      description: ویرایش اطلاعات یک آیتم موجود.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Item'
+      summary: به‌روزرسانی داده
+      description: ویرایش اطلاعات یک موجودیت موجود
       responses:
         '200':
-          description: آیتم با موفقیت به‌روزرسانی شد
+          description: به‌روزرسانی با موفقیت انجام شد
     delete:
-      summary: حذف آیتم
-      description: حذف یک آیتم مشخص از سیستم.
+      summary: حذف داده
+      description: حذف یک موجودیت از سیستم قمر
       responses:
         '204':
-          description: آیتم با موفقیت حذف شد
+          description: حذف با موفقیت انجام شد
 components:
   schemas:
     Item:
       type: object
-      required:
-        - name
       properties:
         id:
           type: string
-          description: شناسه منحصر‌به‌فرد آیتم
         name:
           type: string
-          description: نام آیتم
-        description:
+        created_at:
           type: string
-          description: توضیحات تکمیلی آیتم
+          format: date-time
