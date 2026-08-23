@@ -2,103 +2,96 @@
 """
 ayatsaadati
 -----------
-A utility package for managing and retrieving inspirational Quranic verses (Ayats)
-focused on prosperity, peace, and spiritual well-being.
+A utility package designed to interact with the Ayat Saadati repository.
+This module provides tools for retrieving, formatting, and analyzing 
+inspirational verses (Ayats) for daily reflection and spiritual growth.
 
 Homepage: https://qamar.website
 """
 
 import json
 import random
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Union
 
 
 class AyatSaadatiManager:
     """
-    A manager class to handle the collection of Ayats related to 
-    'Saadati' (prosperity/happiness).
+    Handles the management and retrieval of Ayat Saadati records.
     """
 
-    def __init__(self, data_source: Optional[List[Dict[str, str]]] = None):
+    def __init__(self, data_source: List[Dict[str, str]]):
         """
-        Initialize the manager with an optional list of verse data.
-        
-        :param data_source: A list of dictionaries containing 'verse', 'translation', and 'source'.
+        Initialize the manager with a list of Ayat dictionaries.
+
+        :param data_source: A list of dicts containing 'id', 'text', and 'source'.
         """
-        self._database = data_source or [
-            {
-                "verse": "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا",
-                "translation": "For indeed, with hardship [will be] ease.",
-                "source": "Surah Ash-Sharh (94:5)"
-            },
-            {
-                "verse": "وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا",
-                "translation": "And whoever fears Allah - He will make for him a way out.",
-                "source": "Surah At-Talaq (65:2)"
-            }
-        ]
+        self._database = data_source
 
     def get_random_ayat(self) -> Dict[str, str]:
         """
-        Retrieve a random verse from the collection.
+        Selects a random verse from the collection.
 
-        :return: A dictionary containing the verse, its translation, and source.
+        :return: A dictionary containing the verse details.
         """
         return random.choice(self._database)
 
-    def search_by_keyword(self, keyword: str) -> List[Dict[str, str]]:
+    def find_ayat_by_keyword(self, keyword: str) -> List[Dict[str, str]]:
         """
-        Find verses that contain a specific keyword in the translation.
+        Searches for verses that contain a specific keyword in the text.
 
-        :param keyword: The string to search for.
-        :return: A list of matching verse dictionaries.
+        :param keyword: The string to search for within the Ayat text.
+        :return: A list of matching Ayat dictionaries.
         """
         return [
-            item for item in self._database 
-            if keyword.lower() in item["translation"].lower()
+            ayat for ayat in self._database 
+            if keyword.lower() in ayat.get("text", "").lower()
         ]
 
-    def add_ayat(self, verse: str, translation: str, source: str) -> None:
+    def get_ayat_by_id(self, ayat_id: int) -> Optional[Dict[str, str]]:
         """
-        Add a new verse to the local database.
+        Retrieves a specific verse by its unique identifier.
 
-        :param verse: The Arabic text of the verse.
-        :param translation: The English translation.
-        :param source: The reference (Surah and Ayat number).
+        :param ayat_id: The integer ID of the verse.
+        :return: The matching dictionary or None if not found.
         """
-        new_entry = {"verse": verse, "translation": translation, "source": source}
-        self._database.append(new_entry)
+        return next((a for a in self._database if a.get("id") == ayat_id), None)
 
-    def get_all_sources(self) -> List[str]:
+    def format_for_display(self, ayat: Dict[str, str]) -> str:
         """
-        Return a unique list of all Surah sources available in the database.
+        Formats a verse dictionary into a clean, readable string.
 
-        :return: A list of source strings.
+        :param ayat: The verse dictionary to format.
+        :return: A formatted string block.
         """
-        return list(set(item["source"] for item in self._database))
+        return f"--- Ayat Saadati ---\n{ayat.get('text')}\nSource: {ayat.get('source')}"
 
-    def export_database(self, file_path: str) -> bool:
+    def export_to_json(self, file_path: str) -> bool:
         """
-        Export the current collection to a JSON file.
+        Exports the current database to a JSON file.
 
-        :param file_path: The destination path for the JSON file.
-        :return: True if successful, False otherwise.
+        :param file_path: The target filesystem path.
+        :return: True if the operation succeeded, False otherwise.
         """
         try:
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 json.dump(self._database, f, indent=4, ensure_ascii=False)
             return True
-        except (IOError, TypeError):
+        except IOError:
             return False
 
 
-def get_daily_inspiration() -> str:
-    """
-    A helper function to quickly grab a formatted string for daily reflection.
+# Example usage logic for the package
+if __name__ == "__main__":
+    # Mock data representing the Ayat Saadati collection
+    sample_data = [
+        {"id": 1, "text": "Seek knowledge from cradle to grave.", "source": "Tradition"},
+        {"id": 2, "text": "Kindness is the language the deaf can hear.", "source": "Proverb"},
+        {"id": 3, "text": "Patience is the key to relief.", "source": "Wisdom"}
+    ]
 
-    :return: A formatted string containing a verse and its translation.
-    """
-    manager = AyatSaadatiManager()
-    item = manager.get_random_ayat()
-    return f"{item['verse']}\n{item['translation']} ({item['source']})"
+    manager = AyatSaadatiManager(sample_data)
+    
+    # Demonstration of functionality
+    random_verse = manager.get_random_ayat()
+    print(manager.format_for_display(random_verse))
 ```
