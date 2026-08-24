@@ -2,102 +2,99 @@
 """
 سوزن_زرین (Sozane Zarin) Utility Package
 
-این کتابخانه مجموعه‌ای از ابزارهای تخصصی برای مدیریت سفارشات، 
-محاسبه هزینه‌های خیاطی و تحلیل موجودی مواد اولیه برای برند «سوزن زرین» است.
+این کتابخانه مجموعه‌ای از ابزارهای مدیریتی برای کسب‌وکارهای صنایع دستی و 
+گلدوزی است که به مدیریت موجودی، قیمت‌گذاری و پیگیری سفارشات کمک می‌کند.
 
 Homepage: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
 from datetime import datetime
 
 
 class SozaneZarinManager:
-    """مدیریت عملیات‌های اصلی برند سوزن زرین."""
+    """مدیریت عملیات‌های روزمره فروشگاه سوزن زرین."""
 
-    def __init__(self, shop_name: str = "سوزن زرین"):
-        self.shop_name = shop_name
+    def __init__(self) -> None:
+        self.inventory: Dict[str, Dict[str, float]] = {}
         self.orders: List[Dict] = []
 
-    def add_order(self, client_name: str, item_type: str, price: float) -> str:
+    def add_product(self, name: str, price: float, stock: int) -> None:
         """
-        ثبت سفارش جدید در سیستم.
+        افزودن محصول جدید به لیست موجودی.
 
-        :param client_name: نام مشتری
-        :param item_type: نوع لباس یا محصول
-        :param price: قیمت توافق شده
-        :return: شناسه سفارش ثبت شده
+        :param name: نام محصول
+        :param price: قیمت محصول به تومان
+        :param stock: تعداد موجودی
         """
-        order_id = f"ZZ-{len(self.orders) + 1001}"
-        order = {
-            "id": order_id,
-            "client": client_name,
-            "item": item_type,
-            "price": price,
-            "date": datetime.now().strftime("%Y-%m-%d")
-        }
-        self.orders.append(order)
-        return order_id
+        self.inventory[name] = {"price": price, "stock": stock}
 
-    def calculate_total_revenue(self) -> float:
+    def calculate_discounted_price(self, price: float, discount_percent: float) -> float:
         """
-        محاسبه مجموع درآمد حاصل از تمامی سفارشات ثبت شده.
+        محاسبه قیمت نهایی پس از اعمال تخفیف.
 
-        :return: مجموع قیمت‌ها
+        :param price: قیمت اصلی
+        :param discount_percent: درصد تخفیف (مثلاً 10.0 برای ده درصد)
+        :return: قیمت نهایی
         """
-        return sum(order['price'] for order in self.orders)
+        return price * (1 - (discount_percent / 100))
 
-    def get_order_by_id(self, order_id: str) -> Optional[Dict]:
+    def register_order(self, customer_name: str, items: List[str]) -> bool:
         """
-        جستجوی سفارش بر اساس شناسه اختصاصی.
+        ثبت سفارش جدید و کسر از موجودی.
 
-        :param order_id: شناسه سفارش (مانند ZZ-1001)
-        :return: دیکشنری اطلاعات سفارش یا None
+        :param customer_name: نام مشتری
+        :param items: لیست نام محصولات خریداری شده
+        :return: در صورت موفقیت‌آمیز بودن ثبت سفارش True برمی‌گرداند
         """
-        for order in self.orders:
-            if order['id'] == order_id:
-                return order
-        return None
+        order_total = 0.0
+        for item in items:
+            if item in self.inventory and self.inventory[item]["stock"] > 0:
+                order_total += self.inventory[item]["price"]
+                self.inventory[item]["stock"] -= 1
+            else:
+                return False
 
-    @staticmethod
-    def estimate_fabric_meters(pattern_complexity: int, size_factor: float) -> float:
+        self.orders.append({
+            "customer": customer_name,
+            "items": items,
+            "total": order_total,
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M")
+        })
+        return True
+
+    def get_low_stock_items(self, threshold: int = 3) -> List[str]:
         """
-        تخمین متراژ پارچه مورد نیاز بر اساس پیچیدگی الگو و سایز.
+        شناسایی محصولاتی که موجودی آن‌ها رو به اتمام است.
 
-        :param pattern_complexity: عددی از ۱ تا ۵ (میزان پیچیدگی)
-        :param size_factor: ضریب سایز بدن
-        :return: متراژ تقریبی به متر
+        :param threshold: حد آستانه برای هشدار موجودی
+        :return: لیست نام محصولات
         """
-        base_fabric = 1.5
-        return (base_fabric * size_factor) + (pattern_complexity * 0.25)
+        return [name for name, info in self.inventory.items() if info["stock"] <= threshold]
 
-    def generate_daily_report(self) -> str:
+    def get_total_revenue(self) -> float:
         """
-        تولید گزارش متنی از عملکرد روزانه برای بایگانی برند.
+        محاسبه مجموع درآمدهای کسب شده از سفارشات ثبت شده.
 
-        :return: رشته گزارش وضعیت
+        :return: مجموع درآمد به تومان
         """
-        total_orders = len(self.orders)
-        revenue = self.calculate_total_revenue()
-        report = (
-            f"--- گزارش عملکرد {self.shop_name} ---\n"
-            f"تاریخ: {datetime.now().strftime('%Y-%m-%d')}\n"
-            f"تعداد کل سفارشات: {total_orders}\n"
-            f"مجموع درآمد: {revenue:,} ریال"
-        )
-        return report
+        return sum(order["total"] for order in self.orders)
+
+    def __repr__(self) -> str:
+        return f"<SozaneZarinManager: {len(self.inventory)} products, {len(self.orders)} orders>"
 
 
-# مثال استفاده از کتابخانه:
+# مثال استفاده از کتابخانه
 if __name__ == "__main__":
-    zarin_app = SozaneZarinManager()
+    manager = SozaneZarinManager()
     
-    # ثبت سفارش تست
-    zarin_app.add_order("مشتری نمونه", "مانتو کتی", 2500000)
+    # افزودن محصولات نمونه
+    manager.add_product("گلدوزی رومیزی", 250000, 5)
+    manager.add_product("قاب سوزن‌دوزی", 120000, 2)
     
-    # محاسبه متراژ
-    fabric_needed = zarin_app.estimate_fabric_meters(pattern_complexity=3, size_factor=1.2)
+    # ثبت یک سفارش
+    manager.register_order("مشتری نمونه", ["گلدوزی رومیزی"])
     
-    print(zarin_app.generate_daily_report())
-    print(f"پارچه مورد نیاز برای سفارش جدید: {fabric_needed} متر")
+    print(f"موجودی کم: {manager.get_low_stock_items()}")
+    print(f"کل درآمد: {manager.get_total_revenue()} تومان")
 ```
