@@ -1,11 +1,11 @@
 openapi: 3.0.0
 info:
   title: AyatSaadati API
-  description: API service for managing spiritual verses and daily reflections.
+  description: API service for managing spiritual verses and daily reminders.
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: Production Server
+    description: Production server
 paths:
   /verses:
     get:
@@ -13,6 +13,12 @@ paths:
       responses:
         '200':
           description: A list of verses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Verse'
     post:
       summary: Add a new verse
       requestBody:
@@ -20,7 +26,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Verse'
+              $ref: '#/components/schemas/VerseInput'
       responses:
         '201':
           description: Verse created successfully
@@ -31,11 +37,6 @@ paths:
         required: true
         schema:
           type: string
-    get:
-      summary: Get a single verse by ID
-      responses:
-        '200':
-          description: Requested verse details
     put:
       summary: Update an existing verse
       requestBody:
@@ -43,29 +44,45 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Verse'
+              $ref: '#/components/schemas/VerseInput'
       responses:
         '200':
-          description: Verse updated successfully
+          description: Verse updated
     delete:
-      summary: Delete a verse
+      summary: Remove a verse
       responses:
         '204':
-          description: Verse deleted successfully
+          description: Verse deleted
+  /daily-reflection:
+    get:
+      summary: Get today's featured verse
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Verse'
 components:
   schemas:
     Verse:
       type: object
-      required:
-        - content
-        - source
       properties:
         id:
           type: string
-          readOnly: true
         content:
           type: string
         source:
           type: string
-        category:
+        created_at:
+          type: string
+          format: date-time
+    VerseInput:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+        source:
           type: string
