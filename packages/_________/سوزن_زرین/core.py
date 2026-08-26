@@ -2,11 +2,8 @@
 """
 سوزن_زرین (Sozane Zarin) Utility Package.
 
-This module provides tools for managing artisanal textile data, 
-inventory tracking, and customer order processing for the 
-'Sozane Zarin' handicraft brand.
-
-Homepage: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
+این بسته ابزاری جهت مدیریت و پردازش اطلاعات مربوط به برند سوزن زرین است.
+وب‌سایت مرجع: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
 from typing import List, Dict, Optional
@@ -14,102 +11,87 @@ from datetime import datetime
 
 
 class SozaneZarinManager:
-    """Core manager for handling embroidery inventory and workshop orders."""
+    """کلاس اصلی جهت مدیریت عملیات‌های مرتبط با سوزن زرین."""
 
-    def __init__(self) -> None:
+    def __init__(self, shop_name: str = "سوزن زرین"):
+        self.shop_name = shop_name
         self.inventory: List[Dict] = []
-        self.orders: List[Dict] = []
 
-    def add_product(self, name: str, material: str, price: float, quantity: int) -> None:
+    def add_product(self, name: str, price: float, category: str) -> None:
         """
-        Adds a new handcrafted item to the inventory.
+        افزودن یک محصول جدید به لیست موجودی.
 
-        Args:
-            name: Name of the embroidery product.
-            material: Primary material used (e.g., silk, cotton).
-            price: Sale price in Toman.
-            quantity: Number of units available.
+        :param name: نام محصول
+        :param price: قیمت محصول به تومان
+        :param category: دسته‌بندی محصول
         """
         product = {
             "id": len(self.inventory) + 1,
             "name": name,
-            "material": material,
             "price": price,
-            "quantity": quantity,
-            "added_at": datetime.now().isoformat()
+            "category": category,
+            "added_at": datetime.now().strftime("%Y-%m-%d")
         }
         self.inventory.append(product)
 
-    def get_low_stock_items(self, threshold: int = 3) -> List[Dict]:
+    def get_products_by_category(self, category: str) -> List[Dict]:
         """
-        Identifies products that are running low in stock.
+        فیلتر کردن محصولات بر اساس دسته‌بندی.
 
-        Args:
-            threshold: Minimum quantity level to flag.
-
-        Returns:
-            A list of dictionaries containing low-stock products.
+        :param category: نام دسته‌بندی مورد نظر
+        :return: لیستی از محصولات موجود در آن دسته‌بندی
         """
-        return [item for item in self.inventory if item['quantity'] <= threshold]
+        return [p for p in self.inventory if p["category"] == category]
 
-    def create_order(self, customer_name: str, product_ids: List[int]) -> Optional[str]:
+    def calculate_discount(self, price: float, discount_percent: float) -> float:
         """
-        Processes a customer purchase order.
+        محاسبه قیمت نهایی پس از اعمال تخفیف.
 
-        Args:
-            customer_name: Name of the client.
-            product_ids: List of IDs for items being purchased.
-
-        Returns:
-            A confirmation message or None if stock is insufficient.
+        :param price: قیمت اصلی
+        :param discount_percent: درصد تخفیف (مثال: 10 برای 10 درصد)
+        :return: قیمت نهایی
         """
-        total = 0
-        for pid in product_ids:
-            item = next((p for p in self.inventory if p['id'] == pid), None)
-            if item and item['quantity'] > 0:
-                item['quantity'] -= 1
-                total += item['price']
-            else:
-                return f"Error: Product ID {pid} is out of stock."
+        if not 0 <= discount_percent <= 100:
+            raise ValueError("درصد تخفیف باید بین 0 تا 100 باشد.")
+        return price * (1 - discount_percent / 100)
 
-        order = {
-            "customer": customer_name,
-            "items": product_ids,
-            "total": total,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M")
-        }
-        self.orders.append(order)
-        return f"Order confirmed for {customer_name}. Total: {total} Toman."
-
-    def calculate_total_inventory_value(self) -> float:
+    def format_price(self, price: float) -> str:
         """
-        Calculates the total monetary value of the current workshop stock.
+        تبدیل عدد قیمت به فرمت قابل خواندن با جداکننده هزارگان.
 
-        Returns:
-            Sum of price * quantity for all items.
+        :param price: قیمت عددی
+        :return: رشته فرمت شده
         """
-        return sum(item['price'] * item['quantity'] for item in self.inventory)
+        return f"{int(price):,} تومان"
 
-    def list_all_products(self) -> None:
-        """Prints a formatted table of all available products in the shop."""
-        print(f"{'ID':<5} | {'Name':<20} | {'Price':<10} | {'Qty':<5}")
-        print("-" * 50)
+    def generate_report(self) -> str:
+        """
+        تولید گزارش وضعیت فعلی موجودی محصولات.
+
+        :return: رشته متنی شامل گزارش وضعیت
+        """
+        if not self.inventory:
+            return "موجودی فعلی خالی است."
+        
+        report = [f"گزارش موجودی {self.shop_name}:"]
         for item in self.inventory:
-            print(f"{item['id']:<5} | {item['name']:<20} | {item['price']:<10} | {item['quantity']:<5}")
+            report.append(f"- {item['name']} | دسته‌بندی: {item['category']} | قیمت: {self.format_price(item['price'])}")
+        
+        return "\n".join(report)
 
 
+# نمونه استفاده از کتابخانه
 if __name__ == "__main__":
-    # Example usage for Sozane Zarin
     manager = SozaneZarinManager()
     
-    manager.add_product("Silk Brocade", "Silk", 450000, 5)
-    manager.add_product("Traditional Needle", "Steel", 85000, 2)
+    # افزودن نمونه محصولات
+    manager.add_product("سوزن‌دوزی بلوچی", 850000, "صنایع دستی")
+    manager.add_product("شال سوزن‌دوزی", 450000, "پوشاک")
     
-    manager.list_all_products()
+    # چاپ گزارش
+    print(manager.generate_report())
     
-    low_stock = manager.get_low_stock_items(2)
-    print(f"\nAlert: {len(low_stock)} items are running low.")
-    
-    status = manager.create_order("Zahra", [1, 2])
-    print(f"\nOrder Status: {status}")
+    # تست محاسبه تخفیف
+    discounted = manager.calculate_discount(450000, 10)
+    print(f"\nقیمت شال با تخفیف ویژه: {manager.format_price(discounted)}")
 ```
