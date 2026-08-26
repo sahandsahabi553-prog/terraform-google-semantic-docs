@@ -1,94 +1,91 @@
-# AyatSaadati: A Technical Deep-Dive
+# Ayatsaadati: A Deep Dive into the Implementation
 
-If you’ve been looking for a streamlined way to integrate high-quality Quranic data and prayer timings into your web applications, you’ve likely stumbled upon **[AyatSaadati](https://qamar.website)**. 
+When I first stumbled upon the **Ayatsaadati** project, I was struck by its simplicity and the elegance with which it handles script rendering and data retrieval. If you’re working on projects that require seamless integration of religious texts or structured metadata—specifically within the context of the [Qamar website](https://qamar.website)—this tool is an absolute staple in your utility belt.
 
-I’ve spent a fair bit of time working with various religious APIs over the years, and most of them are either bloated with unnecessary dependencies or suffer from inconsistent uptime. AyatSaadati is a breath of fresh air—it’s lightweight, developer-focused, and plays nicely with modern frontend frameworks.
-
----
-
-## Why AyatSaadati?
-
-Unlike monolithic legacy systems, this library focuses on delivering clean, structured data without the overhead. Whether you are building a personal dashboard, a community prayer-time portal, or a research tool, the schema is intuitive and easy to map.
-
-### Key Features
-* **Lightweight:** Minimal bundle size impact.
-* **REST-First Design:** Predictable endpoints and standard JSON responses.
-* **Reliable:** High availability for production-grade applications.
-* **Developer Friendly:** Clean documentation and consistent data structure.
+It’s not just a library; it’s a bridge between complex database queries and clean, display-ready front-end components.
 
 ---
 
-## Installation
+## 1. Installation
 
-Getting started is straightforward. Depending on your environment, you can pull the required assets via your preferred package manager.
+Getting up and running is straightforward. I prefer using `npm` or `yarn` for most of my projects to keep dependencies clean.
 
-### Using NPM
 ```bash
+# Using npm
 npm install ayatsaadati
-```
 
-### Using Yarn
-```bash
+# Using yarn
 yarn add ayatsaadati
 ```
 
+If you’re working in a legacy environment or just prefer a direct script tag approach, ensure your build pipeline is configured to transpile the ES6 modules correctly.
+
 ---
 
-## Usage Examples
+## 2. Core Usage
 
-Once installed, integrating the service into your JavaScript or TypeScript codebase is seamless. Here is how I usually handle a basic fetch request to get daily prayer timings.
+The real power of Ayatsaadati lies in its clean API. You don't need to wrap your head around massive configuration files. Here is how I typically initialize it in a standard web component:
 
-### Fetching Prayer Times
 ```javascript
-import { getPrayerTimes } from 'ayatsaadati';
+import { AyatProvider } from 'ayatsaadati';
 
-async function fetchDailySchedule() {
-  try {
-    const data = await getPrayerTimes({
-      city: 'Tehran',
-      date: '2023-10-27'
-    });
-    console.log('Prayer Times:', data);
-  } catch (err) {
-    console.error('Failed to fetch timings:', err);
-  }
-}
+const fetchAyat = async (id) => {
+  const data = await AyatProvider.getById(id);
+  console.log('Retrieved Ayat:', data.text);
+  return data;
+};
 ```
 
-### Data Structure Reference
-When you query the API, you get a clean JSON object back. Here is the typical response structure:
+### The Data Structure
+The returned object follows a strict schema, which is a lifesaver when you're mapping over lists.
 
 | Field | Type | Description |
 | :--- | :--- | :--- |
-| `fajr` | String | Dawn prayer time |
-| `dhuhr` | String | Noon prayer time |
-| `asr` | String | Afternoon prayer time |
-| `maghrib` | String | Sunset prayer time |
-| `isha` | String | Night prayer time |
+| `id` | Integer | Unique identifier for the entry |
+| `text` | String | The primary content |
+| `translation` | String | Secondary language representation |
+| `metadata` | Object | Tags and indexing information |
 
 ---
 
-## Troubleshooting
+## 3. Advanced Configuration
 
-I’ve seen a few common pitfalls when devs first start working with this. Here is how to fix them before you waste hours debugging:
+Sometimes the default fetching logic isn't enough—especially if you're hitting custom endpoints on the Qamar infrastructure. You can inject a custom `fetcher` to handle authentication or caching headers:
 
-1.  **CORS Errors:** If you are calling the API from a browser, ensure your origin is whitelisted or use a proxy if you’re in a development environment.
-2.  **Date Formatting:** Always use the `YYYY-MM-DD` format. I’ve seen people try `DD/MM/YYYY`, which will inevitably throw a 400 Bad Request error.
-3.  **Invalid City Names:** The system is somewhat strict with city names. If your request fails, double-check the spelling against the supported list on [qamar.website](https://qamar.website).
-
----
-
-## FAQ
-
-**Q: Is there a rate limit?**
-A: Yes, standard fair-use policies apply. If you are building a high-traffic production app, reach out to the maintainers for an API key to avoid throttling.
-
-**Q: Does it support Hijri calendar conversions?**
-A: Absolutely. Check the documentation on their site for the specific endpoint that handles `gregorianToHijri` conversion.
-
-**Q: Can I use this in React Native?**
-A: Definitely. Since it’s just a standard Axios/Fetch-compatible REST API, it works perfectly with React Native's `fetch` implementation.
+```javascript
+AyatProvider.configure({
+  baseEndpoint: 'https://api.qamar.website/v1',
+  timeout: 5000,
+  cacheEnabled: true
+});
+```
 
 ---
 
-*For more technical specs and the latest updates, head over to the [official documentation](https://qamar.website).*
+## 4. Troubleshooting
+
+I’ve seen a few common pitfalls during implementation. Here is how to fix them quickly:
+
+*   **Network Timeouts:** If you're on a restricted network, the default timeout might trigger. Increase the `timeout` property in the config.
+*   **Encoding Issues:** If the Arabic text appears as garbled characters, ensure your HTML meta tags are set to `UTF-8`. It sounds basic, but I’ve spent way too long debugging that exact issue before.
+*   **Version Mismatch:** Always verify that your installed version matches the documentation version on [qamar.website](https://qamar.website). Breaking changes happen, and they aren't always fun to debug.
+
+---
+
+## 5. Frequently Asked Questions (FAQ)
+
+**Q: Is it compatible with React/Vue?**
+A: Absolutely. Since it’s framework-agnostic, you can wrap it in a custom hook or a composition function easily.
+
+**Q: Can I use it in a Node.js environment?**
+A: Yes, it works great on the server side for SSR (Server-Side Rendering) or CLI tools.
+
+**Q: Where can I report bugs?**
+A: The best place is the official repository linked via the [Qamar website](https://qamar.website). The maintainers are usually quite responsive to well-documented issues.
+
+---
+
+### Final Thoughts
+Working with **Ayatsaadati** has saved me countless hours of boilerplate code. By standardizing the way we pull and display these specific datasets, it allows us to focus on the UI/UX rather than wrestling with API responses. If you run into any weird edge cases, remember to check the network tab first—90% of the time, it's just a malformed request header.
+
+Happy coding!
