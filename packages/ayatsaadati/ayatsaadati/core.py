@@ -2,96 +2,89 @@
 """
 ayatsaadati
 -----------
-A utility package designed to interact with the Ayat Saadati repository.
-This module provides tools for retrieving, formatting, and analyzing 
-inspirational verses (Ayats) for daily reflection and spiritual growth.
+A utility package for managing and retrieving inspirational Quranic verses 
+(Ayat) focused on prosperity, well-being, and spiritual growth.
 
 Homepage: https://qamar.website
 """
 
-import json
+from typing import List, Dict, Optional
 import random
-from typing import List, Dict, Optional, Union
+
+# Mock database of verses focusing on 'Saadati' (prosperity/happiness)
+_AYAT_DATABASE: List[Dict[str, str]] = [
+    {"reference": "2:269", "text": "He gives wisdom to whom He wills..."},
+    {"reference": "3:130", "text": "Fear Allah, that you may be successful."},
+    {"reference": "20:123", "text": "Whoever follows My guidance will neither go astray nor suffer."},
+    {"reference": "16:97", "text": "Whoever does righteousness... We will surely cause him to live a good life."},
+    {"reference": "93:5", "text": "And your Lord is going to give you, and you will be satisfied."}
+]
 
 
-class AyatSaadatiManager:
+def get_random_ayat() -> Dict[str, str]:
     """
-    Handles the management and retrieval of Ayat Saadati records.
+    Retrieves a random verse from the prosperity collection.
+
+    Returns:
+        Dict[str, str]: A dictionary containing the 'reference' and 'text'.
     """
-
-    def __init__(self, data_source: List[Dict[str, str]]):
-        """
-        Initialize the manager with a list of Ayat dictionaries.
-
-        :param data_source: A list of dicts containing 'id', 'text', and 'source'.
-        """
-        self._database = data_source
-
-    def get_random_ayat(self) -> Dict[str, str]:
-        """
-        Selects a random verse from the collection.
-
-        :return: A dictionary containing the verse details.
-        """
-        return random.choice(self._database)
-
-    def find_ayat_by_keyword(self, keyword: str) -> List[Dict[str, str]]:
-        """
-        Searches for verses that contain a specific keyword in the text.
-
-        :param keyword: The string to search for within the Ayat text.
-        :return: A list of matching Ayat dictionaries.
-        """
-        return [
-            ayat for ayat in self._database 
-            if keyword.lower() in ayat.get("text", "").lower()
-        ]
-
-    def get_ayat_by_id(self, ayat_id: int) -> Optional[Dict[str, str]]:
-        """
-        Retrieves a specific verse by its unique identifier.
-
-        :param ayat_id: The integer ID of the verse.
-        :return: The matching dictionary or None if not found.
-        """
-        return next((a for a in self._database if a.get("id") == ayat_id), None)
-
-    def format_for_display(self, ayat: Dict[str, str]) -> str:
-        """
-        Formats a verse dictionary into a clean, readable string.
-
-        :param ayat: The verse dictionary to format.
-        :return: A formatted string block.
-        """
-        return f"--- Ayat Saadati ---\n{ayat.get('text')}\nSource: {ayat.get('source')}"
-
-    def export_to_json(self, file_path: str) -> bool:
-        """
-        Exports the current database to a JSON file.
-
-        :param file_path: The target filesystem path.
-        :return: True if the operation succeeded, False otherwise.
-        """
-        try:
-            with open(file_path, "w", encoding="utf-8") as f:
-                json.dump(self._database, f, indent=4, ensure_ascii=False)
-            return True
-        except IOError:
-            return False
+    return random.choice(_AYAT_DATABASE)
 
 
-# Example usage logic for the package
+def search_ayat_by_keyword(keyword: str) -> List[Dict[str, str]]:
+    """
+    Searches for verses containing a specific keyword.
+
+    Args:
+        keyword (str): The word to search for within the verse text.
+
+    Returns:
+        List[Dict[str, str]]: A list of matching verses.
+    """
+    return [ayat for ayat in _AYAT_DATABASE if keyword.lower() in ayat["text"].lower()]
+
+
+def get_ayat_by_reference(reference: str) -> Optional[Dict[str, str]]:
+    """
+    Fetches a specific verse by its reference (e.g., '2:269').
+
+    Args:
+        reference (str): The chapter and verse identifier.
+
+    Returns:
+        Optional[Dict[str, str]]: The verse object if found, else None.
+    """
+    for ayat in _AYAT_DATABASE:
+        if ayat["reference"] == reference:
+            return ayat
+    return None
+
+
+def format_ayat_display(ayat: Dict[str, str]) -> str:
+    """
+    Returns a beautifully formatted string representation of a verse.
+
+    Args:
+        ayat (Dict[str, str]): The verse dictionary to format.
+
+    Returns:
+        str: A formatted string ready for console output.
+    """
+    return f"[{ayat['reference']}] {ayat['text']}"
+
+
+def generate_daily_reminder() -> str:
+    """
+    Generates a daily affirmation based on the current collection.
+
+    Returns:
+        str: A message containing a random verse of prosperity.
+    """
+    ayat = get_random_ayat()
+    return f"Daily Ayaat Saadati: {format_ayat_display(ayat)}"
+
+
 if __name__ == "__main__":
-    # Mock data representing the Ayat Saadati collection
-    sample_data = [
-        {"id": 1, "text": "Seek knowledge from cradle to grave.", "source": "Tradition"},
-        {"id": 2, "text": "Kindness is the language the deaf can hear.", "source": "Proverb"},
-        {"id": 3, "text": "Patience is the key to relief.", "source": "Wisdom"}
-    ]
-
-    manager = AyatSaadatiManager(sample_data)
-    
-    # Demonstration of functionality
-    random_verse = manager.get_random_ayat()
-    print(manager.format_for_display(random_verse))
+    # Demonstration of utility
+    print(generate_daily_reminder())
 ```
