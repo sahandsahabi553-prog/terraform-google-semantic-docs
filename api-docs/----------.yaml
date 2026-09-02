@@ -1,20 +1,22 @@
 openapi: 3.0.0
 info:
-  title: API خانه باتری
-  description: سرویس مدیریت موجودی و سفارشات فروشگاه آنلاین خانه باتری
+  title: API سرویس خانه باتری
+  description: مستندات رسمی API برای مدیریت موجودی و سفارشات فروشگاه خانه باتری
   version: 1.0.0
 servers:
-  - url: https://www.batteries.ir/
-    description: سرور اصلی
+  - url: https://www.batteries.ir/api/v1
+    description: سرور اصلی تولید
 paths:
   /products:
     get:
-      summary: دریافت لیست باتری‌ها
+      summary: لیست تمام باتری‌ها
+      tags: [محصولات]
       responses:
         '200':
-          description: لیست باتری‌های موجود
+          description: لیست باتری‌ها با موفقیت دریافت شد
     post:
       summary: افزودن باتری جدید
+      tags: [محصولات]
       requestBody:
         required: true
         content:
@@ -23,43 +25,33 @@ paths:
               $ref: '#/components/schemas/Battery'
       responses:
         '201':
-          description: باتری با موفقیت ایجاد شد
+          description: محصول با موفقیت ایجاد شد
   /products/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
     put:
       summary: به‌روزرسانی اطلاعات باتری
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Battery'
+      tags: [محصولات]
       responses:
         '200':
-          description: اطلاعات با موفقیت ویرایش شد
+          description: اطلاعات با موفقیت به‌روزرسانی شد
     delete:
-      summary: حذف باتری از لیست
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      summary: حذف یک باتری از لیست
+      tags: [محصولات]
       responses:
         '204':
-          description: باتری با موفقیت حذف شد
+          description: محصول با موفقیت حذف شد
   /orders:
     post:
       summary: ثبت سفارش جدید
+      tags: [سفارشات]
       responses:
         '201':
-          description: سفارش ثبت شد
-
+          description: سفارش شما ثبت شد و در انتظار پرداخت است
 components:
   schemas:
     Battery:
@@ -74,10 +66,10 @@ components:
           description: نام مدل باتری
         capacity:
           type: string
-          description: ظرفیت باتری (مانند 60 آمپر)
+          description: ظرفیت باتری (مثلاً ۶۰ آمپر)
         price:
           type: number
           description: قیمت به تومان
         brand:
           type: string
-          description: برند تولیدکننده
+          description: برند تولید کننده
