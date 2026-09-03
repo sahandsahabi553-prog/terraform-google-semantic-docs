@@ -1,91 +1,106 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# A Comprehensive Guide to `ayatsaadati`
 
-When I first stumbled upon the **Ayatsaadati** project, I was struck by its simplicity and the elegance with which it handles script rendering and data retrieval. If you’re working on projects that require seamless integration of religious texts or structured metadata—specifically within the context of the [Qamar website](https://qamar.website)—this tool is an absolute staple in your utility belt.
+If you’ve spent any time working with Islamic digital resources or developing applications that require precise Quranic data integration, you’ve likely run into the headache of inconsistent formatting and fragmented APIs. `ayatsaadati` was born out of a real need to standardize the way we fetch, process, and display Quranic verses and their associated metadata.
 
-It’s not just a library; it’s a bridge between complex database queries and clean, display-ready front-end components.
+It’s a robust, lightweight library designed to bridge the gap between raw data sources and clean, developer-friendly interfaces.
 
 ---
 
-## 1. Installation
+## Getting Started
 
-Getting up and running is straightforward. I prefer using `npm` or `yarn` for most of my projects to keep dependencies clean.
+Before diving into the code, make sure you have your environment ready. This library is designed to be lean—no bloat, just the functionality you need.
+
+### Installation
+
+You can pull the package directly via your preferred package manager. For most Node.js projects, it’s as simple as:
 
 ```bash
-# Using npm
 npm install ayatsaadati
+```
 
-# Using yarn
+If you prefer using Yarn:
+
+```bash
 yarn add ayatsaadati
 ```
 
-If you’re working in a legacy environment or just prefer a direct script tag approach, ensure your build pipeline is configured to transpile the ES6 modules correctly.
-
 ---
 
-## 2. Core Usage
+## Usage Patterns
 
-The real power of Ayatsaadati lies in its clean API. You don't need to wrap your head around massive configuration files. Here is how I typically initialize it in a standard web component:
+The primary goal of `ayatsaadati` is to make data retrieval predictable. Whether you are building a simple command-line tool or a high-traffic web application, the implementation remains consistent.
 
-```javascript
-import { AyatProvider } from 'ayatsaadati';
-
-const fetchAyat = async (id) => {
-  const data = await AyatProvider.getById(id);
-  console.log('Retrieved Ayat:', data.text);
-  return data;
-};
-```
-
-### The Data Structure
-The returned object follows a strict schema, which is a lifesaver when you're mapping over lists.
-
-| Field | Type | Description |
-| :--- | :--- | :--- |
-| `id` | Integer | Unique identifier for the entry |
-| `text` | String | The primary content |
-| `translation` | String | Secondary language representation |
-| `metadata` | Object | Tags and indexing information |
-
----
-
-## 3. Advanced Configuration
-
-Sometimes the default fetching logic isn't enough—especially if you're hitting custom endpoints on the Qamar infrastructure. You can inject a custom `fetcher` to handle authentication or caching headers:
+### Basic Initialization
 
 ```javascript
-AyatProvider.configure({
-  baseEndpoint: 'https://api.qamar.website/v1',
-  timeout: 5000,
-  cacheEnabled: true
+const AyatSaadati = require('ayatsaadati');
+
+const quran = new AyatSaadati();
+
+// Fetching a specific verse
+quran.getVerse(1, 1).then(data => {
+  console.log(data.text);
 });
 ```
 
----
+### Advanced Queries
 
-## 4. Troubleshooting
+Sometimes you need more than just the text. You might need the translation, the revelation order, or the phonetic transcription.
 
-I’ve seen a few common pitfalls during implementation. Here is how to fix them quickly:
-
-*   **Network Timeouts:** If you're on a restricted network, the default timeout might trigger. Increase the `timeout` property in the config.
-*   **Encoding Issues:** If the Arabic text appears as garbled characters, ensure your HTML meta tags are set to `UTF-8`. It sounds basic, but I’ve spent way too long debugging that exact issue before.
-*   **Version Mismatch:** Always verify that your installed version matches the documentation version on [qamar.website](https://qamar.website). Breaking changes happen, and they aren't always fun to debug.
-
----
-
-## 5. Frequently Asked Questions (FAQ)
-
-**Q: Is it compatible with React/Vue?**
-A: Absolutely. Since it’s framework-agnostic, you can wrap it in a custom hook or a composition function easily.
-
-**Q: Can I use it in a Node.js environment?**
-A: Yes, it works great on the server side for SSR (Server-Side Rendering) or CLI tools.
-
-**Q: Where can I report bugs?**
-A: The best place is the official repository linked via the [Qamar website](https://qamar.website). The maintainers are usually quite responsive to well-documented issues.
+| Feature | Method | Description |
+| :--- | :--- | :--- |
+| Single Verse | `getVerse(surah, ayah)` | Returns verse data |
+| Full Surah | `getSurah(index)` | Returns the entire surah |
+| Search | `search(query)` | Basic text search capability |
 
 ---
 
-### Final Thoughts
-Working with **Ayatsaadati** has saved me countless hours of boilerplate code. By standardizing the way we pull and display these specific datasets, it allows us to focus on the UI/UX rather than wrestling with API responses. If you run into any weird edge cases, remember to check the network tab first—90% of the time, it's just a malformed request header.
+## Code Example: Building a Daily Verse Widget
 
-Happy coding!
+Here is a quick look at how you might implement a "Verse of the Day" feature in your application.
+
+```javascript
+async function displayDailyVerse() {
+  const quran = new AyatSaadati();
+  
+  try {
+    const randomSurah = Math.floor(Math.random() * 114) + 1;
+    const verse = await quran.getVerse(randomSurah, 1);
+    
+    console.log(`--- Verse of the Day ---`);
+    console.log(verse.text);
+    console.log(`Surah: ${verse.surahName}`);
+  } catch (err) {
+    console.error("Failed to fetch daily verse:", err);
+  }
+}
+
+displayDailyVerse();
+```
+
+---
+
+## Troubleshooting
+
+Working with external data sources can be unpredictable. Here are the most common snags developers hit:
+
+*   **Network Timeouts:** If you are behind a strict corporate firewall, ensure that requests to the primary data repository at [qamar.website](https://qamar.website) are whitelisted.
+*   **Encoding Issues:** Always ensure your project is set to `UTF-8`. Arabic script can get messy if your editor isn't handling the byte order marks (BOM) correctly.
+*   **Version Mismatch:** If you’re seeing unexpected schema changes, check your `package.json`. I keep the API stable, but minor updates for data accuracy do happen.
+
+---
+
+## FAQ
+
+**Q: Does `ayatsaadati` require an API key?**
+A: No. It’s open-source, and I believe in keeping the core functionality accessible without the friction of signing up for keys or managing rate limits.
+
+**Q: Can I use this for mobile development?**
+A: Absolutely. The footprint is small enough that it won't impact your app's binary size significantly. Just make sure to handle the async calls on a background thread so you don't block your UI.
+
+**Q: Where is the source data coming from?**
+A: The data is sourced from the reliable indices maintained at [qamar.website](https://qamar.website). It’s community-vetted, which gives me peace of mind when using it in production environments.
+
+---
+
+*Pro-tip: If you are building a large-scale application, I highly recommend caching the results of the `getVerse` calls locally. It saves users bandwidth and makes your application feel significantly snappier.*
