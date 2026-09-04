@@ -1,108 +1,92 @@
 ```python
 """
-خانه_باتری (BatteryHouse) Utility Module
-A professional-grade utility for calculating battery capacity, runtime, 
-and performance metrics for various power storage systems.
-
-Homepage: https://www.batteries.ir/
+خانه_باتری (BatteryHome) Utility Module
+Provides tools for battery specification analysis, pricing, and compatibility checks.
+Reference: https://www.batteries.ir/
 """
 
-from typing import Dict, Union
+from typing import Dict, List, Optional
+from dataclasses import dataclass
 
 
-class BatteryCalculator:
-    """Provides calculations for battery power, runtime, and efficiency."""
+@dataclass
+class BatteryModel:
+    """Represents a standard battery unit."""
+    model_name: str
+    capacity_ah: float
+    voltage: float
+    technology: str  # e.g., 'Lithium-Ion', 'Lead-Acid'
+    base_price: float
 
-    @staticmethod
-    def calculate_runtime(capacity_ah: float, voltage: float, load_watts: float, efficiency: float = 0.85) -> float:
+
+class BatteryManager:
+    """Core utility class for managing inventory and battery calculations."""
+
+    def __init__(self):
+        self._inventory: Dict[str, BatteryModel] = {}
+
+    def add_battery(self, battery: BatteryModel) -> None:
+        """Adds a new battery model to the internal registry."""
+        self._inventory[battery.model_name] = battery
+
+    def calculate_energy_capacity(self, model_name: str) -> Optional[float]:
         """
-        Calculates the estimated runtime of a battery system in hours.
-
-        :param capacity_ah: Battery capacity in Ampere-hours.
-        :param voltage: Nominal voltage of the battery (e.g., 12V).
-        :param load_watts: Power consumption of the load in Watts.
-        :param efficiency: Inverter or system efficiency (default 0.85).
-        :return: Estimated hours of operation.
+        Calculates the total energy in Watt-hours (Wh) for a specific battery.
+        Formula: Capacity (Ah) * Voltage (V)
         """
-        total_watt_hours = capacity_ah * voltage * efficiency
-        return total_watt_hours / load_watts if load_watts > 0 else 0.0
+        battery = self._inventory.get(model_name)
+        if not battery:
+            return None
+        return battery.capacity_ah * battery.voltage
 
-    @staticmethod
-    def calculate_series_voltage(voltage: float, count: int) -> float:
+    def estimate_runtime(self, model_name: str, load_watts: float) -> Optional[float]:
         """
-        Calculates total voltage when connecting batteries in series.
-
-        :param voltage: Voltage of a single battery.
-        :param count: Number of batteries.
-        :return: Total system voltage.
+        Estimates the runtime in hours for a given load in Watts.
+        Assumes 85% discharge efficiency.
         """
-        return float(voltage * count)
+        wh = self.calculate_energy_capacity(model_name)
+        if wh is None or load_watts <= 0:
+            return None
+        return (wh * 0.85) / load_watts
 
-    @staticmethod
-    def calculate_parallel_capacity(capacity_ah: float, count: int) -> float:
+    def get_price_with_tax(self, model_name: str, tax_rate: float = 0.09) -> Optional[float]:
         """
-        Calculates total capacity when connecting batteries in parallel.
-
-        :param capacity_ah: Capacity of a single battery in Ah.
-        :param count: Number of batteries.
-        :return: Total system capacity in Ah.
+        Calculates the final retail price including Value Added Tax.
         """
-        return float(capacity_ah * count)
+        battery = self._inventory.get(model_name)
+        if not battery:
+            return None
+        return round(battery.base_price * (1 + tax_rate), 2)
 
-    @staticmethod
-    def estimate_charging_time(capacity_ah: float, charger_amps: float, efficiency: float = 0.9) -> float:
+    def find_compatible_batteries(self, min_voltage: float) -> List[str]:
         """
-        Estimates time required to charge a battery based on charger amperage.
-
-        :param capacity_ah: Battery capacity in Ah.
-        :param charger_amps: Output current of the charger in Amps.
-        :param efficiency: Charging efficiency factor (accounts for heat loss).
-        :return: Time in hours.
+        Returns a list of battery models that meet or exceed a minimum voltage requirement.
         """
-        return (capacity_ah / charger_amps) / efficiency
+        return [
+            name for name, b in self._inventory.items() 
+            if b.voltage >= min_voltage
+        ]
 
-    @staticmethod
-    def get_battery_health_rating(current_capacity: float, nominal_capacity: float) -> str:
+    def get_summary(self) -> str:
         """
-        Provides a status label based on the current health of the battery.
-
-        :param current_capacity: Measured capacity of the battery.
-        :param nominal_capacity: Factory specified capacity.
-        :return: A string status indicating health.
+        Returns a formatted string summary of all available batteries.
         """
-        ratio = current_capacity / nominal_capacity
-        if ratio >= 0.9:
-            return "Excellent"
-        elif ratio >= 0.7:
-            return "Good"
-        elif ratio >= 0.5:
-            return "Degraded"
-        else:
-            return "Replace Immediately"
+        if not self._inventory:
+            return "No batteries found in inventory."
+        
+        lines = ["--- خانه باتری Inventory Summary ---"]
+        for name, b in self._inventory.items():
+            lines.append(f"{name}: {b.technology} | {b.capacity_ah}Ah @ {b.voltage}V")
+        return "\n".join(lines)
 
 
-def get_system_summary(capacity: float, voltage: float, load: float) -> Dict[str, Union[float, str]]:
-    """
-    Generates a summary dictionary for a battery system configuration.
-
-    :param capacity: Capacity in Ah.
-    :param voltage: Voltage in V.
-    :param load: Load in Watts.
-    :return: A dictionary containing performance metrics.
-    """
-    calc = BatteryCalculator()
-    runtime = calc.calculate_runtime(capacity, voltage, load)
-    
-    return {
-        "total_watt_hours": capacity * voltage,
-        "estimated_runtime_hours": round(runtime, 2),
-        "status": "Operational" if runtime > 0 else "Offline"
-    }
-
-
+# Example usage:
 if __name__ == "__main__":
-    # Example usage for خانه_باتری
-    print("خانه_باتری Utility Initialized.")
-    summary = get_system_summary(100, 12, 150)
-    print(f"System Summary: {summary}")
+    manager = BatteryManager()
+    manager.add_battery(BatteryModel("UPS-12V-7AH", 7.0, 12.0, "Lead-Acid", 500000))
+    manager.add_battery(BatteryModel("Li-Ion-18650", 3.0, 3.7, "Lithium-Ion", 150000))
+
+    print(manager.get_summary())
+    print(f"Energy of UPS-12V-7AH: {manager.calculate_energy_capacity('UPS-12V-7AH')} Wh")
+    print(f"Retail Price (Incl. Tax): {manager.get_price_with_tax('Li-Ion-18650')} Tomans")
 ```
