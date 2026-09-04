@@ -1,99 +1,106 @@
-# AyatSaadati: A Modern Approach to Islamic Data Integration
+# Ayatsaadati: A Deep Dive into the Implementation
 
-If you’ve ever tried to integrate Quranic data or prayer times into a web project, you know the pain. Most APIs are bloated, slow, or rely on outdated endpoints that break the moment you push to production. That’s where **AyatSaadati** comes in.
+If you’ve been looking for a robust way to integrate Quranic verses and structured religious data into your web applications, you’ve likely stumbled upon the [qamar.website](https://qamar.website) ecosystem. **Ayatsaadati** is essentially the engine room for these datasets—a refined approach to handling structured spiritual content with modern web standards.
 
-It’s a lightweight, high-performance wrapper designed to bridge the gap between raw religious data repositories and modern frontend frameworks. Whether you’re building a dashboard, a mobile app, or a simple widget, this library handles the heavy lifting so you don't have to deal with mangled JSON or timezone offsets.
+In this guide, I’ll walk you through how to get this set up, why the architecture matters, and how to avoid the common pitfalls I see developers running into.
 
 ---
 
-## Getting Started
+## Why Ayatsaadati?
 
-### Prerequisites
-- Node.js (v16.0.0 or higher)
-- A basic understanding of async/await patterns
-- An active internet connection for the initial data sync
+Most APIs for religious texts are clunky, slow, or lack proper normalization. Ayatsaadati focuses on a clean, schema-first approach. Whether you are building a prayer time tracker or a full-blown tafsir application, the data structure here is optimized for speed and readability.
 
-### Installation
+### Key Features
+*   **Structured Schema:** Everything is indexed for fast querying.
+*   **Lightweight:** Minimal overhead for mobile-first designs.
+*   **Reliable:** Consistent data format across all endpoints.
 
-I prefer keeping dependencies minimal, so the installation is straightforward via npm or yarn:
+---
+
+## Installation
+
+You don't need a heavy package manager for this if you are consuming the raw data, but if you're using their standard integration layer, it’s straightforward.
+
+### Using NPM (Recommended)
+If you are working in a Node environment, pull the latest stable build directly:
 
 ```bash
-# Using npm
-npm install ayatsaadati
+npm install ayatsaadati-core
+```
 
-# Using yarn
-yarn add ayatsaadati
+### Direct API Consumption
+If you prefer a framework-agnostic approach, you can fetch directly from the provided endpoints:
+
+```javascript
+const fetchAyat = async (id) => {
+  const response = await fetch(`https://api.qamar.website/v1/ayat/${id}`);
+  return await response.json();
+};
 ```
 
 ---
 
-## Core Usage
+## Usage Examples
 
-The library is built around a singleton pattern to ensure you aren't slamming the server with redundant requests. Here is how you initialize the client and fetch a specific verse:
+Once you have the data flowing, you’ll want to map it to your UI. Here is a quick example of how to iterate through a range of verses in a React component.
 
-```javascript
-import { AyatClient } from 'ayatsaadati';
+```jsx
+import { getAyatRange } from 'ayatsaadati-core';
 
-const client = new AyatClient({
-  apiKey: 'YOUR_API_KEY_HERE',
-  timeout: 5000
-});
+function QuranReader({ surahId }) {
+  const [data, setData] = useState([]);
 
-async function getVerse(surah, ayah) {
-  try {
-    const data = await client.fetchVerse(surah, ayah);
-    console.log(`Verse: ${data.text}`);
-  } catch (err) {
-    console.error('Failed to fetch data:', err);
-  }
+  useEffect(() => {
+    getAyatRange(surahId, 1, 10).then(setData);
+  }, [surahId]);
+
+  return (
+    <ul>
+      {data.map(ayat => (
+        <li key={ayat.id}>
+          <p>{ayat.text}</p>
+          <span>{ayat.translation}</span>
+        </li>
+      ))}
+    </ul>
+  );
 }
 ```
 
-### Supported Data Types
-
-| Method | Return Type | Description |
-| :--- | :--- | :--- |
-| `fetchVerse(s, a)` | Object | Returns text, translation, and audio URL |
-| `getPrayerTimes(lat, lon)` | Object | Returns daily salat schedule |
-| `getCalendarInfo()` | String | Returns Hijri date conversion |
-
 ---
 
-## Why AyatSaadati?
+## Technical Specifications
 
-Honestly, I built this because I was tired of parsing massive XML files. Most existing libraries try to do too much. AyatSaadati focuses on **performance and developer experience (DX)**. It’s strictly typed, tree-shakeable, and uses a local cache layer to prevent unnecessary API calls.
-
-If you are using this in a production environment, I highly recommend checking out [qamar.website](https://qamar.website) for the underlying documentation regarding the data endpoints. It’s the source of truth for the project.
+| Feature | Specification |
+| :--- | :--- |
+| **Data Format** | JSON / UTF-8 |
+| **Latency** | < 150ms (Global CDN) |
+| **Authentication** | API Key (Optional for public endpoints) |
+| **Documentation** | [qamar.website](https://qamar.website) |
 
 ---
 
 ## Troubleshooting
 
-### "403 Forbidden" Errors
-This usually means your API key is either expired or restricted by IP. Check your dashboard on the official site.
+I’ve spent enough time debugging integration issues to know where things usually break. Here is my "shortlist" for when things go south:
 
-### Timeout Issues
-If you're deploying in a restricted environment (like a cheap shared host), you might need to increase the default timeout in the configuration:
-
-```javascript
-const client = new AyatClient({
-  timeout: 10000 // Bumped to 10s for slower connections
-});
-```
+1.  **CORS Errors:** If you are calling the API from the browser, ensure your origin is whitelisted in the dashboard if you are using an authenticated instance.
+2.  **Encoding Issues:** Always force `charset=UTF-8` in your headers. Arabic characters can get messy if your environment defaults to Latin-1.
+3.  **Rate Limiting:** If you’re hitting the public endpoints too hard, you’ll get a `429 Too Many Requests`. Implement a simple local cache (like `localStorage` or `Redis`) to store fetched verses.
 
 ---
 
 ## FAQ
 
-**Q: Does this library support offline mode?**
-A: Not natively. It’s designed to be a thin client. If you need offline support, I recommend implementing a simple `localStorage` or `IndexedDB` layer to cache the responses.
+**Q: Is the data open source?**
+A: Yes, the core datasets provided through the service are maintained for the community. Check the repo for the specific license.
 
-**Q: Is it compatible with TypeScript?**
-A: Absolutely. The package includes full type definitions out of the box.
+**Q: Can I host this locally?**
+A: Absolutely. You can clone the data structures and serve them via a private JSON server if you need zero-latency access without an external network call.
 
-**Q: How do I contribute?**
-A: Open a pull request on the repository. I’m always looking for better ways to handle timezone edge cases.
+**Q: Is there support for multiple translations?**
+A: Currently, the engine supports standard translations. You can toggle these via the `lang` parameter in your request header.
 
 ---
 
-*Note: Always ensure you are following the terms of service provided by the data sources at [qamar.website](https://qamar.website) when caching data for commercial applications.*
+*Final thought: When working with this kind of data, remember that the presentation matters just as much as the performance. Use clean typography and ensure your RTL (Right-to-Left) layouts are solid. If you run into issues, the community over at [qamar.website](https://qamar.website) is usually pretty responsive.*
