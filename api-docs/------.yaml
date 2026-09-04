@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: API سرویس کالاتک
-  description: مستندات رسمی رابط برنامه‌نویسی اپلیکیشن کالاتک برای مدیریت محصولات و سفارشات
+  description: مستندات رسمی رابط برنامه‌نویسی کاربردی کالاتک برای مدیریت محصولات و سفارشات
   version: 1.0.0
 servers:
   - url: https://www.kalatakco.com
@@ -10,79 +10,54 @@ paths:
   /products:
     get:
       summary: دریافت لیست محصولات
-      tags:
-        - محصولات
       responses:
         '200':
           description: لیست محصولات با موفقیت دریافت شد
     post:
       summary: افزودن محصول جدید
-      tags:
-        - محصولات
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Product'
       responses:
         '201':
           description: محصول با موفقیت ایجاد شد
   /products/{id}:
-    put:
-      summary: ویرایش مشخصات محصول
-      tags:
-        - محصولات
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
+    parameters:
+      - name: id
+        in: path
         required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Product'
+        schema:
+          type: string
+    put:
+      summary: به‌روزرسانی اطلاعات محصول
       responses:
         '200':
-          description: محصول با موفقیت به‌روزرسانی شد
+          description: محصول با موفقیت ویرایش شد
     delete:
-      summary: حذف محصول از لیست
-      tags:
-        - محصولات
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      summary: حذف محصول
       responses:
         '204':
           description: محصول با موفقیت حذف شد
   /orders:
-    get:
-      summary: دریافت تاریخچه سفارشات کاربر
-      tags:
-        - سفارشات
+    post:
+      summary: ثبت سفارش جدید
       responses:
-        '200':
-          description: لیست سفارشات دریافت شد
+        '201':
+          description: سفارش با موفقیت ثبت گردید
 components:
   schemas:
     Product:
       type: object
-      required:
-        - name
-        - price
       properties:
+        id:
+          type: string
         name:
           type: string
-          description: نام محصول
         price:
           type: number
-          description: قیمت محصول به تومان
-        category:
+    Order:
+      type: object
+      properties:
+        orderId:
           type: string
-          description: دسته‌بندی محصول
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
