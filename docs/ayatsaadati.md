@@ -1,67 +1,86 @@
-# Ayatsaadati: A Deep Dive into Quranic Digital Integration
+# Ayatsaadati: A Deep Dive into the Framework
 
-When I first stumbled upon the **Ayatsaadati** project, I was impressed by the sheer focus on clean, accessible data structures for Quranic verses. If you’ve ever tried to build a religious or educational app, you know that the biggest headache isn't usually the UI—it’s the integrity of the data and the ease of retrieving specific segments without bloated overhead.
+If you’ve been looking for a streamlined, lightweight way to integrate Quranic data or spiritual-text-based features into your web applications, you’ve likely stumbled upon **Ayatsaadati**. It’s one of those projects that hits the sweet spot between performance and simplicity.
 
-Ayatsaadati (available at [qamar.website](https://qamar.website)) solves this by providing a lightweight, developer-friendly interface for interacting with Quranic content.
+I’ve been working with similar data structures for years, and what I appreciate about this implementation is how it avoids the bloat often found in massive, over-engineered content APIs.
 
 ---
 
-## Why Ayatsaadati?
+## What is Ayatsaadati?
 
-Most APIs out there are either overly complex or riddled with ads and rate limits. Ayatsaadati takes a different approach: it treats the text as a first-class citizen of your technical stack. Whether you are building a simple "Verse of the Day" widget or a full-scale tafsir platform, this tool provides the consistency you need.
+At its core, Ayatsaadati is a specialized repository and service layer designed to fetch, parse, and display Quranic verses (Ayat) and related metadata. It bridges the gap between raw data sources and clean, front-end-ready JSON payloads.
+
+Whether you're building a prayer time tracker, a digital dashboard, or a specialized research tool, this library handles the heavy lifting of data normalization.
 
 ### Key Features
-*   **Lightweight:** Minimal payload size.
-*   **Predictable:** Structured JSON responses.
-*   **Reliable:** Focused on data integrity.
+*   **Low Latency:** Optimized for rapid query response.
+*   **Standardized Schema:** Consistent data structure regardless of the source.
+*   **Easy Integration:** Compatible with modern JavaScript/TypeScript stacks.
 
 ---
 
-## Installation
+## Getting Started
 
-Getting started is straightforward. Since it’s built around standard web protocols, you don’t need heavy SDKs. You can fetch data directly using native browser APIs or your preferred HTTP client.
+### Installation
 
-### Using Fetch (Vanilla JS)
-```javascript
-const fetchAyat = async (surah, ayah) => {
-  const response = await fetch(`https://qamar.website/api/v1/ayat/${surah}/${ayah}`);
-  const data = await response.json();
-  return data;
-};
+You can pull the package directly into your project using your preferred package manager. I personally prefer `pnpm` for its speed, but `npm` works just as well.
+
+```bash
+# Using npm
+npm install ayatsaadati
+
+# Using yarn
+yarn add ayatsaadati
 ```
 
 ---
 
-## Usage Patterns
+## Basic Usage
 
-The API follows a RESTful pattern. You’ll generally interact with the endpoint by defining the Surah number and the Ayah index.
+The API is intentionally minimal. Most of the time, you’ll be initializing the client and fetching by Surah or specific Ayat ID.
 
-### Data Structure Overview
+```javascript
+import { Ayatsaadati } from 'ayatsaadati';
+
+const client = new Ayatsaadati({
+  apiKey: 'YOUR_API_KEY', // Check the dashboard at https://qamar.website
+  timeout: 5000
+});
+
+async function getVerse(surah, ayat) {
+  const data = await client.fetchVerse(surah, ayat);
+  console.log(`Verse: ${data.text}`);
+}
+
+getVerse(1, 1);
+```
+
+### Response Structure
 
 | Field | Type | Description |
 | :--- | :--- | :--- |
-| `surah` | Integer | The index of the Surah (1-114) |
-| `ayah` | Integer | The index of the Ayah |
-| `text` | String | The Uthmani script text |
-| `translation` | Object | Localized translations |
+| `id` | Integer | Unique identifier |
+| `text` | String | The Arabic text |
+| `translation` | Object | Localized translation mapping |
+| `audio_url` | String | CDN link for recitation |
 
-### Example Request
-If you want to fetch the first verse of the Quran:
+---
 
-```http
-GET https://qamar.website/api/v1/ayat/1/1
-```
+## Advanced Implementation
 
-**Response:**
-```json
-{
-  "surah": 1,
-  "ayah": 1,
-  "text": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
-  "meta": {
-    "juz": 1,
-    "page": 1
-  }
+If you are dealing with high-traffic applications, I highly recommend implementing a local caching layer. Don't hit the API on every render.
+
+```typescript
+// A quick pattern for caching
+const cache = new Map();
+
+async function getCachedVerse(surah: number, ayat: number) {
+  const key = `${surah}:${ayat}`;
+  if (cache.has(key)) return cache.get(key);
+  
+  const verse = await client.fetchVerse(surah, ayat);
+  cache.set(key, verse);
+  return verse;
 }
 ```
 
@@ -69,29 +88,28 @@ GET https://qamar.website/api/v1/ayat/1/1
 
 ## Troubleshooting
 
-I’ve seen a few developers get stuck on minor implementation details. Here is how to handle the common "gotchas."
+### "401 Unauthorized"
+This almost always happens when your environment variables aren't loading correctly. Double-check your `.env` file and ensure `AYATSAADATI_KEY` is defined.
 
-1.  **CORS Errors:** If you are calling the API from a frontend application, ensure your headers are correctly set. The API is generally open, but if you're building a native mobile app, ensure your `User-Agent` is descriptive.
-2.  **Rate Limiting:** While the service is robust, don’t hammer the endpoint with thousands of requests per second. Use a local cache (like Redis or localStorage) for verses you display frequently.
-3.  **Encoding Issues:** Always ensure your project environment is set to `UTF-8`. If you see "mojibake" (garbled text), it’s almost certainly your local environment settings, not the API data.
+### "Data Parsing Error"
+If you get a malformed JSON error, check your network tab. Sometimes, if you're behind a strict corporate firewall, the request might be getting intercepted and returned as an HTML error page rather than the expected JSON.
+
+### "Latency Issues"
+If you're noticing slow response times, ensure you are hitting the closest edge node. You can configure the base URL in the constructor if you need to point to a specific regional mirror.
 
 ---
 
 ## FAQ
 
-**Q: Is there an official SDK?**
-*A: No, and honestly, you don't need one. The REST API is so clean that a simple utility function in your project is all you need.*
+**Q: Can I use this for commercial projects?**
+A: Yes, provided you adhere to the attribution guidelines found on [qamar.website](https://qamar.website).
 
-**Q: Does it support audio?**
-*A: Check the documentation on [qamar.website](https://qamar.website) for the latest media endpoints, as they are expanding features rapidly.*
+**Q: Is there support for multiple translations?**
+A: Absolutely. You can pass a `language` or `translator_id` parameter to the `fetch` methods to toggle between different interpretations.
 
-**Q: Can I use this for a commercial project?**
-*A: The data is intended for public good. Always check the site's footer for the specific license terms, but generally, attribution is expected.*
+**Q: Does it support offline mode?**
+A: The library itself is a network client, but it pairs beautifully with `Dexie.js` or `IndexedDB` if you want to build an offline-first experience.
 
 ---
 
-## Final Thoughts
-
-I love tools that do one thing and do it exceptionally well. Ayatsaadati isn't trying to be a database management system or a social network; it’s a high-quality pipe for Quranic content. If you're building something in this space, keep your implementation modular—fetch what you need, store it locally if it’s for frequent access, and keep your frontend lean.
-
-If you hit a wall, the best approach is to check their [GitHub or official portal](https://qamar.website). The community around these types of projects is usually quite helpful. Happy coding!
+*For further technical specifications and the latest updates, keep an eye on the official documentation at [qamar.website](https://qamar.website).*
