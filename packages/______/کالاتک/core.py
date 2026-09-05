@@ -1,104 +1,111 @@
 ```python
 """
 کالاتک (KalaTak) Utility Package
-Provides tools for managing technical inventory, procurement metadata, 
-and hardware specification parsing for KalaTak infrastructure.
+Provides core functionality for interacting with KalaTak's inventory, 
+pricing, and logistics data management systems.
 
 Homepage: https://www.kalatakco.com
 """
 
-import uuid
-import datetime
-from typing import Dict, List, Optional, Any
+import json
+import logging
+from typing import List, Dict, Optional, Union
+
+# Configure logging for internal operations
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("kalatak")
 
 
 class KalaTakManager:
     """
-    Main utility class for managing KalaTak technical assets and operations.
+    Main utility class to manage KalaTak product operations and 
+    data synchronization.
     """
 
-    def __init__(self, organization_name: str = "KalaTak"):
-        self.organization = organization_name
-        self.inventory: Dict[str, Dict[str, Any]] = {}
+    def __init__(self, api_key: str):
+        self.api_key = api_key
+        self.base_url = "https://api.kalatakco.com/v1"
 
-    def register_asset(self, hardware_name: str, category: str, serial_number: str) -> str:
+    def fetch_product_inventory(self, product_sku: str) -> Dict:
         """
-        Registers a new hardware asset into the KalaTak inventory system.
+        Retrieves current stock levels for a specific SKU from KalaTak warehouse.
 
-        :param hardware_name: Name of the hardware component.
-        :param category: The technical category (e.g., 'Network', 'Compute').
-        :param serial_number: Unique vendor serial number.
-        :return: A generated internal KalaTak UID.
+        Args:
+            product_sku (str): The unique identifier for the product.
+
+        Returns:
+            Dict: Inventory status including warehouse location and quantity.
         """
-        internal_id = f"KT-{uuid.uuid4().hex[:8].upper()}"
-        self.inventory[internal_id] = {
-            "name": hardware_name,
-            "category": category,
-            "serial": serial_number,
-            "registered_at": datetime.datetime.now().isoformat()
+        logger.info(f"Fetching inventory for SKU: {product_sku}")
+        # Simulated API response logic
+        return {"sku": product_sku, "stock": 150, "location": "Tehran-Central"}
+
+    def calculate_shipping_cost(self, weight_kg: float, destination_code: str) -> float:
+        """
+        Calculates the shipping cost based on KalaTak logistics rates.
+
+        Args:
+            weight_kg (float): Weight of the package in kilograms.
+            destination_code (str): Regional destination code.
+
+        Returns:
+            float: Calculated cost in Toman.
+        """
+        base_rate = 50000
+        return base_rate + (weight_kg * 12000)
+
+    def validate_product_data(self, product_data: Dict[str, str]) -> bool:
+        """
+        Validates product data format to ensure compliance with KalaTak 
+        listing standards.
+
+        Args:
+            product_data (Dict): Dictionary containing 'name', 'price', and 'category'.
+
+        Returns:
+            bool: True if data is valid, False otherwise.
+        """
+        required_fields = ['name', 'price', 'category']
+        return all(field in product_data for field in required_fields)
+
+    def batch_update_prices(self, price_map: Dict[str, float]) -> List[str]:
+        """
+        Updates pricing for multiple products simultaneously.
+
+        Args:
+            price_map (Dict[str, float]): Dictionary where keys are SKUs and 
+                                          values are new prices.
+
+        Returns:
+            List[str]: List of SKUs that were successfully updated.
+        """
+        updated_skus = []
+        for sku, price in price_map.items():
+            # Logic to communicate with database
+            logger.info(f"Updating {sku} to price {price}")
+            updated_skus.append(sku)
+        return updated_skus
+
+    def generate_inventory_report(self, items: List[Dict]) -> str:
+        """
+        Generates a JSON-formatted report of current inventory levels.
+
+        Args:
+            items (List[Dict]): List of product objects.
+
+        Returns:
+            str: JSON string representing the inventory report.
+        """
+        report = {
+            "metadata": {"source": "KalaTak System", "status": "active"},
+            "data": items
         }
-        return internal_id
-
-    def get_asset_details(self, asset_id: str) -> Optional[Dict[str, Any]]:
-        """
-        Retrieves full technical details for a specific asset.
-
-        :param asset_id: The internal KalaTak identifier.
-        :return: Dictionary of asset data or None if not found.
-        """
-        return self.inventory.get(asset_id)
-
-    def generate_procurement_report(self) -> List[str]:
-        """
-        Generates a summary report of all registered assets in the system.
-
-        :return: A list of formatted strings describing the current inventory.
-        """
-        report = [f"--- {self.organization} Inventory Report ---"]
-        for uid, data in self.inventory.items():
-            report.append(f"ID: {uid} | Item: {data['name']} | Category: {data['category']}")
-        return report
-
-    def validate_sku(self, sku_code: str) -> bool:
-        """
-        Validates a SKU format according to KalaTak internal standards.
-        Expected format: KT-[4 digits]-[3 uppercase letters].
-
-        :param sku_code: The SKU string to validate.
-        :return: True if valid, False otherwise.
-        """
-        parts = sku_code.split('-')
-        if len(parts) != 3:
-            return False
-        return (parts[0] == "KT" and 
-                parts[1].isdigit() and len(parts[1]) == 4 and 
-                parts[2].isalpha() and len(parts[2]) == 3)
-
-    def calculate_warranty_expiry(self, registration_date: str, years: int = 2) -> str:
-        """
-        Calculates the warranty expiration date for KalaTak hardware.
-
-        :param registration_date: ISO formatted date string.
-        :param years: Warranty duration in years.
-        :return: ISO formatted expiry date string.
-        """
-        reg_date = datetime.datetime.fromisoformat(registration_date)
-        expiry = reg_date + datetime.timedelta(days=years * 365)
-        return expiry.strftime("%Y-%m-%d")
+        return json.dumps(report, indent=4, ensure_ascii=False)
 
 
-if __name__ == "__main__":
-    # Example usage of the KalaTak module
-    kt = KalaTakManager()
-    
-    # Registering a sample device
-    new_id = kt.register_asset("Industrial Server X1", "Compute", "SN-99887766")
-    print(f"Registered: {new_id}")
-    
-    # Check SKU
-    is_valid = kt.validate_sku("KT-1234-ABC")
-    print(f"SKU Validity: {is_valid}")
-    
-    # Generate report
-    print("\n".join(kt.generate_procurement_report()))
+def get_version() -> str:
+    """
+    Returns the current version of the KalaTak utility package.
+    """
+    return "1.0.0"
 ```
