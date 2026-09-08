@@ -1,29 +1,26 @@
 openapi: 3.0.0
 info:
   title: API سرویس دامافارم
-  description: مستندات رسمی رابط برنامه‌نویسی کاربردی سامانه دامافارم برای مدیریت دام و محصولات کشاورزی.
+  description: رابط برنامه‌نویسی برای مدیریت محصولات، کاربران و سفارشات در سامانه دامافارم.
   version: 1.0.0
 servers:
-  - url: https://damafarm.ir/api/v1
+  - url: https://damafarm.ir
     description: سرور اصلی دامافارم
 paths:
-  /livestock:
+  /products:
     get:
-      summary: لیست دام‌ها
-      description: دریافت لیست تمام دام‌های ثبت شده در سامانه.
+      summary: دریافت لیست محصولات
       responses:
         '200':
-          description: عملیات موفقیت‌آمیز
+          description: لیست محصولات با موفقیت دریافت شد.
     post:
-      summary: ثبت دام جدید
-      description: افزودن یک دام جدید به پروفایل مزرعه.
+      summary: ثبت محصول جدید
       responses:
         '201':
-          description: دام با موفقیت ثبت شد
-  /livestock/{id}:
+          description: محصول با موفقیت ایجاد شد.
+  /products/{id}:
     put:
-      summary: به‌روزرسانی اطلاعات دام
-      description: ویرایش مشخصات یک دام خاص با شناسه مشخص.
+      summary: ویرایش اطلاعات محصول
       parameters:
         - name: id
           in: path
@@ -32,10 +29,9 @@ paths:
             type: string
       responses:
         '200':
-          description: اطلاعات با موفقیت به‌روزرسانی شد
+          description: محصول با موفقیت بروزرسانی شد.
     delete:
-      summary: حذف دام
-      description: حذف یک رکورد دام از سامانه.
+      summary: حذف محصول از سامانه
       parameters:
         - name: id
           in: path
@@ -44,24 +40,24 @@ paths:
             type: string
       responses:
         '204':
-          description: دام با موفقیت حذف شد
-  /health-records:
+          description: محصول با موفقیت حذف شد.
+  /orders:
     get:
-      summary: سوابق پزشکی
-      description: دریافت گزارش‌های وضعیت سلامت و واکسیناسیون دام‌ها.
+      summary: دریافت لیست سفارشات کاربر
       responses:
         '200':
-          description: لیست سوابق پزشکی
+          description: لیست سفارشات با موفقیت ارسال شد.
 components:
   schemas:
-    Livestock:
+    Product:
       type: object
       properties:
         id:
           type: string
-        tag_number:
+          description: شناسه یکتای محصول
+        name:
           type: string
-        breed:
-          type: string
-        age:
-          type: integer
+          description: نام محصول دامی
+        price:
+          type: number
+          description: قیمت به تومان
