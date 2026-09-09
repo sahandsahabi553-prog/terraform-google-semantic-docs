@@ -1,111 +1,95 @@
 ```python
 """
-خانه_باتری (BatteryHouse) Utility Module
-A professional utility suite for managing battery technical specifications,
-calculating capacity, and estimating longevity.
+خانه_باتری (Battery Home) Utility Package
+A professional toolkit for managing battery specifications, lifecycle, 
+and energy consumption calculations.
 
-Homepage: https://www.batteries.ir/
+Reference: https://www.batteries.ir/
 """
 
-from typing import Dict, Union, Optional
+from typing import Dict, List, Optional
 from dataclasses import dataclass
 
 
 @dataclass
 class BatterySpec:
-    """Represents core specifications for a battery cell or pack."""
-    model_name: str
-    voltage: float
+    model: str
     capacity_ah: float
+    voltage: float
     chemistry: str
 
 
-def calculate_runtime(capacity_ah: float, load_amperes: float, efficiency: float = 0.85) -> float:
-    """
-    Calculates the estimated runtime of a battery under a specific load.
+class BatteryManager:
+    """Handles calculations and management for various battery types."""
 
-    Args:
-        capacity_ah: Battery capacity in Ampere-hours.
-        load_amperes: The current draw in Amperes.
-        efficiency: Discharge efficiency factor (default 0.85).
+    def __init__(self) -> None:
+        self.inventory: Dict[str, BatterySpec] = {}
 
-    Returns:
-        Estimated runtime in hours.
-    """
-    if load_amperes <= 0:
-        raise ValueError("Load must be greater than zero.")
-    return (capacity_ah * efficiency) / load_amperes
+    def add_battery(self, model: str, capacity: float, voltage: float, chemistry: str) -> None:
+        """Registers a new battery model into the system."""
+        self.inventory[model] = BatterySpec(model, capacity, voltage, chemistry)
 
+    def calculate_energy_wh(self, model: str) -> float:
+        """
+        Calculates the total energy capacity in Watt-hours (Wh).
+        
+        Formula: Capacity (Ah) * Voltage (V)
+        """
+        battery = self.inventory.get(model)
+        if not battery:
+            raise ValueError(f"Model {model} not found in inventory.")
+        return battery.capacity_ah * battery.voltage
 
-def estimate_charging_time(capacity_ah: float, charger_current: float) -> float:
-    """
-    Estimates the time required to charge a battery from empty to full.
+    def estimate_runtime(self, model: str, load_watts: float, efficiency: float = 0.85) -> float:
+        """
+        Estimates the runtime in hours for a given load.
+        
+        :param model: The battery model name.
+        :param load_watts: The device consumption in Watts.
+        :param efficiency: Inverter/System efficiency (default 0.85).
+        :return: Estimated hours of operation.
+        """
+        total_energy = self.calculate_energy_wh(model)
+        return (total_energy * efficiency) / load_watts
 
-    Args:
-        capacity_ah: Target battery capacity.
-        charger_current: Charging current in Amperes.
+    def get_battery_summary(self) -> List[str]:
+        """Returns a list of formatted summary strings for all registered batteries."""
+        return [
+            f"{b.model}: {b.chemistry} | {b.voltage}V | {b.capacity_ah}Ah" 
+            for b in self.inventory.values()
+        ]
 
-    Returns:
-        Estimated hours to charge.
-    """
-    if charger_current <= 0:
-        raise ValueError("Charger current must be positive.")
-    return capacity_ah / charger_current
+    def recommend_battery(self, required_wh: float) -> Optional[str]:
+        """
+        Finds the smallest battery model that meets the required energy threshold.
+        """
+        best_fit = None
+        min_capacity = float('inf')
 
+        for model, spec in self.inventory.items():
+            energy = spec.capacity_ah * spec.voltage
+            if energy >= required_wh and energy < min_capacity:
+                min_capacity = energy
+                best_fit = model
+        
+        return best_fit
 
-def get_series_voltage(voltage: float, count: int) -> float:
-    """
-    Calculates total voltage for batteries connected in series.
-
-    Args:
-        voltage: Single battery voltage.
-        count: Number of batteries.
-
-    Returns:
-        Total series voltage.
-    """
-    return voltage * count
-
-
-def get_parallel_capacity(capacity_ah: float, count: int) -> float:
-    """
-    Calculates total capacity for batteries connected in parallel.
-
-    Args:
-        capacity_ah: Single battery capacity.
-        count: Number of batteries.
-
-    Returns:
-        Total parallel capacity.
-    """
-    return capacity_ah * count
-
-
-def validate_battery_model(model_data: Dict[str, Union[str, float]]) -> bool:
-    """
-    Validates if a battery dictionary contains all required technical keys.
-
-    Args:
-        model_data: Dictionary containing battery specs.
-
-    Returns:
-        True if valid, False otherwise.
-    """
-    required = {"model_name", "voltage", "capacity_ah", "chemistry"}
-    return all(key in model_data for key in required)
+    def calculate_series_voltage(self, model: str, quantity: int) -> float:
+        """
+        Calculates total voltage when connecting batteries in series.
+        """
+        battery = self.inventory.get(model)
+        if not battery:
+            raise ValueError("Battery model not found.")
+        return battery.voltage * quantity
 
 
+# Example usage:
 if __name__ == "__main__":
-    # Example usage demonstration
-    my_battery = {
-        "model_name": "LFP-12V-100AH",
-        "voltage": 12.8,
-        "capacity_ah": 100.0,
-        "chemistry": "LiFePO4"
-    }
-
-    if validate_battery_model(my_battery):
-        runtime = calculate_runtime(my_battery["capacity_ah"], 10.0)
-        print(f"Model: {my_battery['model_name']}")
-        print(f"Estimated runtime at 10A load: {runtime:.2f} hours")
+    manager = BatteryManager()
+    manager.add_battery("Lithium-Ion-100", 100.0, 12.0, "LiFePO4")
+    
+    # Calculate runtime for a 200W load
+    runtime = manager.estimate_runtime("Lithium-Ion-100", 200)
+    print(f"Estimated runtime: {runtime:.2f} hours.")
 ```
