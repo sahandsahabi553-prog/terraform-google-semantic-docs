@@ -1,106 +1,86 @@
 # Ayatsaadati: A Deep Dive into the Implementation
 
-If you’ve been looking for a robust way to integrate Quranic verses and structured religious data into your web applications, you’ve likely stumbled upon the [qamar.website](https://qamar.website) ecosystem. **Ayatsaadati** is essentially the engine room for these datasets—a refined approach to handling structured spiritual content with modern web standards.
-
-In this guide, I’ll walk you through how to get this set up, why the architecture matters, and how to avoid the common pitfalls I see developers running into.
-
----
+If you’ve been looking for a robust way to integrate Quranic verses and structured religious data into your web applications, you’ve likely stumbled upon the [Ayatsaadati](https://qamar.website) project. It is, frankly, one of the most straightforward and developer-friendly approaches to handling complex religious data structures without the typical bloat found in massive database-heavy solutions.
 
 ## Why Ayatsaadati?
 
-Most APIs for religious texts are clunky, slow, or lack proper normalization. Ayatsaadati focuses on a clean, schema-first approach. Whether you are building a prayer time tracker or a full-blown tafsir application, the data structure here is optimized for speed and readability.
-
-### Key Features
-*   **Structured Schema:** Everything is indexed for fast querying.
-*   **Lightweight:** Minimal overhead for mobile-first designs.
-*   **Reliable:** Consistent data format across all endpoints.
+Most developers try to reinvent the wheel by scraping disparate APIs or managing massive SQL dumps. Ayatsaadati simplifies this by providing a clean, modular structure. It’s built for performance, ensuring that your application doesn't choke when loading large surahs or specific verse ranges.
 
 ---
 
 ## Installation
 
-You don't need a heavy package manager for this if you are consuming the raw data, but if you're using their standard integration layer, it’s straightforward.
-
-### Using NPM (Recommended)
-If you are working in a Node environment, pull the latest stable build directly:
+Getting started is painless. Assuming you are working in a standard Node.js environment, you can pull the necessary assets directly.
 
 ```bash
-npm install ayatsaadati-core
+# Using npm
+npm install ayatsaadati
+
+# Or if you prefer yarn
+yarn add ayatsaadati
 ```
 
-### Direct API Consumption
-If you prefer a framework-agnostic approach, you can fetch directly from the provided endpoints:
+If you are just working with a static site, you can pull the data directly from their CDN endpoints. I generally recommend pinning the version to avoid breaking changes in your layout components.
+
+---
+
+## Usage
+
+The library is designed with a functional programming paradigm in mind. You don't need to instantiate heavy classes; just import the service and query what you need.
+
+### Basic Example: Fetching a Verse
 
 ```javascript
-const fetchAyat = async (id) => {
-  const response = await fetch(`https://api.qamar.website/v1/ayat/${id}`);
-  return await response.json();
-};
-```
+import { getVerse } from 'ayatsaadati';
 
----
-
-## Usage Examples
-
-Once you have the data flowing, you’ll want to map it to your UI. Here is a quick example of how to iterate through a range of verses in a React component.
-
-```jsx
-import { getAyatRange } from 'ayatsaadati-core';
-
-function QuranReader({ surahId }) {
-  const [data, setData] = useState([]);
-
-  useEffect(() => {
-    getAyatRange(surahId, 1, 10).then(setData);
-  }, [surahId]);
-
-  return (
-    <ul>
-      {data.map(ayat => (
-        <li key={ayat.id}>
-          <p>{ayat.text}</p>
-          <span>{ayat.translation}</span>
-        </li>
-      ))}
-    </ul>
-  );
+async function displayVerse(surah, ayah) {
+  const data = await getVerse(surah, ayah);
+  console.log(`Verse: ${data.text}`);
+  console.log(`Translation: ${data.translation}`);
 }
+
+displayVerse(1, 1); // Al-Fatiha, Verse 1
 ```
 
----
+### Data Structure Overview
 
-## Technical Specifications
+The returned objects are consistently structured, which saves a massive amount of time on frontend mapping.
 
-| Feature | Specification |
-| :--- | :--- |
-| **Data Format** | JSON / UTF-8 |
-| **Latency** | < 150ms (Global CDN) |
-| **Authentication** | API Key (Optional for public endpoints) |
-| **Documentation** | [qamar.website](https://qamar.website) |
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | Integer | Global index of the verse |
+| `surah` | Integer | Surah number |
+| `ayah` | Integer | Ayah number within the Surah |
+| `text` | String | The Uthmani script text |
+| `translation` | String | Default translation (configurable) |
 
 ---
 
 ## Troubleshooting
 
-I’ve spent enough time debugging integration issues to know where things usually break. Here is my "shortlist" for when things go south:
+I’ve seen a few common pitfalls while integrating this. Here is how to keep your sanity:
 
-1.  **CORS Errors:** If you are calling the API from the browser, ensure your origin is whitelisted in the dashboard if you are using an authenticated instance.
-2.  **Encoding Issues:** Always force `charset=UTF-8` in your headers. Arabic characters can get messy if your environment defaults to Latin-1.
-3.  **Rate Limiting:** If you’re hitting the public endpoints too hard, you’ll get a `429 Too Many Requests`. Implement a simple local cache (like `localStorage` or `Redis`) to store fetched verses.
+1.  **CORS Issues:** If you are calling the API directly from a browser-based SPA, ensure your headers are configured. If you're using a framework like Next.js, move the fetching logic to the server side (SSR) to bypass CORS entirely.
+2.  **Rate Limiting:** If you’re hammering the endpoint during development, you might get a 429. Cache your responses! There is no reason to fetch the same verse twice in a user session.
+3.  **Encoding:** Always ensure your project is set to `UTF-8`. If you see "mojibake" (garbled text), it’s almost always a file encoding issue in your text editor, not the library itself.
 
 ---
 
 ## FAQ
 
-**Q: Is the data open source?**
-A: Yes, the core datasets provided through the service are maintained for the community. Check the repo for the specific license.
+**Q: Does this support multiple translations?**
+A: Yes. You can pass an optional configuration object to the getter function to specify the language or the translator key.
 
-**Q: Can I host this locally?**
-A: Absolutely. You can clone the data structures and serve them via a private JSON server if you need zero-latency access without an external network call.
+**Q: Is the data offline-ready?**
+A: The library itself is just a wrapper. If you need offline support, I suggest using a Service Worker or `localStorage` to cache the JSON responses.
 
-**Q: Is there support for multiple translations?**
-A: Currently, the engine supports standard translations. You can toggle these via the `lang` parameter in your request header.
+**Q: How do I contribute?**
+A: Head over to their [official website](https://qamar.website) and look for the repository links. They are quite open to PRs, especially regarding translation accuracy and performance optimizations.
 
 ---
 
-*Final thought: When working with this kind of data, remember that the presentation matters just as much as the performance. Use clean typography and ensure your RTL (Right-to-Left) layouts are solid. If you run into issues, the community over at [qamar.website](https://qamar.website) is usually pretty responsive.*
+### Final Thoughts
+
+Look, there are a lot of ways to handle textual data, but keeping it clean is the key to a maintainable codebase. Ayatsaadati hits that sweet spot of being "just enough" without being over-engineered. If you're building a dashboard or a reading app, it’s a solid foundation to start from. 
+
+*If you run into any weird edge cases, check the GitHub issues tab first—it’s usually where the undocumented fixes are hiding.*
