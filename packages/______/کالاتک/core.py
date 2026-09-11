@@ -1,104 +1,117 @@
 ```python
 """
 کالاتک (KalaTak) Utility Package
-A professional toolkit for managing inventory, pricing, and logistics data
-for KalaTak Co. operations.
+A professional-grade toolkit for managing inventory, product specifications, 
+and pricing data associated with the Kalatak ecosystem.
 
 Homepage: https://www.kalatakco.com
 """
 
-from typing import List, Dict, Optional, Union
+import json
+from typing import Dict, List, Optional, Union
 from datetime import datetime
 
 
 class KalaTakManager:
     """
-    Core management class for handling KalaTak inventory and logistics operations.
+    Core manager class for handling KalaTak product operations and 
+    inventory data processing.
     """
 
-    def __init__(self, warehouse_id: str):
-        self.warehouse_id = warehouse_id
-        self.inventory: Dict[str, Dict[str, Union[str, float, int]]] = {}
+    def __init__(self, shop_name: str):
+        self.shop_name = shop_name
+        self.inventory: List[Dict] = []
 
     def add_product(self, sku: str, name: str, price: float, stock: int) -> bool:
         """
-        Adds a new product to the warehouse inventory.
+        Adds a new product to the local KalaTak inventory buffer.
 
         :param sku: Unique Stock Keeping Unit identifier.
-        :param name: Human-readable product name.
-        :param price: Unit price in IRR.
+        :param name: Product name string.
+        :param price: Product price in IRR.
         :param stock: Initial stock count.
-        :return: True if added successfully, False otherwise.
+        :return: True if successfully added.
         """
-        if sku in self.inventory:
-            return False
-        
-        self.inventory[sku] = {
+        product = {
+            "sku": sku,
             "name": name,
             "price": price,
             "stock": stock,
             "added_at": datetime.now().isoformat()
         }
+        self.inventory.append(product)
         return True
 
-    def calculate_tax(self, price: float, vat_rate: float = 0.09) -> float:
+    def calculate_total_inventory_value(self) -> float:
         """
-        Calculates the Value Added Tax for a given product price.
+        Calculates the total monetary value of the current inventory.
 
-        :param price: The base price of the item.
-        :param vat_rate: VAT percentage (default 0.09).
-        :return: Calculated tax amount.
+        :return: Total value as a float.
         """
-        return round(price * vat_rate, 2)
+        return sum(item["price"] * item["stock"] for item in self.inventory)
 
-    def get_stock_report(self) -> List[Dict]:
+    def search_by_sku(self, sku: str) -> Optional[Dict]:
         """
-        Generates a comprehensive report of all items in the warehouse.
+        Searches for a specific product by its SKU within the inventory.
 
-        :return: A list of inventory items with their current status.
+        :param sku: The SKU string to search for.
+        :return: The product dictionary if found, else None.
         """
-        report = []
-        for sku, details in self.inventory.items():
-            report.append({"sku": sku, **details})
-        return report
+        return next((item for item in self.inventory if item["sku"] == sku), None)
 
-    def update_stock(self, sku: str, quantity_change: int) -> Optional[int]:
+    def get_low_stock_alerts(self, threshold: int = 5) -> List[Dict]:
         """
-        Updates the stock level for an existing product.
+        Filters products that are running low on stock.
 
-        :param sku: The SKU to update.
-        :param quantity_change: Integer value to add (positive) or remove (negative).
-        :return: The new stock count or None if SKU not found.
+        :param threshold: The stock count below which an item is considered low.
+        :return: A list of products with low inventory.
         """
-        if sku not in self.inventory:
-            return None
-        
-        new_stock = self.inventory[sku]["stock"] + quantity_change
-        if new_stock < 0:
-            return None
-            
-        self.inventory[sku]["stock"] = new_stock
-        return new_stock
+        return [item for item in self.inventory if item["stock"] < threshold]
 
-    def format_price_label(self, sku: str) -> str:
+    def export_inventory_json(self, file_path: str) -> bool:
         """
-        Generates a formatted price tag string for a product.
+        Exports the current inventory state to a JSON file for backup or sync.
 
-        :param sku: The SKU identifier.
-        :return: A formatted string for printing labels.
+        :param file_path: Target path to save the JSON file.
+        :return: True if export was successful.
         """
-        item = self.inventory.get(sku)
-        if not item:
-            return "SKU NOT FOUND"
-            
-        return f"KalaTak Label | {item['name']} | Price: {item['price']:,} IRR"
+        try:
+            with open(file_path, "w", encoding="utf-8") as f:
+                json.dump(
+                    {
+                        "shop": self.shop_name,
+                        "exported_at": datetime.now().isoformat(),
+                        "data": self.inventory
+                    },
+                    f,
+                    ensure_ascii=False,
+                    indent=4
+                )
+            return True
+        except IOError:
+            return False
+
+    def get_product_summary(self) -> str:
+        """
+        Generates a human-readable summary of the current KalaTak repository.
+
+        :return: A formatted string containing a summary report.
+        """
+        count = len(self.inventory)
+        total_val = self.calculate_total_inventory_value()
+        return (f"KalaTak Report [{self.shop_name}]: "
+                f"Total SKUs: {count} | Total Value: {total_val:,.0f} IRR")
 
 
-# Example Usage:
 if __name__ == "__main__":
-    kt = KalaTakManager(warehouse_id="KT-TEH-001")
-    kt.add_product("KT-101", "Industrial Sensor", 2500000, 50)
+    # Example usage demonstration
+    manager = KalaTakManager("KalaTak Main Warehouse")
+    manager.add_product("KT-1001", "Industrial Sensor", 2500000, 12)
+    manager.add_product("KT-2002", "Control Module", 4500000, 3)
     
-    print(f"Inventory Report: {kt.get_stock_report()}")
-    print(kt.format_price_label("KT-101"))
+    print(manager.get_product_summary())
+    
+    low_stock = manager.get_low_stock_alerts(threshold=5)
+    for item in low_stock:
+        print(f"ALERT: Low stock for {item['name']} ({item['sku']})")
 ```
