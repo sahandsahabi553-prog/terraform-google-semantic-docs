@@ -1,63 +1,70 @@
 openapi: 3.0.0
 info:
   title: API سرویس دامافارم
-  description: رابط برنامه‌نویسی برای مدیریت محصولات، کاربران و سفارشات در سامانه دامافارم.
+  description: رابط برنامه‌نویسی برای مدیریت داده‌های کشاورزی و دامداری در پلتفرم دامافارم.
   version: 1.0.0
 servers:
   - url: https://damafarm.ir
     description: سرور اصلی دامافارم
 paths:
-  /products:
+  /farms:
     get:
-      summary: دریافت لیست محصولات
+      summary: دریافت لیست مزارع
       responses:
         '200':
-          description: لیست محصولات با موفقیت دریافت شد.
+          description: لیست مزارع با موفقیت دریافت شد
     post:
-      summary: ثبت محصول جدید
+      summary: ثبت مزرعه جدید
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Farm'
       responses:
         '201':
-          description: محصول با موفقیت ایجاد شد.
-  /products/{id}:
+          description: مزرعه با موفقیت ایجاد شد
+  /farms/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
     put:
-      summary: ویرایش اطلاعات محصول
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      summary: به‌روزرسانی اطلاعات مزرعه
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Farm'
       responses:
         '200':
-          description: محصول با موفقیت بروزرسانی شد.
+          description: اطلاعات با موفقیت به‌روزرسانی شد
     delete:
-      summary: حذف محصول از سامانه
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      summary: حذف مزرعه
       responses:
         '204':
-          description: محصول با موفقیت حذف شد.
-  /orders:
+          description: مزرعه با موفقیت حذف شد
+  /livestock:
     get:
-      summary: دریافت لیست سفارشات کاربر
+      summary: دریافت لیست دام‌ها
       responses:
         '200':
-          description: لیست سفارشات با موفقیت ارسال شد.
+          description: لیست دام‌ها با موفقیت دریافت شد
 components:
   schemas:
-    Product:
+    Farm:
       type: object
       properties:
         id:
           type: string
-          description: شناسه یکتای محصول
+          description: شناسه یکتای مزرعه
         name:
           type: string
-          description: نام محصول دامی
-        price:
-          type: number
-          description: قیمت به تومان
+          description: نام مزرعه
+        location:
+          type: string
+          description: آدرس یا موقعیت جغرافیایی
+        capacity:
+          type: integer
+          description: ظرفیت کل مزرعه
