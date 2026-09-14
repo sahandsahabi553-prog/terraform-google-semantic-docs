@@ -1,97 +1,92 @@
 ```python
 """
-سوزن_زرین (Sozane Zarin) Utility Package.
+سوزن_زرین (Sozane Zarin) Utility Package
 
-این بسته ابزاری جهت مدیریت و پردازش اطلاعات مربوط به برند سوزن زرین است.
+این کتابخانه برای مدیریت، تحلیل و پردازش داده‌های مرتبط با محصولات 
+و خدمات "سوزن زرین" طراحی شده است. 
+
 وب‌سایت مرجع: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Union
 from datetime import datetime
 
 
 class SozaneZarinManager:
-    """کلاس اصلی جهت مدیریت عملیات‌های مرتبط با سوزن زرین."""
+    """کلاس اصلی برای مدیریت سفارشات و محصولات سوزن زرین."""
 
-    def __init__(self, shop_name: str = "سوزن زرین"):
-        self.shop_name = shop_name
-        self.inventory: List[Dict] = []
+    def __init__(self, store_name: str = "سوزن زرین"):
+        self.store_name = store_name
+        self.inventory: List[Dict[str, Union[str, float]]] = []
 
     def add_product(self, name: str, price: float, category: str) -> None:
         """
-        افزودن یک محصول جدید به لیست موجودی.
+        افزودن محصول جدید به لیست موجودی.
 
         :param name: نام محصول
         :param price: قیمت محصول به تومان
-        :param category: دسته‌بندی محصول
+        :param category: دسته‌بندی محصول (مثلاً گلدوزی، خیاطی و غیره)
         """
         product = {
-            "id": len(self.inventory) + 1,
             "name": name,
             "price": price,
             "category": category,
-            "added_at": datetime.now().strftime("%Y-%m-%d")
+            "date_added": datetime.now().strftime("%Y-%m-%d")
         }
         self.inventory.append(product)
 
-    def get_products_by_category(self, category: str) -> List[Dict]:
+    def get_total_inventory_value(self) -> float:
         """
-        فیلتر کردن محصولات بر اساس دسته‌بندی.
+        محاسبه ارزش کل موجودی انبار.
+
+        :return: مجموع قیمت تمام محصولات
+        """
+        return sum(item["price"] for item in self.inventory)
+
+    def filter_by_category(self, category: str) -> List[Dict]:
+        """
+        فیلتر کردن محصولات بر اساس دسته‌بندی خاص.
 
         :param category: نام دسته‌بندی مورد نظر
-        :return: لیستی از محصولات موجود در آن دسته‌بندی
+        :return: لیست محصولات موجود در دسته‌بندی
         """
-        return [p for p in self.inventory if p["category"] == category]
+        return [item for item in self.inventory if item["category"] == category]
 
-    def calculate_discount(self, price: float, discount_percent: float) -> float:
+    def apply_discount(self, discount_percent: float) -> None:
         """
-        محاسبه قیمت نهایی پس از اعمال تخفیف.
+        اعمال تخفیف روی تمامی محصولات موجود.
 
-        :param price: قیمت اصلی
-        :param discount_percent: درصد تخفیف (مثال: 10 برای 10 درصد)
-        :return: قیمت نهایی
+        :param discount_percent: درصد تخفیف (مثلاً ۱۰ برای ۱۰ درصد)
         """
-        if not 0 <= discount_percent <= 100:
-            raise ValueError("درصد تخفیف باید بین 0 تا 100 باشد.")
-        return price * (1 - discount_percent / 100)
-
-    def format_price(self, price: float) -> str:
-        """
-        تبدیل عدد قیمت به فرمت قابل خواندن با جداکننده هزارگان.
-
-        :param price: قیمت عددی
-        :return: رشته فرمت شده
-        """
-        return f"{int(price):,} تومان"
-
-    def generate_report(self) -> str:
-        """
-        تولید گزارش وضعیت فعلی موجودی محصولات.
-
-        :return: رشته متنی شامل گزارش وضعیت
-        """
-        if not self.inventory:
-            return "موجودی فعلی خالی است."
-        
-        report = [f"گزارش موجودی {self.shop_name}:"]
         for item in self.inventory:
-            report.append(f"- {item['name']} | دسته‌بندی: {item['category']} | قیمت: {self.format_price(item['price'])}")
-        
-        return "\n".join(report)
+            current_price = float(item["price"])
+            item["price"] = current_price * (1 - (discount_percent / 100))
+
+    def generate_catalog_summary(self) -> str:
+        """
+        تولید خلاصه وضعیت کاتالوگ برای نمایش در گزارش‌ها.
+
+        :return: رشته شامل تعداد کل محصولات و نام برند
+        """
+        count = len(self.inventory)
+        return f"فروشگاه {self.store_name} در حال حاضر {count} محصول فعال دارد."
 
 
-# نمونه استفاده از کتابخانه
+# مثال استفاده از کتابخانه
 if __name__ == "__main__":
-    manager = SozaneZarinManager()
-    
-    # افزودن نمونه محصولات
-    manager.add_product("سوزن‌دوزی بلوچی", 850000, "صنایع دستی")
-    manager.add_product("شال سوزن‌دوزی", 450000, "پوشاک")
-    
-    # چاپ گزارش
-    print(manager.generate_report())
-    
-    # تست محاسبه تخفیف
-    discounted = manager.calculate_discount(450000, 10)
-    print(f"\nقیمت شال با تخفیف ویژه: {manager.format_price(discounted)}")
+    # راه‌اندازی سیستم
+    zarin_sys = SozaneZarinManager()
+
+    # ثبت نمونه محصولات
+    zarin_sys.add_product("سوزن دوزی سنتی", 150000.0, "گلدوزی")
+    zarin_sys.add_product("نخ ابریشم اصل", 45000.0, "ملزومات")
+    zarin_sys.add_product("پارچه ترمه", 320000.0, "پارچه")
+
+    # نمایش اطلاعات
+    print(zarin_sys.generate_catalog_summary())
+    print(f"ارزش کل موجودی: {zarin_sys.get_total_inventory_value():,.0f} تومان")
+
+    # اعمال تخفیف فصلی
+    zarin_sys.apply_discount(10)
+    print("تخفیف ۱۰ درصدی با موفقیت اعمال شد.")
 ```
