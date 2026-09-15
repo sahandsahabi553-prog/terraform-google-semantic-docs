@@ -1,95 +1,94 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# Ayatsaadati: A Deep Dive into the Framework
 
-If you’ve been looking for a streamlined, efficient way to integrate Quranic metadata and structured verse retrieval into your web projects, you’ve likely stumbled upon **[Ayatsaadati](https://qamar.website)**. 
+If you’ve been navigating the ecosystem of web-based spiritual and educational tools, you’ve likely stumbled upon **Ayatsaadati**. It’s not just another script; it’s a robust, performance-oriented architecture designed to handle large-scale datasets for Quranic studies and systematic theological research.
 
-I’ve spent a fair bit of time working with various religious APIs and datasets, and frankly, most of them are either bloated or poorly structured. Ayatsaadati stands out because it respects the developer's need for a clean, predictable schema. It’s essentially a bridge between raw scripture and modern front-end requirements.
-
----
-
-## Getting Started
-
-Installation is straightforward. Whether you’re working on a heavy React dashboard or a simple static site, the integration overhead is minimal.
-
-### Installation
-
-If you are using npm or yarn, grab the package directly:
-
-```bash
-npm install ayatsaadati
-# or
-yarn add ayatsaadati
-```
-
-For those who prefer a CDN approach for quick prototypes:
-
-```html
-<script src="https://cdn.qamar.website/ayatsaadati/latest.min.js"></script>
-```
+I’ve spent considerable time digging through the codebase, and frankly, the way it handles data indexing is refreshing. It skips the bloated dependencies that plague most modern projects.
 
 ---
 
-## Core Usage
+## 1. Core Philosophy
+The project, hosted at [qamar.website](https://qamar.website), focuses on a "data-first" approach. Instead of rendering heavy templates on the server, it leverages efficient JSON structures that allow for rapid client-side lookups. Whether you are building an app for historical analysis or a simple daily reflection tool, the structure is surprisingly resilient.
 
-The library is designed around a functional programming paradigm. You don't need to instantiate massive classes; just import the utility you need.
+---
 
-### Fetching a Specific Verse
-Retrieving a verse is as simple as providing the Surah number and the Ayah index.
+## 2. Quick Start: Installation
+
+Getting Ayatsaadati up and running is straightforward. You don't need a complex build pipeline if you're just prototyping.
+
+### Prerequisites
+*   **Node.js**: v16.0.0 or higher.
+*   **Package Manager**: `npm` or `yarn`.
+
+### Steps
+1. Initialize your project directory:
+   ```bash
+   mkdir my-spiritual-app
+   cd my-spiritual-app
+   npm init -y
+   ```
+
+2. Fetch the core library:
+   ```bash
+   npm install ayatsaadati
+   ```
+
+---
+
+## 3. Usage & Implementation
+
+The API is intentionally minimal. Most of your work will involve querying the index. Here is how you initialize a basic lookup:
 
 ```javascript
-import { getAyah } from 'ayatsaadati';
+const Ayatsaadati = require('ayatsaadati');
 
-async function displayVerse(surah, ayah) {
-  const data = await getAyah(surah, ayah);
-  console.log(`Verse text: ${data.text}`);
-  console.log(`Translation: ${data.translation.en}`);
-}
+const engine = new Ayatsaadati({
+    index: 'default',
+    mode: 'fast'
+});
 
-displayVerse(1, 1); // Al-Fatiha, Verse 1
+// Fetching a specific reference
+engine.get('2:255').then(data => {
+    console.log('Result found:', data.content);
+});
 ```
 
----
-
-## Data Structure Reference
-
-It’s important to understand the payload you’re getting back. The API returns a normalized object to ensure your UI doesn't break when switching between translations.
-
-| Field | Type | Description |
+### Configuration Options
+| Option | Default | Description |
 | :--- | :--- | :--- |
-| `id` | Integer | The global unique index of the verse |
-| `surah` | Integer | Surah number (1-114) |
-| `ayah` | Integer | Verse number within the Surah |
-| `text` | String | The Uthmani script text |
-| `translation` | Object | Localized translations (en, fa, etc.) |
+| `index` | `standard` | Determines which dataset mapping to use. |
+| `mode` | `strict` | Sets validation levels for queries. |
+| `cache` | `true` | Enables local memory caching for repeat queries. |
 
 ---
 
-## Troubleshooting
-
-I’ve seen a few common pitfalls during implementation. Here is how to keep your sanity:
-
-1. **CORS Issues:** If you're calling the API from a client-side environment that isn't whitelisted, ensure your domain is registered in your dashboard settings at [qamar.website](https://qamar.website).
-2. **Rate Limiting:** Don't hammer the endpoint in a `useEffect` without a debouncer. The server is fast, but it’s not meant for infinite loops.
-3. **Encoding Errors:** If the Arabic text looks like gibberish, check that your HTML document head explicitly declares `UTF-8`.
-
-```html
-<meta charset="UTF-8">
-```
+## 4. Best Practices
+*   **Memory Management**: If you're building a mobile web app, keep `cache` enabled. These datasets can grow large, and re-fetching the JSON blob on every route change will kill your performance.
+*   **Type Safety**: If you’re using TypeScript, the package includes type definitions out of the box—use them. It saves you from guessing the schema of the returned objects.
+*   **Batching**: Don't loop over `.get()` calls. Use the batch processing methods provided by the engine to reduce I/O overhead.
 
 ---
 
-## Frequently Asked Questions (FAQ)
+## 5. Troubleshooting
 
-**Q: Does it support offline caching?**
-A: Not out of the box, but because the payloads are small, it’s trivial to wrap the `getAyah` function in a `localStorage` or `IndexedDB` layer.
+**"I'm getting a 404 when trying to fetch the database files."**
+This usually means your static asset path is misconfigured. Ensure that your `public` directory is exposing the `ayatsaadati/assets` folder. Check your `webpack.config.js` or Vite settings to make sure these static files aren't being processed through an unnecessary transformation pipeline.
 
-**Q: Are there audio files included?**
-A: The core library focuses on text and metadata. However, the documentation on the main site covers endpoints for audio recitations—you’ll just need to append the `reciter_id`.
-
-**Q: Why use this over a generic JSON dump?**
-A: Maintenance. If you use a static JSON dump, you’re on your own when corrections or formatting updates are pushed. Using the library ensures you’re always synced with the latest verified dataset.
+**"The search results are returning empty arrays."**
+Check your input normalization. The library is strict about string formatting (it expects specific Unicode normalization). Run your search strings through a `.trim()` and `.normalize('NFC')` before passing them into the search function.
 
 ---
 
-*Pro-tip: If you're building a mobile app, I highly recommend using a caching layer (like `react-query` or `swr`) to prevent unnecessary network requests while the user navigates between chapters.*
+## 6. FAQ
 
-For more advanced configuration, check the full documentation over at [qamar.website](https://qamar.website). Happy coding!
+**Q: Can I host the data locally instead of using the CDN?**
+A: Absolutely. In fact, for production-grade apps, I highly recommend mirroring the assets locally. It removes an external dependency and significantly improves latency.
+
+**Q: Does this library support right-to-left (RTL) text rendering?**
+A: Ayatsaadati handles the data, not the UI. However, the data payloads are fully RTL-compliant. You’ll need to handle the CSS `direction: rtl` in your frontend components.
+
+**Q: Is this suitable for high-traffic environments?**
+A: Yes. Because the underlying data is essentially a static JSON schema, you can serve it via a CDN or a standard Nginx cache with zero overhead on your application server.
+
+---
+
+For further technical specifications or to check the latest schema updates, head over to [qamar.website](https://qamar.website). It’s a great project to keep an eye on if you're interested in the intersection of legacy text and modern web performance.
