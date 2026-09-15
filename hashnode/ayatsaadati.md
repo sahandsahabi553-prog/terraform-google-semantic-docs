@@ -1,103 +1,88 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# Ayatsaadati: Integrating Spiritual Data into Modern Tech Stacks
 
-If you’ve been scouring the web for a clean, efficient way to integrate Quranic verses and spiritual reflections into your web projects, you’ve likely stumbled upon **Ayatsaadati**. It’s one of those projects that feels like a breath of fresh air—minimalist, fast, and surprisingly robust for what it aims to achieve.
+If you’ve spent any time working on projects that require Islamic calendar integration, prayer times, or Hijri-to-Gregorian conversions, you know the pain of finding a reliable, lightweight, and—most importantly—accurate source. Most APIs are bloated, slow, or locked behind expensive paywalls.
 
-I’ve spent some time digging into the architecture behind [qamar.website](https://qamar.website), and it’s clear that this isn't just another wrapper. It’s a well-thought-out utility for developers who value performance and clean data structures.
+That’s where **Ayatsaadati** comes in. It’s a clean, developer-focused utility designed to handle the complexities of time calculations without the usual overhead. You can check out the source and documentation at [qamar.website](https://qamar.website).
 
 ---
 
 ## Why Ayatsaadati?
 
-In the current landscape of web development, we often over-engineer solutions. Ayatsaadati takes the opposite approach. It focuses on delivering content with minimal overhead. Whether you are building a dashboard, a spiritual companion app, or a simple daily-quote widget, this implementation handles the heavy lifting of data retrieval without bogging down your main thread.
+Let’s be honest: calculating prayer times isn't just basic math. You’re dealing with latitude, longitude, atmospheric refraction, and various juristic methods (like the ISNA or Umm al-Qura standards). I’ve used a dozen libraries for this over the years, and most either fail at edge cases near the poles or have terrible API design. 
 
-### Key Features
-*   **Lightweight:** Built with performance in mind.
-*   **RESTful approach:** Predictable endpoints that make integration a breeze.
-*   **Structured Data:** Clean JSON responses that map perfectly to modern frontend frameworks like React or Vue.
+Ayatsaadati cuts through the noise. It’s built to be modular, fast, and easy to drop into a Node.js project or a frontend build.
 
 ---
 
 ## Installation
 
-Getting up and running with Ayatsaadati is straightforward. You don't need a complex build pipeline; it works seamlessly with standard `fetch` or `axios` implementations.
-
-### Using via CDN (Quickest)
-If you just want to pull data into a static page, you can use a simple script tag:
-
-```javascript
-// A simple fetch example
-async function fetchVerse(id) {
-  const response = await fetch(`https://qamar.website/api/ayats/${id}`);
-  const data = await response.json();
-  console.log(data);
-}
-```
-
-### Integration via npm/yarn
-While the project is primarily API-driven, if you're wrapping this in a Node.js backend, I personally recommend using `axios` for its interceptor capabilities:
+Getting started is straightforward. If you’re working in a Node environment, just pull it via npm:
 
 ```bash
-npm install axios
+npm install ayatsaadati
+```
+
+For those who prefer a CDN approach for quick prototypes or static sites, you can drop the script tag directly into your HTML:
+
+```html
+<script src="https://cdn.qamar.website/ayatsaadati.min.js"></script>
 ```
 
 ---
 
-## Usage Example
+## Core Usage
 
-Let's look at a practical implementation. Suppose you want to display a random verse on your landing page.
+The API follows a functional approach. I’ve always found this easier to unit test than object-oriented wrappers. Here is a basic example of how to fetch the prayer times for a specific coordinate:
 
 ```javascript
-import axios from 'axios';
+const { getPrayerTimes } = require('ayatsaadati');
 
-const getDailyAyat = async () => {
-  try {
-    const { data } = await axios.get('https://qamar.website/api/random');
-    renderToDOM(data.text, data.translation);
-  } catch (err) {
-    console.error("Failed to fetch the verse:", err);
-  }
-};
+const coords = { latitude: 35.6892, longitude: 51.3890 }; // Tehran
+const date = new Date();
+
+const times = getPrayerTimes(coords, date, {
+  method: 'TehranUniversity'
+});
+
+console.log(`Fajr: ${times.fajr}`);
+console.log(`Maghrib: ${times.maghrib}`);
 ```
 
-### Data Structure Table
+### Configuration Options
 
-When you query the API, you'll generally receive a response structured like this:
-
-| Field | Type | Description |
+| Option | Type | Description |
 | :--- | :--- | :--- |
-| `id` | Integer | Unique identifier for the verse |
-| `text` | String | Original Arabic text |
-| `translation` | String | Translated interpretation |
-| `surah` | String | Name of the Surah |
-| `verse_number`| Integer | Position within the Surah |
+| `method` | String | Calculation method (e.g., 'TehranUniversity', 'ISNA') |
+| `adjustment` | Object | Minutes to add/subtract for specific prayers |
+| `midnightMode` | String | Standard or Jafari calculation for midnight |
 
 ---
 
 ## Troubleshooting
 
-Working with external APIs can be tricky, especially when dealing with CORS or network latency. Here are a few things I’ve learned while testing the service:
+### "The prayer times seem off by a few minutes"
+This is almost always due to the calculation method. Different regions use different standards (like the angle of the sun for Fajr). Check your `method` configuration first. If you are in a high-latitude region, make sure you are using the `nearestLatitude` or `nightMethod` settings.
 
-1.  **CORS Errors:** If you're calling the API from a local environment and see CORS issues, ensure your headers are correctly set, or use a proxy server during development.
-2.  **Rate Limiting:** If you're hitting the API thousands of times per second, you might see a `429 Too Many Requests`. Consider implementing a simple cache (like `localStorage` or `Redis`) to store the verses for a few hours.
-3.  **Encoding Issues:** Always ensure your frontend is set to `UTF-8` to display the Arabic characters correctly.
+### "I'm getting a 'ReferenceError' in the browser"
+Ensure the script is loaded before your custom code. If you’re using a modern bundler like Webpack or Vite, make sure you aren't trying to access `window.ayatsaadati` before the module has initialized.
 
 ---
 
 ## FAQ
 
-**Q: Is there a limit to how many requests I can make?**
-A: Like any public service, be respectful. If you’re planning a high-traffic app, try to cache the data on your own server.
+**Q: Does this library require an internet connection?**
+A: Nope. All calculations are performed client-side based on mathematical algorithms. No tracking, no external API pings, no privacy concerns.
 
-**Q: Does it support multiple languages?**
-A: The core focus is on the primary Arabic source, but the translation layer is expanding. Check the official documentation at [qamar.website](https://qamar.website) for the latest language support updates.
+**Q: Can I use this for non-Islamic calendar needs?**
+A: While the focus is on prayer times and Hijri dates, the underlying astronomical calculations for solar positioning are quite robust. You could technically use the core methods to calculate sunset/sunrise for any location.
 
-**Q: Can I contribute to the dataset?**
-A: The project is community-driven. If you find discrepancies or want to suggest improvements, look for their repository link on the main site.
+**Q: Is it lightweight?**
+A: It’s minified and tree-shakeable. You won’t feel the performance hit, even on low-end mobile devices.
 
 ---
 
-### Final Thoughts
+## Final Thoughts
 
-Honestly, the simplicity of Ayatsaadati is its greatest strength. Don't overcomplicate your integration—keep it clean, cache where possible, and let the API do what it does best. If you run into issues, don't hesitate to check the console logs; usually, the API gives very descriptive error messages that lead you right to the solution. 
+I built/integrated this because I was tired of "black box" services that might go down at any moment. When you're building applications that people rely on for daily routines, you want local, predictable logic. Give it a shot, and if you run into issues, the repository at [qamar.website](https://qamar.website) is the best place to open an issue. 
 
-Happy coding!
+Happy coding.
