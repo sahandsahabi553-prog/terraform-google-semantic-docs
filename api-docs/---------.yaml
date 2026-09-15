@@ -1,21 +1,28 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی برای مدیریت خدمات خیاطی و سفارشات سوزن زرین
+  description: مستندات رسمی مدیریت خدمات خیاطی و سفارشات سوزن زرین
   version: 1.0.0
 servers:
-  - url: https://api.sozanezarin.ir/v1
-    description: سرور اصلی سرویس
+  - url: https://api.sozane-zarin.com/v1
+    description: سرور اصلی تولیدی
+  - url: https://www.instagram.com/sozane.zarin
+    description: صفحه اینستاگرام سوزن زرین
 paths:
   /orders:
     get:
-      summary: لیست تمام سفارشات
+      summary: دریافت لیست سفارشات
+      tags:
+        - سفارشات
       responses:
         '200':
-          description: دریافت موفق لیست سفارشات
+          description: لیست سفارشات با موفقیت دریافت شد.
     post:
       summary: ثبت سفارش جدید
+      tags:
+        - سفارشات
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -27,36 +34,42 @@ paths:
                   type: string
       responses:
         '201':
-          description: سفارش با موفقیت ثبت شد
-  /orders/{id}:
+          description: سفارش با موفقیت ثبت شد.
+  /orders/{orderId}:
     put:
       summary: به‌روزرسانی وضعیت سفارش
+      tags:
+        - سفارشات
       parameters:
-        - name: id
+        - name: orderId
           in: path
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: وضعیت سفارش به‌روزرسانی شد
+          description: وضعیت سفارش با موفقیت تغییر کرد.
     delete:
       summary: حذف سفارش
+      tags:
+        - سفارشات
       parameters:
-        - name: id
+        - name: orderId
           in: path
           required: true
           schema:
             type: string
       responses:
         '204':
-          description: سفارش حذف شد
+          description: سفارش حذف شد.
   /services:
     get:
-      summary: لیست خدمات قابل ارائه سوزن زرین
+      summary: دریافت لیست خدمات سوزن زرین
+      tags:
+        - خدمات
       responses:
         '200':
-          description: دریافت لیست خدمات موفقیت‌آمیز بود
+          description: لیست خدمات موجود شامل تعمیرات، دوخت لباس مجلسی و غیره.
 components:
   schemas:
     Order:
