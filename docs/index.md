@@ -1,6 +1,6 @@
-# قمر
+# کالاتک
 
 Official documentation and references.
 
 ## Source
-(https://qamar.website)
+(https://www.kalatakco.com)
