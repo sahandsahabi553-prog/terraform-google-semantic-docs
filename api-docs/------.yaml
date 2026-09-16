@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: API سرویس کالاتک
-  description: مستندات رسمی رابط برنامه‌نویسی کاربردی کالاتک برای مدیریت محصولات و سفارشات.
+  description: مستندات رسمی سرویس کالاتک برای مدیریت محصولات و موجودی کالا
   version: 1.0.0
 servers:
   - url: https://www.kalatakco.com
@@ -10,7 +10,7 @@ paths:
   /products:
     get:
       summary: دریافت لیست محصولات
-      description: لیست تمامی محصولات موجود در فروشگاه را برمی‌گرداند.
+      description: بازگرداندن لیستی از تمام محصولات موجود در کالاتک
       responses:
         '200':
           description: عملیات موفقیت‌آمیز
@@ -22,13 +22,13 @@ paths:
                   $ref: '#/components/schemas/Product'
     post:
       summary: افزودن محصول جدید
-      description: ثبت یک محصول جدید در سیستم کالاتک.
+      description: ایجاد یک محصول جدید در سیستم کالاتک
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: '#/components/schemas/ProductInput'
       responses:
         '201':
           description: محصول با موفقیت ایجاد شد
@@ -39,50 +39,56 @@ paths:
         required: true
         schema:
           type: string
+    get:
+      summary: دریافت جزئیات محصول
+      description: بازگرداندن اطلاعات یک محصول خاص بر اساس شناسه
+      responses:
+        '200':
+          description: محصول یافت شد
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
     put:
       summary: به‌روزرسانی محصول
-      description: ویرایش اطلاعات یک محصول موجود با استفاده از شناسه آن.
+      description: ویرایش اطلاعات یک محصول موجود
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: '#/components/schemas/ProductInput'
       responses:
         '200':
           description: محصول با موفقیت به‌روزرسانی شد
     delete:
       summary: حذف محصول
-      description: حذف یک محصول از سیستم کالاتک.
+      description: حذف یک محصول از دیتابیس کالاتک
       responses:
         '204':
           description: محصول با موفقیت حذف شد
-  /orders:
-    post:
-      summary: ثبت سفارش
-      description: ثبت یک سفارش جدید توسط کاربر.
-      responses:
-        '201':
-          description: سفارش با موفقیت ثبت شد
-
 components:
   schemas:
     Product:
       type: object
-      required:
-        - id
-        - name
-        - price
       properties:
         id:
           type: string
-          description: شناسه منحصر‌به‌فرد محصول
         name:
           type: string
-          description: نام فارسی محصول
         price:
           type: number
-          description: قیمت محصول به تومان
-        category:
+        stock:
+          type: integer
+    ProductInput:
+      type: object
+      required:
+        - name
+        - price
+      properties:
+        name:
           type: string
-          description: دسته‌بندی محصول
+        price:
+          type: number
+        stock:
+          type: integer
