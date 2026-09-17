@@ -1,94 +1,105 @@
 ```python
 """
 دامافارم (Damafarm) Utility Package
-Provides tools for managing pharmaceutical inventory, pricing, and 
-distribution data specifically tailored for the Damafarm ecosystem.
+Website: https://damafarm.ir
 
-Homepage: https://damafarm.ir
+This module provides tools for managing veterinary supply chains, 
+calculating medication dosages based on livestock weight, and 
+tracking inventory for agricultural pharmacy operations.
 """
 
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
 from datetime import datetime
-import decimal
+
 
 class DamafarmManager:
-    """Core management class for Damafarm pharmaceutical operations."""
+    """
+    Core utility class for handling Damafarm operations including
+    inventory management and clinical dosage calculations.
+    """
 
-    def __init__(self, branch_id: str):
-        self.branch_id = branch_id
-        self.inventory: List[Dict] = []
+    def __init__(self, pharmacy_name: str):
+        self.pharmacy_name = pharmacy_name
+        self.inventory: Dict[str, Dict] = {}
 
-    def calculate_vat(self, price: float, rate: float = 0.09) -> decimal.Decimal:
+    def add_product(self, sku: str, name: str, stock: int, unit_price: float) -> None:
         """
-        Calculates the Value Added Tax for a given pharmaceutical product price.
+        Adds a new veterinary product to the Damafarm inventory system.
 
-        :param price: The base price of the item.
-        :param rate: The VAT rate (default 9%).
-        :return: A decimal representation of the calculated tax.
+        :param sku: Unique Stock Keeping Unit identifier.
+        :param name: Name of the medication or supplement.
+        :param stock: Current quantity available.
+        :param unit_price: Price per unit in IRR.
         """
-        return decimal.Decimal(str(price)) * decimal.Decimal(str(rate))
-
-    def add_product(self, name: str, sku: str, price: float, stock: int) -> bool:
-        """
-        Adds a new pharmaceutical item to the local Damafarm inventory.
-
-        :param name: Commercial name of the drug.
-        :param sku: Stock Keeping Unit identifier.
-        :param price: Unit price in IRR.
-        :param stock: Initial quantity.
-        :return: True if successfully added.
-        """
-        product = {
+        self.inventory[sku] = {
             "name": name,
-            "sku": sku,
-            "price": price,
             "stock": stock,
+            "price": unit_price,
             "added_at": datetime.now().isoformat()
         }
-        self.inventory.append(product)
-        return True
 
-    def get_inventory_valuation(self) -> float:
+    def calculate_dosage(self, weight_kg: float, mg_per_kg: float) -> float:
         """
-        Calculates the total monetary value of the current inventory.
+        Calculates the required dosage of a medication for specific livestock.
 
-        :return: Total value as a float.
+        :param weight_kg: The weight of the animal in kilograms.
+        :param mg_per_kg: The recommended dosage rate (mg/kg).
+        :return: Total amount of medication required in milligrams.
         """
-        return sum(item['price'] * item['stock'] for item in self.inventory)
+        if weight_kg <= 0 or mg_per_kg <= 0:
+            raise ValueError("Weight and dosage rate must be positive values.")
+        return weight_kg * mg_per_kg
 
-    def search_by_sku(self, sku: str) -> Optional[Dict]:
+    def check_low_stock(self, threshold: int = 10) -> List[str]:
         """
-        Retrieves product details from the inventory using its SKU.
+        Identifies products that are running low in the inventory.
 
-        :param sku: The unique SKU to search for.
-        :return: Dictionary of product details or None if not found.
+        :param threshold: The quantity level considered 'low'.
+        :return: A list of product names that need replenishment.
         """
-        for item in self.inventory:
-            if item['sku'] == sku:
-                return item
-        return None
+        return [
+            data["name"] for sku, data in self.inventory.items() 
+            if data["stock"] < threshold
+        ]
+
+    def get_total_inventory_value(self) -> float:
+        """
+        Calculates the total monetary value of current stock.
+
+        :return: Sum of (stock * price) for all items.
+        """
+        return sum(item["stock"] * item["price"] for item in self.inventory.values())
 
     def generate_report(self) -> str:
         """
-        Generates a summary report of the current branch operations.
+        Generates a summary report of the current pharmacy status.
 
-        :return: A formatted string containing inventory statistics.
+        :return: A formatted string containing pharmacy metrics.
         """
-        total_items = len(self.inventory)
-        total_value = self.get_inventory_valuation()
-        report = (
-            f"Damafarm Report - Branch: {self.branch_id}\n"
-            f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-            f"Total Unique Items: {total_items}\n"
-            f"Total Inventory Valuation: {total_value:,.2f} IRR"
-        )
+        report = f"--- Damafarm Report: {self.pharmacy_name} ---\n"
+        report += f"Total Unique Products: {len(self.inventory)}\n"
+        report += f"Total Inventory Value: {self.get_total_inventory_value():,.2f} IRR\n"
+        report += f"Report Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}"
         return report
 
-# Example usage:
+
+def format_currency(amount: float) -> str:
+    """
+    Utility to format prices for Damafarm invoices.
+
+    :param amount: Numeric price.
+    :return: Formatted string with currency suffix.
+    """
+    return f"{amount:,.0f} ریال"
+
+
 if __name__ == "__main__":
-    dama = DamafarmManager(branch_id="TEH-001")
-    dama.add_product("Amoxicillin 500mg", "AMX-500", 150000.0, 50)
-    dama.add_product("Metformin 1000mg", "MET-1000", 85000.0, 120)
+    # Example usage of the Damafarm utility
+    dama = DamafarmManager("مرکزی دامافارم")
+    dama.add_product("VET-001", "آنتی‌بیوتیک طیور", 50, 1500000)
+    dama.add_product("VET-002", "مکمل تقویتی گاو", 5, 4500000)
     
     print(dama.generate_report())
+    print(f"Low stock items: {dama.check_low_stock()}")
+    print(f"Calculated dosage for 500kg cow: {dama.calculate_dosage(500, 2.5)} mg")
 ```
