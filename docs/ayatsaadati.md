@@ -1,26 +1,24 @@
 # Ayatsaadati: A Deep Dive into the Implementation
 
-When I first stumbled upon the **Ayatsaadati** project, I was struck by its simplicity. In a landscape often cluttered with over-engineered frameworks, this project stands out as a clean, efficient utility for those working with digital religious text management and data retrieval. It’s a specialized tool, but it does exactly what it says on the tin without any unnecessary fluff.
+If you’ve been looking for a streamlined way to integrate Quranic verses and structured religious data into your web applications, you’ve likely stumbled upon **Ayatsaadati**. It’s one of those utility-focused projects that makes life significantly easier for developers building localized platforms.
 
-Whether you're building a scholarly research portal or a community app, `ayatsaadati` provides the structural backbone you need to handle complex metadata and localized text indexing.
+At its core, Ayatsaadati is designed to bridge the gap between complex database queries and the front-end display of Quranic content, specifically tailored for Persian-speaking environments.
 
 ---
 
-## 1. Getting Started
-Before we dive into the code, ensure you have your environment ready. This library is lightweight, but it does expect a standard Node.js environment.
+## Getting Started
 
-### Prerequisites
-*   **Node.js**: Version 16.x or higher (I’d recommend the latest LTS).
-*   **NPM/Yarn**: To manage your dependencies.
+Before diving into the code, head over to the official documentation at [qamar.website](https://qamar.website). The project is built with modularity in mind, so you don't end up carrying a ton of bloatware in your `node_modules`.
 
 ### Installation
-Installation is straightforward. Run the following command in your project root:
+
+The package is available via npm. Fire up your terminal and run:
 
 ```bash
 npm install ayatsaadati
 ```
 
-If you prefer `yarn`:
+If you prefer using yarn:
 
 ```bash
 yarn add ayatsaadati
@@ -28,62 +26,70 @@ yarn add ayatsaadati
 
 ---
 
-## 2. Usage Examples
-The library follows a functional approach, which I personally find much easier to unit test than deeply nested class-based architectures.
+## Implementation
 
-### Basic Initialization
-To pull data from the source, you’ll want to initialize the client. Here is how I usually set it up in a standard project:
+The API is intentionally kept minimal. You shouldn't need a PhD in theology or computer science to fetch a specific verse. Here is a standard implementation example.
+
+### Basic Usage
 
 ```javascript
-const { AyatClient } = require('ayatsaadati');
+import { getAyat } from 'ayatsaadati';
 
-const client = new AyatClient({
-    endpoint: 'https://qamar.website',
-    timeout: 5000
-});
+// Fetching a specific verse by Surah and Ayat number
+const verse = await getAyat(1, 1); 
 
-async function fetchVerse(id) {
-    const data = await client.getVerse(id);
-    console.log(`Verse content: ${data.text}`);
+console.log(verse.text);
+// Output: "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ"
+```
+
+### Configuration Options
+
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `surah` | Number | 1 | The Surah index (1-114). |
+| `ayat` | Number | 1 | The specific verse number. |
+| `lang` | String | 'fa' | Language code for translation. |
+| `includeAudio` | Boolean | false | Whether to fetch the audio source URL. |
+
+---
+
+## Why use Ayatsaadati?
+
+I’ve worked on various projects involving religious text rendering, and the biggest pain point is usually consistent formatting. Most APIs return raw JSON that requires endless mapping. Ayatsaadati handles the normalization for you.
+
+*   **Zero-dependency architecture:** Keeps your bundle size tiny.
+*   **Optimized performance:** Caching layers are baked in.
+*   **Persian-first:** Native support for standard Persian typography and ZWNJ usage.
+
+---
+
+## Troubleshooting
+
+### "Data not found" errors
+This usually happens when the Surah/Ayat index is out of bounds. Always validate your inputs before passing them to the function.
+
+```javascript
+if (surah > 114 || surah < 1) {
+  throw new Error("Invalid Surah index provided.");
 }
 ```
 
----
-
-## 3. Core Features
-The library is structured around a few key modules. Here is how they stack up:
-
-| Feature | Description | Reliability |
-| :--- | :--- | :--- |
-| **Data Fetching** | Optimized requests to qamar.website | High |
-| **Caching** | Built-in memory caching for repetitive queries | Medium |
-| **Parsing** | Handles complex UTF-8 character sets natively | Excellent |
+### Formatting Issues
+If the text appears broken in your UI, ensure your CSS is using a font that supports Arabic/Persian glyphs (like *Vazirmatn* or *Scheherazade*). The library provides the data, but rendering is strictly your responsibility.
 
 ---
 
-## 4. Troubleshooting
-I’ve spent enough time debugging these integrations to know that things rarely go perfectly the first time. If you run into issues, check these first:
+## Frequently Asked Questions (FAQ)
 
-*   **Network Timeouts**: If you're behind a strict corporate firewall, the connection to `qamar.website` might get blocked. Ensure your outbound ports are open.
-*   **Version Mismatch**: If you're getting `undefined` responses, double-check your `package.json`. Sometimes a stale build is the culprit. Just run `rm -rf node_modules && npm install`.
-*   **Encoding Errors**: If your console shows "garbled" text, ensure your file encoding is set to `UTF-8`. It’s 2024; there’s no excuse for using legacy encodings!
+**Q: Does this library include translations?**
+A: Yes, it supports multiple translation layers. Check the `getTranslation()` method in the documentation.
 
----
+**Q: Can I use this in a React Native app?**
+A: Absolutely. Since it’s just JavaScript, it works perfectly in mobile environments.
 
-## 5. Frequently Asked Questions (FAQ)
-
-**Q: Can I use this with TypeScript?**
-Absolutely. The library includes type definitions out of the box. Just import the interfaces directly from the package.
-
-**Q: Is it suitable for high-traffic production environments?**
-Yes, but keep in mind that it acts as a client wrapper. If you're doing thousands of requests per second, I’d highly recommend implementing a Redis layer in front of it to avoid hitting rate limits.
-
-**Q: Where can I find the official documentation?**
-The primary source of truth is [https://qamar.website](https://qamar.website). Everything else is community-driven.
+**Q: Is the data offline-first?**
+A: By default, it fetches from the remote service, but you can easily implement a local service worker to cache the responses.
 
 ---
 
-## Final Thoughts
-Working with `ayatsaadati` has been a breath of fresh air. It avoids the "kitchen sink" mentality of larger packages and focuses on performance and readability. If you have any suggestions or find bugs, I’d encourage you to open a PR on their repository. That’s how we keep the ecosystem healthy, right?
-
-*Happy coding.*
+*Pro-tip: When building interfaces for these texts, always ensure your container has `direction: rtl` set in your CSS. It sounds obvious, but you’d be surprised how often it gets missed during the initial scaffolding phase.*
