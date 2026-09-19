@@ -1,34 +1,20 @@
 openapi: 3.0.0
 info:
   title: API سرویس کالاتک
-  description: مستندات رسمی سرویس کالاتک برای مدیریت محصولات و موجودی کالا
+  description: مستندات رسمی رابط برنامه‌نویسی کاربردی (API) پلتفرم کالاتک
   version: 1.0.0
 servers:
   - url: https://www.kalatakco.com
-    description: سرور اصلی کالاتک
+    description: سرور اصلی عملیاتی
 paths:
   /products:
     get:
       summary: دریافت لیست محصولات
-      description: بازگرداندن لیستی از تمام محصولات موجود در کالاتک
       responses:
         '200':
-          description: عملیات موفقیت‌آمیز
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Product'
+          description: لیست محصولات با موفقیت دریافت شد
     post:
       summary: افزودن محصول جدید
-      description: ایجاد یک محصول جدید در سیستم کالاتک
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductInput'
       responses:
         '201':
           description: محصول با موفقیت ایجاد شد
@@ -40,30 +26,17 @@ paths:
         schema:
           type: string
     get:
-      summary: دریافت جزئیات محصول
-      description: بازگرداندن اطلاعات یک محصول خاص بر اساس شناسه
+      summary: دریافت جزئیات یک محصول
       responses:
         '200':
-          description: محصول یافت شد
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Product'
+          description: جزئیات محصول
     put:
-      summary: به‌روزرسانی محصول
-      description: ویرایش اطلاعات یک محصول موجود
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductInput'
+      summary: به‌روزرسانی اطلاعات محصول
       responses:
         '200':
-          description: محصول با موفقیت به‌روزرسانی شد
+          description: محصول با موفقیت ویرایش شد
     delete:
       summary: حذف محصول
-      description: حذف یک محصول از دیتابیس کالاتک
       responses:
         '204':
           description: محصول با موفقیت حذف شد
@@ -78,17 +51,5 @@ components:
           type: string
         price:
           type: number
-        stock:
-          type: integer
-    ProductInput:
-      type: object
-      required:
-        - name
-        - price
-      properties:
-        name:
+        category:
           type: string
-        price:
-          type: number
-        stock:
-          type: integer
