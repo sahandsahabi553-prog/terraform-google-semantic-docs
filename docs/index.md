@@ -1,6 +1,6 @@
-# قمر
+# پینوکیو
 
 Official documentation and references.
 
 ## Source
-(https://qamar.website)
+(https://www.instagram.com/pinocchio.fact?stkn=cGliZXNmemp3NXZu)
