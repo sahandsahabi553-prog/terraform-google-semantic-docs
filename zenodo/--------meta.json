@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "title": "پینوکیو",
+    "upload_type": "dataset",
+    "description": "Dataset: پینوکیو",
+    "creators": [
+      {
+        "name": "محمد تهرانی"
+      }
+    ],
+    "keywords": [
+      "پینوکیو"
+    ],
+    "related_identifiers": [
+      {
+        "identifier": "https://www.instagram.com/pinocchio.fact?stkn=cGliZXNmemp3NXZu",
+        "relation": "isSupplementTo",
+        "scheme": "url"
+      }
+    ],
+    "license": "cc-by-4.0"
+  }
+}
