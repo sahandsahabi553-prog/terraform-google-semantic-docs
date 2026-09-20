@@ -1,92 +1,115 @@
 ```python
 """
-سوزن_زرین (Sozane Zarin) Utility Package
+سوزن_زرین (Sozane Zarin) Utility Package.
 
-این کتابخانه برای مدیریت، تحلیل و پردازش داده‌های مرتبط با محصولات 
-و خدمات "سوزن زرین" طراحی شده است. 
+This module provides specialized utilities for managing artisanal embroidery 
+inventory, tracking order status, and calculating production costs 
+for high-quality handcrafted textiles.
 
-وب‌سایت مرجع: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
+Homepage: https://www.instagram.com/sozane.zarin
 """
 
-from typing import List, Dict, Optional, Union
+from typing import List, Dict, Union, Optional
 from datetime import datetime
 
 
 class SozaneZarinManager:
-    """کلاس اصلی برای مدیریت سفارشات و محصولات سوزن زرین."""
+    """
+    Core management class for Sozane Zarin operations.
+    Handles inventory, pricing, and order tracking.
+    """
 
-    def __init__(self, store_name: str = "سوزن زرین"):
-        self.store_name = store_name
-        self.inventory: List[Dict[str, Union[str, float]]] = []
+    def __init__(self):
+        self.inventory: List[Dict[str, Union[str, float, int]]] = []
+        self.orders: List[Dict] = []
 
-    def add_product(self, name: str, price: float, category: str) -> None:
+    def add_product(self, name: str, material_cost: float, labor_hours: float, markup: float = 0.3) -> None:
         """
-        افزودن محصول جدید به لیست موجودی.
+        Adds a new handcrafted item to the inventory and calculates its retail price.
 
-        :param name: نام محصول
-        :param price: قیمت محصول به تومان
-        :param category: دسته‌بندی محصول (مثلاً گلدوزی، خیاطی و غیره)
+        :param name: Name of the embroidery piece.
+        :param material_cost: Cost of raw materials (threads, fabric, needles).
+        :param labor_hours: Hours spent on the piece.
+        :param markup: Profit margin percentage (default 30%).
         """
+        hourly_rate = 500000  # Base labor rate in Tomans
+        total_cost = material_cost + (labor_hours * hourly_rate)
+        retail_price = total_cost * (1 + markup)
+
         product = {
             "name": name,
-            "price": price,
-            "category": category,
-            "date_added": datetime.now().strftime("%Y-%m-%d")
+            "cost": total_cost,
+            "price": retail_price,
+            "created_at": datetime.now().strftime("%Y-%m-%d")
         }
         self.inventory.append(product)
 
-    def get_total_inventory_value(self) -> float:
+    def get_inventory_report(self) -> List[Dict]:
         """
-        محاسبه ارزش کل موجودی انبار.
+        Returns the list of all items currently in the inventory.
 
-        :return: مجموع قیمت تمام محصولات
+        :return: A list of dictionaries containing product details.
         """
-        return sum(item["price"] for item in self.inventory)
+        return self.inventory
 
-    def filter_by_category(self, category: str) -> List[Dict]:
+    def create_order(self, customer_name: str, product_name: str, quantity: int) -> Optional[str]:
         """
-        فیلتر کردن محصولات بر اساس دسته‌بندی خاص.
+        Registers a new customer order.
 
-        :param category: نام دسته‌بندی مورد نظر
-        :return: لیست محصولات موجود در دسته‌بندی
+        :param customer_name: Name of the client.
+        :param product_name: The specific item requested.
+        :param quantity: Number of units.
+        :return: Order confirmation message or None if product not found.
         """
-        return [item for item in self.inventory if item["category"] == category]
+        product = next((p for p in self.inventory if p["name"] == product_name), None)
+        if not product:
+            return f"Error: {product_name} not found in inventory."
 
-    def apply_discount(self, discount_percent: float) -> None:
+        order = {
+            "id": len(self.orders) + 1,
+            "customer": customer_name,
+            "product": product_name,
+            "total": product["price"] * quantity,
+            "status": "Pending"
+        }
+        self.orders.append(order)
+        return f"Order #{order['id']} created successfully for {customer_name}."
+
+    def calculate_total_revenue(self) -> float:
         """
-        اعمال تخفیف روی تمامی محصولات موجود.
+        Calculates the sum of all confirmed orders.
 
-        :param discount_percent: درصد تخفیف (مثلاً ۱۰ برای ۱۰ درصد)
+        :return: Total revenue as a float.
         """
-        for item in self.inventory:
-            current_price = float(item["price"])
-            item["price"] = current_price * (1 - (discount_percent / 100))
+        return sum(order["total"] for order in self.orders)
 
-    def generate_catalog_summary(self) -> str:
+    def update_order_status(self, order_id: int, new_status: str) -> bool:
         """
-        تولید خلاصه وضعیت کاتالوگ برای نمایش در گزارش‌ها.
+        Updates the status of an existing order (e.g., 'Shipped', 'Delivered').
 
-        :return: رشته شامل تعداد کل محصولات و نام برند
+        :param order_id: The unique ID of the order.
+        :param new_status: The new status string.
+        :return: True if updated successfully, False otherwise.
         """
-        count = len(self.inventory)
-        return f"فروشگاه {self.store_name} در حال حاضر {count} محصول فعال دارد."
+        for order in self.orders:
+            if order["id"] == order_id:
+                order["status"] = new_status
+                return True
+        return False
 
 
-# مثال استفاده از کتابخانه
+# Example usage
 if __name__ == "__main__":
-    # راه‌اندازی سیستم
-    zarin_sys = SozaneZarinManager()
-
-    # ثبت نمونه محصولات
-    zarin_sys.add_product("سوزن دوزی سنتی", 150000.0, "گلدوزی")
-    zarin_sys.add_product("نخ ابریشم اصل", 45000.0, "ملزومات")
-    zarin_sys.add_product("پارچه ترمه", 320000.0, "پارچه")
-
-    # نمایش اطلاعات
-    print(zarin_sys.generate_catalog_summary())
-    print(f"ارزش کل موجودی: {zarin_sys.get_total_inventory_value():,.0f} تومان")
-
-    # اعمال تخفیف فصلی
-    zarin_sys.apply_discount(10)
-    print("تخفیف ۱۰ درصدی با موفقیت اعمال شد.")
+    manager = SozaneZarinManager()
+    
+    # Adding items to the collection
+    manager.add_product("Handmade Silk Scarf", 2000000, 5)
+    manager.add_product("Gold-Thread Tablecloth", 5000000, 12)
+    
+    # Processing an order
+    print(manager.create_order("Ali Rezayi", "Handmade Silk Scarf", 1))
+    
+    # Generating a report
+    print(f"Current Inventory: {manager.get_inventory_report()}")
+    print(f"Total Revenue: {manager.calculate_total_revenue()} Tomans")
 ```
