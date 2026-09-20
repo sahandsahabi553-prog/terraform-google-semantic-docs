@@ -1,24 +1,23 @@
 openapi: 3.0.0
 info:
-  title: سرویس قمر (Qamar API)
-  description: مستندات رسمی سرویس قمر برای مدیریت داده‌های نجومی و محتوای مرتبط.
+  title: سرویس API قمر
+  description: مستندات رسمی API برای مدیریت داده‌های سرویس قمر
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: سرور اصلی سرویس قمر
+    description: سرور اصلی عملیاتی
+
 paths:
-  /celestial-bodies:
+  /celestials:
     get:
-      summary: دریافت لیست اجرام آسمانی
-      tags:
-        - اجرام آسمانی
+      summary: دریافت لیست اجرام
+      description: بازگرداندن لیستی از تمام اجرام ثبت شده در سامانه قمر
       responses:
         '200':
-          description: لیست اجرام با موفقیت دریافت شد.
+          description: عملیات با موفقیت انجام شد
     post:
-      summary: ثبت یک جرم آسمانی جدید
-      tags:
-        - اجرام آسمانی
+      summary: ثبت جرم جدید
+      description: ایجاد یک موجودیت جدید در پایگاه داده قمر
       requestBody:
         required: true
         content:
@@ -28,59 +27,52 @@ paths:
               properties:
                 name:
                   type: string
-                  description: نام جرم آسمانی
                 type:
                   type: string
-                  description: نوع جرم (ستاره، سیاره و غیره)
       responses:
         '201':
-          description: جرم با موفقیت ایجاد شد.
-  /celestial-bodies/{id}:
-    put:
-      summary: به‌روزرسانی اطلاعات یک جرم آسمانی
-      tags:
-        - اجرام آسمانی
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+          description: جرم با موفقیت ایجاد شد
+
+  /celestials/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: دریافت جزئیات جرم
+      description: دریافت اطلاعات کامل یک جرم خاص با استفاده از شناسه
       responses:
         '200':
-          description: اطلاعات با موفقیت به‌روزرسانی شد.
+          description: اطلاعات یافت شد
+        '404':
+          description: جرم مورد نظر پیدا نشد
+    put:
+      summary: ویرایش جرم
+      description: به‌روزرسانی اطلاعات یک جرم موجود
+      responses:
+        '200':
+          description: اطلاعات با موفقیت به‌روزرسانی شد
     delete:
-      summary: حذف یک جرم آسمانی
-      tags:
-        - اجرام آسمانی
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      summary: حذف جرم
+      description: حذف یک جرم از لیست اجرام سرویس قمر
       responses:
         '204':
-          description: جرم با موفقیت حذف شد.
-  /observations:
-    get:
-      summary: مشاهده لیست رصدهای ثبت شده
-      tags:
-        - رصدها
-      responses:
-        '200':
-          description: لیست رصدها با موفقیت دریافت شد.
+          description: جرم با موفقیت حذف شد
+
 components:
   schemas:
-    CelestialBody:
+    Celestial:
       type: object
       properties:
         id:
           type: string
+          format: uuid
         name:
           type: string
         type:
           type: string
-        discovered_at:
+        created_at:
           type: string
-          format: date
+          format: date-time
