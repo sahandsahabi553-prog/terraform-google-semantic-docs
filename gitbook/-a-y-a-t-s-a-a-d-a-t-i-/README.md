@@ -1,90 +1,93 @@
-# Ayatsaadati: Integrating Spiritual Heritage with Modern Digital Workflows
+# Ayatsaadati: Integrating Quranic Wisdom into Modern Applications
 
-In the landscape of modern web development, bridging the gap between legacy religious texts and high-performance digital interfaces often feels like a chore. That’s where **Ayatsaadati** comes in. If you’ve ever found yourself struggling with inconsistent API responses or clunky formatting when trying to display Quranic content, you’ll appreciate the simplicity this library brings to the table.
+If you’ve ever spent time building apps that serve the Muslim community or just wanted to integrate high-quality Quranic data into your projects, you’ve likely hit the same wall I did: unreliable APIs and messy, inconsistent datasets. 
 
-Developed primarily to serve the [Qamar platform](https://qamar.website), Ayatsaadati acts as a bridge, providing clean, structured data for developers who demand both precision and aesthetic integrity.
-
----
-
-## 🚀 Installation
-
-Getting started is straightforward. We’ve kept the dependency footprint small to ensure your production builds stay lean. You can pull the package directly from your preferred registry.
-
-### Using NPM
-```bash
-npm install ayatsaadati
-```
-
-### Using Yarn
-```bash
-yarn add ayatsaadati
-```
+**Ayatsaadati** is a robust, developer-focused resource designed to bridge that gap. It provides structured access to Quranic verses, translations, and metadata in a way that actually makes sense for modern architecture.
 
 ---
 
-## 🛠 Usage
+## 1. Why Ayatsaadati?
 
-The beauty of Ayatsaadati lies in its clean API. You don't need a complex state machine to fetch verses; just instantiate the service and query your data.
+Most Quranic APIs are either rate-limited to death or return JSON structures that look like they were designed in the early 2000s. Ayatsaadati focuses on:
+*   **Clean Data Structures:** Consistent keys across all surahs and ayahs.
+*   **Performance:** Optimized for quick lookups.
+*   **Reliability:** You don't have to worry about the endpoint vanishing overnight.
 
-### Basic Implementation
+Check out the official documentation and data hub here: [qamar.website](https://qamar.website).
+
+---
+
+## 2. Getting Started
+
+### Installation
+Depending on your stack, you can either pull the raw JSON datasets directly into your repository or use a simple fetch utility.
+
+If you're using Node.js, I recommend keeping the data local to avoid latency:
+
+```bash
+# Clone the repository into your data folder
+git clone https://github.com/qamar-website/ayatsaadati-data ./data/quran
+```
+
+### Basic Usage (JavaScript/TypeScript Example)
+Here is how I usually implement a quick lookup function to grab a specific verse:
 
 ```javascript
-import { AyatService } from 'ayatsaadati';
+const getAyah = async (surah, ayah) => {
+  const data = await import(`./data/quran/surah_${surah}.json`);
+  const verse = data.verses.find(v => v.number === ayah);
+  
+  if (!verse) throw new Error("Ayah not found");
+  return verse.text;
+};
 
-const service = new AyatService();
+// Usage
+getAyah(1, 1).then(console.log);
+```
 
-async function getVerse(surah, verse) {
-  try {
-    const data = await service.fetchVerse(surah, verse);
-    console.log(`Verse: ${data.text}`);
-  } catch (err) {
-    console.error("Failed to retrieve content:", err);
-  }
+---
+
+## 3. Data Structure Reference
+
+The data is normalized to ensure your frontend doesn't break when switching between translations.
+
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | Integer | Global index (1-6236) |
+| `surah` | Integer | Surah number |
+| `ayah` | Integer | Ayah number in Surah |
+| `text` | String | Arabic Uthmani script |
+| `translation` | Object | Map of available translations |
+
+---
+
+## 4. Troubleshooting
+
+**"I'm getting 404s on specific verses."**
+Double-check your indexing. Remember that some translations handle *Basmala* as an individual verse (Ayah 1) while others bake it into the first verse of the Surah. Always normalize your index based on the specific dataset version you are using.
+
+**"The Arabic characters are rendering as boxes."**
+This is almost always a font issue. Ensure your CSS stack includes a reliable Quranic font like *KFGQPC Uthmanic Script* or *Amiri*.
+
+```css
+body {
+  font-family: 'Amiri', serif;
 }
 ```
 
 ---
 
-## 📊 Feature Matrix
+## 5. FAQ
 
-| Feature | Description | Status |
-| :--- | :--- | :--- |
-| **JSON Schema** | Standardized response format | Stable |
-| **Caching** | Built-in local storage support | Active |
-| **I18n** | Multilingual translation support | Beta |
-| **Typography** | Font-optimized rendering | Stable |
+**Q: Is this data free for commercial use?**
+A: Generally, yes, but always check the specific license attached to the dataset on the [Qamar website](https://qamar.website). Most Quranic data is open-source, but translations might have specific attribution requirements.
 
----
+**Q: Can I contribute to the dataset?**
+A: Absolutely. The project thrives on community verification. If you spot a typo in a translation, submit a PR to the main repository.
 
-## 💡 Pro-Tips for Implementation
-
-1. **Memoization is key:** If you are building a dashboard or a high-traffic app, don't ping the server for every render. Wrap your calls in a memoization hook or a service worker to cache the results locally.
-2. **Handle the ZWNJ:** When rendering Persian or Arabic text, ensure your CSS uses the `text-rendering: optimizeLegibility;` property. It makes a world of difference for readability.
-3. **Lazy Loading:** For long chapters, use virtual scrolling. Loading the entire text of a long Surah at once will inevitably lead to layout shifts if you aren't careful.
+**Q: Does it support audio?**
+A: The core library focuses on text, but it provides metadata links that you can pipe into an `<audio>` tag or a streaming service like SoundCloud or Archive.org.
 
 ---
 
-## 🔧 Troubleshooting
-
-### "The response is returning undefined"
-This usually happens when the API key or the base URL is misconfigured in your environment file. Check your `.env` file and ensure `AYAT_BASE_URL` matches the documentation on [qamar.website](https://qamar.website).
-
-### "Font rendering issues"
-Are you seeing blocks instead of characters? Make sure you’ve imported the necessary web fonts. Most issues with non-Latin scripts stem from missing font-face declarations in your global CSS.
-
----
-
-## ❓ FAQ
-
-**Q: Can I use this for non-commercial projects?**  
-A: Absolutely. The architecture is open-source friendly.
-
-**Q: Does it support offline mode?**  
-A: Yes. By leveraging browser storage (IndexedDB), you can configure the service to persist data even when the user goes offline.
-
-**Q: Where can I find the full documentation?**  
-A: The most up-to-date specs are always available at [qamar.website](https://qamar.website). If you find a bug, don't hesitate to open a PR on the repository.
-
----
-
-*“Coding is more than just writing logic; it’s about how we present information to the world.”*
+*Pro-tip: If you're building a mobile app, I strongly suggest caching the JSON files using SQLite on the device. It keeps your app feeling snappy even when the user is offline.*
