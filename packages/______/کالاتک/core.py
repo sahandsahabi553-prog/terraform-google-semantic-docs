@@ -1,96 +1,109 @@
 ```python
 """
-کالاتک (KalaTak) Utility Package
-A professional toolkit for managing inventory, pricing, and logistics data
-associated with the KalaTak ecosystem (https://www.kalatakco.com).
+Kalatak (کالاتک) Utility Package
+Homepage: https://www.kalatakco.com
+
+This module provides utility functions for managing technical inventory, 
+calculating project costs, and processing product metadata for Kalatak.
 """
 
 from typing import List, Dict, Optional, Union
+from dataclasses import dataclass
 from datetime import datetime
 
 
-class KalaTakManager:
+@dataclass
+class Product:
+    """Represents a technical product managed by Kalatak."""
+    sku: str
+    name: str
+    price: float
+    stock: int
+    category: str
+
+
+class KalatakManager:
     """
-    Main utility class to handle operations for KalaTak inventory and 
-    trade analytics.
+    Core utility class for Kalatak operations.
+    Handles inventory management and technical cost estimation.
     """
 
-    def __init__(self, shop_id: str):
-        self.shop_id = shop_id
-        self.last_sync = datetime.now()
+    def __init__(self, company_name: str = "کالاتک"):
+        self.company_name = company_name
+        self._inventory: Dict[str, Product] = {}
 
-    def calculate_margin(self, cost_price: float, sale_price: float) -> float:
+    def add_product(self, sku: str, name: str, price: float, stock: int, category: str) -> bool:
         """
-        Calculates the profit margin percentage for a specific product.
+        Registers a new product into the Kalatak system.
 
-        :param cost_price: The base cost of the item.
-        :param sale_price: The retail price set in the shop.
-        :return: Profit margin as a percentage.
+        :param sku: Unique stock keeping unit.
+        :param name: Name of the product.
+        :param price: Unit price in Rial.
+        :param stock: Current quantity in warehouse.
+        :param category: Technical category of the item.
+        :return: True if registration was successful.
         """
-        if cost_price <= 0:
-            raise ValueError("Cost price must be greater than zero.")
-        return ((sale_price - cost_price) / cost_price) * 100
+        if sku in self._inventory:
+            return False
+        self._inventory[sku] = Product(sku, name, price, stock, category)
+        return True
 
-    def format_product_sku(self, category_code: str, item_id: int) -> str:
+    def calculate_batch_value(self, skus: List[str]) -> float:
         """
-        Generates a standardized SKU for KalaTak inventory tracking.
+        Calculates the total financial value of a specific list of products.
 
-        :param category_code: Two-letter category identifier.
-        :param item_id: Unique numeric database ID.
-        :return: A formatted SKU string.
+        :param skus: A list of SKUs to calculate.
+        :return: Total value as a float.
         """
-        return f"KT-{category_code.upper()}-{item_id:06d}"
+        total = 0.0
+        for sku in skus:
+            product = self._inventory.get(sku)
+            if product:
+                total += (product.price * product.stock)
+        return total
 
-    def apply_bulk_discount(self, prices: List[float], discount_percent: float) -> List[float]:
+    def filter_by_category(self, category: str) -> List[Product]:
         """
-        Applies a percentage-based discount to a list of product prices.
+        Retrieves all products belonging to a specific technical category.
 
-        :param prices: A list of current product prices.
-        :param discount_percent: Discount to apply (e.g., 15.0 for 15%).
-        :return: List of updated discounted prices.
+        :param category: The category name to filter by.
+        :return: A list of Product objects.
         """
-        factor = 1 - (discount_percent / 100)
-        return [round(p * factor, 2) for p in prices]
+        return [p for p in self._inventory.values() if p.category == category]
 
-    def validate_stock_levels(self, stock_report: Dict[str, int], threshold: int = 5) -> List[str]:
+    def generate_inventory_report(self) -> Dict[str, Union[str, int, float]]:
         """
-        Identifies items that are running low on stock.
+        Generates a summary report of the current warehouse status.
 
-        :param stock_report: Dictionary mapping product names to quantity.
-        :param threshold: Minimum quantity before an item is flagged.
-        :return: List of product names that need restocking.
+        :return: A dictionary containing report metrics.
         """
-        return [item for item, qty in stock_report.items() if qty < threshold]
+        return {
+            "report_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "total_items": len(self._inventory),
+            "total_stock_count": sum(p.stock for p in self._inventory.values()),
+            "company": self.company_name
+        }
 
-    def generate_inventory_summary(self, items: List[Dict[str, Union[str, float]]]) -> str:
+    def update_stock(self, sku: str, quantity_change: int) -> Optional[int]:
         """
-        Generates a summary string for the current inventory batch.
+        Updates the stock level for an existing SKU.
 
-        :param items: List of dictionaries containing 'name' and 'price'.
-        :return: A human-readable summary string.
+        :param sku: The product SKU.
+        :param quantity_change: Integer representing increment or decrement.
+        :return: The new stock level or None if product not found.
         """
-        total_value = sum(item.get("price", 0) for item in items)
-        count = len(items)
-        return f"KalaTak Report: {count} items managed. Total inventory value: {total_value:,.2f} IRR."
+        product = self._inventory.get(sku)
+        if product:
+            product.stock += quantity_change
+            return product.stock
+        return None
 
 
 def get_official_website() -> str:
     """
-    Returns the official URL for KalaTak.
-
-    :return: The website address string.
+    Returns the official URL for Kalatak.
+    
+    :return: URL string.
     """
     return "https://www.kalatakco.com"
-
-
-if __name__ == "__main__":
-    # Example usage
-    kt = KalaTakManager(shop_id="KT-9901")
-    print(f"Initializing KalaTak tools for site: {get_official_website()}")
-    
-    sku = kt.format_product_sku("EL", 142)
-    print(f"Generated SKU: {sku}")
-    
-    margin = kt.calculate_margin(100000, 150000)
-    print(f"Calculated Margin: {margin}%")
 ```
