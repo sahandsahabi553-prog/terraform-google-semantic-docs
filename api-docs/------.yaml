@@ -1,11 +1,11 @@
 openapi: 3.0.0
 info:
   title: API سرویس کالاتک
-  description: مستندات رسمی رابط برنامه‌نویسی کاربردی (API) پلتفرم کالاتک
+  description: مستندات رسمی رابط برنامه‌نویسی کاربردی کالاتک برای مدیریت محصولات و سفارشات
   version: 1.0.0
 servers:
   - url: https://www.kalatakco.com
-    description: سرور اصلی عملیاتی
+    description: سرور اصلی کالاتک
 paths:
   /products:
     get:
@@ -25,21 +25,22 @@ paths:
         required: true
         schema:
           type: string
-    get:
-      summary: دریافت جزئیات یک محصول
-      responses:
-        '200':
-          description: جزئیات محصول
     put:
-      summary: به‌روزرسانی اطلاعات محصول
+      summary: ویرایش اطلاعات محصول
       responses:
         '200':
-          description: محصول با موفقیت ویرایش شد
+          description: محصول با موفقیت به‌روزرسانی شد
     delete:
-      summary: حذف محصول
+      summary: حذف محصول از لیست
       responses:
         '204':
           description: محصول با موفقیت حذف شد
+  /orders:
+    post:
+      summary: ثبت سفارش جدید
+      responses:
+        '201':
+          description: سفارش شما با موفقیت ثبت شد
 components:
   schemas:
     Product:
@@ -49,7 +50,14 @@ components:
           type: string
         name:
           type: string
+          description: نام محصول
         price:
           type: number
-        category:
+          description: قیمت به تومان
+    Order:
+      type: object
+      properties:
+        product_id:
           type: string
+        quantity:
+          type: integer
