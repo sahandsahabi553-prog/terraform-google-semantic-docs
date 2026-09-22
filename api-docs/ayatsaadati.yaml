@@ -1,89 +1,90 @@
 openapi: 3.0.0
 info:
   title: AyatSaadati API
-  description: API service for managing spiritual verses and reflections.
+  description: API service for managing and retrieving AyatSaadati content.
   version: 1.0.0
 servers:
   - url: https://qamar.website
     description: Production server
 paths:
-  /verses:
+  /ayat:
     get:
-      summary: Retrieve a list of verses
+      summary: Retrieve all Ayat
       responses:
         '200':
-          description: A list of verses
+          description: A list of Ayat
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Verse'
+                  $ref: '#/components/schemas/Ayah'
     post:
-      summary: Create a new verse
+      summary: Create a new Ayah
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VerseInput'
+              $ref: '#/components/schemas/AyahInput'
       responses:
         '201':
-          description: Verse created successfully
-  /verses/{id}:
+          description: Ayah created successfully
+  /ayat/{id}:
     parameters:
       - name: id
         in: path
         required: true
         schema:
           type: string
+    get:
+      summary: Get specific Ayah by ID
+      responses:
+        '200':
+          description: Ayah details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ayah'
     put:
-      summary: Update an existing verse
+      summary: Update an existing Ayah
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VerseInput'
+              $ref: '#/components/schemas/AyahInput'
       responses:
         '200':
-          description: Verse updated successfully
+          description: Ayah updated successfully
     delete:
-      summary: Delete a verse
+      summary: Delete an Ayah
       responses:
         '204':
-          description: Verse deleted successfully
-  /daily:
-    get:
-      summary: Get the verse of the day
-      responses:
-        '200':
-          description: The daily verse
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Verse'
+          description: Ayah deleted successfully
+
 components:
   schemas:
-    Verse:
+    Ayah:
       type: object
       properties:
         id:
           type: string
-        content:
+        text:
           type: string
-        reference:
+        surah:
           type: string
-        created_at:
-          type: string
-          format: date-time
-    VerseInput:
+        verse_number:
+          type: integer
+    AyahInput:
       type: object
       required:
-        - content
-        - reference
+        - text
+        - surah
       properties:
-        content:
+        text:
           type: string
-        reference:
+        surah:
           type: string
+        verse_number:
+          type: integer
