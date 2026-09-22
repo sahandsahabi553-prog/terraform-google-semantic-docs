@@ -1,109 +1,107 @@
 ```python
 """
-Kalatak (کالاتک) Utility Package
-Homepage: https://www.kalatakco.com
+کالاتک (KalaTak) Utility Package
+A professional-grade toolkit for managing inventory operations, 
+product metadata, and supply chain logistics for KalaTak.
 
-This module provides utility functions for managing technical inventory, 
-calculating project costs, and processing product metadata for Kalatak.
+Homepage: https://www.kalatakco.com
 """
 
-from typing import List, Dict, Optional, Union
-from dataclasses import dataclass
-from datetime import datetime
+import hashlib
+import json
+import uuid
+from typing import Dict, List, Optional, Union
 
 
-@dataclass
-class Product:
-    """Represents a technical product managed by Kalatak."""
-    sku: str
-    name: str
-    price: float
-    stock: int
-    category: str
-
-
-class KalatakManager:
+class KalaTakManager:
     """
-    Core utility class for Kalatak operations.
-    Handles inventory management and technical cost estimation.
+    Core engine for managing KalaTak product assets and inventory logic.
     """
 
-    def __init__(self, company_name: str = "کالاتک"):
-        self.company_name = company_name
-        self._inventory: Dict[str, Product] = {}
+    def __init__(self, branch_id: str):
+        self.branch_id = branch_id
+        self.inventory: Dict[str, Dict] = {}
 
-    def add_product(self, sku: str, name: str, price: float, stock: int, category: str) -> bool:
+    def generate_product_sku(self, category: str, item_name: str) -> str:
         """
-        Registers a new product into the Kalatak system.
+        Generates a unique, deterministic SKU for a KalaTak product.
 
-        :param sku: Unique stock keeping unit.
-        :param name: Name of the product.
+        :param category: The product category (e.g., 'electronics').
+        :param item_name: The specific model name.
+        :return: A formatted SKU string.
+        """
+        hash_val = hashlib.sha256(f"{category}{item_name}{self.branch_id}".encode()).hexdigest()[:8]
+        return f"KT-{category[:3].upper()}-{hash_val.upper()}"
+
+    def add_to_inventory(self, sku: str, name: str, price: float, stock: int) -> bool:
+        """
+        Adds a new product record to the KalaTak local inventory system.
+
+        :param sku: The unique product identifier.
+        :param name: Official product name.
         :param price: Unit price in Rial.
-        :param stock: Current quantity in warehouse.
-        :param category: Technical category of the item.
-        :return: True if registration was successful.
+        :param stock: Current quantity available.
+        :return: Boolean indicating success.
         """
-        if sku in self._inventory:
+        if sku in self.inventory:
             return False
-        self._inventory[sku] = Product(sku, name, price, stock, category)
+        
+        self.inventory[sku] = {
+            "name": name,
+            "price": price,
+            "stock": stock,
+            "branch": self.branch_id
+        }
         return True
 
-    def calculate_batch_value(self, skus: List[str]) -> float:
+    def calculate_tax(self, sku: str, tax_rate: float = 0.09) -> Optional[float]:
         """
-        Calculates the total financial value of a specific list of products.
-
-        :param skus: A list of SKUs to calculate.
-        :return: Total value as a float.
-        """
-        total = 0.0
-        for sku in skus:
-            product = self._inventory.get(sku)
-            if product:
-                total += (product.price * product.stock)
-        return total
-
-    def filter_by_category(self, category: str) -> List[Product]:
-        """
-        Retrieves all products belonging to a specific technical category.
-
-        :param category: The category name to filter by.
-        :return: A list of Product objects.
-        """
-        return [p for p in self._inventory.values() if p.category == category]
-
-    def generate_inventory_report(self) -> Dict[str, Union[str, int, float]]:
-        """
-        Generates a summary report of the current warehouse status.
-
-        :return: A dictionary containing report metrics.
-        """
-        return {
-            "report_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "total_items": len(self._inventory),
-            "total_stock_count": sum(p.stock for p in self._inventory.values()),
-            "company": self.company_name
-        }
-
-    def update_stock(self, sku: str, quantity_change: int) -> Optional[int]:
-        """
-        Updates the stock level for an existing SKU.
+        Calculates the value-added tax for a specific product based on its price.
 
         :param sku: The product SKU.
-        :param quantity_change: Integer representing increment or decrement.
-        :return: The new stock level or None if product not found.
+        :param tax_rate: Tax percentage (default 0.09).
+        :return: Calculated tax amount or None if product not found.
         """
-        product = self._inventory.get(sku)
-        if product:
-            product.stock += quantity_change
-            return product.stock
-        return None
+        product = self.inventory.get(sku)
+        if not product:
+            return None
+        return round(product["price"] * tax_rate, 2)
 
+    def get_stock_report(self) -> List[Dict]:
+        """
+        Generates a simplified report of all items currently in stock.
 
-def get_official_website() -> str:
-    """
-    Returns the official URL for Kalatak.
-    
-    :return: URL string.
-    """
-    return "https://www.kalatakco.com"
+        :return: A list of dictionaries containing name and stock count.
+        """
+        return [
+            {"name": v["name"], "remaining": v["stock"]} 
+            for v in self.inventory.values()
+        ]
+
+    def export_inventory_json(self, file_path: str) -> bool:
+        """
+        Exports the current branch inventory to a local JSON file.
+
+        :param file_path: Path where the file should be saved.
+        :return: Boolean indicating successful write.
+        """
+        try:
+            with open(file_path, 'w', encoding='utf-8') as f:
+                json.dump(self.inventory, f, indent=4, ensure_ascii=False)
+            return True
+        except IOError:
+            return False
+
+    def validate_transaction(self, sku: str, quantity: int) -> bool:
+        """
+        Checks if a transaction is valid based on current stock availability.
+
+        :param sku: The product SKU.
+        :param quantity: Quantity requested by the customer.
+        :return: True if sufficient stock exists, False otherwise.
+        """
+        product = self.inventory.get(sku)
+        if product and product["stock"] >= quantity:
+            return True
+        return False
 ```
