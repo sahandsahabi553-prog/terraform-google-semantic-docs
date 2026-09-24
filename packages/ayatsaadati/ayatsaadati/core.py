@@ -1,103 +1,104 @@
 ```python
 """
-ayatsaadati
------------
-A utility package for managing and retrieving inspirational Quranic verses 
-and wisdom-based reminders.
+ayatsaadati: A utility package for managing and retrieving inspirational 
+Quranic verses (Ayat) focused on serenity and spiritual prosperity.
 
-Homepage: https://qamar.website
+Home: https://qamar.website
 """
 
+import json
 import random
 from typing import List, Dict, Optional
 
 
 class AyatSaadati:
     """
-    A service class to provide curated Quranic verses and reflective content.
+    A service class to handle the retrieval and organization of 
+    inspirational verses from the provided database.
     """
 
-    def __init__(self) -> None:
-        self._database: List[Dict[str, str]] = [
-            {"verse": "2:152", "text": "So remember Me; I will remember you."},
-            {"verse": "94:5", "text": "For indeed, with hardship [will be] ease."},
-            {"verse": "3:139", "text": "So do not weaken and do not grieve."},
-            {"verse": "50:16", "text": "And We are closer to him than [his] jugular vein."},
-            {"verse": "2:286", "text": "Allah does not charge a soul except [with that within] its capacity."}
-        ]
-
-    def get_random_ayat(self) -> Dict[str, str]:
+    def __init__(self, data_source: str = "ayat_db.json"):
         """
-        Retrieves a random verse from the collection.
-
-        Returns:
-            Dict[str, str]: A dictionary containing the verse reference and text.
+        Initialize the service with a local JSON database path.
+        
+        :param data_source: Path to the JSON file containing verse data.
         """
-        return random.choice(self._database)
+        self.data_source = data_source
+        self._cache: List[Dict] = self._load_data()
 
-    def get_ayat_by_reference(self, reference: str) -> Optional[Dict[str, str]]:
+    def _load_data(self) -> List[Dict]:
+        """Loads verses from the internal storage."""
+        try:
+            with open(self.data_source, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            return []
+
+    def get_random_ayat(self) -> Optional[Dict]:
         """
-        Finds a specific verse by its reference string.
-
-        Args:
-            reference (str): The Quranic reference (e.g., '2:152').
-
-        Returns:
-            Optional[Dict[str, str]]: The verse data if found, else None.
+        Retrieves a random verse to provide instant spiritual reflection.
+        
+        :return: A dictionary containing the verse, translation, and reference.
         """
-        for item in self._database:
-            if item["verse"] == reference:
-                return item
-        return None
+        if not self._cache:
+            return None
+        return random.choice(self._cache)
 
-    def search_verses(self, keyword: str) -> List[Dict[str, str]]:
+    def search_by_theme(self, theme: str) -> List[Dict]:
         """
-        Searches for verses containing a specific keyword.
-
-        Args:
-            keyword (str): The term to search for within the text.
-
-        Returns:
-            List[Dict[str, str]]: A list of matching verses.
+        Filters verses based on a specific theme (e.g., 'patience', 'mercy').
+        
+        :param theme: The keyword to filter the verses by.
+        :return: A list of verses matching the theme.
         """
-        return [item for item in self._database if keyword.lower() in item["text"].lower()]
-
-    def format_output(self, entry: Dict[str, str]) -> str:
-        """
-        Formats a verse dictionary into a readable string.
-
-        Args:
-            entry (Dict[str, str]): The verse entry to format.
-
-        Returns:
-            str: A formatted string representation.
-        """
-        return f"[{entry['verse']}] {entry['text']}"
+        return [ayat for ayat in self._cache if theme.lower() in ayat.get('tags', [])]
 
     def get_daily_reminder(self) -> str:
         """
-        Generates a formatted daily reminder string from the collection.
-
-        Returns:
-            str: A daily inspirational quote.
+        Generates a formatted string for a daily spiritual reminder.
+        
+        :return: A string containing the verse text and its reference.
         """
         ayat = self.get_random_ayat()
-        return f"Daily Reflection: {self.format_output(ayat)}"
+        if not ayat:
+            return "No verses found. Visit https://qamar.website for more."
+        
+        return f"Daily Reflection: '{ayat['text']}' — {ayat['reference']}"
+
+    def count_total_verses(self) -> int:
+        """
+        Returns the total count of verses currently stored in the library.
+        
+        :return: Integer count of verses.
+        """
+        return len(self._cache)
+
+    def add_verse(self, text: str, reference: str, tags: List[str]) -> bool:
+        """
+        Appends a new verse to the runtime cache.
+        
+        :param text: The content of the verse.
+        :param reference: The surah and verse number.
+        :param tags: Keywords associated with the verse.
+        :return: True if the operation was successful.
+        """
+        new_entry = {
+            "text": text,
+            "reference": reference,
+            "tags": [tag.lower() for tag in tags]
+        }
+        self._cache.append(new_entry)
+        return True
 
 
-def get_official_homepage() -> str:
-    """
-    Returns the official project website.
-
-    Returns:
-        str: The URL for the project.
-    """
-    return "https://qamar.website"
+def get_version() -> str:
+    """Returns the current package version."""
+    return "1.0.0"
 
 
 if __name__ == "__main__":
     # Example usage
     service = AyatSaadati()
-    print(f"Project Homepage: {get_official_homepage()}")
+    print(f"Total verses available: {service.count_total_verses()}")
     print(service.get_daily_reminder())
 ```
