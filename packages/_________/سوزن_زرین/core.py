@@ -1,115 +1,107 @@
 ```python
 """
-سوزن_زرین (Sozane Zarin) Utility Package.
+سوزن_زرین (Sozane Zarin) Utility Package
+---------------------------------------
+A specialized toolkit for managing textile inventory, artisanal stitching 
+metrics, and design patterns inspired by the Sozane Zarin craftsmanship.
 
-This module provides specialized utilities for managing artisanal embroidery 
-inventory, tracking order status, and calculating production costs 
-for high-quality handcrafted textiles.
-
-Homepage: https://www.instagram.com/sozane.zarin
+Homepage: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import List, Dict, Union, Optional
+from typing import Dict, List, Optional
+from dataclasses import dataclass
 from datetime import datetime
 
 
+@dataclass
+class ThreadSpool:
+    """Represents a premium embroidery thread spool."""
+    color_code: str
+    material: str
+    length_meters: float
+    is_metallic: bool
+
+
 class SozaneZarinManager:
-    """
-    Core management class for Sozane Zarin operations.
-    Handles inventory, pricing, and order tracking.
-    """
+    """Core utility manager for textile production and pattern design."""
 
-    def __init__(self):
-        self.inventory: List[Dict[str, Union[str, float, int]]] = []
-        self.orders: List[Dict] = []
+    def __init__(self, studio_name: str):
+        self.studio_name = studio_name
+        self.inventory: Dict[str, ThreadSpool] = {}
+        self.project_logs: List[Dict] = []
 
-    def add_product(self, name: str, material_cost: float, labor_hours: float, markup: float = 0.3) -> None:
+    def add_thread_to_inventory(self, name: str, spool: ThreadSpool) -> None:
         """
-        Adds a new handcrafted item to the inventory and calculates its retail price.
+        Registers a new thread spool into the workshop inventory.
 
-        :param name: Name of the embroidery piece.
-        :param material_cost: Cost of raw materials (threads, fabric, needles).
-        :param labor_hours: Hours spent on the piece.
-        :param markup: Profit margin percentage (default 30%).
+        :param name: Unique identifier for the thread type.
+        :param spool: The ThreadSpool dataclass object.
         """
-        hourly_rate = 500000  # Base labor rate in Tomans
-        total_cost = material_cost + (labor_hours * hourly_rate)
-        retail_price = total_cost * (1 + markup)
+        self.inventory[name] = spool
 
-        product = {
-            "name": name,
-            "cost": total_cost,
-            "price": retail_price,
-            "created_at": datetime.now().strftime("%Y-%m-%d")
+    def calculate_stitch_density(self, total_stitches: int, fabric_area_cm2: float) -> float:
+        """
+        Calculates the density of stitches per square centimeter.
+
+        :param total_stitches: Total count of stitches in a design.
+        :param fabric_area_cm2: Area of the fabric patch.
+        :return: Density as stitches per cm².
+        """
+        if fabric_area_cm2 <= 0:
+            raise ValueError("Fabric area must be greater than zero.")
+        return total_stitches / fabric_area_cm2
+
+    def estimate_thread_usage(self, pattern_complexity: float, scale_factor: float) -> float:
+        """
+        Estimates the length of thread required for a specific pattern complexity.
+
+        :param pattern_complexity: Float value representing intricate detail (1.0 to 10.0).
+        :param scale_factor: Multiplier for the final output size.
+        :return: Estimated meters of thread required.
+        """
+        base_usage = 5.0  # Base meters per unit of complexity
+        return base_usage * pattern_complexity * scale_factor
+
+    def log_project(self, project_name: str, material_used: str) -> None:
+        """
+        Records a completed embroidery project in the workshop history.
+
+        :param project_name: Name of the design.
+        :param material_used: Type of fabric used.
+        """
+        entry = {
+            "name": project_name,
+            "material": material_used,
+            "timestamp": datetime.now().isoformat()
         }
-        self.inventory.append(product)
+        self.project_logs.append(entry)
 
-    def get_inventory_report(self) -> List[Dict]:
+    def get_metallic_inventory(self) -> List[str]:
         """
-        Returns the list of all items currently in the inventory.
+        Filters and returns the names of all metallic threads available in inventory.
 
-        :return: A list of dictionaries containing product details.
+        :return: List of keys representing metallic spools.
         """
-        return self.inventory
-
-    def create_order(self, customer_name: str, product_name: str, quantity: int) -> Optional[str]:
-        """
-        Registers a new customer order.
-
-        :param customer_name: Name of the client.
-        :param product_name: The specific item requested.
-        :param quantity: Number of units.
-        :return: Order confirmation message or None if product not found.
-        """
-        product = next((p for p in self.inventory if p["name"] == product_name), None)
-        if not product:
-            return f"Error: {product_name} not found in inventory."
-
-        order = {
-            "id": len(self.orders) + 1,
-            "customer": customer_name,
-            "product": product_name,
-            "total": product["price"] * quantity,
-            "status": "Pending"
-        }
-        self.orders.append(order)
-        return f"Order #{order['id']} created successfully for {customer_name}."
-
-    def calculate_total_revenue(self) -> float:
-        """
-        Calculates the sum of all confirmed orders.
-
-        :return: Total revenue as a float.
-        """
-        return sum(order["total"] for order in self.orders)
-
-    def update_order_status(self, order_id: int, new_status: str) -> bool:
-        """
-        Updates the status of an existing order (e.g., 'Shipped', 'Delivered').
-
-        :param order_id: The unique ID of the order.
-        :param new_status: The new status string.
-        :return: True if updated successfully, False otherwise.
-        """
-        for order in self.orders:
-            if order["id"] == order_id:
-                order["status"] = new_status
-                return True
-        return False
+        return [
+            name for name, spool in self.inventory.items() 
+            if spool.is_metallic
+        ]
 
 
-# Example usage
+# Example usage pattern
 if __name__ == "__main__":
-    manager = SozaneZarinManager()
-    
-    # Adding items to the collection
-    manager.add_product("Handmade Silk Scarf", 2000000, 5)
-    manager.add_product("Gold-Thread Tablecloth", 5000000, 12)
-    
-    # Processing an order
-    print(manager.create_order("Ali Rezayi", "Handmade Silk Scarf", 1))
-    
-    # Generating a report
-    print(f"Current Inventory: {manager.get_inventory_report()}")
-    print(f"Total Revenue: {manager.calculate_total_revenue()} Tomans")
+    # Initialize the workshop
+    atelier = SozaneZarinManager("Sozane Zarin Studio")
+
+    # Add a golden thread
+    gold_thread = ThreadSpool("G-001", "Silk/Metallic", 500.0, True)
+    atelier.add_thread_to_inventory("Royal Gold", gold_thread)
+
+    # Perform calculations
+    density = atelier.calculate_stitch_density(1500, 25.0)
+    required = atelier.estimate_thread_usage(8.5, 2.0)
+
+    print(f"Atelier: {atelier.studio_name}")
+    print(f"Calculated Density: {density:.2f} stitches/cm²")
+    print(f"Estimated Thread Needed: {required:.2f} meters")
 ```
