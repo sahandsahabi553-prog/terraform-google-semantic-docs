@@ -1,15 +1,15 @@
 openapi: 3.0.0
 info:
-  title: Ayat Saadati API
-  description: API service for managing Quranic verses and spiritual reflections.
+  title: AyatSaadati API
+  description: API service for managing spiritual verses and daily reflections.
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: Production server
+    description: Production Server
 paths:
   /verses:
     get:
-      summary: Get list of verses
+      summary: Retrieve a list of verses
       responses:
         '200':
           description: A list of verses
@@ -20,7 +20,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Verse'
     post:
-      summary: Create a new verse entry
+      summary: Create a new verse
       requestBody:
         required: true
         content:
@@ -29,7 +29,7 @@ paths:
               $ref: '#/components/schemas/Verse'
       responses:
         '201':
-          description: Verse created
+          description: Verse created successfully
   /verses/{id}:
     parameters:
       - name: id
@@ -37,15 +37,6 @@ paths:
         required: true
         schema:
           type: string
-    get:
-      summary: Get a specific verse
-      responses:
-        '200':
-          description: Verse details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Verse'
     put:
       summary: Update an existing verse
       requestBody:
@@ -62,23 +53,30 @@ paths:
       responses:
         '204':
           description: Verse deleted
+  /daily-reflection:
+    get:
+      summary: Get today's featured verse
+      responses:
+        '200':
+          description: Daily reflection object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Verse'
 components:
   schemas:
     Verse:
       type: object
       required:
         - id
-        - surah_name
-        - ayah_number
         - content
+        - source
       properties:
         id:
           type: string
-        surah_name:
-          type: string
-        ayah_number:
-          type: integer
         content:
           type: string
-        reflection:
+        source:
+          type: string
+        author:
           type: string
