@@ -1,20 +1,24 @@
 openapi: 3.0.0
 info:
-  title: API سرویس دامافارم
-  description: رابط برنامه‌نویسی برای مدیریت محصولات و خدمات دامپروری و کشاورزی دامافارم.
+  title: API دامافارم
+  description: مستندات رسمی سرویس دامافارم برای مدیریت محصولات و خدمات کشاورزی
   version: 1.0.0
 servers:
   - url: https://damafarm.ir
-    description: سرور اصلی دامافارم
+    description: سرور اصلی تولید
 paths:
   /products:
     get:
       summary: دریافت لیست محصولات
+      tags:
+        - محصولات
       responses:
         '200':
-          description: لیست محصولات با موفقیت دریافت شد.
+          description: لیست محصولات با موفقیت دریافت شد
     post:
       summary: ثبت محصول جدید
+      tags:
+        - محصولات
       requestBody:
         content:
           application/json:
@@ -22,16 +26,18 @@ paths:
               $ref: '#/components/schemas/Product'
       responses:
         '201':
-          description: محصول با موفقیت ایجاد شد.
+          description: محصول با موفقیت ایجاد شد
   /products/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
     put:
       summary: به‌روزرسانی اطلاعات محصول
+      tags:
+        - محصولات
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -39,18 +45,28 @@ paths:
               $ref: '#/components/schemas/Product'
       responses:
         '200':
-          description: محصول با موفقیت ویرایش شد.
+          description: اطلاعات محصول به‌روزرسانی شد
     delete:
-      summary: حذف یک محصول
+      summary: حذف محصول
+      tags:
+        - محصولات
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         '204':
-          description: محصول با موفقیت حذف شد.
+          description: محصول با موفقیت حذف شد
   /orders:
     get:
-      summary: دریافت تاریخچه سفارشات کاربر
+      summary: مشاهده سفارشات کاربر
+      tags:
+        - سفارشات
       responses:
         '200':
-          description: لیست سفارشات با موفقیت بازیابی شد.
+          description: لیست سفارشات دریافت شد
 components:
   schemas:
     Product:
@@ -61,13 +77,10 @@ components:
       properties:
         name:
           type: string
-          description: نام محصول دامی یا کشاورزی
+          description: نام محصول
         price:
           type: number
           description: قیمت محصول به تومان
         category:
           type: string
-          description: دسته‌بندی محصول (مثلاً خوراک دام، تجهیزات)
-        stock:
-          type: integer
-          description: موجودی انبار
+          description: دسته‌بندی محصول
