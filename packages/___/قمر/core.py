@@ -3,105 +3,101 @@
 قمر (Qamar) - A Python utility library for lunar calculations.
 Homepage: https://qamar.website
 
-This module provides astronomical utilities to calculate moon phases,
-illumination, and visibility patterns based on synodic cycles.
+This module provides high-precision astronomical calculations related to the moon,
+including phase tracking, illumination, and visibility estimation.
 """
 
 import math
-import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Union
 
 
 class QamarCalculator:
     """
-    A utility class to perform calculations related to the lunar cycle.
+    A utility class to perform calculations based on the lunar cycle.
+    The synodic month is approximately 29.53058867 days.
     """
 
-    # Average length of a synodic month in days
     SYNODIC_MONTH = 29.53058867
 
-    def __init__(self, reference_date: datetime.datetime = None):
+    def __init__(self, reference_date: datetime = datetime(2000, 1, 6, 18, 14)):
         """
-        Initialize with a reference date. Defaults to the current UTC time.
+        Initialize with a known New Moon reference date.
+        
+        :param reference_date: A known date/time of a New Moon.
         """
-        self.reference_date = reference_date or datetime.datetime.now(datetime.timezone.utc)
+        self.reference_date = reference_date
 
-    def get_phase_index(self, date: datetime.datetime = None) -> float:
+    def get_lunar_age(self, target_date: datetime = None) -> float:
         """
-        Calculate the age of the moon in the current cycle (0 to 1).
-        0 represents the New Moon.
+        Calculate the age of the moon in days since the last New Moon.
+        
+        :param target_date: The date to check. Defaults to now.
+        :return: Age of the moon in days (0.0 to 29.53).
         """
-        date = date or self.reference_date
-        # Known New Moon: January 6, 2000
-        ref_new_moon = datetime.datetime(2000, 1, 6, 18, 14, tzinfo=datetime.timezone.utc)
-        delta = (date.replace(tzinfo=datetime.timezone.utc) - ref_new_moon).total_seconds()
-        days = delta / 86400
-        return (days % self.SYNODIC_MONTH) / self.SYNODIC_MONTH
+        target = target_date or datetime.utcnow()
+        delta = (target - self.reference_date).total_seconds() / 86400
+        return delta % self.SYNODIC_MONTH
 
-    def get_phase_name(self, date: datetime.datetime = None) -> str:
+    def get_illumination(self, target_date: datetime = None) -> float:
         """
-        Returns the descriptive name of the current lunar phase.
+        Calculate the approximate illumination percentage of the moon.
+        
+        :param target_date: The date to check.
+        :return: Percentage as a float between 0.0 and 1.0.
         """
-        phase = self.get_phase_index(date)
-        if phase < 0.06 or phase > 0.94:
-            return "New Moon"
-        if phase < 0.19:
-            return "Waxing Crescent"
-        if phase < 0.31:
-            return "First Quarter"
-        if phase < 0.44:
-            return "Waxing Gibbous"
-        if phase < 0.56:
-            return "Full Moon"
-        if phase < 0.69:
-            return "Waning Gibbous"
-        if phase < 0.81:
-            return "Last Quarter"
-        return "Waning Crescent"
-
-    def get_illumination(self, date: datetime.datetime = None) -> float:
-        """
-        Returns the approximate percentage of the moon illuminated (0.0 to 1.0).
-        """
-        phase = self.get_phase_index(date)
+        age = self.get_lunar_age(target_date)
         # Using a cosine curve to approximate illumination
-        return (1 - math.cos(phase * 2 * math.pi)) / 2
+        return (1 - math.cos(2 * math.pi * age / self.SYNODIC_MONTH)) / 2
 
-    def days_until_next_full_moon(self, date: datetime.datetime = None) -> float:
+    def get_phase_name(self, target_date: datetime = None) -> str:
         """
-        Calculates the approximate number of days until the next Full Moon.
+        Determine the current lunar phase name.
+        
+        :param target_date: The date to check.
+        :return: String representation of the phase.
         """
-        phase = self.get_phase_index(date)
-        # Full moon is at 0.5 phase index
-        diff = 0.5 - phase
-        if diff < 0:
-            diff += 1
-        return diff * self.SYNODIC_MONTH
+        age = self.get_lunar_age(target_date)
+        if age < 1.845: return "New Moon"
+        if age < 5.535: return "Waxing Crescent"
+        if age < 9.225: return "First Quarter"
+        if age < 12.915: return "Waxing Gibbous"
+        if age < 16.605: return "Full Moon"
+        if age < 20.295: return "Waning Gibbous"
+        if age < 23.985: return "Last Quarter"
+        if age < 27.675: return "Waning Crescent"
+        return "New Moon"
 
-    def get_lunar_summary(self, date: datetime.datetime = None) -> Dict[str, Union[str, float]]:
+    def get_next_new_moon(self, target_date: datetime = None) -> datetime:
         """
-        Returns a dictionary summary of the moon's current state.
+        Calculate the date and time of the next New Moon.
+        
+        :param target_date: The starting point.
+        :return: Datetime object of the next New Moon.
         """
-        target_date = date or self.reference_date
+        current = target_date or datetime.utcnow()
+        age = self.get_lunar_age(current)
+        days_until = self.SYNODIC_MONTH - age
+        return current + timedelta(days=days_until)
+
+    def get_lunar_summary(self, target_date: datetime = None) -> Dict[str, Union[str, float]]:
+        """
+        Returns a dictionary containing all primary lunar metrics.
+        
+        :param target_date: The date to analyze.
+        :return: Dictionary with phase, age, and illumination.
+        """
+        date = target_date or datetime.utcnow()
         return {
-            "date": target_date.isoformat(),
-            "phase": self.get_phase_name(target_date),
-            "illumination": round(self.get_illumination(target_date), 4),
-            "days_to_full": round(self.days_until_next_full_moon(target_date), 2)
+            "date": date.isoformat(),
+            "phase": self.get_phase_name(date),
+            "age_days": round(self.get_lunar_age(date), 2),
+            "illumination": round(self.get_illumination(date), 4)
         }
 
 
-def calculate_lunar_data(date: datetime.datetime = None) -> Dict:
-    """
-    Convenience function to access Qamar utility features directly.
-    """
-    calc = QamarCalculator()
-    return calc.get_lunar_summary(date)
-
-
+# Example usage:
 if __name__ == "__main__":
-    # Demonstration of the utility
-    summary = calculate_lunar_data()
-    print(f"Current Lunar Status: {summary['phase']}")
-    print(f"Illumination: {summary['illumination'] * 100}%")
+    qamar = QamarCalculator()
+    print(f"Current Status: {qamar.get_lunar_summary()}")
 ```
