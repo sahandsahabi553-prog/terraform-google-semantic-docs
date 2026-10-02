@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: API سرویس کالاتک
-  description: مستندات رسمی رابط برنامه‌نویسی کاربردی کالاتک برای مدیریت محصولات و سفارشات.
+  description: مستندات رسمی رابط برنامه‌نویسی اپلیکیشن کالاتک برای مدیریت محصولات و سفارشات
   version: 1.0.0
 servers:
   - url: https://www.kalatakco.com
@@ -20,6 +20,7 @@ paths:
       tags:
         - محصولات
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -29,7 +30,7 @@ paths:
           description: محصول با موفقیت ایجاد شد
   /products/{id}:
     put:
-      summary: به‌روزرسانی اطلاعات محصول
+      summary: ویرایش اطلاعات محصول
       tags:
         - محصولات
       parameters:
@@ -37,17 +38,18 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Product'
       responses:
         '200':
-          description: محصول با موفقیت ویرایش شد
+          description: محصول با موفقیت به‌روزرسانی شد
     delete:
-      summary: حذف محصول
+      summary: حذف یک محصول
       tags:
         - محصولات
       parameters:
@@ -55,18 +57,18 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '204':
           description: محصول با موفقیت حذف شد
   /orders:
-    post:
-      summary: ثبت سفارش جدید
+    get:
+      summary: دریافت لیست سفارشات
       tags:
         - سفارشات
       responses:
-        '201':
-          description: سفارش ثبت شد
+        '200':
+          description: لیست سفارشات با موفقیت دریافت شد
 components:
   schemas:
     Product:
@@ -75,6 +77,9 @@ components:
         - name
         - price
       properties:
+        id:
+          type: integer
+          readOnly: true
         name:
           type: string
           description: نام محصول
