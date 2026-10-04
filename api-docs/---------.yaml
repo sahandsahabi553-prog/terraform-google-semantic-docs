@@ -1,64 +1,72 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی API برای مدیریت محصولات و سفارشات گالری سوزن زرین.
+  description: مستندات رسمی برای مدیریت خدمات خیاطی و سفارشات سوزن زرین
   version: 1.0.0
 servers:
-  - url: https://api.sozane-zarin.ir/v1
-    description: سرور اصلی
+  - url: https://api.sozanezarin.com/v1
+    description: سرور اصلی سرویس سوزن زرین
+
 paths:
-  /products:
+  /orders:
     get:
-      summary: دریافت لیست محصولات
+      summary: دریافت لیست سفارشات
+      tags: [سفارشات]
       responses:
         '200':
-          description: لیست محصولات با موفقیت دریافت شد.
+          description: لیست سفارشات با موفقیت دریافت شد
     post:
-      summary: افزودن محصول جدید
+      summary: ثبت سفارش جدید
+      tags: [سفارشات]
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                name: {type: string}
-                price: {type: integer}
+                customer_name: {type: string}
+                service_type: {type: string}
       responses:
         '201':
-          description: محصول با موفقیت ایجاد شد.
-  /products/{id}:
+          description: سفارش با موفقیت ثبت شد
+
+  /orders/{orderId}:
     put:
-      summary: ویرایش مشخصات محصول
+      summary: ویرایش وضعیت سفارش
+      tags: [سفارشات]
       parameters:
-        - name: id
+        - name: orderId
           in: path
           required: true
           schema: {type: string}
       responses:
         '200':
-          description: محصول با موفقیت ویرایش شد.
+          description: سفارش با موفقیت بروزرسانی شد
     delete:
-      summary: حذف محصول
+      summary: حذف سفارش
+      tags: [سفارشات]
       parameters:
-        - name: id
+        - name: orderId
           in: path
           required: true
           schema: {type: string}
       responses:
         '204':
-          description: محصول با موفقیت حذف شد.
-  /orders:
-    post:
-      summary: ثبت سفارش جدید
+          description: سفارش حذف شد
+
+  /portfolio:
+    get:
+      summary: دریافت نمونه‌کارهای سوزن زرین
+      tags: [نمونه‌کارها]
       responses:
-        '201':
-          description: سفارش شما در سوزن زرین ثبت گردید.
+        '200':
+          description: لیست نمونه‌کارها شامل تصاویر و توضیحات
+
 components:
   schemas:
-    Product:
+    Order:
       type: object
       properties:
         id: {type: string}
-        name: {type: string}
-        price: {type: integer}
+        status: {type: string}
+        price: {type: number}
