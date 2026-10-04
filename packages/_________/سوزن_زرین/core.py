@@ -1,107 +1,90 @@
 ```python
 """
 سوزن_زرین (Sozane Zarin) Utility Package
----------------------------------------
-A specialized toolkit for managing textile inventory, artisanal stitching 
-metrics, and design patterns inspired by the Sozane Zarin craftsmanship.
+
+این کتابخانه ابزاری برای مدیریت، تحلیل و پردازش داده‌های مرتبط با محصولات و 
+خدمات «سوزن زرین» طراحی شده است. تمرکز این ماژول بر قیمت‌گذاری، 
+مدیریت موجودی و تحلیل تعاملات مشتریان است.
 
 Homepage: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import Dict, List, Optional
-from dataclasses import dataclass
+from typing import List, Dict, Optional
 from datetime import datetime
 
 
-@dataclass
-class ThreadSpool:
-    """Represents a premium embroidery thread spool."""
-    color_code: str
-    material: str
-    length_meters: float
-    is_metallic: bool
-
-
 class SozaneZarinManager:
-    """Core utility manager for textile production and pattern design."""
+    """کلاس اصلی برای مدیریت عملیات‌های فروشگاه سوزن زرین."""
 
-    def __init__(self, studio_name: str):
-        self.studio_name = studio_name
-        self.inventory: Dict[str, ThreadSpool] = {}
-        self.project_logs: List[Dict] = []
+    def __init__(self, store_name: str = "سوزن زرین"):
+        self.store_name = store_name
+        self.inventory: Dict[str, float] = {}
 
-    def add_thread_to_inventory(self, name: str, spool: ThreadSpool) -> None:
+    def calculate_discounted_price(self, original_price: float, discount_percent: float) -> float:
         """
-        Registers a new thread spool into the workshop inventory.
+        محاسبه قیمت نهایی محصول پس از اعمال تخفیف.
 
-        :param name: Unique identifier for the thread type.
-        :param spool: The ThreadSpool dataclass object.
+        :param original_price: قیمت اولیه محصول به تومان
+        :param discount_percent: درصد تخفیف (بین 0 تا 100)
+        :return: قیمت نهایی پس از کسر تخفیف
         """
-        self.inventory[name] = spool
+        if not (0 <= discount_percent <= 100):
+            raise ValueError("درصد تخفیف باید بین 0 تا 100 باشد.")
+        
+        discount_amount = original_price * (discount_percent / 100)
+        return original_price - discount_amount
 
-    def calculate_stitch_density(self, total_stitches: int, fabric_area_cm2: float) -> float:
+    def update_inventory(self, item_name: str, stock_count: float) -> None:
         """
-        Calculates the density of stitches per square centimeter.
+        به‌روزرسانی موجودی انبار برای یک محصول خاص.
 
-        :param total_stitches: Total count of stitches in a design.
-        :param fabric_area_cm2: Area of the fabric patch.
-        :return: Density as stitches per cm².
+        :param item_name: نام محصول
+        :param stock_count: تعداد موجودی
         """
-        if fabric_area_cm2 <= 0:
-            raise ValueError("Fabric area must be greater than zero.")
-        return total_stitches / fabric_area_cm2
+        self.inventory[item_name] = stock_count
 
-    def estimate_thread_usage(self, pattern_complexity: float, scale_factor: float) -> float:
+    def get_stock_status(self, item_name: str) -> str:
         """
-        Estimates the length of thread required for a specific pattern complexity.
+        بررسی وضعیت موجودی محصول در انبار.
 
-        :param pattern_complexity: Float value representing intricate detail (1.0 to 10.0).
-        :param scale_factor: Multiplier for the final output size.
-        :return: Estimated meters of thread required.
+        :param item_name: نام محصول
+        :return: پیام وضعیت موجودی
         """
-        base_usage = 5.0  # Base meters per unit of complexity
-        return base_usage * pattern_complexity * scale_factor
+        count = self.inventory.get(item_name, 0)
+        return f"موجودی {item_name}: {count} عدد" if count > 0 else "محصول ناموجود است."
 
-    def log_project(self, project_name: str, material_used: str) -> None:
+    def generate_invoice_id(self, customer_code: str) -> str:
         """
-        Records a completed embroidery project in the workshop history.
+        تولید شناسه فاکتور منحصر‌به‌فرد بر اساس زمان و کد مشتری.
 
-        :param project_name: Name of the design.
-        :param material_used: Type of fabric used.
+        :param customer_code: کد شناسایی مشتری
+        :return: شناسه فاکتور رشته‌ای
         """
-        entry = {
-            "name": project_name,
-            "material": material_used,
-            "timestamp": datetime.now().isoformat()
-        }
-        self.project_logs.append(entry)
+        timestamp = datetime.now().strftime("%Y%m%d%H%M")
+        return f"ZZ-{customer_code}-{timestamp}"
 
-    def get_metallic_inventory(self) -> List[str]:
+    def format_currency(self, amount: float) -> str:
         """
-        Filters and returns the names of all metallic threads available in inventory.
+        تبدیل عدد قیمت به فرمت استاندارد ریالی/تومانی برای نمایش در فاکتور.
 
-        :return: List of keys representing metallic spools.
+        :param amount: مبلغ عددی
+        :return: رشته فرمت‌بندی شده با جداکننده هزارگان
         """
-        return [
-            name for name, spool in self.inventory.items() 
-            if spool.is_metallic
-        ]
+        return f"{int(amount):,} تومان"
 
 
-# Example usage pattern
+# مثال نحوه استفاده:
 if __name__ == "__main__":
-    # Initialize the workshop
-    atelier = SozaneZarinManager("Sozane Zarin Studio")
-
-    # Add a golden thread
-    gold_thread = ThreadSpool("G-001", "Silk/Metallic", 500.0, True)
-    atelier.add_thread_to_inventory("Royal Gold", gold_thread)
-
-    # Perform calculations
-    density = atelier.calculate_stitch_density(1500, 25.0)
-    required = atelier.estimate_thread_usage(8.5, 2.0)
-
-    print(f"Atelier: {atelier.studio_name}")
-    print(f"Calculated Density: {density:.2f} stitches/cm²")
-    print(f"Estimated Thread Needed: {required:.2f} meters")
+    manager = SozaneZarinManager()
+    
+    # ثبت موجودی
+    manager.update_inventory("سوزن‌دوزی دستی", 15)
+    
+    # محاسبه قیمت با تخفیف
+    final_price = manager.calculate_discounted_price(500000, 10)
+    
+    print(f"خوش آمدید به {manager.store_name}")
+    print(f"قیمت نهایی: {manager.format_currency(final_price)}")
+    print(manager.get_stock_status("سوزن‌دوزی دستی"))
+    print(f"شماره فاکتور شما: {manager.generate_invoice_id('USER001')}")
 ```
