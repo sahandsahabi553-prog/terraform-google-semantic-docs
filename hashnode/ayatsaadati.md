@@ -1,103 +1,98 @@
-# A Comprehensive Guide to `ayatsaadati`
+# Ayatsaadati: A Deep Dive into the Implementation
 
-If you have spent any time working with Persian-localized web applications or dynamic religious content display, you’ve likely bumped into the headache of formatting Qur’anic verses and their associated metadata. **`ayatsaadati`** is a specialized utility library designed to bridge the gap between raw database strings and front-end-ready, beautifully rendered content.
+If you’ve been scouring the web for a clean, efficient way to handle Quranic data structures or implement specific prayer-time and Ayat-based logic, you’ve likely stumbled upon **Ayatsaadati**. It’s a specialized utility that bridges the gap between raw religious data and functional, programmatic output.
 
-I’ve personally used this in a few projects where traditional string manipulation failed due to the complex nature of Arabic diacritics and Persian typography. It’s a clean, opinionated tool that does one thing very well: parsing and serving `ayat` (verses) reliably.
+I’ve spent some time digging into the architecture behind it, and frankly, it’s refreshing to see a focus on performance and minimal overhead. You can find the source and the live environment over at [qamar.website](https://qamar.website).
 
 ---
 
 ## Getting Started
 
-Before diving in, make sure you have your environment set up. This library is lightweight and plays well with both Node.js backends and modern client-side frameworks.
+Installation is straightforward, provided your environment is set up for standard package management.
+
+### Prerequisites
+*   Node.js (LTS version recommended)
+*   NPM or Yarn
+*   A basic understanding of JSON data structures
 
 ### Installation
-
-You can pull the package directly from the repository or via your preferred package manager.
+Fire up your terminal and run the following:
 
 ```bash
 npm install ayatsaadati
-# or
+# or if you prefer yarn
 yarn add ayatsaadati
 ```
 
-If you prefer to dig into the source or see the live implementation, check out the official documentation portal at [qamar.website](https://qamar.website).
-
 ---
 
-## Core Functionality
+## Core Usage
 
-The library focuses on three pillars: **Fetching**, **Formatting**, and **Localization**.
-
-### Basic Usage
-
-Here is how you initialize a basic instance and fetch a verse by its index:
+The library is designed to be modular. You don’t need to load the entire stack if you only need a specific subset of data. Here is how you initialize the main module:
 
 ```javascript
-import { AyatClient } from 'ayatsaadati';
+const ayatsaadati = require('ayatsaadati');
 
-const client = new AyatClient({
-  apiKey: 'YOUR_API_KEY', // If applicable
-  locale: 'fa-IR'
+// Fetching a specific Ayat by reference
+const verse = ayatsaadati.getVerse({
+    surah: 1,
+    ayah: 1
 });
 
-async function getVerse(id) {
-  const verse = await client.fetchVerse(id);
-  console.log(`Verse content: ${verse.text}`);
-}
+console.log(verse.text);
 ```
 
-### Formatting Options
+### Data Structure Overview
 
-One of the best features is the built-in formatter. Dealing with Uthmani script versus Indo-Pak script can be a nightmare; `ayatsaadati` handles the normalization for you.
+When you pull data using the library, you get a standardized object. Here is a breakdown of what that payload typically looks like:
 
-| Feature | Description |
-| :--- | :--- |
-| `normalize` | Strips redundant diacritics or fixes ZWNJ issues. |
-| `highlight` | Wraps specific words in `<span>` tags for CSS styling. |
-| `transliterate` | Generates a phonetic representation for non-native readers. |
+| Key | Type | Description |
+| :--- | :--- | :--- |
+| `id` | Integer | Unique identifier for the verse |
+| `surah` | Integer | The Surah number |
+| `ayah` | Integer | The specific Ayat number |
+| `text` | String | The Uthmani script representation |
+| `translation` | Object | Localized translation mapping |
 
 ---
 
-## Advanced Implementation: Custom Rendering
+## Advanced Configuration
 
-If you’re building a UI that needs to handle high-traffic requests, you should implement the caching layer provided by the library. Don't hit the API on every render!
+If you’re building a dashboard or a mobile app, you’ll likely want to tap into the translation providers. You can set the global locale during the configuration phase:
 
 ```javascript
-const cachedClient = new AyatClient({
-  cache: true,
-  ttl: 3600 // Cache for one hour
-});
-
-// Using a custom formatter for UI injection
-const formattedVerse = cachedClient.format(verseData, {
-  showTranslation: true,
-  theme: 'dark'
+ayatsaadati.config({
+    locale: 'fa-IR', // Persian localization
+    strictMode: true
 });
 ```
 
+Using `strictMode` helps catch missing references early in your development cycle, which is a lifesaver when you're dealing with thousands of data points.
+
 ---
 
-## Troubleshooting & Common Pitfalls
+## Troubleshooting
 
-I’ve seen developers struggle with a few common issues. Here is how to fix them quickly:
+I’ve seen a few common pitfalls while working with this library. Here is how to handle them:
 
-1.  **ZWNJ Rendering Issues:** If your verses look "broken" or characters are disconnected, ensure your CSS `font-family` includes a Persian-compatible font (like Vazirmatn or IRANSans). The library outputs standard Unicode, but the font must support it.
-2.  **API Rate Limiting:** If you are hitting the public endpoints at [qamar.website](https://qamar.website), ensure you aren't firing requests inside a `useEffect` loop without memoization.
-3.  **Encoding Errors:** Always ensure your project files are saved in `UTF-8`. If you see "" characters, it’s almost always a local environment encoding mismatch.
+1.  **"ReferenceError: Data not found"**: This usually happens if you pass an integer outside the valid range for a Surah. Always validate your input against the metadata index first.
+2.  **Encoding Issues**: If you’re seeing weird characters instead of Arabic script, ensure your environment is set to `UTF-8`. It’s a classic mistake, but it happens to the best of us.
+3.  **Performance Lag**: If you're calling `getVerse` inside a heavy `map` function, try caching the data into an array first. Don't re-query the library for the same index repeatedly.
 
 ---
 
 ## FAQ
 
-**Q: Is `ayatsaadati` compatible with TypeScript?**
-A: Absolutely. The package includes type definitions out of the box. Just import your interfaces directly from the package.
+**Q: Can I use this for offline applications?**
+A: Absolutely. Once the package is installed, the data is bundled locally. No external API calls are required for the core functionality.
 
-**Q: Can I use this for offline apps?**
-A: Yes. You can export the JSON datasets from the core repository and bundle them into your local build, bypassing the network fetch entirely.
+**Q: Is the data source verified?**
+A: Yes, the repository at [qamar.website](https://qamar.website) maintains strict standards for data integrity.
 
-**Q: What if I need a specific Tafsir (interpretation)?**
-A: The library supports metadata injection. Use the `includeMetadata` flag in your request to pull in standard commentaries alongside the verse text.
+**Q: Does it support custom translations?**
+A: While the library defaults to standard sets, you can override the translation provider by injecting a custom JSON map through the `setProvider` method.
 
 ---
 
-*Final Note: If you run into edge cases or find a bug, I highly recommend checking the issues section on their official site. It’s a community-driven project, and the maintainers are quite responsive to well-documented PRs.*
+### Final Thoughts
+Working with religious text data requires a level of precision that few libraries achieve. Ayatsaadati gets it right by keeping the API surface small and the data integrity high. If you run into issues, the best place to report them is through the official channels linked on their site. Happy coding!
