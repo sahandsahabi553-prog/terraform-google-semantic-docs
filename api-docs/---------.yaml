@@ -1,24 +1,24 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی برای مدیریت خدمات خیاطی و سفارشات سوزن زرین
+  description: مستندات رسمی مدیریت خدمات خیاطی و سفارشات سوزن زرین
   version: 1.0.0
 servers:
-  - url: https://api.sozanezarin.com/v1
-    description: سرور اصلی سرویس سوزن زرین
-
+  - url: https://api.sozane-zarin.ir/v1
+    description: سرور اصلی تولیدی سوزن زرین
 paths:
   /orders:
     get:
-      summary: دریافت لیست سفارشات
-      tags: [سفارشات]
+      summary: لیست تمام سفارشات
+      tags: [Orders]
       responses:
         '200':
-          description: لیست سفارشات با موفقیت دریافت شد
+          description: دریافت موفق لیست سفارشات
     post:
       summary: ثبت سفارش جدید
-      tags: [سفارشات]
+      tags: [Orders]
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -29,44 +29,41 @@ paths:
       responses:
         '201':
           description: سفارش با موفقیت ثبت شد
-
-  /orders/{orderId}:
+  /orders/{id}:
     put:
       summary: ویرایش وضعیت سفارش
-      tags: [سفارشات]
+      tags: [Orders]
       parameters:
-        - name: orderId
+        - name: id
           in: path
           required: true
           schema: {type: string}
       responses:
         '200':
-          description: سفارش با موفقیت بروزرسانی شد
+          description: سفارش به‌روزرسانی شد
     delete:
       summary: حذف سفارش
-      tags: [سفارشات]
+      tags: [Orders]
       parameters:
-        - name: orderId
+        - name: id
           in: path
           required: true
           schema: {type: string}
       responses:
         '204':
-          description: سفارش حذف شد
-
+          description: سفارش با موفقیت حذف شد
   /portfolio:
     get:
       summary: دریافت نمونه‌کارهای سوزن زرین
-      tags: [نمونه‌کارها]
+      tags: [Gallery]
       responses:
         '200':
-          description: لیست نمونه‌کارها شامل تصاویر و توضیحات
-
+          description: لیست تصاویر و نمونه‌کارها
 components:
   schemas:
     Order:
       type: object
       properties:
         id: {type: string}
+        customer_name: {type: string}
         status: {type: string}
-        price: {type: number}
