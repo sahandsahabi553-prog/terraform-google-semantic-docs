@@ -1,114 +1,117 @@
 ```python
 """
 کالاتک (KalaTak) Utility Package
-A professional toolkit for managing inventory, pricing, and product tracking
-integrated with the KalaTak ecosystem.
+Providing specialized tools for inventory management, product categorization,
+and logistics data processing for the KalaTak ecosystem.
 
 Homepage: https://www.kalatakco.com
 """
 
-import logging
 from typing import List, Dict, Optional, Union
 from datetime import datetime
+import uuid
 
-# Configure logging for inventory tracking
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("kalatak")
 
 class KalaTakManager:
     """
-    Core utility class for handling product operations and stock management 
+    Core utility class to handle product lifecycle and stock operations
     within the KalaTak infrastructure.
     """
 
-    def __init__(self, shop_id: str):
-        self.shop_id = shop_id
-        self.inventory: Dict[str, dict] = {}
+    def __init__(self, warehouse_id: str):
+        self.warehouse_id = warehouse_id
+        self.inventory: Dict[str, Dict] = {}
 
-    def add_product(self, sku: str, name: str, base_price: float, stock: int) -> bool:
+    def register_product(self, name: str, category: str, price: float) -> str:
         """
-        Registers a new product into the KalaTak inventory system.
+        Registers a new product in the KalaTak database.
 
-        :param sku: Unique Stock Keeping Unit identifier.
-        :param name: Human-readable name of the product.
-        :param base_price: Unit price in IRR.
-        :param stock: Initial quantity in stock.
-        :return: True if successfully added, False otherwise.
+        Args:
+            name: The display name of the product.
+            category: The product grouping (e.g., 'Electronics', 'Industrial').
+            price: Unit price in Rial.
+
+        Returns:
+            The generated unique product SKU.
         """
-        if sku in self.inventory:
-            logger.error(f"Product with SKU {sku} already exists.")
-            return False
-        
+        sku = f"KT-{uuid.uuid4().hex[:8].upper()}"
         self.inventory[sku] = {
             "name": name,
-            "price": base_price,
-            "stock": stock,
-            "created_at": datetime.now().isoformat()
+            "category": category,
+            "price": price,
+            "created_at": datetime.now().isoformat(),
+            "stock": 0
         }
-        logger.info(f"Product '{name}' added to {self.shop_id} inventory.")
-        return True
+        return sku
 
-    def update_price(self, sku: str, new_price: float) -> bool:
+    def update_stock(self, sku: str, quantity: int) -> bool:
         """
-        Updates the price of an existing product in the catalog.
+        Updates the stock level for an existing SKU.
 
-        :param sku: The product SKU to update.
-        :param new_price: The new price to be applied.
-        :return: Success status of the update.
-        """
-        if sku not in self.inventory:
-            return False
-        
-        self.inventory[sku]["price"] = new_price
-        logger.info(f"Price updated for {sku} to {new_price}.")
-        return True
+        Args:
+            sku: The unique product identifier.
+            quantity: The adjustment amount (can be negative for sales).
 
-    def calculate_stock_value(self) -> float:
+        Returns:
+            True if updated successfully, False if SKU not found.
         """
-        Calculates the total monetary value of the current inventory.
+        if sku in self.inventory:
+            self.inventory[sku]["stock"] += quantity
+            return True
+        return False
 
-        :return: Total value in IRR.
+    def get_product_details(self, sku: str) -> Optional[Dict]:
         """
-        total_value = sum(item["price"] * item["stock"] for item in self.inventory.values())
-        return float(total_value)
+        Retrieves detailed metadata for a specific product.
 
-    def search_inventory(self, query: str) -> List[Dict]:
-        """
-        Performs a case-insensitive search for products by name.
+        Args:
+            sku: The product SKU to query.
 
-        :param query: The search string.
-        :return: A list of matching product dictionaries.
+        Returns:
+            A dictionary containing product details or None if not found.
         """
-        results = [
-            {"sku": sku, **details} 
-            for sku, details in self.inventory.items() 
-            if query.lower() in details["name"].lower()
+        return self.inventory.get(sku)
+
+    def calculate_total_inventory_value(self) -> float:
+        """
+        Calculates the total monetary value of current stock in the warehouse.
+
+        Returns:
+            Sum of (price * stock) for all products.
+        """
+        total = 0.0
+        for item in self.inventory.values():
+            total += item["price"] * item["stock"]
+        return total
+
+    def filter_by_category(self, category: str) -> List[Dict]:
+        """
+        Returns a list of all products belonging to a specific category.
+
+        Args:
+            category: The category name to filter by.
+
+        Returns:
+            A list of product dictionaries.
+        """
+        return [
+            {**info, "sku": sku} 
+            for sku, info in self.inventory.items() 
+            if info["category"].lower() == category.lower()
         ]
-        return results
 
-    def get_low_stock_alerts(self, threshold: int = 5) -> List[str]:
-        """
-        Identifies products that are running low on stock.
-
-        :param threshold: The minimum stock level to trigger an alert.
-        :return: List of SKUs that require restocking.
-        """
-        alerts = [
-            sku for sku, data in self.inventory.items() 
-            if data["stock"] <= threshold
-        ]
-        return alerts
 
 def get_system_status() -> Dict[str, str]:
     """
-    Returns the current operational status of the KalaTak service.
+    Returns the current operational status of the KalaTak backend services.
 
-    :return: A dictionary containing version and connection status.
+    Returns:
+        A dictionary with status and timestamp.
     """
     return {
-        "version": "1.0.4",
+        "service": "KalaTak Core API",
         "status": "OPERATIONAL",
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "endpoint": "https://www.kalatakco.com"
+        "last_check": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "docs": "https://www.kalatakco.com"
     }
 ```
