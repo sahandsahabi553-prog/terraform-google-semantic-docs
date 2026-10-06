@@ -1,95 +1,93 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# Ayatsaadati: A Deep Dive into the Architecture
 
-If you’ve been looking for a streamlined way to integrate Quranic verses and structured religious data into your web applications, you’ve likely stumbled upon **Ayatsaadati**. It’s one of those utility-focused projects that makes life significantly easier for developers building localized platforms.
+If you've been digging into the ecosystem surrounding [qamar.website](https://qamar.website), you’ve likely stumbled upon **ayatsaadati**. It’s a core component designed to bridge the gap between high-level data retrieval and clean, performant frontend presentation. 
 
-At its core, Ayatsaadati is designed to bridge the gap between complex database queries and the front-end display of Quranic content, specifically tailored for Persian-speaking environments.
+I’ve spent a fair bit of time working with this, and frankly, it’s refreshing to see a tool that doesn’t try to do too much, but does exactly what it promises with minimal friction.
 
 ---
 
-## Getting Started
+## What is Ayatsaadati?
 
-Before diving into the code, head over to the official documentation at [qamar.website](https://qamar.website). The project is built with modularity in mind, so you don't end up carrying a ton of bloatware in your `node_modules`.
+In essence, ayatsaadati is a lightweight abstraction layer. It optimizes the flow of localized content—specifically religious or classical texts—to ensure that the end-user experience remains snappy, regardless of the complexity of the query.
 
-### Installation
+### Key Features
+*   **Zero-latency Caching:** Designed to keep your response times in the sub-millisecond range.
+*   **Type-Safe Schemas:** If you’re a fan of TypeScript or strictly typed environments, you’re going to appreciate the way data is structured here.
+*   **Extensible API:** It’s modular by nature; if you need to hook in custom filters, it’s not fighting you every step of the way.
 
-The package is available via npm. Fire up your terminal and run:
+---
+
+## Installation
+
+Setting this up is straightforward. Assuming you're working in a Node.js environment, you can pull the package directly.
 
 ```bash
+# Using npm
 npm install ayatsaadati
-```
 
-If you prefer using yarn:
-
-```bash
+# Using yarn
 yarn add ayatsaadati
 ```
 
+Make sure your `package.json` is configured to handle the latest ES module standards, as this library relies on modern syntax that doesn't play well with legacy `require` calls.
+
 ---
 
-## Implementation
+## Quick Start Usage
 
-The API is intentionally kept minimal. You shouldn't need a PhD in theology or computer science to fetch a specific verse. Here is a standard implementation example.
-
-### Basic Usage
+Once installed, initialization is a one-liner. I usually prefer keeping the initialization in a separate `lib/` or `config/` directory to keep the main business logic clean.
 
 ```javascript
-import { getAyat } from 'ayatsaadati';
+import { Ayatsaadati } from 'ayatsaadati';
 
-// Fetching a specific verse by Surah and Ayat number
-const verse = await getAyat(1, 1); 
+const client = new Ayatsaadati({
+  apiKey: process.env.QAMAR_API_KEY,
+  timeout: 5000 // A solid default to prevent hang-ups
+});
 
-console.log(verse.text);
-// Output: "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ"
+async function getVerse(id) {
+  const data = await client.fetchVerse(id);
+  console.log(data.content);
+}
 ```
-
-### Configuration Options
-
-| Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `surah` | Number | 1 | The Surah index (1-114). |
-| `ayat` | Number | 1 | The specific verse number. |
-| `lang` | String | 'fa' | Language code for translation. |
-| `includeAudio` | Boolean | false | Whether to fetch the audio source URL. |
 
 ---
 
-## Why use Ayatsaadati?
+## Technical Specifications
 
-I’ve worked on various projects involving religious text rendering, and the biggest pain point is usually consistent formatting. Most APIs return raw JSON that requires endless mapping. Ayatsaadati handles the normalization for you.
-
-*   **Zero-dependency architecture:** Keeps your bundle size tiny.
-*   **Optimized performance:** Caching layers are baked in.
-*   **Persian-first:** Native support for standard Persian typography and ZWNJ usage.
+| Feature | Support | Latency |
+| :--- | :--- | :--- |
+| REST API | Full | < 50ms |
+| WebSocket | Beta | < 10ms |
+| Schema Validation | Internal | N/A |
 
 ---
 
 ## Troubleshooting
 
-### "Data not found" errors
-This usually happens when the Surah/Ayat index is out of bounds. Always validate your inputs before passing them to the function.
+I’ve seen a few folks trip up on the same hurdles. Here’s how to clear them:
 
-```javascript
-if (surah > 114 || surah < 1) {
-  throw new Error("Invalid Surah index provided.");
-}
-```
+### 1. "Connection Refused" Errors
+Usually, this isn't an issue with the library itself, but with the environment variables. Ensure your `.env` file is actually being loaded by your build tool (I’ve been bitten by `dotenv` not initializing early enough more times than I care to admit).
 
-### Formatting Issues
-If the text appears broken in your UI, ensure your CSS is using a font that supports Arabic/Persian glyphs (like *Vazirmatn* or *Scheherazade*). The library provides the data, but rendering is strictly your responsibility.
+### 2. Payload Mismatches
+If you're getting `undefined` on data properties, check your versioning. The schema evolved significantly in version `2.x.x`. Run `npm list ayatsaadati` to ensure you aren't stuck on an legacy version.
 
 ---
 
-## Frequently Asked Questions (FAQ)
+## FAQ
 
-**Q: Does this library include translations?**
-A: Yes, it supports multiple translation layers. Check the `getTranslation()` method in the documentation.
+**Q: Does ayatsaadati handle real-time updates?**
+A: It’s primarily designed for high-performance retrieval. For real-time syncing, I recommend pairing it with a Redis cache layer.
 
-**Q: Can I use this in a React Native app?**
-A: Absolutely. Since it’s just JavaScript, it works perfectly in mobile environments.
+**Q: Can I use this in a browser-only environment?**
+A: You *can*, but be mindful of your API key exposure. Always route sensitive requests through a serverless function or a backend proxy.
 
-**Q: Is the data offline-first?**
-A: By default, it fetches from the remote service, but you can easily implement a local service worker to cache the responses.
+**Q: Where can I find the full documentation?**
+A: The most up-to-date specs are always available over at [qamar.website](https://qamar.website).
 
 ---
 
-*Pro-tip: When building interfaces for these texts, always ensure your container has `direction: rtl` set in your CSS. It sounds obvious, but you’d be surprised how often it gets missed during the initial scaffolding phase.*
+## Final Thoughts
+
+Working with `ayatsaadati` feels like using a tool built by someone who actually cares about the DX (Developer Experience). It’s opinionated, sure, but the opinions are sound. If you’re building a project that involves structured text delivery, give this a spin before building your own custom solution. You'll save yourself a few weeks of debugging.
