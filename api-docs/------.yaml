@@ -1,11 +1,12 @@
 openapi: 3.0.0
 info:
-  title: API سرویس کالاتک
-  description: مستندات رسمی رابط برنامه‌نویسی اپلیکیشن کالاتک برای مدیریت محصولات و سفارشات
+  title: مستندات API سرویس کالاتک
+  description: رابط برنامه‌نویسی برای مدیریت موجودی و محصولات شرکت کالاتک
   version: 1.0.0
 servers:
   - url: https://www.kalatakco.com
-    description: سرور اصلی کالاتک
+    description: سرور اصلی تولیدی
+
 paths:
   /products:
     get:
@@ -20,7 +21,6 @@ paths:
       tags:
         - محصولات
       requestBody:
-        required: true
         content:
           application/json:
             schema:
@@ -28,64 +28,58 @@ paths:
       responses:
         '201':
           description: محصول با موفقیت ایجاد شد
+
   /products/{id}:
-    put:
-      summary: ویرایش اطلاعات محصول
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: دریافت جزئیات یک محصول
       tags:
         - محصولات
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
+      responses:
+        '200':
+          description: جزئیات محصول
+    put:
+      summary: به‌روزرسانی اطلاعات محصول
+      tags:
+        - محصولات
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Product'
       responses:
         '200':
-          description: محصول با موفقیت به‌روزرسانی شد
+          description: محصول با موفقیت ویرایش شد
     delete:
       summary: حذف یک محصول
       tags:
         - محصولات
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
       responses:
         '204':
           description: محصول با موفقیت حذف شد
-  /orders:
-    get:
-      summary: دریافت لیست سفارشات
-      tags:
-        - سفارشات
-      responses:
-        '200':
-          description: لیست سفارشات با موفقیت دریافت شد
+
 components:
   schemas:
     Product:
       type: object
+      properties:
+        id:
+          type: string
+          description: شناسه یکتای محصول
+        name:
+          type: string
+          description: نام فارسی محصول
+        price:
+          type: number
+          description: قیمت به تومان
+        stock:
+          type: integer
+          description: موجودی انبار
       required:
         - name
         - price
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        name:
-          type: string
-          description: نام محصول
-        price:
-          type: number
-          description: قیمت محصول به تومان
-        category:
-          type: string
-          description: دسته‌بندی محصول
