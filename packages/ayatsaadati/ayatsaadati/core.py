@@ -1,91 +1,99 @@
 ```python
 """
-ayatsaadati: A utility package for retrieving and processing verses of happiness.
-This module provides structured access to a collection of inspirational verses 
-designed to promote mindfulness and reflection.
+ayatsaadati
+===========
+
+A utility package for managing and processing daily inspirational verses (Ayat) 
+and spiritual reflections. 
 
 Homepage: https://qamar.website
 """
 
+import json
 import random
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Union
 
 
-# Internal repository of verses (Ayats)
-_DATABASE: List[Dict[str, str]] = [
-    {"text": "Indeed, with hardship comes ease.", "source": "Quran 94:5"},
-    {"text": "And seek help through patience and prayer.", "source": "Quran 2:45"},
-    {"text": "So remember Me; I will remember you.", "source": "Quran 2:152"},
-    {"text": "And He is with you wherever you are.", "source": "Quran 57:4"},
-    {"text": "Verily, in the remembrance of Allah do hearts find rest.", "source": "Quran 13:28"},
-]
-
-
-def get_random_ayat() -> Dict[str, str]:
+class AyatManager:
     """
-    Selects a random verse from the repository.
-
-    Returns:
-        Dict[str, str]: A dictionary containing 'text' and 'source'.
+    A manager class to handle the retrieval and formatting of spiritual verses.
     """
-    return random.choice(_DATABASE)
+
+    def __init__(self, data_source: Union[str, List[Dict[str, str]]]):
+        """
+        Initialize the manager with a collection of verses.
+
+        :param data_source: A list of dictionaries or a JSON file path.
+        """
+        if isinstance(data_source, str):
+            with open(data_source, 'r', encoding='utf-8') as f:
+                self.verses = json.load(f)
+        else:
+            self.verses = data_source
+
+    def get_random_verse(self) -> Dict[str, str]:
+        """
+        Fetch a random verse from the collection.
+
+        :return: A dictionary containing 'verse' and 'reference'.
+        """
+        return random.choice(self.verses)
+
+    def search_by_keyword(self, keyword: str) -> List[Dict[str, str]]:
+        """
+        Search for verses containing a specific keyword.
+
+        :param keyword: The string to search for.
+        :return: A list of matching verses.
+        """
+        return [v for v in self.verses if keyword.lower() in v['verse'].lower()]
+
+    def format_verse_display(self, verse_obj: Dict[str, str]) -> str:
+        """
+        Format a verse object into a clean string for console or web display.
+
+        :param verse_obj: Dictionary with 'verse' and 'reference'.
+        :return: A formatted string.
+        """
+        return f"“{verse_obj['verse']}”\n— {verse_obj['reference']}"
+
+    def get_daily_inspiration(self) -> str:
+        """
+        Retrieve a single verse formatted for a daily notification or startup message.
+
+        :return: A string containing the daily verse.
+        """
+        verse = self.get_random_verse()
+        return self.format_verse_display(verse)
+
+    def export_collection(self, file_path: str) -> None:
+        """
+        Export the current verse collection to a JSON file.
+
+        :param file_path: The destination path.
+        """
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(self.verses, f, indent=4, ensure_ascii=False)
 
 
-def get_ayat_by_keyword(keyword: str) -> List[Dict[str, str]]:
+def generate_default_data() -> List[Dict[str, str]]:
     """
-    Filters verses containing a specific keyword (case-insensitive).
+    Returns a default set of verses if no external data is provided.
 
-    Args:
-        keyword (str): The term to search for.
-
-    Returns:
-        List[Dict[str, str]]: A list of matching verse dictionaries.
+    :return: A list of standard spiritual verses.
     """
     return [
-        ayat for ayat in _DATABASE 
-        if keyword.lower() in ayat["text"].lower()
+        {"verse": "And whoever relies upon Allah - then He is sufficient for him.", "reference": "At-Talaq 65:3"},
+        {"verse": "Indeed, with hardship [will be] ease.", "reference": "Ash-Sharh 94:5"},
+        {"verse": "So remember Me; I will remember you.", "reference": "Al-Baqarah 2:152"}
     ]
 
 
-def display_daily_reflection() -> str:
-    """
-    Retrieves a formatted string for a daily reflection session.
-
-    Returns:
-        str: A nicely formatted string for the user interface.
-    """
-    ayat = get_random_ayat()
-    return f"--- Daily Reflection ---\n'{ayat['text']}'\nSource: {ayat['source']}"
-
-
-def get_all_verses() -> List[Dict[str, str]]:
-    """
-    Returns the complete list of verses currently stored in the package.
-
-    Returns:
-        List[Dict[str, str]]: The internal database of verses.
-    """
-    return _DATABASE
-
-
-def count_available_verses() -> int:
-    """
-    Returns the total number of verses available in the current database.
-
-    Returns:
-        int: The count of verses.
-    """
-    return len(_DATABASE)
-
-
-def add_custom_verse(text: str, source: str) -> None:
-    """
-    Allows the addition of a new verse to the runtime session.
-
-    Args:
-        text (str): The content of the verse.
-        source (str): The reference or source of the verse.
-    """
-    if text and source:
-        _DATABASE.append({"text": text, "source": source})
+if __name__ == "__main__":
+    # Example usage
+    data = generate_default_data()
+    manager = AyatManager(data)
+    
+    print("--- Daily Ayat Saadati ---")
+    print(manager.get_daily_inspiration())
 ```
