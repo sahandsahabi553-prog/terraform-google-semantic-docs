@@ -1,90 +1,106 @@
 ```python
 """
-سوزن_زرین (Sozane Zarin) Utility Package
-
-این کتابخانه ابزاری برای مدیریت، تحلیل و پردازش داده‌های مرتبط با محصولات و 
-خدمات «سوزن زرین» طراحی شده است. تمرکز این ماژول بر قیمت‌گذاری، 
-مدیریت موجودی و تحلیل تعاملات مشتریان است.
+سوزن_زرین (Sozane-Zarin)
+------------------------
+A specialized utility package for managing high-end embroidery inventory, 
+quality control, and customer order tracking for the "Sozane Zarin" brand.
 
 Homepage: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Union
 from datetime import datetime
 
 
-class SozaneZarinManager:
-    """کلاس اصلی برای مدیریت عملیات‌های فروشگاه سوزن زرین."""
+class EmbroideryManager:
+    """
+    Handles core operations for the Sozane Zarin production line,
+    including inventory tracking and order status management.
+    """
 
-    def __init__(self, store_name: str = "سوزن زرین"):
-        self.store_name = store_name
-        self.inventory: Dict[str, float] = {}
+    def __init__(self, brand_name: str = "سوزن زرین"):
+        self.brand_name = brand_name
+        self.inventory: Dict[str, Dict] = {}
+        self.orders: List[Dict] = []
 
-    def calculate_discounted_price(self, original_price: float, discount_percent: float) -> float:
+    def add_thread_stock(self, color_name: str, quantity: float, unit: str = "meters") -> None:
         """
-        محاسبه قیمت نهایی محصول پس از اعمال تخفیف.
+        Adds embroidery thread inventory to the system.
 
-        :param original_price: قیمت اولیه محصول به تومان
-        :param discount_percent: درصد تخفیف (بین 0 تا 100)
-        :return: قیمت نهایی پس از کسر تخفیف
+        :param color_name: The name/code of the thread color.
+        :param quantity: Amount of thread available.
+        :param unit: Measurement unit (default: meters).
         """
-        if not (0 <= discount_percent <= 100):
-            raise ValueError("درصد تخفیف باید بین 0 تا 100 باشد.")
-        
-        discount_amount = original_price * (discount_percent / 100)
-        return original_price - discount_amount
+        self.inventory[color_name] = {
+            "quantity": quantity,
+            "unit": unit,
+            "last_updated": datetime.now().strftime("%Y-%m-%d")
+        }
 
-    def update_inventory(self, item_name: str, stock_count: float) -> None:
+    def register_order(self, customer_name: str, design_name: str, price: float) -> str:
         """
-        به‌روزرسانی موجودی انبار برای یک محصول خاص.
+        Registers a new custom embroidery order.
 
-        :param item_name: نام محصول
-        :param stock_count: تعداد موجودی
+        :param customer_name: Name of the client.
+        :param design_name: The specific pattern or design requested.
+        :param price: Total price in currency units.
+        :return: A unique order reference string.
         """
-        self.inventory[item_name] = stock_count
+        order_id = f"ZZ-{datetime.now().strftime('%y%m%d')}-{len(self.orders) + 1}"
+        order = {
+            "id": order_id,
+            "customer": customer_name,
+            "design": design_name,
+            "price": price,
+            "status": "Pending"
+        }
+        self.orders.append(order)
+        return order_id
 
-    def get_stock_status(self, item_name: str) -> str:
+    def check_stock_level(self, color_name: str) -> Union[float, str]:
         """
-        بررسی وضعیت موجودی محصول در انبار.
+        Checks the remaining quantity of a specific thread color.
 
-        :param item_name: نام محصول
-        :return: پیام وضعیت موجودی
+        :param color_name: The color to check.
+        :return: Quantity as float or error message if not found.
         """
-        count = self.inventory.get(item_name, 0)
-        return f"موجودی {item_name}: {count} عدد" if count > 0 else "محصول ناموجود است."
+        item = self.inventory.get(color_name)
+        return item["quantity"] if item else "Item not found in inventory."
 
-    def generate_invoice_id(self, customer_code: str) -> str:
+    def calculate_total_revenue(self) -> float:
         """
-        تولید شناسه فاکتور منحصر‌به‌فرد بر اساس زمان و کد مشتری.
+        Calculates total revenue from all registered orders.
 
-        :param customer_code: کد شناسایی مشتری
-        :return: شناسه فاکتور رشته‌ای
+        :return: Sum of all order prices.
         """
-        timestamp = datetime.now().strftime("%Y%m%d%H%M")
-        return f"ZZ-{customer_code}-{timestamp}"
+        return sum(order["price"] for order in self.orders)
 
-    def format_currency(self, amount: float) -> str:
+    def update_order_status(self, order_id: str, new_status: str) -> bool:
         """
-        تبدیل عدد قیمت به فرمت استاندارد ریالی/تومانی برای نمایش در فاکتور.
+        Updates the production status of a specific order.
 
-        :param amount: مبلغ عددی
-        :return: رشته فرمت‌بندی شده با جداکننده هزارگان
+        :param order_id: The unique reference ID.
+        :param new_status: The new status (e.g., 'Completed', 'In Progress').
+        :return: True if update was successful, False otherwise.
         """
-        return f"{int(amount):,} تومان"
+        for order in self.orders:
+            if order["id"] == order_id:
+                order["status"] = new_status
+                return True
+        return False
 
 
-# مثال نحوه استفاده:
+# Example usage:
 if __name__ == "__main__":
-    manager = SozaneZarinManager()
+    manager = EmbroideryManager()
     
-    # ثبت موجودی
-    manager.update_inventory("سوزن‌دوزی دستی", 15)
+    # Inventory management
+    manager.add_thread_stock("Gold Silk", 500.0)
     
-    # محاسبه قیمت با تخفیف
-    final_price = manager.calculate_discounted_price(500000, 10)
+    # Order processing
+    order_id = manager.register_order("Sara", "Persian Paisley", 1500000)
+    manager.update_order_status(order_id, "In Progress")
     
-    print(f"خوش آمدید به {manager.store_name}")
-    print(f"قیمت نهایی: {manager.format_currency(final_price)}")
-    print(manager.get_stock_status("سوزن‌دوزی دستی"))
-    print(f"شماره فاکتور شما: {manager.generate_invoice_id('USER001')}")
+    print(f"Inventory status for Gold Silk: {manager.check_stock_level('Gold Silk')}m")
+    print(f"Total Revenue: {manager.calculate_total_revenue()} Tomans")
 ```
