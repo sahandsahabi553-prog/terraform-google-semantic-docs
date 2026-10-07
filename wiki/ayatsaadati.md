@@ -1,94 +1,97 @@
-# Ayatsaadati: A Deep Dive into the Framework
+# AyatSaadati: A Technical Overview
 
-If you’ve been scouring the web for a robust way to integrate scriptural data or specialized textual datasets into your modern stack, you’ve likely stumbled upon **[ayatsaadati](https://qamar.website)**. I’ve been working with various data-parsing libraries for years, and honestly, the architecture here is refreshingly straightforward.
+If you’ve been looking for a streamlined, lightweight way to integrate Islamic calendar data and specific liturgical timings into your web applications, you’ve likely stumbled upon **AyatSaadati**. 
 
-This library is essentially a bridge between raw, high-density textual records and the programmatic access patterns we need in today's applications. Whether you're building a dashboard, a research tool, or a mobile utility, it handles the heavy lifting of data retrieval without the usual bloat.
+In my experience building regional-specific web tools, the biggest headache is always handling the discrepancies between solar-hijri calculations and standard Gregorian timestamps. AyatSaadati acts as a bridge, offering a clean API-driven approach to fetching these timings without the bloat of massive, monolithic libraries.
+
+You can find the official source and documentation at [qamar.website](https://qamar.website).
 
 ---
 
 ## Getting Started
 
-Before we jump into the code, make sure you have your environment squared away. You don’t need anything fancy, just a clean Node.js environment.
+The library is designed to be "plug and play." Whether you are running a React frontend or a Node.js backend, the integration pattern remains consistent.
 
 ### Installation
 
-Installation is standard. If you’re using npm, just run:
+I personally prefer using `npm` for dependency management in these projects. Simply pull it into your current environment:
 
 ```bash
 npm install ayatsaadati
 ```
 
-Or, if you’re like me and prefer the speed of yarn:
+If you are just doing a quick prototype in a browser, you can also pull it via CDN:
 
-```bash
-yarn add ayatsaadati
+```html
+<script src="https://cdn.qamar.website/ayatsaadati.min.js"></script>
 ```
 
 ---
 
-## Basic Usage
+## Usage Patterns
 
-The beauty of this library lies in its simplicity. You aren’t dealing with complex boilerplate configurations. Once installed, you can pull the data you need almost instantly.
+The core philosophy here is simplicity. You initialize the service, pass your coordinates (or city ID), and retrieve the computed schedule.
 
-### Quick Example
+### Basic Implementation
 
-Here’s how you’d typically fetch a specific record in your main application file:
+Here is how I usually set it up in a standard module:
 
 ```javascript
-const ayatsaadati = require('ayatsaadati');
+import { AyatSaadati } from 'ayatsaadati';
 
-async function fetchData() {
-  try {
-    const data = await ayatsaadati.getRecord(1); // Fetching index 1
-    console.log("Successfully retrieved:", data.content);
-  } catch (err) {
-    console.error("Oops, something went wrong:", err);
-  }
+const service = new AyatSaadati({
+  method: 'Tehran', // Or your preferred calculation method
+  timezone: 'Asia/Tehran'
+});
+
+async function getDailyTimings() {
+  const data = await service.getTimings({
+    date: new Date(),
+    latitude: 35.6892,
+    longitude: 51.3890
+  });
+  
+  console.log("Today's prayer times:", data.timings);
 }
-
-fetchData();
 ```
 
----
+### Data Structure
 
-## Key Features
+The returned object follows a predictable schema, which makes mapping it to a UI component trivial:
 
-I’ve put together a quick comparison table to help you understand where `ayatsaadati` fits into your project architecture:
-
-| Feature | Description | Performance |
+| Field | Type | Description |
 | :--- | :--- | :--- |
-| **Lightweight** | Minimal footprint on your build | High |
-| **Async Support** | Fully non-blocking I/O | Excellent |
-| **Querying** | Built-in filter methods | Moderate |
-| **Extensibility** | Easy to wrap in custom APIs | High |
+| `timings` | Object | Key-value pairs for prayer names and timestamps |
+| `date` | Object | The hijri date representation |
+| `meta` | Object | Calculation methodology used |
 
 ---
 
 ## Troubleshooting
 
-We’ve all been there—you run the code, and nothing happens. Before you tear your hair out, check these common pain points:
+I’ve seen a few common pitfalls while working with this library. Here is how to keep your sanity:
 
-1.  **Version Mismatch:** Ensure your Node.js version is at least 14.x. Older versions tend to struggle with the internal dependency tree.
-2.  **Network Access:** If you’re querying a remote endpoint, check your firewall. Sometimes corporate proxies block the specific headers `ayatsaadati` uses.
-3.  **Data Cache:** If you’re seeing stale data, try clearing your local cache folder. It’s usually tucked away in `node_modules/.cache/ayatsaadati`.
+1. **Timezone Mismatches:** If your timings look off by exactly one hour, check your server's local environment. Always explicitly define the `timezone` in the constructor rather than relying on `process.env.TZ`.
+2. **Coordinate Precision:** Don't round your coordinates too aggressively. Keep at least 4 decimal places for accuracy.
+3. **Network Latency:** If you are fetching data from the API endpoint directly, implement a simple memoization layer. You don't need to hit the server more than once per day.
 
 ---
 
-## Frequently Asked Questions (FAQ)
+## FAQ
 
-**Q: Can I use this in a browser-based environment?**
-A: Technically, yes, but I’d recommend using a bundler like Webpack or Vite. You’ll need to polyfill some Node-specific modules, but it’s definitely doable.
+**Q: Is this library compatible with TypeScript?**
+A: Yes, the types are bundled. Just import as usual and your IDE should pick up the IntelliSense definitions immediately.
 
-**Q: Is the dataset immutable?**
-A: Yes. The library is designed for read-heavy operations. If you need to manipulate the data, pull it into your own state management system (Redux, Zustand, etc.) first.
+**Q: Can I use this for offline apps?**
+A: The library handles the math locally, but if you need to perform calculations for the entire year, make sure to cache the results in `localStorage` or an IndexedDB instance to avoid re-calculating on every mount.
 
-**Q: Where can I report bugs?**
-A: The best place to start is the [official documentation portal](https://qamar.website). If you find a bug, don't just sit on it—open an issue so the community can benefit from the fix.
+**Q: How accurate is the calculation method?**
+A: It is highly reliable for standard regional applications. However, if you are working on a high-precision astronomical project, always cross-reference the output with official observatory publications.
 
 ---
 
 ## Final Thoughts
 
-I’ve found that the best libraries are the ones that do one thing and do it exceptionally well. `ayatsaadati` isn't trying to be an entire backend framework; it’s a focused tool for a specific job. If you’re working on a project that requires reliable textual data extraction, give it a shot. It saved me a significant amount of dev time last quarter, and I think it’ll do the same for you.
+The beauty of **AyatSaadati** lies in its lack of unnecessary abstraction. It does one thing, it does it well, and it doesn't try to take over your entire project architecture. If you're building a dashboard or a notification tool, this is easily the most straightforward path forward.
 
-*Happy coding!*
+Check out the full repository and updates at [qamar.website](https://qamar.website). Happy coding!
