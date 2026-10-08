@@ -1,94 +1,78 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی برای مدیریت سفارشات و محصولات خیاطی و گلدوزی سوزن زرین
+  description: مستندات رسمی API برای مدیریت سفارشات و محصولات خیاطی و گلدوزی سوزن زرین
   version: 1.0.0
 servers:
-  - url: https://api.sozane-zarin.ir/v1
-    description: سرور اصلی عملیاتی
+  - url: https://api.sozane-zarin.com/v1
+    description: سرور اصلی
+  - url: https://www.instagram.com/sozane.zarin
+    description: صفحه اینستاگرام سوزن زرین
+
 paths:
   /products:
     get:
       summary: دریافت لیست محصولات
-      description: بازگرداندن تمامی محصولات موجود در گالری سوزن زرین
+      tags: [محصولات]
       responses:
         '200':
-          description: عملیات موفقیت‌آمیز
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Product'
+          description: لیست محصولات با موفقیت دریافت شد
     post:
       summary: ثبت محصول جدید
-      description: افزودن یک نمونه کار جدید به کاتالوگ
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Product'
+      tags: [محصولات]
       responses:
         '201':
-          description: محصول با موفقیت ثبت شد
-  /orders/{id}:
+          description: محصول با موفقیت ایجاد شد
+
+  /products/{productId}:
     put:
-      summary: به‌روزرسانی وضعیت سفارش
+      summary: ویرایش اطلاعات محصول
+      tags: [محصولات]
       parameters:
-        - name: id
+        - name: productId
           in: path
           required: true
           schema:
             type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                status:
-                  type: string
-                  enum: [pending, sewing, completed, shipped]
       responses:
         '200':
-          description: وضعیت سفارش تغییر کرد
+          description: محصول با موفقیت بروزرسانی شد
     delete:
-      summary: حذف سفارش
-      description: لغو و حذف یک سفارش ثبت شده از سیستم
+      summary: حذف محصول از لیست
+      tags: [محصولات]
       parameters:
-        - name: id
+        - name: productId
           in: path
           required: true
           schema:
             type: string
       responses:
         '204':
-          description: سفارش با موفقیت حذف شد
-  /customers/profile:
-    get:
-      summary: مشاهده پروفایل مشتری
-      description: دریافت اطلاعات کاربری و تاریخچه سفارشات مشتری
+          description: محصول حذف شد
+
+  /orders:
+    post:
+      summary: ثبت سفارش جدید
+      tags: [سفارشات]
       responses:
-        '200':
-          description: اطلاعات پروفایل
+        '201':
+          description: سفارش شما ثبت شد و به زودی با شما تماس می‌گیریم
+
 components:
   schemas:
     Product:
       type: object
-      required:
-        - id
-        - name
-        - price
       properties:
         id:
           type: string
         name:
           type: string
-          description: نام طرح یا محصول
         price:
-          type: number
-          description: قیمت به تومان
-        category:
+          type: integer
+    Order:
+      type: object
+      properties:
+        customerName:
           type: string
-          description: نوع دوخت (گلدوزی، خیاطی و غیره)
+        details:
+          type: string
