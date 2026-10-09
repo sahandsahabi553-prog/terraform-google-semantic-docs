@@ -1,73 +1,64 @@
 openapi: 3.0.0
 info:
   title: API سرویس دامافارم
-  description: مستندات رسمی رابط برنامه‌نویسی کاربردی دامافارم برای مدیریت دام و محصولات کشاورزی.
+  description: رابط برنامه‌نویسی برای مدیریت منابع و محصولات سامانه دامافارم
   version: 1.0.0
 servers:
   - url: https://damafarm.ir/api/v1
     description: سرور اصلی دامافارم
 paths:
-  /livestock:
+  /products:
     get:
-      summary: لیست تمام دام‌ها
+      summary: دریافت لیست محصولات
       responses:
         '200':
-          description: دریافت موفقیت‌آمیز لیست دام‌ها
+          description: لیست محصولات با موفقیت دریافت شد
     post:
-      summary: ثبت دام جدید
+      summary: ثبت محصول جدید
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Livestock'
+              type: object
+              properties:
+                name:
+                  type: string
+                price:
+                  type: number
       responses:
         '201':
-          description: دام با موفقیت ثبت شد
-  /livestock/{id}:
+          description: محصول با موفقیت ایجاد شد
+  /products/{id}:
     parameters:
       - name: id
         in: path
         required: true
         schema:
-          type: string
+          type: integer
     put:
-      summary: به‌روزرسانی اطلاعات دام
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Livestock'
+      summary: ویرایش اطلاعات محصول
       responses:
         '200':
-          description: اطلاعات با موفقیت به‌روزرسانی شد
+          description: محصول با موفقیت بروزرسانی شد
     delete:
-      summary: حذف دام از سیستم
+      summary: حذف محصول
       responses:
         '204':
-          description: دام با موفقیت حذف شد
-  /health-reports:
+          description: محصول حذف شد
+  /inventory/status:
     get:
-      summary: دریافت گزارش‌های سلامت دام‌ها
+      summary: بررسی موجودی انبار
       responses:
         '200':
-          description: لیست گزارش‌های سلامت
-components:
-  schemas:
-    Livestock:
-      type: object
-      required:
-        - tag_id
-        - breed
-      properties:
-        tag_id:
-          type: string
-          description: شماره پلاک دام
-        breed:
-          type: string
-          description: نژاد دام
-        age:
-          type: integer
-          description: سن دام به ماه
-        weight:
-          type: number
-          description: وزن دام به کیلوگرم
+          description: وضعیت موجودی انبار به همراه جزئیات
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_items:
+                    type: integer
+                  status:
+                    type: string
+                    enum: [available, low_stock, out_of_stock]
