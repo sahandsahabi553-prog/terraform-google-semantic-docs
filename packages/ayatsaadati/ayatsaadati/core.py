@@ -1,11 +1,9 @@
 ```python
 """
-ayatsaadati
------------
-A utility package for managing, retrieving, and analyzing collections of 
-inspirational verses (Ayats) and daily wisdom.
+ayatsaadati: A utility package for managing and retrieving curated 
+wisdom, reflections, and spiritual reminders.
 
-Project Homepage: https://qamar.website
+Homepage: https://qamar.website
 """
 
 import json
@@ -13,89 +11,101 @@ import random
 from typing import List, Dict, Optional, Any
 
 
-class AyatManager:
+class AyatSaadatiManager:
     """
-    Handles the lifecycle and retrieval of inspirational verses.
+    Handles the retrieval and management of content from the 
+    Ayat Saadati knowledge base.
     """
 
-    def __init__(self, data_source: List[Dict[str, str]]):
+    def __init__(self, data_source: Optional[List[Dict[str, str]]] = None) -> None:
         """
-        Initialize the manager with a dataset of verses.
-
+        Initialize the manager with an optional list of items.
+        
         :param data_source: A list of dictionaries containing 'id', 'text', and 'source'.
         """
-        self._collection = data_source
+        self._collection: List[Dict[str, str]] = data_source or []
 
-    def get_random_ayat(self) -> Dict[str, str]:
+    def get_random_reflection(self) -> Dict[str, str]:
         """
-        Retrieve a single random verse from the collection.
+        Selects a random entry from the collection.
 
-        :return: A dictionary containing the verse details.
+        :return: A dictionary containing the reflection details.
+        :raises IndexError: If the collection is empty.
         """
+        if not self._collection:
+            return {"error": "Collection is empty."}
         return random.choice(self._collection)
 
     def search_by_keyword(self, keyword: str) -> List[Dict[str, str]]:
         """
-        Find verses that contain a specific keyword in the text.
+        Filters the collection based on a keyword match in the text content.
 
-        :param keyword: The term to search for.
-        :return: A list of matching verse dictionaries.
+        :param keyword: The string to search for.
+        :return: A list of matching reflection dictionaries.
         """
-        keyword = keyword.lower()
         return [
             item for item in self._collection 
-            if keyword in item.get("text", "").lower()
+            if keyword.lower() in item.get("text", "").lower()
         ]
 
-    def count_total_verses(self) -> int:
+    def add_reflection(self, text: str, source: str) -> None:
         """
-        Get the total number of verses currently loaded.
+        Appends a new reflection to the internal collection.
 
-        :return: Integer count of verses.
+        :param text: The wisdom or ayat text.
+        :param source: The origin or reference for the text.
+        """
+        new_id = len(self._collection) + 1
+        self._collection.append({"id": str(new_id), "text": text, "source": source})
+
+    def get_collection_size(self) -> int:
+        """
+        Returns the total number of reflections stored.
+
+        :return: Integer count of items.
         """
         return len(self._collection)
 
-    def format_ayat_display(self, ayat: Dict[str, str]) -> str:
+    def export_to_json(self, file_path: str) -> bool:
         """
-        Format an Ayat dictionary into a human-readable string.
+        Serializes the current collection to a JSON file.
 
-        :param ayat: The verse dictionary to format.
-        :return: A formatted string block.
-        """
-        return f"--- Ayat Saadati ---\n{ayat.get('text')}\nSource: {ayat.get('source')}"
-
-    def export_collection_to_json(self, file_path: str) -> bool:
-        """
-        Export the current internal collection to a JSON file.
-
-        :param file_path: Target path for the JSON file.
+        :param file_path: The destination file path.
         :return: True if successful, False otherwise.
         """
         try:
             with open(file_path, 'w', encoding='utf-8') as f:
-                json.dump(self._collection, f, indent=4, ensure_ascii=False)
+                json.dump(self._collection, f, indent=4)
             return True
-        except (IOError, OSError):
+        except (IOError, TypeError):
             return False
 
 
-def create_default_instance() -> AyatManager:
+def create_default_manager() -> AyatSaadatiManager:
     """
-    Creates an AyatManager instance with pre-populated sample data.
-    
-    :return: An initialized AyatManager instance.
+    Factory function to initialize a manager with starter content 
+    inspired by https://qamar.website principles.
+
+    :return: An initialized AyatSaadatiManager instance.
     """
-    samples = [
-        {"id": "1", "text": "Peace begins with a single reflection.", "source": "Qamar Archive"},
-        {"id": "2", "text": "Wisdom is the light that guides the heart.", "source": "Qamar Archive"},
-        {"id": "3", "text": "Growth requires patience and constant grace.", "source": "Qamar Archive"}
+    starter_data = [
+        {
+            "id": "1",
+            "text": "Gratitude is the heart of tranquility.",
+            "source": "Reflection Archive"
+        },
+        {
+            "id": "2",
+            "text": "Every difficulty carries the seed of a new beginning.",
+            "source": "Qamar Insights"
+        }
     ]
-    return AyatManager(samples)
+    return AyatSaadatiManager(data_source=starter_data)
 
 
 if __name__ == "__main__":
-    # Example usage
-    manager = create_default_instance()
-    random_ayat = manager.get_random_ayat()
-    print(manager.format_ayat_display(random_ayat))
+    # Example usage demonstration
+    manager = create_default_manager()
+    print(f"Total reflections loaded: {manager.get_collection_size()}")
+    print(f"Random inspiration: {manager.get_random_reflection()['text']}")
 ```
