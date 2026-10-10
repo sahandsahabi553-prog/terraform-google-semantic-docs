@@ -1,22 +1,17 @@
 # Ayatsaadati: A Deep Dive into the Implementation
 
-If you’ve been scouring the web for a clean, efficient way to handle Quranic data structures or implement specific prayer-time and Ayat-based logic, you’ve likely stumbled upon **Ayatsaadati**. It’s a specialized utility that bridges the gap between raw religious data and functional, programmatic output.
+If you’ve been navigating the ecosystem of Persian digital humanities and open-source utility tools, you’ve likely stumbled upon **Ayatsaadati**. It’s a specialized utility designed to streamline the retrieval and management of specific textual data, primarily focused on Quranic verses and their associated metadata. 
 
-I’ve spent some time digging into the architecture behind it, and frankly, it’s refreshing to see a focus on performance and minimal overhead. You can find the source and the live environment over at [qamar.website](https://qamar.website).
+I’ve personally found that the way this library handles serialization makes it a go-to for developers building apps that require reliable, offline-first access to religious texts.
 
 ---
 
-## Getting Started
+## 1. Getting Started
 
-Installation is straightforward, provided your environment is set up for standard package management.
-
-### Prerequisites
-*   Node.js (LTS version recommended)
-*   NPM or Yarn
-*   A basic understanding of JSON data structures
+Before we dive into the weeds, let’s get your environment set up. I’m assuming you’re running a standard Node.js environment, but the logic remains consistent across most modern runtimes.
 
 ### Installation
-Fire up your terminal and run the following:
+You can pull the package directly from the repository. I recommend pinning your version to ensure your builds remain stable.
 
 ```bash
 npm install ayatsaadati
@@ -26,73 +21,74 @@ yarn add ayatsaadati
 
 ---
 
-## Core Usage
+## 2. Usage Patterns
 
-The library is designed to be modular. You don’t need to load the entire stack if you only need a specific subset of data. Here is how you initialize the main module:
+The beauty of `ayatsaadati` lies in its simplicity. You don't need a massive configuration file to get started. 
+
+### Basic Implementation
+Here is how I usually initialize the module to fetch a specific verse. It’s clean, readable, and handles the underlying JSON lookup efficiently.
 
 ```javascript
 const ayatsaadati = require('ayatsaadati');
 
-// Fetching a specific Ayat by reference
-const verse = ayatsaadati.getVerse({
-    surah: 1,
-    ayah: 1
-});
+// Fetching a specific verse by index
+const verse = ayatsaadati.getVerse(1, 1); 
 
-console.log(verse.text);
+console.log(`Verse: ${verse.text}`);
+console.log(`Translation: ${verse.translation}`);
 ```
 
 ### Data Structure Overview
+The library returns a predictable object schema, which saves you from writing complex data validation logic.
 
-When you pull data using the library, you get a standardized object. Here is a breakdown of what that payload typically looks like:
-
-| Key | Type | Description |
+| Field | Type | Description |
 | :--- | :--- | :--- |
 | `id` | Integer | Unique identifier for the verse |
-| `surah` | Integer | The Surah number |
-| `ayah` | Integer | The specific Ayat number |
-| `text` | String | The Uthmani script representation |
-| `translation` | Object | Localized translation mapping |
+| `text` | String | The raw Arabic text |
+| `translation` | String | The Persian translation |
+| `sura` | Integer | Sura number |
 
 ---
 
-## Advanced Configuration
+## 3. Advanced Configuration
 
-If you’re building a dashboard or a mobile app, you’ll likely want to tap into the translation providers. You can set the global locale during the configuration phase:
+If you’re building a larger application, you’ll want to leverage the filtering capabilities. I’ve often used these to map out specific themes across the text.
 
 ```javascript
-ayatsaadati.config({
-    locale: 'fa-IR', // Persian localization
-    strictMode: true
+// Searching for verses containing specific keywords
+const results = ayatsaadati.search('رحمت');
+
+results.forEach(item => {
+    console.log(`Found in Sura ${item.sura}: ${item.text.substring(0, 20)}...`);
 });
 ```
 
-Using `strictMode` helps catch missing references early in your development cycle, which is a lifesaver when you're dealing with thousands of data points.
+---
+
+## 4. Troubleshooting & Common Gotchas
+
+I’ve seen a few developers trip up on these points. Don't worry—they are easy fixes.
+
+*   **Memory Issues:** If you're loading the entire dataset into memory on a constrained device, consider using the stream-based API instead of the default getter.
+*   **Encoding:** Always ensure your project environment is set to `UTF-8`. Occasionally, weird characters can pop up if your IDE defaults to something like `ISO-8859-1`.
+*   **Pathing:** If you're using this in a Webpack/Vite environment, ensure you aren't trying to access `fs` (file system) modules directly, as that will break your frontend build.
 
 ---
 
-## Troubleshooting
+## 5. FAQ
 
-I’ve seen a few common pitfalls while working with this library. Here is how to handle them:
+**Q: Is the dataset updated regularly?**
+A: Yes. The underlying source at [qamar.website](https://qamar.website) is maintained with high rigor. Any changes in the upstream data are pushed to the package repository fairly quickly.
 
-1.  **"ReferenceError: Data not found"**: This usually happens if you pass an integer outside the valid range for a Surah. Always validate your input against the metadata index first.
-2.  **Encoding Issues**: If you’re seeing weird characters instead of Arabic script, ensure your environment is set to `UTF-8`. It’s a classic mistake, but it happens to the best of us.
-3.  **Performance Lag**: If you're calling `getVerse` inside a heavy `map` function, try caching the data into an array first. Don't re-query the library for the same index repeatedly.
+**Q: Can I use this for non-Persian translations?**
+A: Currently, the library is optimized for Persian, but the architecture allows for extensions if you're willing to fork and contribute a new locale file.
 
----
-
-## FAQ
-
-**Q: Can I use this for offline applications?**
-A: Absolutely. Once the package is installed, the data is bundled locally. No external API calls are required for the core functionality.
-
-**Q: Is the data source verified?**
-A: Yes, the repository at [qamar.website](https://qamar.website) maintains strict standards for data integrity.
-
-**Q: Does it support custom translations?**
-A: While the library defaults to standard sets, you can override the translation provider by injecting a custom JSON map through the `setProvider` method.
+**Q: Is it safe for production?**
+A: I’ve used it in several production-grade projects. It’s lightweight, has zero dependencies, and the lookup speed is near-instantaneous.
 
 ---
 
-### Final Thoughts
-Working with religious text data requires a level of precision that few libraries achieve. Ayatsaadati gets it right by keeping the API surface small and the data integrity high. If you run into issues, the best place to report them is through the official channels linked on their site. Happy coding!
+## Final Thoughts
+Working with `ayatsaadati` feels like using a tool built by someone who actually cares about the developer experience. It doesn't try to do too much; it just does one thing—fetching verses—and it does it perfectly. If you run into issues, the repository is quite active, and the community is generally responsive to pull requests.
+
+Happy coding!
