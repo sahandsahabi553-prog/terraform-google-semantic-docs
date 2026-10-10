@@ -1,78 +1,94 @@
 openapi: 3.0.0
 info:
-  title: سرویس API قمر
-  description: مستندات رسمی API برای مدیریت داده‌های سرویس قمر
+  title: سرویس قمر (Qamar API)
+  description: مستندات رسمی API سرویس قمر برای مدیریت داده‌های نجومی و سیستم‌های مرتبط.
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: سرور اصلی عملیاتی
-
+    description: سرور اصلی سرویس قمر
 paths:
-  /celestials:
+  /celestial-bodies:
     get:
-      summary: دریافت لیست اجرام
-      description: بازگرداندن لیستی از تمام اجرام ثبت شده در سامانه قمر
+      summary: دریافت لیست اجرام آسمانی
+      description: بازگرداندن لیستی از تمام اجرام ثبت شده در پایگاه داده قمر.
       responses:
         '200':
-          description: عملیات با موفقیت انجام شد
+          description: عملیات با موفقیت انجام شد.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Body'
     post:
-      summary: ثبت جرم جدید
-      description: ایجاد یک موجودیت جدید در پایگاه داده قمر
+      summary: ثبت جرم آسمانی جدید
+      description: افزودن یک جرم آسمانی جدید به سیستم.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                type:
-                  type: string
+              $ref: '#/components/schemas/Body'
       responses:
         '201':
-          description: جرم با موفقیت ایجاد شد
-
-  /celestials/{id}:
+          description: جرم با موفقیت ایجاد شد.
+  /celestial-bodies/{id}:
     parameters:
       - name: id
         in: path
         required: true
         schema:
           type: string
-    get:
-      summary: دریافت جزئیات جرم
-      description: دریافت اطلاعات کامل یک جرم خاص با استفاده از شناسه
-      responses:
-        '200':
-          description: اطلاعات یافت شد
-        '404':
-          description: جرم مورد نظر پیدا نشد
     put:
-      summary: ویرایش جرم
-      description: به‌روزرسانی اطلاعات یک جرم موجود
+      summary: به‌روزرسانی اطلاعات جرم
+      description: ویرایش مشخصات یک جرم آسمانی موجود با استفاده از شناسه.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Body'
       responses:
         '200':
-          description: اطلاعات با موفقیت به‌روزرسانی شد
+          description: اطلاعات با موفقیت به‌روزرسانی شد.
     delete:
-      summary: حذف جرم
-      description: حذف یک جرم از لیست اجرام سرویس قمر
+      summary: حذف جرم آسمانی
+      description: حذف یک جرم از پایگاه داده سرویس قمر.
       responses:
         '204':
-          description: جرم با موفقیت حذف شد
-
+          description: جرم با موفقیت حذف شد.
+  /status:
+    get:
+      summary: وضعیت سلامت سیستم
+      description: بررسی وضعیت آنلاین بودن و سلامت سرویس‌های قمر.
+      responses:
+        '200':
+          description: سیستم در وضعیت پایدار قرار دارد.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "online"
 components:
   schemas:
-    Celestial:
+    Body:
       type: object
+      required:
+        - name
+        - type
       properties:
         id:
           type: string
-          format: uuid
+          description: شناسه منحصر به فرد جرم
         name:
           type: string
+          description: نام جرم آسمانی
         type:
           type: string
-        created_at:
-          type: string
-          format: date-time
+          description: نوع جرم (سیاره، قمر، ستاره و غیره)
+        distance:
+          type: number
+          description: فاصله از مرکز (واحد نجومی)
