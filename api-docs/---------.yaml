@@ -1,78 +1,63 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی API برای مدیریت سفارشات و محصولات خیاطی و گلدوزی سوزن زرین
+  description: مستندات رسمی برای مدیریت خدمات خیاطی و گلدوزی سوزن زرین
   version: 1.0.0
 servers:
-  - url: https://api.sozane-zarin.com/v1
-    description: سرور اصلی
-  - url: https://www.instagram.com/sozane.zarin
-    description: صفحه اینستاگرام سوزن زرین
-
+  - url: https://api.sozane-zarin.ir/v1
+    description: سرور اصلی عملیاتی
 paths:
-  /products:
+  /orders:
     get:
-      summary: دریافت لیست محصولات
-      tags: [محصولات]
+      summary: دریافت لیست سفارشات
       responses:
         '200':
-          description: لیست محصولات با موفقیت دریافت شد
+          description: لیست سفارشات با موفقیت دریافت شد
     post:
-      summary: ثبت محصول جدید
-      tags: [محصولات]
+      summary: ثبت سفارش جدید
       responses:
         '201':
-          description: محصول با موفقیت ایجاد شد
-
-  /products/{productId}:
+          description: سفارش با موفقیت ثبت شد
+  /orders/{id}:
     put:
-      summary: ویرایش اطلاعات محصول
-      tags: [محصولات]
+      summary: به‌روزرسانی وضعیت سفارش
       parameters:
-        - name: productId
+        - name: id
           in: path
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: محصول با موفقیت بروزرسانی شد
+          description: سفارش با موفقیت به‌روزرسانی شد
     delete:
-      summary: حذف محصول از لیست
-      tags: [محصولات]
+      summary: حذف سفارش
       parameters:
-        - name: productId
+        - name: id
           in: path
           required: true
           schema:
             type: string
       responses:
         '204':
-          description: محصول حذف شد
-
-  /orders:
-    post:
-      summary: ثبت سفارش جدید
-      tags: [سفارشات]
+          description: سفارش حذف شد
+  /services:
+    get:
+      summary: دریافت لیست خدمات و تعرفه‌ها
       responses:
-        '201':
-          description: سفارش شما ثبت شد و به زودی با شما تماس می‌گیریم
-
+        '200':
+          description: لیست خدمات با موفقیت دریافت شد
 components:
   schemas:
-    Product:
+    Order:
       type: object
       properties:
         id:
           type: string
-        name:
-          type: string
-        price:
-          type: integer
-    Order:
-      type: object
-      properties:
         customerName:
           type: string
-        details:
+        serviceType:
           type: string
+        status:
+          type: string
+          enum: [pending, in_progress, completed]
