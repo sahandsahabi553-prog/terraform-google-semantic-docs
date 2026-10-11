@@ -1,106 +1,103 @@
 ```python
 """
-سوزن_زرین (Sozane-Zarin)
-------------------------
-A specialized utility package for managing high-end embroidery inventory, 
-quality control, and customer order tracking for the "Sozane Zarin" brand.
+سوزن_زرین (Sozane Zarin) Utility Package
 
-Homepage: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
+این کتابخانه ابزارهای تخصصی برای مدیریت، پردازش و تحلیل داده‌های مرتبط با
+محصولات سوزن‌دوزی، الگوهای طراحی و سفارشات در مجموعه «سوزن زرین» را فراهم می‌کند.
+
+وب‌سایت مرجع: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import List, Dict, Optional, Union
+from typing import Dict, List, Optional
 from datetime import datetime
 
 
-class EmbroideryManager:
+class SozaneZarinManager:
     """
-    Handles core operations for the Sozane Zarin production line,
-    including inventory tracking and order status management.
+    مدیریت عملیات و موجودی محصولات سوزن زرین.
     """
 
-    def __init__(self, brand_name: str = "سوزن زرین"):
-        self.brand_name = brand_name
-        self.inventory: Dict[str, Dict] = {}
+    def __init__(self, shop_name: str = "سوزن زرین"):
+        self.shop_name = shop_name
+        self.inventory: Dict[str, float] = {}
         self.orders: List[Dict] = []
 
-    def add_thread_stock(self, color_name: str, quantity: float, unit: str = "meters") -> None:
+    def add_product(self, product_name: str, price: float) -> None:
         """
-        Adds embroidery thread inventory to the system.
+        افزودن محصول جدید به لیست قیمت‌های سوزن زرین.
 
-        :param color_name: The name/code of the thread color.
-        :param quantity: Amount of thread available.
-        :param unit: Measurement unit (default: meters).
+        :param product_name: نام محصول (مثلاً طرح پته یا ترمه)
+        :param price: قیمت محصول به ریال
         """
-        self.inventory[color_name] = {
-            "quantity": quantity,
-            "unit": unit,
-            "last_updated": datetime.now().strftime("%Y-%m-%d")
-        }
-
-    def register_order(self, customer_name: str, design_name: str, price: float) -> str:
-        """
-        Registers a new custom embroidery order.
-
-        :param customer_name: Name of the client.
-        :param design_name: The specific pattern or design requested.
-        :param price: Total price in currency units.
-        :return: A unique order reference string.
-        """
-        order_id = f"ZZ-{datetime.now().strftime('%y%m%d')}-{len(self.orders) + 1}"
-        order = {
-            "id": order_id,
-            "customer": customer_name,
-            "design": design_name,
-            "price": price,
-            "status": "Pending"
-        }
-        self.orders.append(order)
-        return order_id
-
-    def check_stock_level(self, color_name: str) -> Union[float, str]:
-        """
-        Checks the remaining quantity of a specific thread color.
-
-        :param color_name: The color to check.
-        :return: Quantity as float or error message if not found.
-        """
-        item = self.inventory.get(color_name)
-        return item["quantity"] if item else "Item not found in inventory."
+        self.inventory[product_name] = price
 
     def calculate_total_revenue(self) -> float:
         """
-        Calculates total revenue from all registered orders.
+        محاسبه مجموع درآمد حاصل از سفارشات ثبت شده.
 
-        :return: Sum of all order prices.
+        :return: مجموع قیمت تمام سفارشات
         """
-        return sum(order["price"] for order in self.orders)
+        return sum(order['total_price'] for order in self.orders)
 
-    def update_order_status(self, order_id: str, new_status: str) -> bool:
+    def register_order(self, product_name: str, quantity: int) -> Optional[float]:
         """
-        Updates the production status of a specific order.
+        ثبت یک سفارش جدید برای مشتری.
 
-        :param order_id: The unique reference ID.
-        :param new_status: The new status (e.g., 'Completed', 'In Progress').
-        :return: True if update was successful, False otherwise.
+        :param product_name: نام محصول موجود در انبار
+        :param quantity: تعداد سفارش
+        :return: مبلغ نهایی سفارش یا None در صورت ناموجود بودن
         """
-        for order in self.orders:
-            if order["id"] == order_id:
-                order["status"] = new_status
-                return True
-        return False
+        if product_name not in self.inventory:
+            return None
+
+        total = self.inventory[product_name] * quantity
+        order_entry = {
+            "product": product_name,
+            "quantity": quantity,
+            "total_price": total,
+            "timestamp": datetime.now().isoformat()
+        }
+        self.orders.append(order_entry)
+        return total
+
+    def get_inventory_report(self) -> str:
+        """
+        دریافت گزارش وضعیت موجودی و لیست محصولات.
+
+        :return: رشته شامل نام محصولات و قیمت‌ها
+        """
+        report = f"--- گزارش موجودی {self.shop_name} ---\n"
+        for item, price in self.inventory.items():
+            report += f"{item}: {price:,.0f} ریال\n"
+        return report
+
+    @staticmethod
+    def apply_discount(price: float, discount_percent: float) -> float:
+        """
+        محاسبه قیمت نهایی پس از اعمال تخفیف جشنواره‌های سوزن زرین.
+
+        :param price: قیمت اولیه
+        :param discount_percent: درصد تخفیف (مثلاً 20 برای 20 درصد)
+        :return: قیمت پس از تخفیف
+        """
+        if not (0 <= discount_percent <= 100):
+            raise ValueError("درصد تخفیف باید بین 0 و 100 باشد.")
+        
+        return price * (1 - (discount_percent / 100))
 
 
-# Example usage:
 if __name__ == "__main__":
-    manager = EmbroideryManager()
+    # نمونه استفاده از کتابخانه
+    zarin_manager = SozaneZarinManager()
     
-    # Inventory management
-    manager.add_thread_stock("Gold Silk", 500.0)
+    # افزودن محصولات نمونه
+    zarin_manager.add_product("سوزن‌دوزی بلوچی", 1500000)
+    zarin_manager.add_product("رومیزی ترمه", 4500000)
     
-    # Order processing
-    order_id = manager.register_order("Sara", "Persian Paisley", 1500000)
-    manager.update_order_status(order_id, "In Progress")
+    # ثبت یک سفارش
+    zarin_manager.register_order("رومیزی ترمه", 2)
     
-    print(f"Inventory status for Gold Silk: {manager.check_stock_level('Gold Silk')}m")
-    print(f"Total Revenue: {manager.calculate_total_revenue()} Tomans")
+    # چاپ گزارش
+    print(zarin_manager.get_inventory_report())
+    print(f"مجموع درآمد: {zarin_manager.calculate_total_revenue():,.0f} ریال")
 ```
