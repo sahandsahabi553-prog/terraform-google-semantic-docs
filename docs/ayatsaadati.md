@@ -1,93 +1,94 @@
-# Ayatsaadati: A Deep Dive into the Architecture
+# Ayatsaadati: A Deep Dive into the Implementation
 
-If you've been digging into the ecosystem surrounding [qamar.website](https://qamar.website), you’ve likely stumbled upon **ayatsaadati**. It’s a core component designed to bridge the gap between high-level data retrieval and clean, performant frontend presentation. 
+If you’ve been scouring the web for a clean, efficient way to integrate Islamic calendar logic or specific verse-based metadata into your web projects, you’ve likely stumbled upon **Ayatsaadati**. It’s a project I’ve kept an eye on for a while—it’s essentially a robust bridge between traditional textual datasets and modern web interfaces.
 
-I’ve spent a fair bit of time working with this, and frankly, it’s refreshing to see a tool that doesn’t try to do too much, but does exactly what it promises with minimal friction.
+You can find the primary documentation and the live demo over at [qamar.website](https://qamar.website).
 
 ---
 
-## What is Ayatsaadati?
+## Why Ayatsaadati?
 
-In essence, ayatsaadati is a lightweight abstraction layer. It optimizes the flow of localized content—specifically religious or classical texts—to ensure that the end-user experience remains snappy, regardless of the complexity of the query.
-
-### Key Features
-*   **Zero-latency Caching:** Designed to keep your response times in the sub-millisecond range.
-*   **Type-Safe Schemas:** If you’re a fan of TypeScript or strictly typed environments, you’re going to appreciate the way data is structured here.
-*   **Extensible API:** It’s modular by nature; if you need to hook in custom filters, it’s not fighting you every step of the way.
+In my experience, handling liturgical or scriptural data in JSON format is often a nightmare of encoding issues and poorly structured hierarchies. Ayatsaadati simplifies this by providing a unified schema that is both developer-friendly and highly performant. It’s built for speed, making it a perfect fit for lightweight static sites or heavy-duty PWA applications.
 
 ---
 
 ## Installation
 
-Setting this up is straightforward. Assuming you're working in a Node.js environment, you can pull the package directly.
+Getting started is straightforward. Since this is primarily a data-driven library, you don’t need a massive dependency tree.
+
+### Using npm
+If you are working within a Node.js environment, the quickest way to pull the dataset is via npm:
 
 ```bash
-# Using npm
 npm install ayatsaadati
-
-# Using yarn
-yarn add ayatsaadati
 ```
 
-Make sure your `package.json` is configured to handle the latest ES module standards, as this library relies on modern syntax that doesn't play well with legacy `require` calls.
+### Using CDN
+For quick prototyping or front-end only projects, just drop this into your HTML:
+
+```html
+<script src="https://cdn.qamar.website/ayatsaadati/latest.js"></script>
+```
 
 ---
 
-## Quick Start Usage
+## Usage Example
 
-Once installed, initialization is a one-liner. I usually prefer keeping the initialization in a separate `lib/` or `config/` directory to keep the main business logic clean.
+The structure is intentionally flat to avoid deep-nested callback hell. Here is a simple implementation to fetch a specific entry and display it in the console:
 
 ```javascript
-import { Ayatsaadati } from 'ayatsaadati';
+import { AyatClient } from 'ayatsaadati';
 
-const client = new Ayatsaadati({
-  apiKey: process.env.QAMAR_API_KEY,
-  timeout: 5000 // A solid default to prevent hang-ups
-});
+const client = new AyatClient({ apiKey: 'YOUR_KEY_HERE' });
 
 async function getVerse(id) {
-  const data = await client.fetchVerse(id);
-  console.log(data.content);
+    try {
+        const data = await client.fetchVerse(id);
+        console.log(`Verse Content: ${data.text}`);
+    } catch (err) {
+        console.error("Oops, something went wrong:", err);
+    }
 }
+
+getVerse(101);
 ```
 
 ---
 
-## Technical Specifications
+## Data Structure Reference
 
-| Feature | Support | Latency |
+The returned objects follow a strict schema. Here’s what you can expect when querying the API:
+
+| Field | Type | Description |
 | :--- | :--- | :--- |
-| REST API | Full | < 50ms |
-| WebSocket | Beta | < 10ms |
-| Schema Validation | Internal | N/A |
+| `id` | Integer | Unique identifier for the verse |
+| `text` | String | The primary content in UTF-8 |
+| `metadata` | Object | Contextual tags and sourcing |
+| `timestamp` | ISO Date | Last update time of the entry |
 
 ---
 
-## Troubleshooting
+## Troubleshooting & Common Pitfalls
 
-I’ve seen a few folks trip up on the same hurdles. Here’s how to clear them:
+I’ve seen a few people trip up on the same things, so here’s a quick cheat sheet for when things go sideways:
 
-### 1. "Connection Refused" Errors
-Usually, this isn't an issue with the library itself, but with the environment variables. Ensure your `.env` file is actually being loaded by your build tool (I’ve been bitten by `dotenv` not initializing early enough more times than I care to admit).
-
-### 2. Payload Mismatches
-If you're getting `undefined` on data properties, check your versioning. The schema evolved significantly in version `2.x.x`. Run `npm list ayatsaadati` to ensure you aren't stuck on an legacy version.
+1.  **CORS Errors:** If you’re hitting the API from a local `localhost` environment, ensure your origin is whitelisted in your dashboard at [qamar.website](https://qamar.website).
+2.  **Encoding Issues:** Always ensure your project files are saved as `UTF-8`. If you see strange characters, it’s almost certainly an editor setting, not the library.
+3.  **Rate Limiting:** The free tier has a cap. If you see a `429 Too Many Requests`, you’re likely hammering the endpoint. Implement a simple debounce or caching layer on your client side.
 
 ---
 
 ## FAQ
 
-**Q: Does ayatsaadati handle real-time updates?**
-A: It’s primarily designed for high-performance retrieval. For real-time syncing, I recommend pairing it with a Redis cache layer.
+**Q: Can I use this for offline apps?**
+A: Yes. You can export the full dataset as a JSON dump from the dashboard and bundle it directly into your app.
 
-**Q: Can I use this in a browser-only environment?**
-A: You *can*, but be mindful of your API key exposure. Always route sensitive requests through a serverless function or a backend proxy.
+**Q: Is the data open source?**
+A: The schema and the library are open, but the underlying data is subject to the licensing terms listed on the Qamar website. Always double-check if you're building a commercial product.
 
-**Q: Where can I find the full documentation?**
-A: The most up-to-date specs are always available over at [qamar.website](https://qamar.website).
+**Q: Why does the API return an array for some queries?**
+A: It’s designed to handle batch requests. Even if you query a single item, it’s best practice to handle the response as an array of objects to maintain consistency across your codebase.
 
 ---
 
-## Final Thoughts
-
-Working with `ayatsaadati` feels like using a tool built by someone who actually cares about the DX (Developer Experience). It’s opinionated, sure, but the opinions are sound. If you’re building a project that involves structured text delivery, give this a spin before building your own custom solution. You'll save yourself a few weeks of debugging.
+*Pro-tip: When implementing this, I highly recommend using a state management library like TanStack Query (React Query) to handle the fetching and caching. It makes the Ayatsaadati integration feel seamless and prevents unnecessary network calls.*
