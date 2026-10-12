@@ -1,52 +1,62 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی برای مدیریت خدمات خیاطی و گلدوزی سوزن زرین
+  description: مستندات رسمی برای مدیریت خدمات گلدوزی و خیاطی سوزن زرین
   version: 1.0.0
 servers:
-  - url: https://api.sozane-zarin.ir/v1
-    description: سرور اصلی عملیاتی
+  - url: https://api.sozanezarin.com/v1
+    description: سرور اصلی
 paths:
   /orders:
     get:
-      summary: دریافت لیست سفارشات
+      summary: دریافت لیست سفارش‌ها
       responses:
         '200':
-          description: لیست سفارشات با موفقیت دریافت شد
+          description: لیست سفارش‌ها با موفقیت دریافت شد
     post:
       summary: ثبت سفارش جدید
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
       responses:
         '201':
           description: سفارش با موفقیت ثبت شد
-  /orders/{id}:
-    put:
-      summary: به‌روزرسانی وضعیت سفارش
+  /orders/{orderId}:
+    get:
+      summary: دریافت جزئیات یک سفارش
       parameters:
-        - name: id
+        - name: orderId
           in: path
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: سفارش با موفقیت به‌روزرسانی شد
+          description: جزئیات سفارش
+    put:
+      summary: به‌روزرسانی وضعیت سفارش
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: سفارش با موفقیت ویرایش شد
     delete:
       summary: حذف سفارش
       parameters:
-        - name: id
+        - name: orderId
           in: path
           required: true
           schema:
             type: string
       responses:
         '204':
-          description: سفارش حذف شد
-  /services:
-    get:
-      summary: دریافت لیست خدمات و تعرفه‌ها
-      responses:
-        '200':
-          description: لیست خدمات با موفقیت دریافت شد
+          description: سفارش با موفقیت حذف شد
 components:
   schemas:
     Order:
@@ -58,6 +68,9 @@ components:
           type: string
         serviceType:
           type: string
+          description: نوع خدمات گلدوزی یا خیاطی
+        price:
+          type: number
         status:
           type: string
           enum: [pending, in_progress, completed]
