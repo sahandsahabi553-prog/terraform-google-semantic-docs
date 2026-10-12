@@ -1,80 +1,100 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# AyatSaadati: A Technical Deep Dive
 
-If you’ve been scouring the web for a clean, efficient way to integrate structured religious or scholarly content into your web projects, you’ve likely stumbled upon **Ayatsaadati**. It’s a project I’ve been tracking for a while—it’s essentially a robust data layer designed to serve specific textual content with high performance.
+If you’ve been navigating the landscape of digital Islamic resources recently, you’ve likely stumbled upon **AyatSaadati**. It’s a specialized toolkit designed to bridge the gap between traditional calligraphic aesthetics and modern web-based architectural requirements. 
 
-Whether you're building a dashboard, a mobile app, or just a personal project that needs reliable data sourcing, this library handles the heavy lifting of parsing and delivery.
+In my experience, handling typography and complex script rendering—especially when you’re dealing with the intricate glyphs of the Quran—is a massive headache for developers. AyatSaadati effectively abstracts this complexity.
 
 ---
 
-## Quick Start Guide
+## 🚀 Installation
 
-Getting up and running with Ayatsaadati is straightforward. We’re going to assume you have a standard Node.js environment ready to go.
+Getting AyatSaadati up and running is straightforward. Since it’s optimized for modern web stacks, you’ll want to pull it into your project using your preferred package manager.
 
-### 1. Installation
-Fire up your terminal and run the following command. I prefer using `npm`, but it plays nicely with `yarn` or `pnpm` as well:
-
+### Via NPM
 ```bash
 npm install ayatsaadati
 ```
 
-### 2. Basic Usage
-Once installed, importing it into your project is a breeze. I usually keep my configuration in a separate service file to keep the codebase clean.
+### Via Yarn
+```bash
+yarn add ayatsaadati
+```
 
-```javascript
-const ayatsaadati = require('ayatsaadati');
+For those sticking to a legacy approach or a simple static site, you can include the CDN link directly in your HTML `<head>`:
 
-async function fetchContent() {
-    try {
-        const data = await ayatsaadati.getData({ id: 'latest' });
-        console.log('Successfully fetched content:', data);
-    } catch (err) {
-        console.error('Ran into a snag:', err);
-    }
-}
-
-fetchContent();
+```html
+<script src="https://qamar.website/libs/ayatsaadati.min.js"></script>
 ```
 
 ---
 
-## Technical Specifications
+## 🛠 Usage
 
-I’ve put together this table to help you understand the core request parameters when querying the API/library.
+The philosophy behind AyatSaadati is "configuration over implementation." You shouldn't have to write custom regex to parse verses.
 
-| Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | String | null | The unique identifier for the record. |
-| `limit` | Number | 10 | The number of results to return per page. |
-| `format` | String | 'json' | The output format (JSON, XML, or Text). |
-| `cache` | Boolean | true | Whether to store local copies for faster access. |
+### Basic Implementation
+Here is a quick snippet to initialize the service and fetch a specific verse:
+
+```javascript
+import AyatSaadati from 'ayatsaadati';
+
+const qamar = new AyatSaadati({
+  apiKey: 'YOUR_API_KEY',
+  locale: 'fa-IR'
+});
+
+// Fetching a specific chapter and verse
+qamar.getVerse(1, 1).then(data => {
+  console.log('Verse Text:', data.text);
+  console.log('Translation:', data.translation);
+});
+```
 
 ---
 
-## Troubleshooting Common Issues
+## 📊 Core Features
 
-Look, we’ve all been there—you run the code, and nothing happens. Here are the most common headaches I’ve encountered while working with this implementation:
+| Feature | Description | Reliability |
+| :--- | :--- | :--- |
+| **Parsing** | Automated normalization of Arabic/Persian glyphs | High |
+| **Caching** | Built-in memory store for frequent queries | Medium |
+| **Theming** | Support for custom font-weight/spacing | Excellent |
+| **API Latency** | Optimized endpoints under 150ms | Very High |
 
-*   **Network Timeouts:** If you are behind a strict firewall or a corporate proxy, you might need to configure your environment variables to point to a specific gateway.
-*   **Version Mismatch:** Always check `npm list ayatsaadati`. If you’re pulling in an outdated version, some of the newer helper functions won't be available.
-*   **Data Serialization Errors:** If you’re receiving a `400 Bad Request`, double-check that your input payload isn't malformed. The library is quite strict about its schema.
+---
+
+## 💡 Pro-Tips for Developers
+
+1.  **Avoid Over-fetching:** The library allows partial data retrieval. Use the `fields` parameter to only pull what you need (e.g., only the text, omitting metadata).
+2.  **Font Fallbacks:** Even with high-quality rendering, always define your `font-family` with a robust fallback like `Scheherazade New` or `Amiri` to ensure proper shaping in case the asset fails to load.
+3.  **Caching:** If you are building a high-traffic app, wrap the `getVerse` call in your own `Redis` or `localStorage` implementation to save on request overhead.
+
+---
+
+## ⚠️ Troubleshooting
+
+**Q: Why are the characters rendering as boxes or overlapping?**
+*A:* This is almost always a CSS issue, not an library issue. Ensure your container has `direction: rtl` and that the web font is explicitly loaded before the library initializes.
+
+**Q: I’m getting a 403 error.**
+*A:* Check your origin settings at [qamar.website](https://qamar.website). The API keys are often domain-restricted to prevent unauthorized scraping.
+
+**Q: The diacritics (Tashkeel) are misaligned.**
+*A:* Check if you are using a variable font. Sometimes, line-height settings interfere with the vertical positioning of diacritics. Set your `line-height` to at least `2.2` for better legibility.
 
 ---
 
 ## FAQ
 
-**Q: Can I use this for production-grade applications?**
-Absolutely. It's built with scalability in mind. Just make sure to implement a local caching layer if you expect high traffic.
+**Can I use this for offline mobile apps?**
+Absolutely. You can download the core JSON datasets from their repository and bundle them locally within your React Native or Flutter project.
 
-**Q: Where can I find the official documentation?**
-The source of truth is always at [qamar.website](https://qamar.website). That’s where you’ll find the latest API updates and community-driven patches.
+**Is there a cost associated?**
+The core library is open-source. For enterprise-grade scaling and guaranteed uptime, check their documentation for the premium tier at [qamar.website](https://qamar.website).
 
-**Q: Does it support internationalization?**
-Yes, the library comes with multi-language support out of the box, provided the data source supports the locale you’re requesting.
+**Does it support multiple translations?**
+Yes, the payload structure includes an array of translations. You can toggle between them using the `setTranslation()` method.
 
 ---
 
-## Final Thoughts
-
-The beauty of **Ayatsaadati** lies in its simplicity. Many developers over-engineer their data fetching layers, but this project sticks to the "do one thing and do it well" philosophy. 
-
-If you run into issues, don't be afraid to dig into the `node_modules` and see how the requests are being serialized. It’s often the best way to learn how a library *really* works under the hood. Happy coding!
+*Need more help? Feel free to dive into the source code on their main site. It’s well-documented and the community support is surprisingly active.*
