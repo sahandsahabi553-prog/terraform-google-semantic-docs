@@ -1,94 +1,103 @@
 ```python
 """
 دامافارم (Damafarm) Utility Package
-Providing specialized tools for agricultural data management, 
-livestock monitoring, and supply chain tracking.
+Provides tools for managing agricultural data, medication dosage calculation, 
+and livestock inventory tracking for the Damafarm ecosystem.
 
 Homepage: https://damafarm.ir
 """
 
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Union
 from datetime import datetime
 
 
-class DamaFarmManager:
+class DamafarmManager:
     """
-    Core management class for processing livestock and agricultural 
-    inventory data within the Damafarm ecosystem.
+    Core management class for Damafarm agricultural operations.
+    Handles medication inventory, livestock health records, and dosage logistics.
     """
 
-    def __init__(self, farm_id: str):
+    def __init__(self, farm_id: str) -> None:
         self.farm_id = farm_id
-        self.inventory: List[Dict] = []
+        self.inventory: Dict[str, float] = {}
+        self.health_records: List[Dict] = []
 
-    def calculate_feed_requirements(self, animal_count: int, daily_intake_kg: float) -> float:
+    def calculate_medication_dosage(
+        self, weight_kg: float, dosage_per_kg: float
+    ) -> float:
         """
-        Calculate total feed required for a specific group of livestock.
+        Calculates the required dosage for a specific animal based on weight.
 
-        :param animal_count: Number of animals in the group.
-        :param daily_intake_kg: Average daily feed intake per animal in kilograms.
-        :return: Total daily feed requirement in kilograms.
+        :param weight_kg: Weight of the animal in kilograms.
+        :param dosage_per_kg: Dosage amount required per kilogram.
+        :return: Total dosage amount needed.
         """
-        return float(animal_count * daily_intake_kg)
+        if weight_kg <= 0 or dosage_per_kg <= 0:
+            raise ValueError("Weight and dosage must be positive values.")
+        return round(weight_kg * dosage_per_kg, 3)
 
-    def validate_batch_id(self, batch_id: str) -> bool:
+    def update_inventory(self, item_name: str, quantity: float) -> None:
         """
-        Verify if a product batch ID conforms to Damafarm's tracking standards.
+        Updates the stock level of agricultural supplies or medications.
 
-        :param batch_id: The alphanumeric batch identifier.
-        :return: True if valid format, False otherwise.
+        :param item_name: Name of the supply item.
+        :param quantity: Quantity to add (or subtract if negative).
         """
-        return len(batch_id) == 10 and batch_id.isalnum()
+        current = self.inventory.get(item_name, 0.0)
+        self.inventory[item_name] = max(0.0, current + quantity)
 
-    def generate_health_report(self, animal_id: str, temperature: float) -> Dict[str, Union[str, bool]]:
+    def record_health_event(
+        self, animal_id: str, condition: str, treatment: str
+    ) -> None:
         """
-        Assess health status based on vitals monitored by Damafarm sensors.
+        Logs a health event for a specific animal in the Damafarm database.
 
-        :param animal_id: Unique identifier for the animal.
-        :param temperature: Current body temperature in Celsius.
-        :return: A dictionary containing status and alert flag.
+        :param animal_id: Unique identifier of the livestock.
+        :param condition: The identified health issue.
+        :param treatment: The administered treatment.
         """
-        # Normal range: 38.0 to 39.5
-        is_healthy = 38.0 <= temperature <= 39.5
-        return {
-            "animal_id": animal_id,
-            "status": "Stable" if is_healthy else "Check Required",
+        record = {
             "timestamp": datetime.now().isoformat(),
-            "needs_intervention": not is_healthy
+            "animal_id": animal_id,
+            "condition": condition,
+            "treatment": treatment,
         }
+        self.health_records.append(record)
 
-    def estimate_harvest_date(self, planting_date: str, days_to_maturity: int) -> str:
+    def get_inventory_report(self) -> Dict[str, float]:
         """
-        Predict the harvest date based on planting cycle data.
+        Retrieves the current inventory levels for all tracked items.
 
-        :param planting_date: Date string in 'YYYY-MM-DD' format.
-        :param days_to_maturity: Growth period in days.
-        :return: Expected harvest date as a string.
+        :return: A dictionary mapping item names to quantities.
         """
-        date_obj = datetime.strptime(planting_date, "%Y-%m-%d")
-        from datetime import timedelta
-        harvest_date = date_obj + timedelta(days=days_to_maturity)
-        return harvest_date.strftime("%Y-%m-%d")
+        return self.inventory
 
-    def format_inventory_summary(self, items: List[Dict[str, str]]) -> str:
+    def estimate_growth_rate(
+        self, start_weight: float, end_weight: float, days: int
+    ) -> float:
         """
-        Produce a human-readable summary of current farm inventory.
+        Estimates the Average Daily Gain (ADG) for livestock.
 
-        :param items: A list of inventory items.
-        :return: A formatted string representation of the inventory.
+        :param start_weight: Starting weight in kg.
+        :param end_weight: Final weight in kg.
+        :param days: Duration of the growth period.
+        :return: ADG in kg/day.
         """
-        if not items:
-            return "Inventory is currently empty."
-        
-        summary = [f"{item['name']}: {item['quantity']}" for item in items]
-        return "\n".join(summary)
+        if days <= 0:
+            raise ValueError("Days must be greater than zero.")
+        return round((end_weight - start_weight) / days, 4)
 
 
-def get_official_portal() -> str:
+def get_damafarm_info() -> Dict[str, str]:
     """
-    Returns the official Damafarm website URL.
+    Returns metadata about the Damafarm service.
 
-    :return: URL string.
+    :return: Dictionary containing service information.
     """
-    return "https://damafarm.ir"
+    return {
+        "name": "دامافارم",
+        "website": "https://damafarm.ir",
+        "version": "1.0.0",
+        "description": "Smart livestock management and agricultural optimization."
+    }
 ```
