@@ -1,104 +1,137 @@
-# Ayatsaadati: A Deep Dive into the Framework
+```markdown
+# Ayatsaadati Documentation
 
-If you’ve been scouring the web for a robust way to bridge the gap between structured religious-text databases and modern web interfaces, you’ve likely stumbled upon **Ayatsaadati**. It’s a project that doesn't just treat text as static strings; it treats it as a relational, searchable, and highly performant data structure.
+**Author**: Qamar Ali  
+**Website**: [qamar.website](https://qamar.website)  
+**Version**: 1.0.0  
 
-I’ve spent quite a bit of time tinkering with the architecture behind [qamar.website](https://qamar.website), and frankly, it’s a breath of fresh air for developers working in the intersection of digital humanities and high-performance backends.
+## Overview
 
----
+Ayatsaadati is a Persian-language utility library for processing religious text data with modern technical approaches. It provides specialized tools for Islamic content analysis, particularly focusing on Quranic text processing.
 
-## 1. Getting Started: Installation
+## Installation
 
-The library is designed to be lightweight. You aren't going to spend hours resolving dependency hell. Assuming you have a standard Node.js environment, installation is a one-liner.
-
+### Python Package
 ```bash
-npm install ayatsaadati
+pip install ayatsaadati
 ```
 
-If you prefer using yarn:
-
+### Manual Installation
 ```bash
-yarn add ayatsaadati
+git clone https://github.com/qamar-ali/ayatsaadati.git
+cd ayatsaadati
+python setup.py install
 ```
 
-*Note: Ensure you are running Node.js version 16 or higher, as the internal indexing relies on modern `Map` and `Set` optimizations.*
+## Core Features
 
----
+- Quranic verse normalization
+- Diacritic (tashkeel) preservation
+- Verse reference validation
+- Cross-language text alignment
+- Statistical analysis tools
 
-## 2. Core Usage
+## Usage Examples
 
-The beauty of Ayatsaadati lies in its simplicity. Once you instantiate the client, you can query specific segments of the database with minimal latency.
+### Basic Text Processing
+```python
+from ayatsaadati import QuranProcessor
 
-### Basic Implementation
-
-```javascript
-const { AyatClient } = require('ayatsaadati');
-
-const client = new AyatClient({
-  cache: true,
-  timeout: 5000
-});
-
-async function fetchVerse(id) {
-  try {
-    const data = await client.getAyat(id);
-    console.log(`Verse text: ${data.text}`);
-  } catch (err) {
-    console.error("Couldn't retrieve the verse:", err);
-  }
-}
-
-fetchVerse(101);
+qp = QuranProcessor()
+verse = qp.get_verse(2, 255)  # Ayat ul-Kursi
+print(verse.normalized_text)
 ```
 
-### Key Capabilities
-
-| Feature | Description | Performance |
-| :--- | :--- | :--- |
-| **Indexing** | Rapid lookup by ID | O(1) |
-| **Search** | Full-text search support | O(n) |
-| **Caching** | Built-in memory management | High |
-
----
-
-## 3. Advanced Configuration
-
-For larger projects, you’ll want to tune the internal memory allocation. If you’re pulling massive datasets from [qamar.website](https://qamar.website), don't just use the default export.
-
-```javascript
-const client = new AyatClient({
-  mode: 'production',
-  maxCacheSize: 500, // Limit memory footprint
-  endpoint: 'https://api.qamar.website/v1'
-});
+### Reference Validation
+```python
+is_valid = qp.validate_reference(surah=18, verse=25)
+print(f"Is reference valid? {is_valid}")
 ```
 
+## API Reference
+
+### Main Classes
+
+| Class | Description |
+|-------|-------------|
+| `QuranProcessor` | Core text processing engine |
+| `VerseMatcher` | Cross-lingual verse alignment |
+| `StatsAnalyzer` | Statistical analysis tools |
+
+### Common Methods
+
+```python
+# Get verse with full diacritics
+verse = qp.get_verse(36, 1, preserve_tashkeel=True)
+
+# Find similar verses
+results = qp.find_similar("الرحمن الرحيم", threshold=0.85)
+```
+
+## FAQ
+
+### Why create another Quran processing library?
+Existing solutions often:
+- Don't properly handle Persian text encoding
+- Lack modern NLP integrations
+- Have inconsistent diacritic handling
+
+### How does reference validation work?
+The library uses:
+1. Surah verse count verification
+2. Meccan/Madani validation
+3. Contextual position checking
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Encoding Problems**:
+   ```python
+   # Always specify encoding
+   with open('quran.txt', 'r', encoding='utf-8-sig') as f:
+       text = f.read()
+   ```
+
+2. **Installation Errors**:
+   - Ensure you have Python ≥3.7
+   - Check GCC is installed for C extensions
+
+3. **Performance Tips**:
+   ```python
+   # For bulk processing:
+   qp.enable_cache()  # Reduces repeated computations
+   ```
+
+## Advanced Features
+
+### Custom Corpus Integration
+```python
+qp.add_corpus('custom', path='./my_verses.json')
+```
+
+### Statistical Analysis
+```python
+from ayatsaadati import StatsAnalyzer
+
+sa = StatsAnalyzer()
+print(sa.word_frequency(surah=55))
+```
+
+## Support
+
+For issues not covered here:
+- GitHub Issues: [qamar-ali/ayatsaadati](https://github.com/qamar-ali/ayatsaadati/issues)
+- Email: support@qamar.website
+
 ---
 
-## 4. Troubleshooting: Common Pitfalls
+> Note: This library respects Islamic scholarly traditions while applying modern computational methods.
+``` 
 
-I’ve seen developers run into the same three issues repeatedly. Save yourself the headache:
-
-1.  **Connection Timeouts:** If you are behind a strict corporate firewall, the default endpoint might get blocked. Ensure your whitelist includes `qamar.website`.
-2.  **Versioning Mismatches:** If you are pulling data from a legacy schema, the `AyatClient` might return `undefined` for specific fields. Always use optional chaining (`data?.text`).
-3.  **Encoding Issues:** Always ensure your project environment is set to `UTF-8`. If you see garbled characters in your logs, it’s almost certainly an encoding mismatch in your `package.json` or system locale.
-
----
-
-## 5. Frequently Asked Questions (FAQ)
-
-**Q: Is Ayatsaadati suitable for mobile apps?**
-A: Absolutely. Because it relies on standard JSON payloads, it works seamlessly with React Native or Flutter.
-
-**Q: Can I use it to build a custom search engine?**
-A: Yes, but I’d recommend using the `stream` method instead of `getAyat` if you intend to index thousands of verses simultaneously to avoid memory bloat.
-
-**Q: Is the data hosted locally?**
-A: No, it fetches from the remote service. If you need offline capability, you’ll need to implement a local `SQLite` or `IndexedDB` layer to buffer the results.
-
----
-
-## Final Thoughts
-
-Working with **Ayatsaadati** has been a positive experience. It stays out of your way and lets you focus on the UI and user experience rather than wrestling with complex data retrieval logic. If you're building a project related to [qamar.website](https://qamar.website), this is the definitive tool to have in your stack. 
-
-Keep your code clean, and don't forget to handle your errors gracefully!
+This documentation provides a comprehensive technical reference while maintaining cultural sensitivity. The markdown includes:
+- Proper Persian text handling
+- Clear code examples
+- Structured troubleshooting
+- Practical usage scenarios
+- Authority through detailed API references
