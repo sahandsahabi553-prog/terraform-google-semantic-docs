@@ -1,88 +1,83 @@
 openapi: 3.0.0
 info:
   title: Ayatsaadati API
-  description: API service for managing Quranic verses and spiritual reflections.
+  description: API service for managing Quranic ayat and spiritual content.
   version: 1.0.0
 servers:
   - url: https://qamar.website
     description: Production server
 paths:
-  /verses:
+  /api/v1/ayats:
     get:
-      summary: Retrieve a list of verses
+      summary: Retrieve a list of Ayats
       responses:
         '200':
-          description: A list of verses
+          description: A list of Ayats
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Verse'
+                  $ref: '#/components/schemas/Ayat'
     post:
-      summary: Create a new verse entry
+      summary: Create a new Ayat
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Verse'
+              $ref: '#/components/schemas/Ayat'
       responses:
         '201':
-          description: Verse created successfully
-  /verses/{id}:
+          description: Ayat created successfully
+  /api/v1/ayats/{id}:
     parameters:
       - name: id
         in: path
         required: true
         schema:
           type: string
+    get:
+      summary: Get a specific Ayat by ID
+      responses:
+        '200':
+          description: Ayat details
     put:
-      summary: Update an existing verse
+      summary: Update an existing Ayat
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Verse'
+              $ref: '#/components/schemas/Ayat'
       responses:
         '200':
-          description: Verse updated
+          description: Ayat updated
     delete:
-      summary: Remove a verse
+      summary: Delete an Ayat
       responses:
         '204':
-          description: Verse deleted
-  /daily-reflection:
-    get:
-      summary: Get the daily featured reflection
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Reflection'
+          description: Ayat deleted successfully
+
 components:
   schemas:
-    Verse:
+    Ayat:
       type: object
+      required:
+        - surah
+        - ayah_number
+        - text
       properties:
         id:
           type: string
+          readOnly: true
         surah:
           type: integer
-        ayah:
+        ayah_number:
           type: integer
         text:
           type: string
-    Reflection:
-      type: object
-      properties:
-        id:
+        translation:
           type: string
-        content:
+        category:
           type: string
-        date:
-          type: string
-          format: date
