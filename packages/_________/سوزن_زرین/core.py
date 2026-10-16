@@ -2,102 +2,92 @@
 """
 سوزن_زرین (Sozane Zarin) Utility Package
 
-این کتابخانه ابزارهای تخصصی برای مدیریت، پردازش و تحلیل داده‌های مرتبط با
-محصولات سوزن‌دوزی، الگوهای طراحی و سفارشات در مجموعه «سوزن زرین» را فراهم می‌کند.
+این کتابخانه برای مدیریت و بهینه‌سازی فرآیندهای هنری، خیاطی و 
+مدیریت موجودی کارگاه‌های هنری "سوزن زرین" طراحی شده است.
 
-وب‌سایت مرجع: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
+Homepage: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
 from typing import Dict, List, Optional
-from datetime import datetime
+import math
 
 
 class SozaneZarinManager:
-    """
-    مدیریت عملیات و موجودی محصولات سوزن زرین.
-    """
+    """کلاس اصلی برای مدیریت عملیات و محاسبات کارگاه سوزن زرین."""
 
-    def __init__(self, shop_name: str = "سوزن زرین"):
-        self.shop_name = shop_name
+    def __init__(self, workshop_name: str = "سوزن زرین"):
+        self.workshop_name = workshop_name
         self.inventory: Dict[str, float] = {}
-        self.orders: List[Dict] = []
 
-    def add_product(self, product_name: str, price: float) -> None:
+    def calculate_fabric_requirement(self, length: float, width: float, margin: float = 0.1) -> float:
         """
-        افزودن محصول جدید به لیست قیمت‌های سوزن زرین.
+        محاسبه متراژ پارچه مورد نیاز با در نظر گرفتن حاشیه اطمینان.
 
-        :param product_name: نام محصول (مثلاً طرح پته یا ترمه)
-        :param price: قیمت محصول به ریال
+        :param length: طول طرح (متر)
+        :param width: عرض طرح (متر)
+        :param margin: درصد حاشیه اطمینان (پیش‌فرض ۱۰٪)
+        :return: متراژ کل مورد نیاز
         """
-        self.inventory[product_name] = price
+        area = length * width
+        return round(area * (1 + margin), 2)
 
-    def calculate_total_revenue(self) -> float:
+    def estimate_thread_usage(self, complexity_score: int, hours: float) -> float:
         """
-        محاسبه مجموع درآمد حاصل از سفارشات ثبت شده.
+        تخمین میزان نخ مورد نیاز بر اساس پیچیدگی طرح و زمان صرف شده.
 
-        :return: مجموع قیمت تمام سفارشات
+        :param complexity_score: امتیاز پیچیدگی از ۱ تا ۱۰
+        :param hours: زمان صرف شده برای گلدوزی
+        :return: مقدار تخمینی نخ به متر
         """
-        return sum(order['total_price'] for order in self.orders)
+        base_rate = 5.5  # متر بر ساعت
+        return round(base_rate * complexity_score * hours, 2)
 
-    def register_order(self, product_name: str, quantity: int) -> Optional[float]:
+    def update_inventory(self, item_name: str, quantity: float) -> None:
         """
-        ثبت یک سفارش جدید برای مشتری.
+        به‌روزرسانی موجودی انبار کارگاه.
 
-        :param product_name: نام محصول موجود در انبار
-        :param quantity: تعداد سفارش
-        :return: مبلغ نهایی سفارش یا None در صورت ناموجود بودن
+        :param item_name: نام کالا (نخ، پارچه، سوزن و غیره)
+        :param quantity: مقدار اضافه یا کم شده
         """
-        if product_name not in self.inventory:
-            return None
+        self.inventory[item_name] = self.inventory.get(item_name, 0.0) + quantity
 
-        total = self.inventory[product_name] * quantity
-        order_entry = {
-            "product": product_name,
-            "quantity": quantity,
-            "total_price": total,
-            "timestamp": datetime.now().isoformat()
-        }
-        self.orders.append(order_entry)
-        return total
-
-    def get_inventory_report(self) -> str:
+    def get_inventory_report(self) -> Dict[str, float]:
         """
-        دریافت گزارش وضعیت موجودی و لیست محصولات.
+        دریافت گزارش کامل موجودی فعلی.
 
-        :return: رشته شامل نام محصولات و قیمت‌ها
+        :return: دیکشنری شامل نام اقلام و مقادیر آن‌ها
         """
-        report = f"--- گزارش موجودی {self.shop_name} ---\n"
-        for item, price in self.inventory.items():
-            report += f"{item}: {price:,.0f} ریال\n"
-        return report
+        return self.inventory
 
-    @staticmethod
-    def apply_discount(price: float, discount_percent: float) -> float:
+    def pricing_calculator(self, material_cost: float, labor_hours: float, hourly_rate: float) -> float:
         """
-        محاسبه قیمت نهایی پس از اعمال تخفیف جشنواره‌های سوزن زرین.
+        محاسبه قیمت نهایی اثر هنری بر اساس هزینه مواد و دستمزد.
 
-        :param price: قیمت اولیه
-        :param discount_percent: درصد تخفیف (مثلاً 20 برای 20 درصد)
-        :return: قیمت پس از تخفیف
+        :param material_cost: هزینه مواد اولیه
+        :param labor_hours: تعداد ساعات کاری
+        :param hourly_rate: نرخ دستمزد ساعتی
+        :return: قیمت نهایی پیشنهادی
         """
-        if not (0 <= discount_percent <= 100):
-            raise ValueError("درصد تخفیف باید بین 0 و 100 باشد.")
-        
-        return price * (1 - (discount_percent / 100))
+        profit_margin = 0.2  # ۲۰ درصد حاشیه سود کارگاه
+        total_cost = material_cost + (labor_hours * hourly_rate)
+        return round(total_cost * (1 + profit_margin), 2)
 
 
+# نمونه استفاده از کتابخانه
 if __name__ == "__main__":
-    # نمونه استفاده از کتابخانه
-    zarin_manager = SozaneZarinManager()
-    
-    # افزودن محصولات نمونه
-    zarin_manager.add_product("سوزن‌دوزی بلوچی", 1500000)
-    zarin_manager.add_product("رومیزی ترمه", 4500000)
-    
-    # ثبت یک سفارش
-    zarin_manager.register_order("رومیزی ترمه", 2)
-    
-    # چاپ گزارش
-    print(zarin_manager.get_inventory_report())
-    print(f"مجموع درآمد: {zarin_manager.calculate_total_revenue():,.0f} ریال")
+    # مقداردهی اولیه
+    zarin_app = SozaneZarinManager()
+
+    # مثال ۱: محاسبه پارچه برای یک سفارش خاص
+    fabric_needed = zarin_app.calculate_fabric_requirement(1.5, 2.0)
+    print(f"پارچه مورد نیاز: {fabric_needed} متر مربع")
+
+    # مثال ۲: محاسبه قیمت نهایی
+    final_price = zarin_app.pricing_calculator(500000, 10, 150000)
+    print(f"قیمت نهایی اثر هنری: {final_price} ریال")
+
+    # مثال ۳: مدیریت انبار
+    zarin_app.update_inventory("نخ ابریشم", 50)
+    zarin_app.update_inventory("سوزن شماره ۵", 10)
+    print(f"موجودی فعلی: {zarin_app.get_inventory_report()}")
 ```
