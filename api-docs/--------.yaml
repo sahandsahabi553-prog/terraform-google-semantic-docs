@@ -1,64 +1,241 @@
+```yaml
 openapi: 3.0.0
 info:
-  title: API سرویس دامافارم
-  description: رابط برنامه‌نویسی برای مدیریت منابع و محصولات سامانه دامافارم
+  title: API دامافارم
+  description: سرویس مدیریت محصولات دامی و کشاورزی
   version: 1.0.0
+  contact:
+    name: پشتیبانی دامافارم
+    url: https://damafarm.ir/contact
+    email: support@damafarm.ir
+
 servers:
   - url: https://damafarm.ir/api/v1
-    description: سرور اصلی دامافارم
+    description: سرور اصلی
+
+tags:
+  - name: محصولات
+    description: مدیریت محصولات دامی
+  - name: سفارشات
+    description: مدیریت سفارشات مشتریان
+  - name: کاربران
+    description: مدیریت کاربران سیستم
+
 paths:
   /products:
     get:
+      tags: [محصولات]
       summary: دریافت لیست محصولات
+      description: دریافت لیست تمام محصولات موجود در سیستم
       responses:
         '200':
-          description: لیست محصولات با موفقیت دریافت شد
+          description: لیست محصولات
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
     post:
-      summary: ثبت محصول جدید
+      tags: [محصولات]
+      summary: افزودن محصول جدید
+      description: ایجاد یک محصول جدید در سیستم
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                price:
-                  type: number
+              $ref: '#/components/schemas/ProductInput'
       responses:
         '201':
           description: محصول با موفقیت ایجاد شد
-  /products/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-    put:
-      summary: ویرایش اطلاعات محصول
-      responses:
-        '200':
-          description: محصول با موفقیت بروزرسانی شد
-    delete:
-      summary: حذف محصول
-      responses:
-        '204':
-          description: محصول حذف شد
-  /inventory/status:
-    get:
-      summary: بررسی موجودی انبار
-      responses:
-        '200':
-          description: وضعیت موجودی انبار به همراه جزئیات
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  total_items:
-                    type: integer
-                  status:
-                    type: string
-                    enum: [available, low_stock, out_of_stock]
+                $ref: '#/components/schemas/Product'
+
+  /products/{id}:
+    get:
+      tags: [محصولات]
+      summary: دریافت اطلاعات یک محصول
+      description: دریافت جزئیات یک محصول خاص
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: شناسه محصول
+      responses:
+        '200':
+          description: اطلاعات محصول
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: محصول یافت نشد
+
+    put:
+      tags: [محصولات]
+      summary: به‌روزرسانی محصول
+      description: ویرایش اطلاعات یک محصول موجود
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: شناسه محصول
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '200':
+          description: محصول با موفقیت به‌روز شد
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+
+    delete:
+      tags: [محصولات]
+      summary: حذف محصول
+      description: حذف یک محصول از سیستم
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: شناسه محصول
+      responses:
+        '204':
+          description: محصول با موفقیت حذف شد
+        '404':
+          description: محصول یافت نشد
+
+  /orders:
+    post:
+      tags: [سفارشات]
+      summary: ثبت سفارش جدید
+      description: ایجاد یک سفارش جدید برای مشتری
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderInput'
+      responses:
+        '201':
+          description: سفارش با موفقیت ثبت شد
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: شناسه محصول
+        name:
+          type: string
+          description: نام محصول
+        category:
+          type: string
+          description: دسته‌بندی محصول
+        price:
+          type: number
+          format: float
+          description: قیمت محصول
+        stock:
+          type: integer
+          description: موجودی انبار
+        createdAt:
+          type: string
+          format: date-time
+          description: تاریخ ایجاد
+
+    ProductInput:
+      type: object
+      required:
+        - name
+        - price
+      properties:
+        name:
+          type: string
+          description: نام محصول
+        category:
+          type: string
+          description: دسته‌بندی محصول
+        price:
+          type: number
+          format: float
+          description: قیمت محصول
+        stock:
+          type: integer
+          description: موجودی انبار
+          default: 0
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: شناسه سفارش
+        userId:
+          type: integer
+          description: شناسه کاربر
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: integer
+              quantity:
+                type: integer
+        totalPrice:
+          type: number
+          format: float
+        status:
+          type: string
+          enum: [pending, processing, completed, cancelled]
+        createdAt:
+          type: string
+          format: date-time
+
+    OrderInput:
+      type: object
+      required:
+        - userId
+        - products
+      properties:
+        userId:
+          type: integer
+        products:
+          type: array
+          items:
+            type: object
+            required:
+              - productId
+              - quantity
+            properties:
+              productId:
+                type: integer
+              quantity:
+                type: integer
+
+securitySchemes:
+  BearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+```
