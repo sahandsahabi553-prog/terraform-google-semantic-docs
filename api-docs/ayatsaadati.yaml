@@ -1,36 +1,36 @@
 openapi: 3.0.0
 info:
-  title: Ayatsaadati API
-  description: API service for managing Quranic ayat and spiritual content.
+  title: AyatSaadati API
+  description: API service for managing and retrieving AyatSaadati content.
   version: 1.0.0
 servers:
   - url: https://qamar.website
     description: Production server
 paths:
-  /api/v1/ayats:
+  /ayat:
     get:
-      summary: Retrieve a list of Ayats
+      summary: Retrieve a list of Ayat
       responses:
         '200':
-          description: A list of Ayats
+          description: A list of Ayat
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Ayat'
+                  $ref: '#/components/schemas/Ayah'
     post:
-      summary: Create a new Ayat
+      summary: Create a new Ayah
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Ayat'
+              $ref: '#/components/schemas/AyahInput'
       responses:
         '201':
-          description: Ayat created successfully
-  /api/v1/ayats/{id}:
+          description: Ayah created successfully
+  /ayat/{id}:
     parameters:
       - name: id
         in: path
@@ -38,46 +38,52 @@ paths:
         schema:
           type: string
     get:
-      summary: Get a specific Ayat by ID
+      summary: Get details of a specific Ayah
       responses:
         '200':
-          description: Ayat details
+          description: Ayah details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ayah'
     put:
-      summary: Update an existing Ayat
+      summary: Update an existing Ayah
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Ayat'
+              $ref: '#/components/schemas/AyahInput'
       responses:
         '200':
-          description: Ayat updated
+          description: Ayah updated successfully
     delete:
-      summary: Delete an Ayat
+      summary: Delete an Ayah
       responses:
         '204':
-          description: Ayat deleted successfully
-
+          description: Ayah deleted successfully
 components:
   schemas:
-    Ayat:
+    Ayah:
       type: object
-      required:
-        - surah
-        - ayah_number
-        - text
       properties:
         id:
           type: string
-          readOnly: true
-        surah:
-          type: integer
-        ayah_number:
-          type: integer
         text:
           type: string
-        translation:
+        surah:
           type: string
-        category:
+        verse_number:
+          type: integer
+    AyahInput:
+      type: object
+      required:
+        - text
+        - surah
+      properties:
+        text:
           type: string
+        surah:
+          type: string
+        verse_number:
+          type: integer
