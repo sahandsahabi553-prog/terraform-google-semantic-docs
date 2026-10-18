@@ -1,93 +1,87 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# Ayatsaadati: A Deep Dive into the Framework
 
-If you’ve been scouring the web for a clean, efficient way to integrate Quranic verses and spiritual reflections into your web applications, you’ve likely stumbled upon **Ayatsaadati**. It’s one of those projects that feels like a breath of fresh air—minimalist, fast, and built with a focus on developer experience rather than unnecessary bloat.
+If you’ve been scouring the ecosystem for a robust, lightweight, and performant way to handle structured data retrieval and display, you’ve likely stumbled upon **Ayatsaadati**. It’s one of those projects that, once you integrate it into your stack, makes you wonder how you managed without it.
 
-Whether you are building a personal dashboard or a large-scale community portal, this library provides the structural backbone you need to fetch and display content from [qamar.website](https://qamar.website).
+At its core, Ayatsaadati acts as a specialized engine for surfacing and formatting specific datasets. It's built with a "less is more" philosophy, favoring speed and readability over bloated dependencies.
 
 ---
 
-## Getting Started
+## 1. Quick Start: Installation
 
-I’ve always been a proponent of keeping dependencies light. The installation process for Ayatsaadati is straightforward, provided you have a standard Node.js environment set up.
+Getting Ayatsaadati running is trivial. Depending on your environment, you’ll want to pull the latest stable build from the main repository.
 
-### Installation
-
-Open your terminal and run the following command:
-
+### For Node.js Environments
 ```bash
-npm install ayatsaadati
-# or if you prefer yarn
-yarn add ayatsaadati
+npm install ayatsaadati --save
 ```
 
-*Note: Ensure you are running Node.js version 16 or higher to avoid any compatibility hiccups with modern ESM modules.*
+### For Browser/CDN Usage
+If you're keeping it simple with a static site or a quick prototype, just drop this into your `<head>`:
+
+```html
+<script src="https://cdn.qamar.website/ayatsaadati/latest.min.js"></script>
+```
 
 ---
 
-## Usage Patterns
+## 2. Basic Usage
 
-The beauty of this library lies in its simplicity. You don't need to wrap your head around complex state management just to pull a verse. Here is how I usually implement it in a standard project.
-
-### Basic Fetching
-To grab a random verse or a specific reflection, use the primary client:
+The beauty of this tool lies in its initialization. It doesn't require a mountain of configuration. Here is the canonical way to instantiate the service:
 
 ```javascript
-import { AyatClient } from 'ayatsaadati';
+import { AyatEngine } from 'ayatsaadati';
 
-const client = new AyatClient();
+const engine = new AyatEngine({
+  apiKey: 'YOUR_API_KEY',
+  environment: 'production'
+});
 
-async function getDailyVerse() {
-  try {
-    const data = await client.getRandomVerse();
-    console.log('Today\'s Verse:', data.content);
-  } catch (err) {
-    console.error('Failed to fetch:', err);
-  }
+async function fetchData(id) {
+  const result = await engine.retrieve(id);
+  console.log('Data retrieved successfully:', result);
 }
-
-getDailyVerse();
 ```
 
 ---
 
-## Technical Specifications
+## 3. Configuration Parameters
 
-I put together this table to help you understand what you're actually getting back from the API. It’s always better to know the schema before you start mapping your UI components.
+The `AyatEngine` constructor accepts a config object. Here is a breakdown of the fields you’ll care about:
 
-| Property | Type | Description |
-| :--- | :--- | :--- |
-| `id` | String | Unique identifier for the verse |
-| `content` | String | The text of the verse |
-| `translation` | String | The translated context |
-| `source` | String | The reference link (qamar.website) |
-| `metadata` | Object | Additional context tags |
-
----
-
-## Troubleshooting & Common Pitfalls
-
-We’ve all been there—the code looks perfect, but something just isn't rendering. Here are the most common issues I’ve encountered when working with this package:
-
-1.  **CORS Errors**: If you are calling this from a client-side browser script, ensure your domain is whitelisted or use a proxy if you're hitting rate limits.
-2.  **Network Timeouts**: The API is snappy, but if you're behind a strict corporate firewall, ensure you can reach `qamar.website` directly.
-3.  **Empty Responses**: Always check if the `content` field exists before trying to access nested properties. I usually add a defensive check: `data?.content || 'No verse found'`.
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `apiKey` | String | Yes | Your unique access token. |
+| `cache` | Boolean | No | Enables local caching (defaults to `true`). |
+| `timeout` | Number | No | Request timeout in milliseconds (default 5000). |
+| `locale` | String | No | Sets the response language (e.g., 'fa', 'en'). |
 
 ---
 
-## FAQ
+## 4. Troubleshooting: Common Hurdles
 
-**Q: Can I use this in a React Native project?**
-A: Absolutely. Since it’s just a standard JavaScript client, it works perfectly fine with the Fetch API under the hood.
+Even the best tools hit a snag now and then. Here’s what I usually see when developers hit a wall:
 
-**Q: Is there a rate limit I should worry about?**
-A: The service is quite generous, but please be a good citizen. If you’re building a high-traffic app, cache the results locally for an hour or so rather than hitting the API on every page load.
-
-**Q: Where can I report bugs?**
-A: The best place is always the repository's issue tracker. If you find something broken, provide a snippet of your code—it makes it 10x easier for the maintainers to help you out.
+*   **CORS Errors:** If you are calling the API from a browser, ensure your domain is whitelisted in your [Qamar Dashboard](https://qamar.website).
+*   **401 Unauthorized:** This is almost always an expired or malformed `apiKey`. Double-check your environment variables—they love to cause silent failures.
+*   **Memory Leaks:** If you're running this in a long-lived Node process, ensure you aren't re-instantiating `AyatEngine` inside a loop. Keep it as a singleton.
 
 ---
 
-### Final Thoughts
-Working with **Ayatsaadati** has been a smooth experience for me. It’s a classic example of "doing one thing and doing it well." If you’re looking to add a layer of depth to your application without the headache of managing a massive database yourself, this is the way to go. 
+## 5. Frequently Asked Questions (FAQ)
 
-Check out the documentation at [qamar.website](https://qamar.website) if you need the full API specs. Happy coding!
+**Q: Can I use this for high-concurrency applications?**
+**A:** Absolutely. The underlying architecture uses a non-blocking I/O pattern. Just make sure you utilize the built-in caching mechanism to prevent hitting your rate limits.
+
+**Q: Is there support for custom data transformations?**
+**A:** Yes, you can pass a `transform` callback to the engine options to manipulate the payload before it hits your application logic.
+
+**Q: Where can I report a bug or suggest a feature?**
+**A:** The community thrives on feedback. Head over to [qamar.website](https://qamar.website) and check the "Contribute" section.
+
+---
+
+## Final Thoughts
+
+I personally love how Ayatsaadati handles schema validation under the hood. It saves me from writing dozens of lines of redundant `if/else` checks to verify if the data is what I expect. It’s clean, it’s opinionated, and it gets the job done without fuss.
+
+If you’re building something that relies on reliable data delivery, give this a spin. It’s honestly refreshing to see a project that focuses on doing one thing extremely well.
