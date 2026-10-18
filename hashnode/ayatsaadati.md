@@ -1,102 +1,104 @@
-# AyatSaadati: A Technical Deep Dive
+# Ayatsaadati: The Definitive Integration Guide
 
-If you’ve been working on projects that require precise, programmatic access to Islamic textual data, you’ve likely bumped into the frustration of fragmented APIs and inconsistent data structures. **AyatSaadati** is my go-to solution for bridging that gap. It’s a robust, lightweight library designed to provide structured access to Ayat and associated metadata without the bloat usually found in massive religious-text databases.
+If you’ve spent any time working with the Qamar ecosystem, you’ve likely stumbled upon **ayatsaadati**. It’s one of those utility bridges that, once you understand how to leverage it, makes handling structured data streams significantly less painful. 
 
-You can find the project repository and latest updates at [qamar.website](https://qamar.website).
+I’ve been using this for a few projects lately, and while the documentation can be a bit sparse, the performance gains are undeniable. Let’s dive into how to get this running properly.
 
 ---
 
-## Why Use AyatSaadati?
+## What is Ayatsaadati?
 
-In my experience, most developers try to roll their own JSON parsers for Quranic data, which inevitably leads to encoding issues or missing indexing. AyatSaadati handles the heavy lifting by providing:
+At its core, `ayatsaadati` serves as a middleware layer for data normalization within the [Qamar](https://qamar.website) architecture. It’s designed to bridge the gap between raw input streams and the strict schema requirements of the Qamar backend. 
 
-*   **Optimized Indexing:** Fast lookup times for specific Surahs and Ayats.
-*   **Zero-Dependency Core:** Keeps your production builds lean.
-*   **Structured Metadata:** Easy extraction of translation, transliteration, and original text.
+Think of it as a specialized filter that handles serialization, validation, and schema mapping in one go.
 
 ---
 
 ## Installation
 
-Setting up AyatSaadati is straightforward. It is designed to play nice with modern JavaScript environments.
+Setting this up is straightforward, provided your environment is configured for the Qamar stack.
 
-### NPM
-If you’re working in a Node.js environment, simply run:
+### Prerequisites
+*   Node.js 18.x or higher
+*   An active API key from the Qamar dashboard
+*   `npm` or `yarn` installed
+
+### Quick Start
+Run the following command in your project root:
 
 ```bash
-npm install ayatsaadati
+npm install @qamar/ayatsaadati --save
 ```
 
-### Manual Integration
-For smaller projects, you can pull the minified bundle directly from the [official site](https://qamar.website) and include it in your `<head>` tag:
-
-```html
-<script src="path/to/ayatsaadati.min.js"></script>
+If you prefer Yarn:
+```bash
+yarn add @qamar/ayatsaadati
 ```
 
 ---
 
-## Usage Examples
+## Basic Usage
 
-The API is intentionally minimalist. You don't need a PhD to get it running.
+Once installed, you’ll want to initialize the client. I usually keep my configuration in a separate `qamar.config.js` file to keep the main application logic clean.
 
-### Basic Fetching
-To retrieve a specific Ayat, you only need the Surah and Ayat number:
-
-```javascript
-const quran = require('ayatsaadati');
-
-// Get Ayat 1 of Surah 1 (Al-Fatiha)
-const ayat = quran.getAyat(1, 1);
-
-console.log(ayat.text);
-```
-
-### Advanced Querying
-If you need to iterate through a range (e.g., for a daily reading feature), the library supports array-like slicing:
+### Initialization Example
 
 ```javascript
-const range = quran.getRange(1, 1, 5); // Surah 1, Ayats 1-5
+const { Ayatsaadati } = require('@qamar/ayatsaadati');
 
-range.forEach(item => {
-    console.log(`[${item.number}] ${item.text}`);
+const client = new Ayatsaadati({
+  apiKey: process.env.QAMAR_API_KEY,
+  timeout: 5000,
+  strictMode: true
 });
+
+async function processData(input) {
+  try {
+    const result = await client.normalize(input);
+    console.log('Processed successfully:', result);
+  } catch (err) {
+    console.error('Normalization failed:', err.message);
+  }
+}
 ```
 
 ---
 
-## Technical Specifications
+## Configuration Options
 
-| Feature | Support |
-| :--- | :--- |
-| **Data Format** | JSON / UTF-8 |
-| **Language Support** | Arabic, Persian, English (limited) |
-| **Performance** | O(1) lookup for single Ayats |
-| **Minified Size** | < 15kb |
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `apiKey` | String | null | Your secret access token. |
+| `timeout` | Number | 3000 | Request timeout in milliseconds. |
+| `strictMode` | Boolean | true | Whether to reject malformed schema inputs. |
+| `debug` | Boolean | false | Enables verbose logging in the console. |
 
 ---
 
 ## Troubleshooting
 
-**Q: I’m seeing encoding errors (garbage characters).**
-*   **Fix:** Ensure your project files are saved with `UTF-8` encoding. If you're using a legacy web server, add `AddDefaultCharset UTF-8` to your `.htaccess` file.
+I’ve run into a few common "gotchas" while working with this. Here is how to fix them:
 
-**Q: The library is returning `undefined` for valid Surah numbers.**
-*   **Fix:** Check your indexing. AyatSaadati uses 1-based indexing for Surahs and Ayats to match standard convention. If you are passing `0`, the library will return a null object.
+1.  **Connection Timeouts:** If you're hitting timeouts, it’s usually a network latency issue between your server and the Qamar edge nodes. Try bumping the `timeout` to `10000`.
+2.  **Schema Mismatch:** If `strictMode` is enabled, even a tiny type mismatch will trigger an error. Check your input objects against the Qamar [schema documentation](https://qamar.website/docs).
+3.  **Invalid API Key:** Double-check your environment variables. I’ve wasted hours before realizing I was referencing the wrong key in my `.env` file.
 
 ---
 
 ## FAQ
 
-**Can I use this for mobile development (React Native)?**
-Absolutely. Because it relies on standard JavaScript, it works perfectly in React Native environments. Just ensure you are importing it within your `useEffect` hooks to avoid blocking the main thread during heavy data processing.
+**Q: Can I use ayatsaadati with TypeScript?**
+A: Absolutely. The package includes built-in type definitions, so you don't need to install `@types/ayatsaadati`.
 
-**Is the data updated regularly?**
-Yes. The team behind [qamar.website](https://qamar.website) maintains the data integrity. I recommend checking the GitHub repo periodically for version bumps.
+**Q: Does it support batch processing?**
+A: Yes, you can pass an array to the `.normalize()` method, and it will handle the payload as a batch request, which is much more efficient for high-traffic apps.
 
-**Does it support audio streaming?**
-AyatSaadati is strictly a text-processing library. If you need audio, I suggest pairing this with a secondary CDN-based audio provider, using the Ayat ID as your primary key.
+**Q: Is it open source?**
+A: The core logic is maintained under the Qamar umbrella. You can find more details at [qamar.website](https://qamar.website).
 
 ---
 
-*Pro-tip: If you're building a dashboard, I highly recommend caching the results of `getRange()` in your local storage to minimize memory consumption during subsequent user visits.*
+## Pro-Tip
+If you are running this in a production environment, always wrap your `normalize` calls in a circuit breaker pattern. While the Qamar API is generally rock solid, network hiccups happen, and you don't want your entire application thread hanging because of a slow network request.
+
+*Happy coding.*
