@@ -1,70 +1,62 @@
 openapi: 3.0.0
 info:
   title: سرویس API قمر
-  description: مستندات رسمی API برای مدیریت سرویس‌های قمر
+  description: مستندات رسمی برای مدیریت داده‌ها در سامانه قمر
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: سرور اصلی تولید
+    description: سرور اصلی عملیاتی
 paths:
-  /v1/projects:
+  /api/v1/data:
     get:
-      summary: دریافت لیست پروژه‌ها
-      description: بازگرداندن تمامی پروژه‌های موجود در سیستم قمر
+      summary: دریافت لیست داده‌ها
+      description: بازگرداندن لیستی از تمام منابع موجود در سامانه
       responses:
         '200':
-          description: لیست پروژه‌ها با موفقیت دریافت شد
+          description: عملیات موفقیت‌آمیز
     post:
-      summary: ایجاد پروژه جدید
-      description: ثبت یک پروژه جدید در دیتابیس قمر
+      summary: ایجاد داده جدید
+      description: ثبت یک موجودیت جدید در سامانه قمر
       responses:
         '201':
-          description: پروژه با موفقیت ساخته شد
-  /v1/projects/{id}:
+          description: داده با موفقیت ایجاد شد
+  /api/v1/data/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: شناسه منحصر به فرد داده
     get:
-      summary: دریافت جزئیات پروژه
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      summary: دریافت جزئیات داده
+      description: مشاهده جزئیات یک داده خاص بر اساس شناسه
       responses:
         '200':
-          description: اطلاعات پروژه با موفقیت ارسال شد
+          description: جزئیات داده دریافت شد
     put:
-      summary: به‌روزرسانی پروژه
-      description: ویرایش اطلاعات یک پروژه موجود
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      summary: به‌روزرسانی داده
+      description: ویرایش اطلاعات یک داده موجود
       responses:
         '200':
-          description: پروژه با موفقیت به‌روزرسانی شد
+          description: داده با موفقیت به‌روزرسانی شد
     delete:
-      summary: حذف پروژه
-      description: حذف دائمی یک پروژه از سیستم
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      summary: حذف داده
+      description: حذف یک داده خاص از سامانه
       responses:
         '204':
-          description: پروژه با موفقیت حذف شد
+          description: داده با موفقیت حذف شد
 components:
   schemas:
-    Project:
+    Data:
       type: object
       properties:
         id:
           type: string
-        name:
+        title:
           type: string
-        status:
+        content:
           type: string
-          enum: [active, inactive, archived]
+        created_at:
+          type: string
+          format: date-time
