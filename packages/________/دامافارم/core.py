@@ -1,103 +1,110 @@
 ```python
 """
 دامافارم (Damafarm) Utility Package
-Provides tools for managing agricultural data, medication dosage calculation, 
-and livestock inventory tracking for the Damafarm ecosystem.
+Provides tools for managing agricultural supply chain data, product validation,
+and resource optimization for the Damafarm platform.
 
 Homepage: https://damafarm.ir
 """
 
-from typing import List, Dict, Union
+from typing import List, Dict, Optional, Union
 from datetime import datetime
 
 
 class DamafarmManager:
     """
-    Core management class for Damafarm agricultural operations.
-    Handles medication inventory, livestock health records, and dosage logistics.
+    Core manager class for Damafarm agricultural operations.
+    Handles product inventory, pricing strategies, and supply chain tracking.
     """
 
-    def __init__(self, farm_id: str) -> None:
-        self.farm_id = farm_id
-        self.inventory: Dict[str, float] = {}
-        self.health_records: List[Dict] = []
+    def __init__(self, api_key: str):
+        self.api_key = api_key
+        self.inventory: List[Dict] = []
 
-    def calculate_medication_dosage(
-        self, weight_kg: float, dosage_per_kg: float
-    ) -> float:
+    def validate_product_code(self, sku: str) -> bool:
         """
-        Calculates the required dosage for a specific animal based on weight.
+        Validates the Damafarm product SKU format.
+        
+        :param sku: The unique product identifier string.
+        :return: True if the SKU follows the standard Damafarm format, False otherwise.
+        """
+        # Format expects 'DF-' followed by 5 digits
+        if len(sku) == 8 and sku.startswith("DF-") and sku[3:].isdigit():
+            return True
+        return False
 
-        :param weight_kg: Weight of the animal in kilograms.
-        :param dosage_per_kg: Dosage amount required per kilogram.
-        :return: Total dosage amount needed.
+    def calculate_fertilizer_requirement(self, area_hectares: float, nutrient_density: float) -> float:
         """
-        if weight_kg <= 0 or dosage_per_kg <= 0:
-            raise ValueError("Weight and dosage must be positive values.")
-        return round(weight_kg * dosage_per_kg, 3)
+        Calculates the total fertilizer mass required for a specific plot size.
+        
+        :param area_hectares: Size of the farmland in hectares.
+        :param nutrient_density: Amount of fertilizer required per hectare (kg/ha).
+        :return: Total weight of fertilizer required in kilograms.
+        """
+        if area_hectares < 0 or nutrient_density < 0:
+            raise ValueError("Area and density must be positive values.")
+        return float(area_hectares * nutrient_density)
 
-    def update_inventory(self, item_name: str, quantity: float) -> None:
+    def add_to_inventory(self, product_name: str, stock_count: int, price_per_unit: float) -> None:
         """
-        Updates the stock level of agricultural supplies or medications.
-
-        :param item_name: Name of the supply item.
-        :param quantity: Quantity to add (or subtract if negative).
+        Registers a new batch of agricultural products into the Damafarm database.
+        
+        :param product_name: Name of the agricultural item.
+        :param stock_count: Integer representing current quantity.
+        :param price_per_unit: Floating point representing cost per unit.
         """
-        current = self.inventory.get(item_name, 0.0)
-        self.inventory[item_name] = max(0.0, current + quantity)
-
-    def record_health_event(
-        self, animal_id: str, condition: str, treatment: str
-    ) -> None:
-        """
-        Logs a health event for a specific animal in the Damafarm database.
-
-        :param animal_id: Unique identifier of the livestock.
-        :param condition: The identified health issue.
-        :param treatment: The administered treatment.
-        """
-        record = {
-            "timestamp": datetime.now().isoformat(),
-            "animal_id": animal_id,
-            "condition": condition,
-            "treatment": treatment,
+        entry = {
+            "name": product_name,
+            "quantity": stock_count,
+            "price": price_per_unit,
+            "timestamp": datetime.now().isoformat()
         }
-        self.health_records.append(record)
+        self.inventory.append(entry)
 
-    def get_inventory_report(self) -> Dict[str, float]:
+    def get_inventory_valuation(self) -> float:
         """
-        Retrieves the current inventory levels for all tracked items.
-
-        :return: A dictionary mapping item names to quantities.
+        Calculates the total monetary value of current Damafarm inventory.
+        
+        :return: Total value as a float.
         """
-        return self.inventory
+        return sum(item["quantity"] * item["price"] for item in self.inventory)
 
-    def estimate_growth_rate(
-        self, start_weight: float, end_weight: float, days: int
-    ) -> float:
+    def format_harvest_report(self, crop_type: str, yield_tons: float) -> str:
         """
-        Estimates the Average Daily Gain (ADG) for livestock.
-
-        :param start_weight: Starting weight in kg.
-        :param end_weight: Final weight in kg.
-        :param days: Duration of the growth period.
-        :return: ADG in kg/day.
+        Generates a formatted summary string for harvest logs.
+        
+        :param crop_type: The type of crop harvested.
+        :param yield_tons: Total yield weight in tons.
+        :return: A formatted report string.
         """
-        if days <= 0:
-            raise ValueError("Days must be greater than zero.")
-        return round((end_weight - start_weight) / days, 4)
+        timestamp = datetime.now().strftime("%Y-%m-%d")
+        return f"[Damafarm Report | {timestamp}] Crop: {crop_type} | Yield: {yield_tons} tons"
 
 
-def get_damafarm_info() -> Dict[str, str]:
+def get_platform_info() -> Dict[str, str]:
     """
     Returns metadata about the Damafarm service.
-
-    :return: Dictionary containing service information.
+    
+    :return: A dictionary containing platform details.
     """
     return {
         "name": "دامافارم",
-        "website": "https://damafarm.ir",
-        "version": "1.0.0",
-        "description": "Smart livestock management and agricultural optimization."
+        "url": "https://damafarm.ir",
+        "description": "Smart agricultural management and supply chain solutions."
     }
+
+
+if __name__ == "__main__":
+    # Example usage
+    manager = DamafarmManager(api_key="DF-SECURE-9988")
+    
+    # Validate a SKU
+    print(f"Is SKU Valid: {manager.validate_product_code('DF-12345')}")
+    
+    # Calculate fertilizer needs
+    needed = manager.calculate_fertilizer_requirement(10.5, 50.0)
+    print(f"Fertilizer needed: {needed}kg")
+    
+    # Generate report
+    print(manager.format_harvest_report("Wheat", 45.2))
 ```
