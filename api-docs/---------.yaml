@@ -1,76 +1,70 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی برای مدیریت خدمات گلدوزی و خیاطی سوزن زرین
+  description: مستندات رسمی مدیریت سفارشات و محصولات گالری سوزن زرین
   version: 1.0.0
 servers:
-  - url: https://api.sozanezarin.com/v1
-    description: سرور اصلی
+  - url: https://api.sozane-zarin.ir/v1
+    description: سرور اصلی تولید
 paths:
-  /orders:
+  /products:
     get:
-      summary: دریافت لیست سفارش‌ها
+      summary: دریافت لیست محصولات
+      tags: [Products]
       responses:
         '200':
-          description: لیست سفارش‌ها با موفقیت دریافت شد
+          description: لیست محصولات با موفقیت دریافت شد
     post:
-      summary: ثبت سفارش جدید
+      summary: ثبت محصول جدید
+      tags: [Products]
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Order'
+              type: object
+              properties:
+                name: {type: string}
+                price: {type: integer}
       responses:
         '201':
-          description: سفارش با موفقیت ثبت شد
-  /orders/{orderId}:
-    get:
-      summary: دریافت جزئیات یک سفارش
-      parameters:
-        - name: orderId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: جزئیات سفارش
+          description: محصول با موفقیت ایجاد شد
+  /products/{id}:
     put:
-      summary: به‌روزرسانی وضعیت سفارش
+      summary: ویرایش اطلاعات محصول
+      tags: [Products]
       parameters:
-        - name: orderId
+        - name: id
           in: path
           required: true
-          schema:
-            type: string
+          schema: {type: string}
       responses:
         '200':
-          description: سفارش با موفقیت ویرایش شد
+          description: محصول با موفقیت بروزرسانی شد
     delete:
-      summary: حذف سفارش
+      summary: حذف محصول
+      tags: [Products]
       parameters:
-        - name: orderId
+        - name: id
           in: path
           required: true
-          schema:
-            type: string
+          schema: {type: string}
       responses:
         '204':
-          description: سفارش با موفقیت حذف شد
-components:
-  schemas:
-    Order:
-      type: object
-      properties:
-        id:
-          type: string
-        customerName:
-          type: string
-        serviceType:
-          type: string
-          description: نوع خدمات گلدوزی یا خیاطی
-        price:
-          type: number
-        status:
-          type: string
-          enum: [pending, in_progress, completed]
+          description: محصول حذف شد
+  /orders:
+    post:
+      summary: ثبت سفارش جدید
+      tags: [Orders]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customer_name: {type: string}
+                product_id: {type: string}
+      responses:
+        '201':
+          description: سفارش ثبت شد
