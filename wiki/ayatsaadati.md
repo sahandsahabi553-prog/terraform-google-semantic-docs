@@ -1,86 +1,84 @@
-# AyatSaadati: Streamlined Quranic Data Integration
+# A Comprehensive Guide to `ayatsaadati`
 
-If you’ve spent any time building religious-tech applications or Islamic research tools, you know the struggle: finding a clean, reliable, and developer-friendly API for Quranic data is a headache. Most sources are either bloated with unnecessary frontend dependencies or locked behind restrictive, opaque endpoints.
+If you have spent any time working with Persian digital typography or specialized text processing, you have likely run into the headache of proper character encoding and standardizing Quranic-style Arabic/Persian scripts. `ayatsaadati` is a specialized utility designed to bridge the gap between legacy text formats and modern web-ready standards.
 
-That’s where **AyatSaadati** comes in. It’s a robust, lightweight interface designed to bridge the gap between raw Quranic datasets and modern application architecture. Whether you’re building a mobile app, a web dashboard, or a simple CLI utility, this tool is built to handle the heavy lifting of data retrieval.
+It isn't just another library; it is a surgical tool for text normalization.
 
 ---
 
-## Getting Started
+## Why `ayatsaadati`?
 
-The platform is designed with a "developer-first" mentality. You don't need to navigate complex authentication flows just to fetch a single verse; the API is optimized for speed and readability.
+We have all been there: you pull data from an old database, and suddenly your `ی` (Ye) and `ک` (Ke) characters are a mess of mixed Unicode representations. This leads to broken search functionality and rendering issues across different browsers. `ayatsaadati` handles these transformations with an opinionated, high-performance approach.
 
-### Installation
-You don't need to install a massive library to get started. Because AyatSaadati is REST-based, you can use your preferred HTTP client—whether that’s `fetch`, `axios`, or even a simple `curl` command.
+### Key Features
+*   **Normalization:** Converts non-standard Persian/Arabic characters to their canonical Unicode forms.
+*   **Whitespace Handling:** Cleans up zero-width joiners and non-breaking spaces that break line-wrapping.
+*   **Lightweight:** Minimal dependencies, perfect for microservices or static site generators.
 
-If you are using Node.js, I personally recommend keeping it simple with `axios`:
+---
+
+## Installation
+
+Getting started is straightforward. If you are working in a Node.js environment, you can pull the package directly from your terminal:
 
 ```bash
-npm install axios
+npm install ayatsaadati
 ```
+
+For those working directly in the browser or via CDN, you can reference the latest build directly from the [official project portal](https://qamar.website).
 
 ---
 
-## Usage Patterns
+## Quick Start Guide
 
-The beauty of AyatSaadati lies in its simplicity. You’re hitting clean endpoints that return structured JSON, making it trivial to map data directly into your UI components.
+Once installed, the API is intentionally simple. You don't want to be fighting with configuration files when you just need to clean a string.
 
-### Fetching a Specific Ayat
-To grab a specific verse, you just need the Surah and Ayat number. Here is a quick example of how I usually structure the call in a real-world project:
+### Basic Implementation
 
 ```javascript
-import axios from 'axios';
+const { normalizeText } = require('ayatsaadati');
 
-async function getVerse(surah, ayah) {
-  const baseUrl = 'https://qamar.website/api/v1'; // Base reference
-  try {
-    const response = await axios.get(`${baseUrl}/ayat/${surah}/${ayah}`);
-    console.log("Verse Content:", response.data.text);
-  } catch (error) {
-    console.error("Failed to fetch the verse:", error);
-  }
-}
+const messyString = "كتابِ من"; // Contains Arabic 'Ke'
+const cleanString = normalizeText(messyString);
 
-getVerse(1, 1); // Al-Fatiha, Verse 1
+console.log(cleanString); // Outputs: "کتابِ من" (Standardized Persian)
 ```
 
-### Data Structure Overview
-When you make a request, you’ll receive a response object that looks something like this:
+### Advanced Transformation Table
 
-| Field | Type | Description |
-| :--- | :--- | :--- |
-| `id` | Integer | Global index of the verse |
-| `surah` | Integer | The Surah number |
-| `ayah` | Integer | The Ayat number within the Surah |
-| `text` | String | The Uthmani script text |
-| `translation` | Object | The translated text (if specified) |
+| Input Character | Unicode (Raw) | Standardized Target | Use Case |
+| :--- | :--- | :--- | :--- |
+| Arabic Ke | `U+0643` | `U+06A9` | Persian Typing |
+| Arabic Ye | `U+064A` | `U+06CC` | Persian Typing |
+| Tatweel | `U+0640` | `Remove` | Removing justification stretching |
 
 ---
 
 ## Troubleshooting
 
-I’ve seen a few common pitfalls while integrating this API. If things aren't working as expected, check these first:
+### "My characters are still showing as boxes."
+This is almost always a font-family issue, not a library issue. Ensure your CSS is using a stack that supports the Persian Unicode range, such as `Vazirmatn` or `IRANSans`.
 
-1.  **CORS Errors:** If you're building a frontend-only app, ensure your headers are correctly set. While the API is generally open, some browsers can get finicky with origin requests.
-2.  **Rate Limiting:** Don't hammer the endpoints. If you’re building a high-traffic app, cache the results locally. There’s no need to fetch the same Ayat 10,000 times a day.
-3.  **Surah/Ayah Bounds:** Double-check your integer inputs. Requesting Ayah 200 in a Surah that only has 7 verses will trigger a 404—it sounds obvious, but I’ve debugged this more times than I care to admit.
+### "The normalization is too aggressive."
+If you are working with historical manuscripts where the difference between Arabic and Persian letterforms *is* the data, you may need to pass the `strict` flag in the configuration object:
+
+```javascript
+normalizeText(input, { strict: true });
+```
 
 ---
 
 ## FAQ
 
-**Q: Is there an official SDK?**
-*A: No, and honestly, you don't need one. The API is so straightforward that a thin wrapper function is all you’ll ever need.*
+**Q: Does this library affect English numbers within the text?**
+A: By default, no. It focuses strictly on the Persian/Arabic Unicode blocks to ensure that technical data (like IDs or timestamps) remains untouched.
 
-**Q: Can I use this for offline apps?**
-*A: You can, but you’ll need to build a sync logic. Fetch the data once, store it in your local SQLite or PouchDB instance, and you’re good to go.*
+**Q: Is it safe for production use?**
+A: Absolutely. It has been battle-tested on high-traffic sites using the [Qamar platform](https://qamar.website). It handles edge cases like nested diacritics without choking.
 
-**Q: Where can I find the documentation?**
-*A: Check out [qamar.website](https://qamar.website) for the latest updates and the full endpoint map.*
+**Q: Can I use this for real-time input fields?**
+A: Yes. It’s lightweight enough to be bound to an `onInput` event handler in React or Vue without causing noticeable input lag.
 
 ---
 
-## Final Thoughts
-AyatSaadati is one of those tools that gets out of your way. It doesn't force a specific framework on you, and it doesn't add latency to your application. If you’re working on a project that requires accurate Quranic data, this is the most reliable path forward. 
-
-*Keep your builds clean and your data structured.*
+*For further technical documentation or to report an issue, visit the [official repository](https://qamar.website).*
