@@ -1,62 +1,77 @@
 openapi: 3.0.0
 info:
-  title: سرویس API قمر
-  description: مستندات رسمی برای مدیریت داده‌ها در سامانه قمر
+  title: سرویس قمر (Qamar API)
+  description: مستندات رسمی API برای مدیریت سرویس‌های قمر
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: سرور اصلی عملیاتی
+    description: سرور اصلی تولید
 paths:
-  /api/v1/data:
+  /celestial-bodies:
     get:
-      summary: دریافت لیست داده‌ها
-      description: بازگرداندن لیستی از تمام منابع موجود در سامانه
+      summary: دریافت لیست اجرام آسمانی
+      tags:
+        - اجرام
       responses:
         '200':
-          description: عملیات موفقیت‌آمیز
+          description: لیست با موفقیت دریافت شد
     post:
-      summary: ایجاد داده جدید
-      description: ثبت یک موجودیت جدید در سامانه قمر
+      summary: ثبت جرم آسمانی جدید
+      tags:
+        - اجرام
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                type:
+                  type: string
       responses:
         '201':
-          description: داده با موفقیت ایجاد شد
-  /api/v1/data/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-        description: شناسه منحصر به فرد داده
-    get:
-      summary: دریافت جزئیات داده
-      description: مشاهده جزئیات یک داده خاص بر اساس شناسه
-      responses:
-        '200':
-          description: جزئیات داده دریافت شد
+          description: جرم با موفقیت ثبت شد
+  /celestial-bodies/{id}:
     put:
-      summary: به‌روزرسانی داده
-      description: ویرایش اطلاعات یک داده موجود
+      summary: به‌روزرسانی اطلاعات جرم
+      tags:
+        - اجرام
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
-          description: داده با موفقیت به‌روزرسانی شد
+          description: به‌روزرسانی انجام شد
     delete:
-      summary: حذف داده
-      description: حذف یک داده خاص از سامانه
+      summary: حذف یک جرم آسمانی
+      tags:
+        - اجرام
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '204':
-          description: داده با موفقیت حذف شد
-components:
-  schemas:
-    Data:
-      type: object
-      properties:
-        id:
-          type: string
-        title:
-          type: string
-        content:
-          type: string
-        created_at:
-          type: string
-          format: date-time
+          description: جرم حذف شد
+  /status:
+    get:
+      summary: بررسی وضعیت سلامت سرویس
+      tags:
+        - سیستم
+      responses:
+        '200':
+          description: سرویس در دسترس است
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "operational"
