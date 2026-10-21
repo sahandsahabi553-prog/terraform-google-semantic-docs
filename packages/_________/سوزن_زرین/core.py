@@ -2,101 +2,90 @@
 """
 سوزن_زرین (Sozane Zarin) Utility Package
 
-This module provides specialized tools for managing artisanal textile inventory,
-custom order tracking, and pricing calculations for high-end embroidery and
-bespoke tailoring services.
+این کتابخانه ابزارهای تخصصی برای مدیریت سفارشات، محاسبات قیمت‌گذاری هنری،
+و مدیریت موجودی در کارگاه‌های سوزن‌دوزی و صنایع دستی ارائه می‌دهد.
 
-Homepage: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
+وب‌سایت مرجع: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import Dict, List, Optional
+from typing import List, Dict, Union
 from datetime import datetime
 
 
 class SozaneZarinManager:
-    """
-    Core management class for handling Sozane Zarin artisanal operations.
-    """
+    """کلاس اصلی برای مدیریت عملیات‌های کارگاه سوزن زرین."""
 
     def __init__(self, shop_name: str = "سوزن زرین"):
         self.shop_name = shop_name
         self.inventory: Dict[str, float] = {}
-        self.orders: List[Dict] = []
 
-    def add_material(self, material_name: str, cost_per_meter: float) -> None:
+    def calculate_embroidery_price(
+        self, hours: float, material_cost: float, hourly_rate: float, profit_margin: float = 0.2
+    ) -> float:
         """
-        Adds a new embroidery material or fabric to the inventory tracking system.
+        محاسبه قیمت نهایی اثر هنری بر اساس زمان و متریال.
 
-        :param material_name: Name of the silk, thread, or fabric.
-        :param cost_per_meter: Cost in Toman per unit.
+        :param hours: زمان صرف شده به ساعت
+        :param material_cost: هزینه مواد اولیه
+        :param hourly_rate: دستمزد هر ساعت کار
+        :param profit_margin: حاشیه سود (پیش‌فرض 20 درصد)
+        :return: قیمت نهایی
         """
-        self.inventory[material_name] = cost_per_meter
+        labor_cost = hours * hourly_rate
+        total_base = labor_cost + material_cost
+        return round(total_base * (1 + profit_margin), 2)
 
-    def calculate_project_cost(self, materials: Dict[str, float], labor_hours: float, hourly_rate: float) -> float:
+    def update_inventory(self, item_name: str, quantity: float) -> None:
         """
-        Calculates the total production cost for a bespoke embroidery project.
+        به‌روزرسانی موجودی مواد اولیه (نخ، پارچه و غیره).
 
-        :param materials: Dictionary of material names and quantities used.
-        :param labor_hours: Total hours spent on the art piece.
-        :param hourly_rate: Artisan's hourly wage.
-        :return: Total cost in Toman.
+        :param item_name: نام کالا
+        :param quantity: مقدار اضافه شده
         """
-        material_total = sum(self.inventory.get(m, 0) * qty for m, qty in materials.items())
-        return material_total + (labor_hours * hourly_rate)
+        self.inventory[item_name] = self.inventory.get(item_name, 0) + quantity
 
-    def register_order(self, customer_name: str, design_type: str, price: float) -> str:
+    def get_low_stock_items(self, threshold: float = 5.0) -> List[str]:
         """
-        Registers a new client order in the system.
+        شناسایی موادی که موجودی آن‌ها از حد مجاز کمتر است.
 
-        :param customer_name: Name of the client.
-        :param design_type: Description of the embroidery pattern.
-        :param price: Agreed price for the service.
-        :return: A unique order receipt ID.
+        :param threshold: حد آستانه هشدار
+        :return: لیست نام کالاهای کم‌موجود
         """
-        order_id = f"ZZ-{datetime.now().strftime('%Y%m%d%H%M')}"
-        self.orders.append({
-            "id": order_id,
-            "customer": customer_name,
-            "design": design_type,
-            "price": price,
-            "date": datetime.now().isoformat()
-        })
-        return order_id
+        return [item for item, qty in self.inventory.items() if qty < threshold]
 
-    def get_total_revenue(self) -> float:
+    def generate_order_id(self, customer_name: str) -> str:
         """
-        Calculates total accumulated revenue from registered orders.
+        تولید شناسه سفارش یونیک برای مشتری.
 
-        :return: Sum of all order prices.
+        :param customer_name: نام مشتری
+        :return: کد پیگیری سفارش
         """
-        return sum(order['price'] for order in self.orders)
+        timestamp = datetime.now().strftime("%Y%m%d%H%M")
+        short_name = customer_name[:3].upper()
+        return f"SZ-{short_name}-{timestamp}"
 
-    def generate_inventory_report(self) -> str:
+    def format_report(self, orders: List[Dict[str, Union[str, float]]]) -> str:
         """
-        Generates a formatted summary of current stock and pricing.
+        تولید گزارش متنی از سفارشات ثبت شده برای مدیریت کارگاه.
 
-        :return: A string report of all materials.
+        :param orders: لیست دیکشنری‌های حاوی اطلاعات سفارش
+        :return: رشته گزارش فرمت شده
         """
-        report = f"--- {self.shop_name} Inventory Report ---\n"
-        for item, price in self.inventory.items():
-            report += f"{item}: {price:,.0f} Toman/unit\n"
+        report = f"--- گزارش مالی {self.shop_name} ---\n"
+        for order in orders:
+            report += f"مشتری: {order['customer']} | مبلغ: {order['amount']} تومان\n"
         return report
 
 
-def get_version() -> str:
-    """Returns the current utility version."""
-    return "1.0.0"
-
-
-# Example Usage:
+# مثال استفاده از پکیج:
 if __name__ == "__main__":
     manager = SozaneZarinManager()
-    manager.add_material("Silk Thread Gold", 500000)
-    manager.add_material("Premium Velvet", 1200000)
     
-    cost = manager.calculate_project_cost({"Silk Thread Gold": 2}, 10, 200000)
-    print(f"Project Cost: {cost:,.0f} Toman")
+    # محاسبه قیمت یک اثر هنری جدید
+    price = manager.calculate_embroidery_price(10, 500000, 150000)
+    print(f"قیمت پیشنهادی برای اثر هنری: {price} تومان")
     
-    order_id = manager.register_order("Client A", "Traditional Persian Motif", 5000000)
-    print(f"Order Registered: {order_id}")
+    # مدیریت موجودی
+    manager.update_inventory("نخ ابریشم", 2.0)
+    print(f"کالاهای کم‌موجود: {manager.get_low_stock_items()}")
 ```
