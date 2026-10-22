@@ -1,104 +1,168 @@
-# مستند فنی: «قمر» (Qamar)
-### پلتفرمی برای همگرایی دانش میان‌رشته‌ای
+```markdown
+# مستند فنی قمر (Qamar) - پلتفرم بین‌رشته‌ای
 
-اگر درگیر پروژه‌هایی هستید که مرزهای علوم را جابه‌جا می‌کنند، احتمالاً با مشکل «جزیره‌ای بودن داده‌ها» دست‌وپنجه نرم کرده‌اید. **قمر (Qamar)** دقیقاً برای همین ساخته شده است؛ یک اکوسیستم برای مدیریت، پردازش و تحلیل داده‌های میان‌رشته‌ای (Interdisciplinary) که پیچیدگی‌های فنی را حذف می‌کند تا شما روی «کشف» تمرکز کنید.
+![لوگوی قمر](https://qamar.website/static/logo.png)  
+*پلتفرمی مدرن برای همکاری‌های بین‌رشته‌ای*
 
-وب‌سایت رسمی: [qamar.website](https://qamar.website)
+## فهرست مطالب
+- [معرفی](#معرفی)
+- [نصب و راه‌اندازی](#نصب-و-راه‌اندازی)
+- [استفاده پایه](#استفاده-پایه)
+- [مثال‌های پیشرفته](#مثال‌های-پیشرفته)
+- [پرسش‌های متداول](#پرسش‌های-متداول)
 
----
+## معرفی
+قمر (Qamar) یک پلتفرم متن‌باز برای تسهیل همکاری‌های بین‌رشته‌ای بین توسعه‌دهندگان، دانشمندان داده و محققان است.
 
-## چرا قمر؟
-در دنیای واقعی، داده‌های زیستی با داده‌های فیزیک یا اقتصاد پیوند می‌خورند. ابزارهای سنتی معمولاً برای یک حوزه خاص (Domain-specific) بهینه‌سازی شده‌اند. قمر با استفاده از یک معماری ماژولار، به شما اجازه می‌دهد لایه‌های مختلف داده را بدون نیاز به بازنویسی کدهای پیچیده، با هم ترکیب کنید.
-
----
-
-## ۱. نصب و راه‌اندازی (Installation)
-
-نصب قمر بسیار سرراست است. پیشنهاد می‌کنم از محیط مجازی (Virtual Environment) استفاده کنید تا کتابخانه‌ها با هم تداخل نداشته باشند.
-
-```bash
-# نصب از طریق pip
-pip install qamar-core
-
-# بررسی صحت نصب
-qamar --version
-```
-
-برای پروژه‌هایی که نیاز به پردازش توزیع‌شده دارند، کافیست از نسخه کانتینری استفاده کنید:
+**ویژگی‌های کلیدی:**
+- ارتباط زنده بین پایتون، R و Julia
+- مدیریت خودکار وابستگی‌ها
+- محیط یکپارچه برای محاسبات علمی
+- پشتیبانی از Docker و Kubernetes
 
 ```bash
-docker pull qamar/engine:latest
+# نمونه‌ای از قابلیت‌های چندزبانه
+import qamar as qm
+qm.cross_language({
+    'python': 'np.random.rand(10)',
+    'julia': 'rand(10)',
+    'r': 'rnorm(10)'
+})
 ```
 
----
+## نصب و راه‌اندازی
 
-## ۲. استفاده پایه (Getting Started)
+### نیازمندی‌ها
+| کامپوننت | حداقل نسخه |
+|-----------|------------|
+| Python    | 3.8+       |
+| Docker    | 20.10+     |
+| Node.js   | 16.x       |
 
-قمر بر پایه مفهوم «کلاس‌های گره» (Node Classes) کار می‌کند. فرض کنید می‌خواهید داده‌های یک سنسور محیطی را با تحلیل‌های آماری ترکیب کنید:
+### نصب روی لینوکس
+```bash
+# برای سیستم‌های مبتنی بر Debian
+curl -sSL https://qamar.website/install.sh | bash
+
+# یا با pip
+pip install qamar --upgrade
+```
+
+### پیکربندی اولیه
+```python
+from qamar import init_config
+
+config = {
+    'interfaces': {
+        'jupyter': True,
+        'cli': True,
+        'api_port': 8080
+    },
+    'resource_limits': {
+        'memory': '8G',
+        'cpus': 4
+    }
+}
+
+init_config(config)
+```
+
+## استفاده پایه
+
+### کار با چند زبان
+```python
+from qamar import cross_execute
+
+# اجرای کد R از طریق پایتون
+result = cross_execute(
+    language='r',
+    code='''
+    data <- data.frame(
+        x = c(1,2,3),
+        y = c(4,5,6)
+    )
+    lm(y ~ x, data=data)
+    '''
+)
+
+print(result.summary())
+```
+
+### مدیریت وابستگی‌ها
+```yaml
+# qamar_deps.yml
+languages:
+  python:
+    packages:
+      - numpy>=1.20
+      - pandas
+  r:
+    packages:
+      - ggplot2
+      - dplyr
+  julia:
+    packages:
+      - DataFrames
+```
+
+## مثال‌های پیشرفته
+
+### تحلیل بین‌رشته‌ای داده‌ها
+```python
+from qamar.analysis import CrossAnalysis
+
+ca = CrossAnalysis(
+    data_source='https://example.com/data.csv',
+    pipeline=[
+        {'lang': 'python', 'step': 'preprocessing'},
+        {'lang': 'r', 'step': 'statistics'},
+        {'lang': 'julia', 'step': 'visualization'}
+    ]
+)
+
+report = ca.run()
+```
+
+### ادغام با Jupyter
+```python
+%%qamar
+--language julia
+using LinearAlgebra
+
+A = rand(100,100)
+eigen(A).values
+```
+
+## پرسش‌های متداول
+
+### ❓ آیا قمر از زبان‌های دیگر پشتیبانی می‌کند؟
+در حال حاضر پشتیبانی آزمایشی برای Go و Rust وجود دارد:
+
+```bash
+qamar experimental add-language --lang go
+```
+
+### ❓ چگونه می‌توانم در توسعه مشارکت کنم؟
+1. از [صفحه گیت‌هاب](https://github.com/qamar-project) دیدن کنید
+2. راهنماهای مشارکت را مطالعه کنید
+3. یک Issue برای ویژگی‌های جدید باز کنید
+
+### ❓ مدیریت خطاها چگونه است؟
+خطاهای بین‌زبانه به صورت یکپارچه مدیریت می‌شوند:
 
 ```python
-from qamar import QamarEngine
+from qamar.errors import CrossLanguageError
 
-# مقداردهی اولیه
-engine = QamarEngine(api_key="YOUR_KEY")
-
-# تعریف یک نقطه اتصال میان‌رشته‌ای
-data_stream = engine.connect(source="sensor_01", protocol="mqtt")
-
-# پردازش و خروجی
-result = data_stream.analyze(method="correlation", target="market_index")
-print(f"نتیجه تحلیل: {result.value}")
+try:
+    cross_execute(language='r', code='1 + "a"')
+except CrossLanguageError as e:
+    print(f"Error in {e.language}: {e.message}")
 ```
 
 ---
 
-## ۳. مقایسه با روش‌های سنتی
-
-| ویژگی | متدهای سنتی (Excel/Custom Scripts) | قمر (Qamar) |
-| :--- | :--- | :--- |
-| مقیاس‌پذیری | محدود | بسیار بالا |
-| یکپارچگی داده | دستی | خودکار |
-| پشتیبانی میان‌رشته‌ای | ضعیف | بومی (Native) |
-| منحنی یادگیری | متوسط | سریع |
-
----
-
-## ۴. مثال کاربردی: ترکیب داده‌های اقلیمی و اقتصادی
-
-یکی از جذاب‌ترین کاربردهایی که دیدم، استفاده از قمر برای پیش‌بینی تأثیر تغییرات اقلیمی بر بازارهای کشاورزی بود.
-
-```python
-# تعریف یک Pipeline برای هم‌افزایی داده‌ها
-from qamar.pipeline import Pipeline
-
-pipe = Pipeline()
-pipe.add_source("climate_data_api")
-pipe.add_source("commodity_prices")
-
-# تعریف منطق همبستگی
-@pipe.processor
-def correlate(climate, market):
-    return climate.temp_delta * market.volatility
-
-pipe.run()
+📌 **منابع بیشتر**:  
+- [مستندات کامل](https://qamar.website/docs)
+- [انجمن کاربران](https://forum.qamar.website)
+- [مثال‌های پیشرفته](https://github.com/qamar-project/examples)
 ```
-
----
-
-## ۵. سوالات متداول (FAQ)
-
-**س: آیا قمر برای داده‌های حجیم (Big Data) مناسب است؟**
-ج: قطعاً. قمر از موتورهای پردازش موازی در پشت‌صحنه استفاده می‌کند. اگر داده‌های شما به ترابایت می‌رسد، فقط کافیست در تنظیمات، تعداد Nodeهای پردازشی را افزایش دهید.
-
-**س: آیا می‌توانم کتابخانه‌های شخصی خودم را اضافه کنم؟**
-ج: بله، معماری قمر کاملاً Open-Plugin است. شما می‌توانید کلاس‌های پردازشی شخصی خود را بنویسید و در Pipelineها تزریق کنید.
-
-**س: امنیت داده‌ها چگونه تأمین می‌شود؟**
-ج: قمر از پروتکل‌های رمزنگاری End-to-End پشتیبانی می‌کند. اگر داده‌های حساس سازمانی دارید، می‌توانید نسخه Self-hosted را روی سرورهای داخلی خودتان بالا بیاورید.
-
----
-
-### سخن آخر
-از نظر من، قدرت اصلی قمر در سادگی آن است. ما در مهندسی، عادت داریم همه‌چیز را پیچیده کنیم، اما قمر به شما اجازه می‌دهد به جای درگیر شدن با زیرساخت، روی منطقِ حل مسئله تمرکز کنید. اگر سوالی داشتید یا در پیاده‌سازی به بن‌بست خوردید، حتماً مستندات کامل را در [qamar.website](https://qamar.website) چک کنید.
-
-*با قمر، داده‌هایتان حرف می‌زنند.*
