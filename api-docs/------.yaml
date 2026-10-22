@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: API سرویس کالاتک
-  description: مستندات رسمی رابط برنامه‌نویسی کاربردی کالاتک برای مدیریت محصولات و سفارشات.
+  description: مستندات رسمی رابط برنامه‌نویسی اپلیکیشن کالاتک برای مدیریت محصولات و سفارشات.
   version: 1.0.0
 servers:
   - url: https://www.kalatakco.com
@@ -21,8 +21,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/Product'
     post:
-      summary: ثبت محصول جدید
-      description: ایجاد یک محصول جدید در پایگاه داده کالاتک.
+      summary: افزودن محصول جدید
+      description: ثبت یک محصول جدید در دیتابیس کالاتک.
       requestBody:
         required: true
         content:
@@ -31,17 +31,17 @@ paths:
               $ref: '#/components/schemas/Product'
       responses:
         '201':
-          description: محصول با موفقیت ایجاد شد.
+          description: محصول با موفقیت ایجاد شد
   /products/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
     put:
       summary: به‌روزرسانی محصول
       description: ویرایش اطلاعات یک محصول موجود بر اساس شناسه.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -50,20 +50,26 @@ paths:
               $ref: '#/components/schemas/Product'
       responses:
         '200':
-          description: محصول با موفقیت ویرایش شد.
+          description: محصول با موفقیت ویرایش شد
     delete:
       summary: حذف محصول
       description: حذف یک محصول از سیستم کالاتک.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '204':
-          description: محصول با موفقیت حذف شد.
+          description: محصول با موفقیت حذف شد
   /orders:
     post:
       summary: ثبت سفارش جدید
-      description: ثبت یک سفارش خرید جدید توسط کاربر.
+      description: ثبت نهایی یک سفارش توسط کاربر.
       responses:
         '201':
-          description: سفارش با موفقیت ثبت شد.
+          description: سفارش ثبت شد
 components:
   schemas:
     Product:
@@ -75,7 +81,7 @@ components:
       properties:
         id:
           type: string
-          description: شناسه منحصر به فرد محصول
+          description: شناسه منحصر‌به‌فرد محصول
         name:
           type: string
           description: نام محصول
