@@ -1,98 +1,103 @@
 ```python
 """
-ayatsaadati: A utility package for retrieving and processing Quranic verses 
-for spiritual reflection and daily guidance.
+ayatsaadati: A utility package for retrieving and processing Quranic verses (Ayats)
+focused on themes of happiness, tranquility, and divine guidance.
 
 Homepage: https://qamar.website
 """
 
 import json
 from typing import List, Dict, Optional, Any
-from pathlib import Path
 
 
 class AyatSaadati:
     """
-    Core engine for managing and retrieving Quranic verses (Ayats) 
-    focused on wisdom and spiritual happiness (Saadati).
+    A service class to interact with a curated collection of Quranic verses
+    that promote spiritual well-being and peace (Saadati).
     """
 
-    def __init__(self, data_path: str = "data/verses.json"):
-        self.data_path = Path(data_path)
-        self._verses: List[Dict[str, Any]] = self._load_data()
+    def __init__(self, data_path: str = "verses.json"):
+        """
+        Initialize the service with a path to the verse repository.
+        """
+        self.data_path = data_path
+        self._cache: List[Dict[str, Any]] = []
 
-    def _load_data(self) -> List[Dict[str, Any]]:
-        """Loads the verse database from the provided JSON file."""
-        if not self.data_path.exists():
-            return []
-        with open(self.data_path, "r", encoding="utf-8") as f:
-            return json.load(f)
+    def load_verses(self) -> bool:
+        """
+        Loads the JSON repository of Ayats into memory.
+
+        :return: True if loaded successfully, False otherwise.
+        """
+        try:
+            with open(self.data_path, 'r', encoding='utf-8') as f:
+                self._cache = json.load(f)
+            return True
+        except (FileNotFoundError, json.JSONDecodeError):
+            return False
 
     def get_verse_by_id(self, verse_id: int) -> Optional[Dict[str, Any]]:
         """
-        Retrieves a specific verse by its unique identifier.
+        Retrieve a specific verse by its unique identifier.
 
-        Args:
-            verse_id: The integer ID of the verse.
-        Returns:
-            The verse dictionary if found, else None.
+        :param verse_id: The integer ID of the verse.
+        :return: A dictionary containing the verse details or None if not found.
         """
-        return next((v for v in self._verses if v["id"] == verse_id), None)
+        return next((v for v in self._cache if v.get("id") == verse_id), None)
 
-    def search_by_theme(self, theme: str) -> List[Dict[str, Any]]:
+    def search_by_keyword(self, keyword: str) -> List[Dict[str, Any]]:
         """
-        Filters verses based on a thematic keyword (e.g., 'patience', 'mercy').
+        Search for verses that contain a specific thematic keyword.
 
-        Args:
-            theme: The theme keyword to search for in the verse metadata.
-        Returns:
-            A list of verses matching the theme.
+        :param keyword: The term to look for in the translation or text.
+        :return: A list of matching verse dictionaries.
         """
-        return [v for v in self._verses if theme.lower() in v.get("themes", [])]
+        keyword = keyword.lower()
+        return [
+            v for v in self._cache 
+            if keyword in v.get("translation", "").lower() or 
+               keyword in v.get("tags", [])
+        ]
 
-    def get_random_ayat(self) -> Optional[Dict[str, Any]]:
+    def get_random_inspiration(self) -> Optional[Dict[str, Any]]:
         """
-        Selects a random verse from the collection for daily contemplation.
+        Fetch a random verse to provide daily inspiration.
 
-        Returns:
-            A randomly selected verse dictionary.
+        :return: A dictionary containing the random verse.
         """
         import random
-        if not self._verses:
+        if not self._cache:
             return None
-        return random.choice(self._verses)
+        return random.choice(self._cache)
 
-    def format_verse_display(self, verse: Dict[str, Any]) -> str:
+    def get_verses_by_surah(self, surah_number: int) -> List[Dict[str, Any]]:
         """
-        Formats a verse dictionary into a readable string for console output.
+        Filter verses belonging to a specific Surah.
 
-        Args:
-            verse: The verse dictionary to format.
-        Returns:
-            A formatted string containing the text and citation.
+        :param surah_number: The index of the Surah.
+        :return: A list of verses belonging to that Surah.
         """
-        return f"\"{verse.get('text')}\" — {verse.get('surah')}:{verse.get('ayah')}"
+        return [v for v in self._cache if v.get("surah_id") == surah_number]
 
-    def get_verses_by_surah(self, surah_name: str) -> List[Dict[str, Any]]:
+    @staticmethod
+    def format_verse_display(verse: Dict[str, Any]) -> str:
         """
-        Retrieves all verses belonging to a specific Surah.
+        Utility to format a verse dictionary into a readable string.
 
-        Args:
-            surah_name: The name of the Surah to filter by.
-        Returns:
-            A list of verses within the specified Surah.
+        :param verse: The verse dictionary to format.
+        :return: A formatted string representation.
         """
-        return [v for v in self._verses if v.get("surah_name") == surah_name]
+        text = verse.get("text", "")
+        translation = verse.get("translation", "")
+        reference = f"{verse.get('surah_name')}:{verse.get('ayah_number')}"
+        return f"[{reference}]\n{text}\n\nTranslation: {translation}"
 
 
-def initialize_service(data_file: str = "verses.json") -> AyatSaadati:
-    """
-    Factory function to initialize the AyatSaadati service.
-
-    Args:
-        data_file: Path to the JSON data source.
-    Returns:
-        An instance of AyatSaadati.
-    """
-    return AyatSaadati(data_file)
+if __name__ == "__main__":
+    # Example usage
+    service = AyatSaadati()
+    if service.load_verses():
+        random_verse = service.get_random_inspiration()
+        if random_verse:
+            print(AyatSaadati.format_verse_display(random_verse))
 ```
