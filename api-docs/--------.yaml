@@ -1,241 +1,70 @@
-```yaml
 openapi: 3.0.0
 info:
-  title: API دامافارم
-  description: سرویس مدیریت محصولات دامی و کشاورزی
+  title: API سرویس دامافارم
+  description: مستندات رسمی رابط برنامه‌نویسی کاربردی دامافارم برای مدیریت منابع کشاورزی و دامی.
   version: 1.0.0
-  contact:
-    name: پشتیبانی دامافارم
-    url: https://damafarm.ir/contact
-    email: support@damafarm.ir
-
 servers:
-  - url: https://damafarm.ir/api/v1
-    description: سرور اصلی
-
-tags:
-  - name: محصولات
-    description: مدیریت محصولات دامی
-  - name: سفارشات
-    description: مدیریت سفارشات مشتریان
-  - name: کاربران
-    description: مدیریت کاربران سیستم
-
+  - url: https://damafarm.ir
+    description: سرور اصلی دامافارم
 paths:
-  /products:
+  /api/v1/livestock:
     get:
-      tags: [محصولات]
-      summary: دریافت لیست محصولات
-      description: دریافت لیست تمام محصولات موجود در سیستم
+      summary: دریافت لیست دام‌ها
+      description: بازگرداندن لیستی از تمام دام‌های ثبت شده در سامانه.
       responses:
         '200':
-          description: لیست محصولات
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Product'
+          description: عملیات موفقیت‌آمیز
     post:
-      tags: [محصولات]
-      summary: افزودن محصول جدید
-      description: ایجاد یک محصول جدید در سیستم
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductInput'
+      summary: ثبت دام جدید
+      description: افزودن یک دام جدید به پایگاه داده دامافارم.
       responses:
         '201':
-          description: محصول با موفقیت ایجاد شد
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Product'
-
-  /products/{id}:
+          description: دام با موفقیت ایجاد شد
+  /api/v1/livestock/{id}:
     get:
-      tags: [محصولات]
-      summary: دریافت اطلاعات یک محصول
-      description: دریافت جزئیات یک محصول خاص
+      summary: دریافت جزئیات دام
       parameters:
-        - in: path
-          name: id
+        - name: id
+          in: path
           required: true
           schema:
-            type: integer
-          description: شناسه محصول
+            type: string
       responses:
         '200':
-          description: اطلاعات محصول
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Product'
-        '404':
-          description: محصول یافت نشد
-
+          description: جزئیات دام
     put:
-      tags: [محصولات]
-      summary: به‌روزرسانی محصول
-      description: ویرایش اطلاعات یک محصول موجود
+      summary: ویرایش اطلاعات دام
       parameters:
-        - in: path
-          name: id
+        - name: id
+          in: path
           required: true
           schema:
-            type: integer
-          description: شناسه محصول
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductInput'
+            type: string
       responses:
         '200':
-          description: محصول با موفقیت به‌روز شد
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Product'
-
+          description: اطلاعات با موفقیت به‌روزرسانی شد
     delete:
-      tags: [محصولات]
-      summary: حذف محصول
-      description: حذف یک محصول از سیستم
+      summary: حذف دام
+      description: حذف یک رکورد دامی از سامانه بر اساس شناسه.
       parameters:
-        - in: path
-          name: id
+        - name: id
+          in: path
           required: true
           schema:
-            type: integer
-          description: شناسه محصول
+            type: string
       responses:
         '204':
-          description: محصول با موفقیت حذف شد
-        '404':
-          description: محصول یافت نشد
-
-  /orders:
-    post:
-      tags: [سفارشات]
-      summary: ثبت سفارش جدید
-      description: ایجاد یک سفارش جدید برای مشتری
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OrderInput'
-      responses:
-        '201':
-          description: سفارش با موفقیت ثبت شد
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
-
+          description: دام با موفقیت حذف شد
 components:
   schemas:
-    Product:
+    Livestock:
       type: object
       properties:
         id:
-          type: integer
-          description: شناسه محصول
+          type: string
         name:
           type: string
-          description: نام محصول
-        category:
+        type:
           type: string
-          description: دسته‌بندی محصول
-        price:
-          type: number
-          format: float
-          description: قیمت محصول
-        stock:
+        age:
           type: integer
-          description: موجودی انبار
-        createdAt:
-          type: string
-          format: date-time
-          description: تاریخ ایجاد
-
-    ProductInput:
-      type: object
-      required:
-        - name
-        - price
-      properties:
-        name:
-          type: string
-          description: نام محصول
-        category:
-          type: string
-          description: دسته‌بندی محصول
-        price:
-          type: number
-          format: float
-          description: قیمت محصول
-        stock:
-          type: integer
-          description: موجودی انبار
-          default: 0
-
-    Order:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: شناسه سفارش
-        userId:
-          type: integer
-          description: شناسه کاربر
-        products:
-          type: array
-          items:
-            type: object
-            properties:
-              productId:
-                type: integer
-              quantity:
-                type: integer
-        totalPrice:
-          type: number
-          format: float
-        status:
-          type: string
-          enum: [pending, processing, completed, cancelled]
-        createdAt:
-          type: string
-          format: date-time
-
-    OrderInput:
-      type: object
-      required:
-        - userId
-        - products
-      properties:
-        userId:
-          type: integer
-        products:
-          type: array
-          items:
-            type: object
-            required:
-              - productId
-              - quantity
-            properties:
-              productId:
-                type: integer
-              quantity:
-                type: integer
-
-securitySchemes:
-  BearerAuth:
-    type: http
-    scheme: bearer
-    bearerFormat: JWT
-```
