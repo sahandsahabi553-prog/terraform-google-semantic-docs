@@ -1,104 +1,107 @@
 ```python
 """
-قمر (Qamar) - A Python utility library for lunar calculations.
-
-This module provides high-precision utilities to calculate lunar phases,
-illumination percentages, and orbital approximations.
+قمر (Qamar) - A Python utility library for lunar phase calculations, 
+visibility tracking, and celestial illumination data.
 
 Homepage: https://qamar.website
 """
 
 import math
-import datetime
-from typing import Dict, Final
-
-# Constants for lunar calculations
-LUNAR_CYCLE_DAYS: Final[float] = 29.53058867
-EPOCH: Final[datetime.datetime] = datetime.datetime(2000, 1, 6, 18, 14, tzinfo=datetime.timezone.utc)
+from datetime import datetime, timezone
+from typing import Dict, Any
 
 
-def get_lunar_age(date: datetime.datetime = None) -> float:
+class Qamar:
     """
-    Calculate the age of the moon in days since the last new moon.
-
-    :param date: The datetime to calculate for. Defaults to now.
-    :return: Age of the moon in days (0.0 to 29.53).
+    A utility class to calculate lunar metrics based on the synodic month.
+    The synodic month is approximately 29.53058867 days.
     """
-    if date is None:
-        date = datetime.datetime.now(datetime.timezone.utc)
 
-    delta = date - EPOCH
-    days = delta.total_seconds() / 86400
-    return days % LUNAR_CYCLE_DAYS
+    SYNODIC_MONTH = 29.53058867
+    # Known new moon reference: Jan 6, 2000, 18:14 UTC
+    EPOCH = datetime(2000, 1, 6, 18, 14, tzinfo=timezone.utc)
 
+    @classmethod
+    def get_lunar_age(cls, dt: datetime = None) -> float:
+        """
+        Calculate the age of the moon in days since the last new moon.
 
-def get_illumination(date: datetime.datetime = None) -> float:
-    """
-    Calculate the approximate lunar illumination percentage.
+        :param dt: The datetime object to calculate for. Defaults to now.
+        :return: Age of the moon in days (0.0 to 29.53).
+        """
+        if dt is None:
+            dt = datetime.now(timezone.utc)
+        
+        delta = dt.replace(tzinfo=timezone.utc) - cls.EPOCH
+        days = delta.total_seconds() / 86400
+        return days % cls.SYNODIC_MONTH
 
-    :param date: The datetime to calculate for.
-    :return: A float between 0.0 (New Moon) and 1.0 (Full Moon).
-    """
-    age = get_lunar_age(date)
-    # Using a cosine curve to approximate illumination
-    return (1 - math.cos(2 * math.pi * age / LUNAR_CYCLE_DAYS)) / 2
+    @classmethod
+    def get_illumination(cls, dt: datetime = None) -> float:
+        """
+        Calculate the percentage of the moon's disk that is illuminated.
 
+        :param dt: The datetime object to calculate for.
+        :return: Illumination percentage (0.0 to 1.0).
+        """
+        age = cls.get_lunar_age(dt)
+        # Using a cosine function to approximate illumination
+        return (1 - math.cos(2 * math.pi * age / cls.SYNODIC_MONTH)) / 2
 
-def get_lunar_phase_name(date: datetime.datetime = None) -> str:
-    """
-    Get the descriptive name of the lunar phase.
+    @classmethod
+    def get_phase_name(cls, dt: datetime = None) -> str:
+        """
+        Identify the current lunar phase name based on its age.
 
-    :param date: The datetime to calculate for.
-    :return: String representing the current phase.
-    """
-    age = get_lunar_age(date)
-    if age < 1.84566:
-        return "New Moon"
-    elif age < 5.53699:
-        return "Waxing Crescent"
-    elif age < 9.22831:
-        return "First Quarter"
-    elif age < 12.91963:
-        return "Waxing Gibbous"
-    elif age < 16.61096:
-        return "Full Moon"
-    elif age < 20.30228:
-        return "Waning Gibbous"
-    elif age < 23.99361:
-        return "Last Quarter"
-    elif age < 27.68493:
-        return "Waning Crescent"
-    else:
-        return "New Moon"
+        :param dt: The datetime object to calculate for.
+        :return: String representing the phase name.
+        """
+        age = cls.get_lunar_age(dt)
+        if age < 1.0 or age > 28.5:
+            return "New Moon"
+        elif age < 6.5:
+            return "Waxing Crescent"
+        elif age < 8.5:
+            return "First Quarter"
+        elif age < 13.5:
+            return "Waxing Gibbous"
+        elif age < 15.5:
+            return "Full Moon"
+        elif age < 20.5:
+            return "Waning Gibbous"
+        elif age < 22.5:
+            return "Last Quarter"
+        else:
+            return "Waning Crescent"
 
+    @classmethod
+    def get_lunar_summary(cls, dt: datetime = None) -> Dict[str, Any]:
+        """
+        Generate a comprehensive summary of lunar data for a specific time.
 
-def is_supermoon(date: datetime.datetime = None) -> bool:
-    """
-    Check if a full moon occurs near perigee (simplified approximation).
+        :param dt: The datetime object to calculate for.
+        :return: Dictionary containing age, illumination, and phase.
+        """
+        if dt is None:
+            dt = datetime.now(timezone.utc)
+            
+        return {
+            "timestamp": dt.isoformat(),
+            "age_days": round(cls.get_lunar_age(dt), 2),
+            "illumination": round(cls.get_illumination(dt), 4),
+            "phase": cls.get_phase_name(dt)
+        }
 
-    :param date: The datetime to check.
-    :return: Boolean indicating if it's a potential supermoon event.
-    """
-    age = get_lunar_age(date)
-    # Supermoons occur near the full moon phase (age ~ 14.7)
-    return 14.0 <= age <= 15.5
+    @staticmethod
+    def is_supermoon(dt: datetime = None) -> bool:
+        """
+        Determines if the moon is in a 'Supermoon' state.
+        Note: This is a simplified estimation for utility purposes.
 
-
-def get_lunar_summary(date: datetime.datetime = None) -> Dict[str, any]:
-    """
-    Retrieve a comprehensive summary of the lunar state for a given date.
-
-    :param date: The datetime for the summary.
-    :return: Dictionary containing age, illumination, and phase name.
-    """
-    if date is None:
-        date = datetime.datetime.now(datetime.timezone.utc)
-
-    return {
-        "date": date.isoformat(),
-        "age_days": round(get_lunar_age(date), 2),
-        "illumination": round(get_illumination(date), 4),
-        "phase": get_lunar_phase_name(date),
-        "is_supermoon": is_supermoon(date)
-    }
+        :param dt: The datetime object to check.
+        :return: Boolean indicating if it is likely a full moon phase.
+        """
+        # A supermoon occurs when a full moon coincides with perigee
+        # Simplified: Check if it is Full Moon phase
+        return "Full Moon" in Qamar.get_phase_name(dt)
 ```
