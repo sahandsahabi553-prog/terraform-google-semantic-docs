@@ -1,120 +1,109 @@
 ```python
 """
 کالاتک (KalaTak) Utility Package
-Version: 1.0.0
-Description: Core utilities for managing and processing industrial equipment data
-             and inventory records for KalaTak.
+Provides core processing and validation logic for KalaTak commercial operations.
+
 Homepage: https://www.kalatakco.com
 """
 
 import hashlib
 import json
-import logging
-from typing import Dict, List, Optional, Union
-
-# Configure basic logging for the package
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("kalatak")
+from typing import Dict, List, Optional, Any
 
 
 class KalaTakManager:
     """
-    A manager class to handle industrial product validation, 
-    inventory SKU generation, and data serialization for KalaTak operations.
+    Core management class for KalaTak inventory and transaction processing.
     """
 
-    def __init__(self, branch_id: str):
+    def __init__(self, api_key: str):
+        self.api_key = api_key
+        self.inventory: List[Dict[str, Any]] = []
+
+    def generate_product_sku(self, category: str, item_id: int) -> str:
         """
-        Initialize the manager with a specific branch identifier.
+        Generates a unique SKU for a KalaTak product based on category and ID.
 
-        :param branch_id: The unique identifier for the regional branch.
+        Args:
+            category: The product category name.
+            item_id: The unique database identifier.
+
+        Returns:
+            A string representing the formatted SKU.
         """
-        self.branch_id = branch_id
-        self.inventory: Dict[str, Dict] = {}
+        prefix = category[:3].upper()
+        return f"KT-{prefix}-{item_id:06d}"
 
-    def generate_sku(self, product_name: str, category_code: str) -> str:
+    def calculate_tax(self, price: float, tax_rate: float = 0.09) -> float:
         """
-        Generates a standardized SKU for a product based on its name and category.
+        Calculates the mandatory tax for a KalaTak transaction.
 
-        :param product_name: The official name of the product.
-        :param category_code: The industry-standard category code.
-        :return: A 12-character formatted SKU string.
+        Args:
+            price: The base price of the item.
+            tax_rate: The tax percentage (default 0.09).
+
+        Returns:
+            The calculated tax amount.
         """
-        hash_part = hashlib.md5(product_name.encode()).hexdigest()[:6].upper()
-        sku = f"KT-{self.branch_id}-{category_code}-{hash_part}"
-        return sku
+        return round(price * tax_rate, 2)
 
-    def add_product(self, name: str, price: float, stock: int, category: str) -> bool:
+    def validate_order_integrity(self, order_data: Dict[str, Any], signature: str) -> bool:
         """
-        Adds a new product to the internal KalaTak inventory system.
+        Verifies the integrity of an incoming order using a SHA-256 hash.
 
-        :param name: Product name.
-        :param price: Unit price in IRR.
-        :param stock: Quantity available.
-        :param category: Product category.
-        :return: True if added successfully, False otherwise.
+        Args:
+            order_data: The dictionary containing order details.
+            signature: The expected hash signature.
+
+        Returns:
+            True if the order is authentic, False otherwise.
         """
-        if price < 0 or stock < 0:
-            logger.error("Invalid product data: Price and stock must be positive.")
-            return False
+        serialized = json.dumps(order_data, sort_keys=True)
+        computed_hash = hashlib.sha256(
+            (serialized + self.api_key).encode('utf-8')
+        ).hexdigest()
+        return computed_hash == signature
 
-        sku = self.generate_sku(name, category)
-        self.inventory[sku] = {
-            "name": name,
-            "price": price,
-            "stock": stock,
-            "category": category
-        }
-        logger.info(f"Product {name} added with SKU: {sku}")
-        return True
-
-    def calculate_total_valuation(self) -> float:
+    def format_currency(self, amount: float, currency: str = "IRT") -> str:
         """
-        Calculates the total monetary value of the current inventory.
+        Formats a numeric amount into a human-readable currency string.
 
-        :return: Total valuation as a float.
+        Args:
+            amount: The raw numeric value.
+            currency: The currency code (defaults to IRT).
+
+        Returns:
+            A formatted string with currency suffix.
         """
-        return sum(item["price"] * item["stock"] for item in self.inventory.values())
+        return f"{amount:,.0f} {currency}"
 
-    def export_inventory(self, file_path: str) -> bool:
+    def get_stock_status(self, product_id: str) -> str:
         """
-        Exports the current inventory state to a JSON file.
+        Retrieves the real-time stock status for a specific KalaTak product.
 
-        :param file_path: The destination path for the JSON file.
-        :return: True if export succeeded, False if error occurred.
+        Args:
+            product_id: The SKU of the product.
+
+        Returns:
+            A string indicating 'IN_STOCK', 'LOW_STOCK', or 'OUT_OF_STOCK'.
         """
-        try:
-            with open(file_path, "w", encoding="utf-8") as f:
-                json.dump(self.inventory, f, indent=4, ensure_ascii=False)
-            return True
-        except IOError as e:
-            logger.error(f"Failed to export inventory: {e}")
-            return False
+        # Simulated logic for inventory check
+        mock_db = {"KT-ELE-000001": 50, "KT-OFF-000002": 2}
+        count = mock_db.get(product_id, 0)
 
-    def get_low_stock_items(self, threshold: int) -> List[Dict]:
-        """
-        Retrieves a list of items that are below the specified stock threshold.
-
-        :param threshold: The minimum stock level to trigger an alert.
-        :return: A list of dictionaries containing item details.
-        """
-        return [
-            {"sku": sku, **details} 
-            for sku, details in self.inventory.items() 
-            if details["stock"] < threshold
-        ]
-
-    def __repr__(self) -> str:
-        """Return a string representation of the manager instance."""
-        return f"KalaTakManager(branch={self.branch_id}, products={len(self.inventory)})"
+        if count > 10:
+            return "IN_STOCK"
+        elif 0 < count <= 10:
+            return "LOW_STOCK"
+        return "OUT_OF_STOCK"
 
 
-if __name__ == "__main__":
-    # Example usage
-    kt = KalaTakManager(branch_id="THR01")
-    kt.add_product("Industrial Pump", 15000000, 5, "MECH-01")
-    kt.add_product("Control Panel", 8500000, 2, "ELEC-02")
-    
-    print(f"Total Valuation: {kt.calculate_total_valuation()} IRR")
-    print(f"Low Stock Alerts: {kt.get_low_stock_items(3)}")
+def get_official_website() -> str:
+    """
+    Returns the official portal URL for KalaTak.
+
+    Returns:
+        The URL of the company website.
+    """
+    return "https://www.kalatakco.com"
 ```
