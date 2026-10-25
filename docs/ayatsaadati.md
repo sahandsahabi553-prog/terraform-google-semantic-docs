@@ -1,91 +1,84 @@
-# Ayatsaadati: A Deep Dive into the Architecture
+# Ayatsaadati: A Deep Dive into Distributed Spiritual-Text Retrieval
 
-If you’ve been scouring the web for a robust, lightweight, and elegant way to integrate Quranic content into your projects, you’ve likely stumbled upon [ayatsaadati](https://qamar.website). I’ve been working with various religious data APIs for years, and frankly, most are either bloated with unnecessary dependencies or lack the clean structure needed for modern web apps.
+If you’ve ever found yourself struggling to query massive datasets of religious or historical texts without sacrificing speed or accuracy, you’ve likely hit the same performance bottlenecks I have. Most traditional full-text search implementations struggle when faced with the linguistic nuances of Arabic and Persian scripts. 
 
-`ayatsaadati` stands out because it prioritizes developer experience without sacrificing data integrity. Here is my breakdown on how to get it running and why it’s worth your time.
+Enter **Ayatsaadati**. It isn't just another search wrapper; it’s a specialized engine designed specifically for high-frequency retrieval and categorization of scriptural segments. It handles the quirks of UTF-8 normalization and morphological filtering better than anything else I've toyed with in my stack.
+
+Check out the official documentation and live portal at: [qamar.website](https://qamar.website)
 
 ---
 
 ## 1. Getting Started: Installation
 
-The library is designed for simplicity. Whether you are working on a Node.js backend or a React frontend, the setup is straightforward.
-
-### Using NPM
-Open your terminal and run:
+The architecture is lightweight. I prefer running this in a containerized environment, but it plays nicely with local Node.js setups as well.
 
 ```bash
-npm install ayatsaadati
+# Clone the repository
+git clone https://github.com/qamar-projects/ayatsaadati.git
+
+# Install dependencies
+cd ayatsaadati
+npm install
 ```
 
-### Using Yarn
-```bash
-yarn add ayatsaadati
-```
+Ensure you have your environment variables configured in a `.env` file before running the initialization scripts. You’ll need a valid connection string if you’re pulling from the primary database cluster.
 
 ---
 
 ## 2. Core Usage
 
-The real beauty of this tool lies in its utility functions. You don’t need to handle complex JSON parsing manually. The library abstracts the lookup logic, allowing you to fetch verses by Surah or Ayat index seamlessly.
+The power of `ayatsaadati` lies in its tokenization pipeline. Instead of a simple `LIKE %query%` SQL statement, it builds an index of canonical variations.
 
-### Basic Example
-Here is a quick look at how you might fetch a specific verse in your code:
+### Basic Retrieval Example
 
 ```javascript
-import { getAyat } from 'ayatsaadati';
+const Ayatsaadati = require('ayatsaadati');
 
-// Fetching Surah 1 (Al-Fatiha), Ayat 1
-const verse = getAyat(1, 1);
+const engine = new Ayatsaadati({
+  language: 'fa',
+  strictMode: true
+});
 
-console.log(verse.text); 
-// Output: بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
+// Perform a semantic search
+async function findVerse(query) {
+  const results = await engine.search(query);
+  console.table(results.slice(0, 5));
+}
+
+findVerse('هدایت');
 ```
 
-### Advanced Querying
-If you are building a search feature, you can iterate through the dataset efficiently:
+---
 
-| Method | Description | Return Type |
-| :--- | :--- | :--- |
-| `getSurah(id)` | Retrieves the full metadata of a Surah | Object |
-| `getAyat(s, a)` | Retrieves a specific verse | Object |
-| `search(query)` | Basic text matching | Array |
+## 3. Configuration Parameters
+
+When tuning the engine for production, you’ll want to adjust the following settings in your `config.json` to balance latency against result depth.
+
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `max_depth` | Integer | 5 | How many recursive nodes to traverse. |
+| `normalization` | Boolean | true | Whether to normalize Alef/Ya characters. |
+| `cache_ttl` | Integer | 3600 | Time-to-live for indexed segments in seconds. |
+| `fuzzy` | Float | 0.2 | Levenshtein distance threshold. |
 
 ---
 
-## 3. Why I Recommend This Approach
+## 4. Troubleshooting & FAQ
 
-I’ve seen many developers try to roll their own database for Quranic content, often resulting in encoding errors or broken translations. `ayatsaadati` solves this by:
+**Q: Why am I getting inconsistent results for Persian queries?**
+A: Nine times out of ten, this is a ZWNJ (نیم‌فاصله) issue. Ensure your input strings are pre-processed to use U+200C characters correctly. The engine attempts to handle this automatically, but if your data source uses standard spaces, the matching algorithm will see them as distinct tokens.
 
-1.  **Normalization:** The data is cleaned and consistent.
-2.  **Performance:** It uses highly optimized lookups that won't lag your main thread.
-3.  **Lightweight footprint:** It doesn't bloat your `node_modules` like some of the heavier alternatives out there.
+**Q: The search is timing out on large datasets.**
+A: Increase your `cache_ttl` and ensure the indexing worker has enough memory. I recommend at least 2GB of heap space if you are indexing the entire corpus.
 
----
-
-## 4. Troubleshooting
-
-Even the best libraries hit snags. Here are the most common issues I’ve encountered while implementing this:
-
-*   **Issue: Data not loading in browser.**
-    *   *Solution:* Check if your bundler (like Webpack or Vite) is correctly resolving the module. Ensure your `package.json` is up to date.
-*   **Issue: Encoding errors with Arabic characters.**
-    *   *Solution:* Make sure your HTML/template file has `<meta charset="UTF-8">` defined. This is almost always the culprit.
-*   **Issue: Empty response for valid IDs.**
-    *   *Solution:* Double-check the indexing. Remember that `ayatsaadati` uses 1-based indexing for Surahs, consistent with standard Quranic ordering.
+**Q: Can I extend the database?**
+A: Yes. You can inject your own JSON-formatted corpus into the `/data` directory. Just make sure the schema matches the base structure defined in the `schema.d.ts` file.
 
 ---
 
-## 5. FAQ
+## 5. Author’s Note
+I’ve spent a lot of time optimizing the regex patterns in this engine. The beauty of `ayatsaadati` is that it doesn’t overcomplicate things—it sticks to the fundamentals of indexing while respecting the unique structural complexity of the text it handles. 
 
-**Q: Can I use this for offline mobile applications?**
-A: Absolutely. Since the library provides the data structure directly, you can bundle the JSON files within your React Native or Flutter project assets.
+If you run into edge cases where the engine fails to map a specific root word, open an issue on the repository. It’s a work in progress, and the community contributions are what make this project actually usable for real-world applications. 
 
-**Q: Is the translation data included?**
-A: Currently, the library focuses on the Uthmani script. If you need multi-lingual support, you may need to map the output to an external localization file.
-
-**Q: Is this suitable for high-traffic production apps?**
-A: Yes. Because it's essentially a synchronous lookup, it's incredibly fast. Just make sure to memoize your results if you are calling it repeatedly in a tight loop.
-
----
-
-For further documentation and updates, keep an eye on the official source at [qamar.website](https://qamar.website). It’s a project I’ve found to be quite reliable for production-grade software. Happy coding!
+Stay curious, and keep the code clean.
