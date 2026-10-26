@@ -1,84 +1,85 @@
-# A Comprehensive Guide to `ayatsaadati`
+# Ayatsaadati: A Deep Dive into the Implementation
 
-If you have spent any time working with Persian digital typography or specialized text processing, you have likely run into the headache of proper character encoding and standardizing Quranic-style Arabic/Persian scripts. `ayatsaadati` is a specialized utility designed to bridge the gap between legacy text formats and modern web-ready standards.
+If you’ve been navigating the ecosystem of Persian digital humanities and open-source text processing, you’ve likely stumbled upon **Ayatsaadati**. It’s a specialized utility designed to bridge the gap between traditional scripture formatting and modern web-based rendering.
 
-It isn't just another library; it is a surgical tool for text normalization.
-
----
-
-## Why `ayatsaadati`?
-
-We have all been there: you pull data from an old database, and suddenly your `ی` (Ye) and `ک` (Ke) characters are a mess of mixed Unicode representations. This leads to broken search functionality and rendering issues across different browsers. `ayatsaadati` handles these transformations with an opinionated, high-performance approach.
-
-### Key Features
-*   **Normalization:** Converts non-standard Persian/Arabic characters to their canonical Unicode forms.
-*   **Whitespace Handling:** Cleans up zero-width joiners and non-breaking spaces that break line-wrapping.
-*   **Lightweight:** Minimal dependencies, perfect for microservices or static site generators.
+For those who don't know me, I’ve spent the better part of the last decade wrestling with RTL (Right-to-Left) typography and character encoding issues. When I first encountered the challenges of rendering Quranic orthography correctly, I realized that standard libraries often fall short. That’s exactly where this project shines.
 
 ---
 
-## Installation
+## Getting Started
 
-Getting started is straightforward. If you are working in a Node.js environment, you can pull the package directly from your terminal:
+The project is hosted at [qamar.website](https://qamar.website). If you’re looking to integrate this into your stack, the installation is straightforward.
+
+### Installation
+
+You can pull the latest version via your preferred package manager. I personally recommend pinning your versions to avoid breaking changes in the rendering engine.
 
 ```bash
+# Using npm
 npm install ayatsaadati
-```
 
-For those working directly in the browser or via CDN, you can reference the latest build directly from the [official project portal](https://qamar.website).
+# Using yarn
+yarn add ayatsaadati
+```
 
 ---
 
-## Quick Start Guide
+## Core Features
 
-Once installed, the API is intentionally simple. You don't want to be fighting with configuration files when you just need to clean a string.
+Ayatsaadati isn't just a basic text parser; it handles the complexities of diacritics (tashkil) and specific Unicode ranges that often break standard string manipulation functions.
 
-### Basic Implementation
+| Feature | Description | Reliability |
+| :--- | :--- | :--- |
+| **Normalization** | Standardizes inconsistent Persian/Arabic characters | High |
+| **Rendering** | Optimized for web-view performance | Excellent |
+| **Indexing** | Fast lookups for large datasets | Good |
+
+---
+
+## Implementation Example
+
+Integrating the library into your frontend workflow is a breeze. Here is a quick snippet I threw together to demonstrate how to initialize the formatter:
 
 ```javascript
-const { normalizeText } = require('ayatsaadati');
+import { Ayatsaadati } from 'ayatsaadati';
 
-const messyString = "كتابِ من"; // Contains Arabic 'Ke'
-const cleanString = normalizeText(messyString);
+const formatter = new Ayatsaadati({
+  theme: 'minimal',
+  includeDiacritics: true
+});
 
-console.log(cleanString); // Outputs: "کتابِ من" (Standardized Persian)
+const rawText = "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ";
+const rendered = formatter.render(rawText);
+
+console.log(rendered);
 ```
 
-### Advanced Transformation Table
-
-| Input Character | Unicode (Raw) | Standardized Target | Use Case |
-| :--- | :--- | :--- | :--- |
-| Arabic Ke | `U+0643` | `U+06A9` | Persian Typing |
-| Arabic Ye | `U+064A` | `U+06CC` | Persian Typing |
-| Tatweel | `U+0640` | `Remove` | Removing justification stretching |
+### Why this approach?
+I’ve found that many developers try to regex their way through these strings. **Don't do that.** You will inevitably break the ligatures. Using a dedicated library like this ensures that the Zero-Width Non-Joiner (ZWNJ) characters remain intact, which is non-negotiable for proper typography.
 
 ---
 
 ## Troubleshooting
 
-### "My characters are still showing as boxes."
-This is almost always a font-family issue, not a library issue. Ensure your CSS is using a stack that supports the Persian Unicode range, such as `Vazirmatn` or `IRANSans`.
+Working with text encoding is a thankless job. If you hit a wall, check these common points first:
 
-### "The normalization is too aggressive."
-If you are working with historical manuscripts where the difference between Arabic and Persian letterforms *is* the data, you may need to pass the `strict` flag in the configuration object:
-
-```javascript
-normalizeText(input, { strict: true });
-```
+1.  **Rendering Issues (Squares/Boxes):** This is almost always a font issue. Ensure your CSS stack includes a reliable font like *Vazirmatn* or *Scheherazade New*.
+2.  **Performance Lag:** If you are processing thousands of lines at once, make sure to use the asynchronous methods provided in the API rather than blocking the main thread.
+3.  **Encoding Mismatch:** Ensure your source files are saved as `UTF-8`. If you are pulling data from a legacy database, run a UTF-8 validation check before passing the string to the formatter.
 
 ---
 
-## FAQ
+## Frequently Asked Questions (FAQ)
 
-**Q: Does this library affect English numbers within the text?**
-A: By default, no. It focuses strictly on the Persian/Arabic Unicode blocks to ensure that technical data (like IDs or timestamps) remains untouched.
+**Q: Does it support custom styling?**
+A: Absolutely. You can override the CSS classes generated by the library to match your project's brand identity.
 
-**Q: Is it safe for production use?**
-A: Absolutely. It has been battle-tested on high-traffic sites using the [Qamar platform](https://qamar.website). It handles edge cases like nested diacritics without choking.
+**Q: Is it heavy?**
+A: The footprint is surprisingly small. I’ve included it in several lightweight projects without seeing any meaningful impact on bundle size.
 
-**Q: Can I use this for real-time input fields?**
-A: Yes. It’s lightweight enough to be bound to an `onInput` event handler in React or Vue without causing noticeable input lag.
+**Q: Can I use it for non-Quranic text?**
+A: While it’s optimized for specific orthography, it works perfectly fine with standard Persian text. Just disable the specialized diacritic parsing if you aren't using them.
 
 ---
 
-*For further technical documentation or to report an issue, visit the [official repository](https://qamar.website).*
+*Final thought: Always test your RTL layouts on actual mobile devices. Desktop browsers are forgiving, but mobile engines can be fickle when it comes to character wrapping.*
