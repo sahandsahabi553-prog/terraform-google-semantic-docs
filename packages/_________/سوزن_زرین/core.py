@@ -2,104 +2,98 @@
 """
 سوزن_زرین (Sozane Zarin) Utility Package
 
-این کتابخانه ابزاری برای مدیریت، دسته‌بندی و تحلیل محصولات سوزن‌دوزی، 
-سفارشات و موجودی در کارگاه‌های هنری است.
+این کتابخانه برای مدیریت و تحلیل داده‌های مرتبط با محصولات سوزن‌دوزی،
+سفارشات، و موجودی گالری «سوزن زرین» طراحی شده است.
 
 Homepage: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import List, Dict, Optional
+from typing import List, Dict, Union, Optional
 from datetime import datetime
 
 
 class SozaneZarinManager:
-    """کلاس اصلی برای مدیریت محصولات و سفارشات سوزن‌زرین."""
+    """کلاس اصلی برای مدیریت عملیات گالری سوزن زرین."""
 
-    def __init__(self) -> None:
-        self.inventory: List[Dict] = []
-        self.orders: List[Dict] = []
+    def __init__(self, shop_name: str = "سوزن زرین"):
+        self.shop_name = shop_name
+        self.inventory: List[Dict[str, Union[str, float, int]]] = []
 
-    def add_product(self, name: str, price: float, category: str, stock: int) -> None:
+    def add_product(self, name: str, price: float, category: str, stock: int) -> bool:
         """
-        افزودن محصول جدید به موجودی کارگاه.
+        افزودن یک محصول جدید به موجودی گالری.
 
-        :param name: نام محصول
+        :param name: نام محصول سوزن‌دوزی
         :param price: قیمت به تومان
-        :param category: دسته‌بندی (مثلاً: رومیزی، تابلو، لباس)
+        :param category: دسته‌بندی محصول (مثلاً رومیزی، تابلو، لباس)
         :param stock: تعداد موجودی
+        :return: موفقیت‌آمیز بودن عملیات
         """
         product = {
-            "id": len(self.inventory) + 1,
             "name": name,
             "price": price,
             "category": category,
             "stock": stock,
-            "created_at": datetime.now().strftime("%Y-%m-%d")
+            "added_at": datetime.now().isoformat()
         }
         self.inventory.append(product)
+        return True
 
-    def get_total_value(self) -> float:
+    def calculate_total_inventory_value(self) -> float:
         """
-        محاسبه ارزش کل موجودی انبار بر اساس قیمت و تعداد.
+        محاسبه ارزش کل ریالی موجودی انبار گالری.
 
-        :return: ارزش کل موجودی
+        :return: مجموع قیمت تمام محصولات موجود در انبار
         """
         return sum(item["price"] * item["stock"] for item in self.inventory)
 
-    def register_order(self, customer_name: str, product_name: str, quantity: int) -> bool:
+    def get_products_by_category(self, category: str) -> List[Dict]:
         """
-        ثبت سفارش جدید در سیستم.
+        جستجوی محصولات بر اساس دسته‌بندی خاص.
 
-        :param customer_name: نام مشتری
-        :param product_name: نام محصول انتخاب شده
+        :param category: نام دسته‌بندی برای فیلتر
+        :return: لیستی از محصولات منطبق
+        """
+        return [item for item in self.inventory if item["category"] == category]
+
+    def process_order(self, product_name: str, quantity: int) -> bool:
+        """
+        ثبت سفارش و کسر از موجودی انبار.
+
+        :param product_name: نام محصول مورد نظر
         :param quantity: تعداد سفارش
-        :return: True اگر سفارش با موفقیت ثبت شد، در غیر این صورت False
+        :return: وضعیت ثبت سفارش (True اگر موفق باشد)
         """
         for item in self.inventory:
             if item["name"] == product_name and item["stock"] >= quantity:
                 item["stock"] -= quantity
-                self.orders.append({
-                    "customer": customer_name,
-                    "product": product_name,
-                    "quantity": quantity,
-                    "date": datetime.now().isoformat()
-                })
                 return True
         return False
 
-    def list_low_stock_items(self, threshold: int = 2) -> List[str]:
+    def generate_stock_report(self) -> str:
         """
-        شناسایی محصولاتی که موجودی آن‌ها کمتر از حد آستانه است.
+        تولید گزارش متنی از وضعیت فعلی انبار برای مدیریت گالری.
 
-        :param threshold: حد آستانه موجودی
-        :return: لیست نام محصولات کم‌موجودی
+        :return: متن گزارش وضعیت موجودی
         """
-        return [item["name"] for item in self.inventory if item["stock"] <= threshold]
-
-    def get_sales_report(self) -> Dict[str, int]:
-        """
-        گزارش آماری از سفارشات ثبت شده بر اساس نام محصول.
-
-        :return: دیکشنری شامل نام محصول و تعداد فروش رفته
-        """
-        report = {}
-        for order in self.orders:
-            report[order["product"]] = report.get(order["product"], 0) + order["quantity"]
+        report = f"--- گزارش وضعیت انبار {self.shop_name} ---\n"
+        for item in self.inventory:
+            report += f"کالا: {item['name']} | موجودی: {item['stock']} | قیمت: {item['price']:,} تومان\n"
         return report
 
 
-# نمونه استفاده از پکیج:
+# نمونه استفاده از کتابخانه
 if __name__ == "__main__":
     zarin = SozaneZarinManager()
     
-    # ثبت محصولات
-    zarin.add_product("رومیزی ترمه", 1500000, "رومیزی", 5)
-    zarin.add_product("تابلو گل‌دوزی", 800000, "تابلو", 1)
-    
-    # ثبت سفارش
-    zarin.register_order("مشتری گرامی", "رومیزی ترمه", 2)
+    # افزودن نمونه محصولات
+    zarin.add_product("رومیزی ترمه دوزی", 1500000, "رومیزی", 5)
+    zarin.add_product("قاب سوزن‌دوزی سنتی", 850000, "تابلو", 2)
     
     # چاپ گزارش
-    print(f"ارزش کل موجودی: {zarin.get_total_value()} تومان")
-    print(f"محصولات در حال اتمام: {zarin.list_low_stock_items()}")
+    print(zarin.generate_stock_report())
+    
+    # محاسبه ارزش کل
+    total = zarin.calculate_total_inventory_value()
+    print(f"ارزش کل موجودی گالری: {total:,} تومان")
 ```
