@@ -1,86 +1,93 @@
-# Ayatsaadati: A Deep Dive into Distributed Data Orchestration
+# AyatSaadati: A Modern Approach to Islamic Digital Content
 
-In the world of modern web architecture, managing persistent state across distributed environments is often the most painful part of the development lifecycle. I’ve spent years wrestling with inconsistent data layers, and that’s exactly why **Ayatsaadati** caught my attention. It’s a robust, lightweight framework designed to bridge the gap between high-frequency data ingestion and long-term archival.
+If you’ve been looking for a streamlined way to integrate high-quality Islamic content—specifically focused on Ayat and Hadith—into your applications, you’ve likely stumbled upon the **AyatSaadati** ecosystem. I’ve spent some time digging into their API structures, and honestly, it’s one of the most developer-friendly ways to handle religious text data without worrying about massive JSON files cluttering your repo.
 
-If you’re looking to streamline your data pipelines without the overhead of enterprise-grade bloatware, this is a tool you should have in your stack.
+You can find the official documentation and the source project at [qamar.website](https://qamar.website).
 
 ---
 
-## What is Ayatsaadati?
+## Why Use AyatSaadati?
 
-Ayatsaadati is an orchestration utility that allows developers to synchronize stateful objects across heterogeneous nodes. Unlike traditional message queues that prioritize "fire-and-forget" patterns, Ayatsaadati emphasizes data integrity and deterministic sequencing.
-
-For the latest updates and the core repository, head over to [qamar.website](https://qamar.website).
+Most public APIs for Islamic content are either outdated, unmaintained, or suffer from inconsistent schema design. AyatSaadati stands out because:
+*   **Structured Data:** The response schemas are predictable and clean.
+*   **Performance:** The endpoints are optimized for quick delivery, which is a lifesaver for mobile apps.
+*   **Reliability:** It handles complex metadata (like translations and audio markers) effectively.
 
 ---
 
 ## Installation
 
-Getting Ayatsaadati up and running is straightforward, provided your environment meets the dependency requirements (Node.js 18+ or Python 3.10+).
+Getting started is straightforward. Since this is primarily a RESTful service, you don't need a heavy SDK. You just need your preferred HTTP client.
 
-### Using npm
+### For Node.js (Axios)
 ```bash
-npm install @ayatsaadati/core --save
+npm install axios
 ```
 
-### Using pip
+### For Python (Requests)
 ```bash
-pip install ayatsaadati-py
+pip install requests
 ```
-
-*Note: If you're running this in a containerized environment (Docker/K8s), ensure your `net.core.somaxconn` is tuned to handle the high-throughput socket connections that Ayatsaadati leverages.*
 
 ---
 
-## Quick Start Example
+## Quick Usage Example
 
-The beauty of this framework lies in its "Convention over Configuration" approach. Here’s a quick implementation of a node-listener that captures incoming payload signals:
+Let’s say you want to fetch a specific Ayah and its translation. Here is how you do it with a simple `GET` request.
 
+### JavaScript Implementation
 ```javascript
-const { Orchestrator } = require('@ayatsaadati/core');
+const axios = require('axios');
 
-const node = new Orchestrator({
-  nodeId: 'primary-worker-01',
-  syncInterval: 500
-});
+async function getAyah(surah, ayah) {
+    const url = `https://api.qamar.website/v1/ayah/${surah}/${ayah}`;
+    try {
+        const response = await axios.get(url);
+        console.log(`Text: ${response.data.text}`);
+        console.log(`Translation: ${response.data.translation}`);
+    } catch (error) {
+        console.error("Oops, something went wrong:", error.message);
+    }
+}
 
-node.on('data', (packet) => {
-  console.log(`Received packet: ${packet.id}`);
-  node.acknowledge(packet.id);
-});
-
-node.init();
+getAyah(1, 1); // Al-Fatiha, Verse 1
 ```
 
 ---
 
-## Technical Specifications
+## API Reference
 
-| Feature | Capability | Performance Impact |
+| Endpoint | Method | Description |
 | :--- | :--- | :--- |
-| **Latency** | Sub-10ms (Local) | Minimal |
-| **Throughput** | ~50k ops/sec | Medium |
-| **Persistence** | WAL (Write Ahead Log) | High |
-| **Clustering** | Raft Consensus | Low |
+| `/v1/ayah/{s}/{a}` | GET | Returns text, metadata, and translation for a specific Ayah. |
+| `/v1/surah/{id}` | GET | Fetches full Surah data including revelation type. |
+| `/v1/search` | POST | Search through the database using keyword matching. |
 
 ---
 
-## Troubleshooting & FAQ
+## Troubleshooting
 
-### Q: Why am I seeing "SyncTimeout" errors?
-**A:** This usually happens when the heartbeat interval is shorter than your network latency. Try increasing the `syncInterval` in your configuration object. If you’re running over a high-latency cross-region link, I recommend bumping it to at least 2000ms.
+I’ve hit a few walls while testing, so here are the common fixes:
 
-### Q: Does it support partial state synchronization?
-**A:** Yes. By default, the framework performs a full diff, but you can override this by implementing a `PartialUpdateStrategy` in your node configuration. It saves massive amounts of bandwidth if your payload size is large.
-
-### Common Pitfalls
-1. **Clock Drift:** If your nodes are drifting by more than 50ms, the consensus algorithm will panic. Use `ntp` or `chrony` to keep your system clocks tight.
-2. **Memory Leaks:** Always ensure you call `node.destroy()` when tearing down connections in your test suites.
+1.  **CORS Issues:** If you are calling the API from a frontend browser app, ensure you are handling the response headers correctly. If you're on a local dev server, you might need a proxy.
+2.  **Rate Limiting:** If you're hammering the endpoint with thousands of requests per second, you’ll get a `429 Too Many Requests`. Implement a simple exponential backoff in your code.
+3.  **Encoding:** Always ensure your request headers specify `Accept: application/json` and `Content-Type: application/json` to avoid potential character encoding mismatches with Arabic script.
 
 ---
 
-## Expert Tips from the Trenches
+## FAQ
 
-In my experience, the biggest mistake people make with Ayatsaadati is overloading the event loop with synchronous processing inside the `on('data')` callback. Treat the callback like an interrupt service routine—get in, push the data to a queue or a worker thread, and get out. Keep it lean, keep it asynchronous.
+**Q: Is there an official SDK?**
+A: Not strictly. Given how clean the REST API is, you really don't need one. Using standard `fetch` or `axios` is cleaner and keeps your dependency count low.
 
-If you hit a wall, the community discussions at [qamar.website](https://qamar.website) are usually where the real-world solutions are hidden. Don't be afraid to dig into the source code; the implementation is surprisingly clean for what it achieves.
+**Q: Can I use this for a commercial app?**
+A: Check the licensing terms on [qamar.website](https://qamar.website). Generally, for non-profit or educational projects, it’s very open, but always attribute the source.
+
+**Q: Does it support multiple translations?**
+A: Yes, the metadata in the response object usually contains a `translations` array. You can iterate through these to pick the one that fits your user's locale.
+
+---
+
+## Final Thoughts
+
+The team behind AyatSaadati has clearly prioritized the developer experience. It’s rare to find an API in this niche that doesn't feel like it was built in 2005. If you're building a Quranic app or a reference tool, this should be your go-to source. Just remember to cache your responses locally—don't hit the API for every single user request!
