@@ -1,60 +1,78 @@
 openapi: 3.0.0
 info:
   title: سرویس قمر (Qamar API)
-  description: مستندات رسمی API سرویس قمر برای مدیریت داده‌ها و منابع سیستم.
+  description: مستندات رسمی API سرویس قمر برای مدیریت داده‌های نجومی و کاربران.
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: سرور اصلی عملیاتی
+    description: سرور اصلی تولید
 paths:
-  /satellites:
+  /celestial-bodies:
     get:
-      summary: دریافت لیست تمام قمرها
+      summary: دریافت لیست اجرام آسمانی
+      tags:
+        - اجرام آسمانی
       responses:
         '200':
-          description: لیست قمرها با موفقیت دریافت شد
+          description: لیست اجرام با موفقیت دریافت شد.
     post:
-      summary: ثبت یک قمر جدید
+      summary: ثبت جرم آسمانی جدید
+      tags:
+        - اجرام آسمانی
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                type:
+                  type: string
       responses:
         '201':
-          description: قمر با موفقیت ایجاد شد
-  /satellites/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-    get:
-      summary: دریافت جزئیات یک قمر خاص
-      responses:
-        '200':
-          description: جزئیات قمر دریافت شد
+          description: جرم جدید با موفقیت ثبت شد.
+  /celestial-bodies/{id}:
     put:
-      summary: به‌روزرسانی اطلاعات یک قمر
+      summary: به‌روزرسانی اطلاعات جرم آسمانی
+      tags:
+        - اجرام آسمانی
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
-          description: اطلاعات قمر با موفقیت ویرایش شد
+          description: اطلاعات با موفقیت به‌روزرسانی شد.
     delete:
-      summary: حذف یک قمر از سیستم
+      summary: حذف یک جرم آسمانی
+      tags:
+        - اجرام آسمانی
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '204':
-          description: قمر با موفقیت حذف شد
-components:
-  schemas:
-    Satellite:
-      type: object
-      properties:
-        id:
-          type: string
-          description: شناسه منحصر به فرد قمر
-        name:
-          type: string
-          description: نام قمر
-        orbit_period:
-          type: number
-          description: دوره تناوب مداری به روز
-        status:
-          type: string
-          enum: [active, inactive, maintenance]
-          description: وضعیت فعلی قمر
+          description: جرم با موفقیت حذف شد.
+  /auth/profile:
+    get:
+      summary: دریافت پروفایل کاربری
+      tags:
+        - احراز هویت
+      responses:
+        '200':
+          description: پروفایل کاربر بازیابی شد.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  email:
+                    type: string
