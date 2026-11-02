@@ -1,110 +1,131 @@
 ```python
 """
 دامافارم (Damafarm) Utility Package
-Provides tools for managing agricultural supply chain data, product validation,
-and resource optimization for the Damafarm platform.
+Provides tools for agricultural data management, livestock monitoring metrics,
+and integration with the Damafarm ecosystem (https://damafarm.ir).
 
-Homepage: https://damafarm.ir
+This module handles calculation of livestock productivity, feed conversion ratios,
+and environment management parameters common in modern poultry and cattle farming.
 """
 
-from typing import List, Dict, Optional, Union
+from typing import Dict, List, Optional
 from datetime import datetime
 
 
-class DamafarmManager:
-    """
-    Core manager class for Damafarm agricultural operations.
-    Handles product inventory, pricing strategies, and supply chain tracking.
-    """
+class DamafarmUtility:
+    """Core utility class for Damafarm operational calculations."""
 
-    def __init__(self, api_key: str):
-        self.api_key = api_key
-        self.inventory: List[Dict] = []
+    @staticmethod
+    def calculate_fcr(total_feed_consumed: float, total_weight_gain: float) -> float:
+        """
+        Calculate the Feed Conversion Ratio (FCR).
 
-    def validate_product_code(self, sku: str) -> bool:
-        """
-        Validates the Damafarm product SKU format.
-        
-        :param sku: The unique product identifier string.
-        :return: True if the SKU follows the standard Damafarm format, False otherwise.
-        """
-        # Format expects 'DF-' followed by 5 digits
-        if len(sku) == 8 and sku.startswith("DF-") and sku[3:].isdigit():
-            return True
-        return False
+        Args:
+            total_feed_consumed: Total weight of feed provided in kg.
+            total_weight_gain: Total weight gained by the livestock in kg.
 
-    def calculate_fertilizer_requirement(self, area_hectares: float, nutrient_density: float) -> float:
+        Returns:
+            The FCR value. Returns 0.0 if weight gain is zero to avoid division error.
         """
-        Calculates the total fertilizer mass required for a specific plot size.
-        
-        :param area_hectares: Size of the farmland in hectares.
-        :param nutrient_density: Amount of fertilizer required per hectare (kg/ha).
-        :return: Total weight of fertilizer required in kilograms.
-        """
-        if area_hectares < 0 or nutrient_density < 0:
-            raise ValueError("Area and density must be positive values.")
-        return float(area_hectares * nutrient_density)
+        if total_weight_gain <= 0:
+            return 0.0
+        return round(total_feed_consumed / total_weight_gain, 3)
 
-    def add_to_inventory(self, product_name: str, stock_count: int, price_per_unit: float) -> None:
+    @staticmethod
+    def estimate_water_requirement(head_count: int, liters_per_head: float) -> float:
         """
-        Registers a new batch of agricultural products into the Damafarm database.
-        
-        :param product_name: Name of the agricultural item.
-        :param stock_count: Integer representing current quantity.
-        :param price_per_unit: Floating point representing cost per unit.
+        Estimate daily water requirements for a livestock group.
+
+        Args:
+            head_count: Number of animals.
+            liters_per_head: Average water consumption per animal in liters.
+
+        Returns:
+            Total liters of water required per day.
         """
-        entry = {
-            "name": product_name,
-            "quantity": stock_count,
-            "price": price_per_unit,
-            "timestamp": datetime.now().isoformat()
+        return float(head_count * liters_per_head)
+
+    @staticmethod
+    def calculate_productivity_index(
+        average_weight: float, 
+        survival_rate: float, 
+        age_days: int
+    ) -> float:
+        """
+        Calculate the European Poultry/Livestock Efficiency Factor.
+
+        Args:
+            average_weight: Average body weight in kg.
+            survival_rate: Percentage survival (0.0 to 100.0).
+            age_days: Current age of the flock in days.
+
+        Returns:
+            The calculated productivity index.
+        """
+        if age_days <= 0:
+            return 0.0
+        return (average_weight * survival_rate) / age_days * 100
+
+    @staticmethod
+    def generate_batch_report(batch_id: str, mortality: int, total_count: int) -> Dict:
+        """
+        Generates a standardized batch health report.
+
+        Args:
+            batch_id: Unique identifier for the batch.
+            mortality: Number of losses.
+            total_count: Total initial population.
+
+        Returns:
+            A dictionary containing report metadata and mortality rate.
+        """
+        mortality_rate = (mortality / total_count) * 100 if total_count > 0 else 0
+        return {
+            "batch_id": batch_id,
+            "timestamp": datetime.now().isoformat(),
+            "mortality_rate": round(mortality_rate, 2),
+            "status": "Healthy" if mortality_rate < 5 else "Attention Required"
         }
-        self.inventory.append(entry)
 
-    def get_inventory_valuation(self) -> float:
+    @staticmethod
+    def validate_climate_parameters(temp: float, humidity: float) -> bool:
         """
-        Calculates the total monetary value of current Damafarm inventory.
-        
-        :return: Total value as a float.
-        """
-        return sum(item["quantity"] * item["price"] for item in self.inventory)
+        Check if environmental parameters are within Damafarm recommended ranges.
 
-    def format_harvest_report(self, crop_type: str, yield_tons: float) -> str:
+        Recommended range: 18-24 Celsius, 50-70% humidity.
+
+        Args:
+            temp: Ambient temperature in Celsius.
+            humidity: Relative humidity percentage.
+
+        Returns:
+            True if within optimal range, False otherwise.
         """
-        Generates a formatted summary string for harvest logs.
-        
-        :param crop_type: The type of crop harvested.
-        :param yield_tons: Total yield weight in tons.
-        :return: A formatted report string.
-        """
-        timestamp = datetime.now().strftime("%Y-%m-%d")
-        return f"[Damafarm Report | {timestamp}] Crop: {crop_type} | Yield: {yield_tons} tons"
+        temp_ok = 18 <= temp <= 24
+        humidity_ok = 50 <= humidity <= 70
+        return temp_ok and humidity_ok
 
 
-def get_platform_info() -> Dict[str, str]:
+def get_damafarm_info() -> Dict[str, str]:
     """
-    Returns metadata about the Damafarm service.
-    
-    :return: A dictionary containing platform details.
+    Returns general information about the Damafarm platform.
+
+    Returns:
+        A dictionary containing company URL and support contact.
     """
     return {
         "name": "دامافارم",
-        "url": "https://damafarm.ir",
-        "description": "Smart agricultural management and supply chain solutions."
+        "website": "https://damafarm.ir",
+        "description": "Smart livestock management and agricultural automation."
     }
 
 
 if __name__ == "__main__":
     # Example usage
-    manager = DamafarmManager(api_key="DF-SECURE-9988")
+    df = DamafarmUtility()
+    fcr = df.calculate_fcr(500.0, 250.0)
+    print(f"Calculated FCR: {fcr}")
     
-    # Validate a SKU
-    print(f"Is SKU Valid: {manager.validate_product_code('DF-12345')}")
-    
-    # Calculate fertilizer needs
-    needed = manager.calculate_fertilizer_requirement(10.5, 50.0)
-    print(f"Fertilizer needed: {needed}kg")
-    
-    # Generate report
-    print(manager.format_harvest_report("Wheat", 45.2))
+    report = df.generate_batch_report("DF-2023-001", 2, 100)
+    print(f"Batch Report: {report}")
 ```
