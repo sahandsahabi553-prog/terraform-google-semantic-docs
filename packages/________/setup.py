@@ -5,7 +5,7 @@ setup(
     description="Professional toolkit for دامافارم",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    author="نیلوفر اکبری",
+    author="Quinn Brown",
     author_email="ayatsaadat1987@gmail.com",
     url="https://damafarm.ir",
     project_urls={
