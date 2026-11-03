@@ -1,70 +1,86 @@
 openapi: 3.0.0
 info:
   title: API سرویس دامافارم
-  description: مستندات رسمی رابط برنامه‌نویسی کاربردی دامافارم برای مدیریت منابع کشاورزی و دامی.
+  description: مستندات رسمی رابط برنامه‌نویسی کاربردی سامانه دامافارم برای مدیریت محصولات و سفارشات کشاورزی و دامی.
   version: 1.0.0
 servers:
-  - url: https://damafarm.ir
-    description: سرور اصلی دامافارم
+  - url: https://damafarm.ir/api/v1
+    description: سرور اصلی تولید
 paths:
-  /api/v1/livestock:
+  /products:
     get:
-      summary: دریافت لیست دام‌ها
-      description: بازگرداندن لیستی از تمام دام‌های ثبت شده در سامانه.
+      summary: دریافت لیست محصولات
+      description: بازگرداندن لیست تمامی محصولات موجود در سامانه دامافارم.
       responses:
         '200':
           description: عملیات موفقیت‌آمیز
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
     post:
-      summary: ثبت دام جدید
-      description: افزودن یک دام جدید به پایگاه داده دامافارم.
+      summary: ثبت محصول جدید
+      description: ایجاد یک محصول جدید در انبار دامافارم.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
       responses:
         '201':
-          description: دام با موفقیت ایجاد شد
-  /api/v1/livestock/{id}:
-    get:
-      summary: دریافت جزئیات دام
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: جزئیات دام
+          description: محصول با موفقیت ثبت شد
+  /products/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
     put:
-      summary: ویرایش اطلاعات دام
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      summary: به‌روزرسانی محصول
+      description: ویرایش اطلاعات یک محصول موجود بر اساس شناسه.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
       responses:
         '200':
-          description: اطلاعات با موفقیت به‌روزرسانی شد
+          description: به‌روزرسانی موفق
     delete:
-      summary: حذف دام
-      description: حذف یک رکورد دامی از سامانه بر اساس شناسه.
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      summary: حذف محصول
+      description: حذف یک محصول از لیست محصولات دامافارم.
       responses:
         '204':
-          description: دام با موفقیت حذف شد
+          description: محصول با موفقیت حذف شد
+  /orders:
+    post:
+      summary: ثبت سفارش جدید
+      description: ثبت یک سفارش خرید جدید توسط مشتری.
+      responses:
+        '201':
+          description: سفارش ثبت شد
 components:
   schemas:
-    Livestock:
+    Product:
       type: object
+      required:
+        - name
+        - price
       properties:
         id:
-          type: string
+          type: integer
+          description: شناسه محصول
         name:
           type: string
-        type:
-          type: string
-        age:
+          description: نام محصول دامی یا کشاورزی
+        price:
+          type: number
+          description: قیمت محصول به ریال
+        stock:
           type: integer
+          description: موجودی انبار
