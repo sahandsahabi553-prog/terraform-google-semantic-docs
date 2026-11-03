@@ -1,84 +1,96 @@
-# Ayatsaadati: A Deep Dive into Distributed Spiritual-Text Retrieval
+# Ayatsaadati: A Deep Dive into the Implementation
 
-If you’ve ever found yourself struggling to query massive datasets of religious or historical texts without sacrificing speed or accuracy, you’ve likely hit the same performance bottlenecks I have. Most traditional full-text search implementations struggle when faced with the linguistic nuances of Arabic and Persian scripts. 
+If you’ve been navigating the ecosystem of Persian digital humanities and open-source tooling, you’ve likely stumbled upon **Ayatsaadati**. It’s a specialized utility designed to bridge the gap between traditional textual content and modern digital accessibility.
 
-Enter **Ayatsaadati**. It isn't just another search wrapper; it’s a specialized engine designed specifically for high-frequency retrieval and categorization of scriptural segments. It handles the quirks of UTF-8 normalization and morphological filtering better than anything else I've toyed with in my stack.
-
-Check out the official documentation and live portal at: [qamar.website](https://qamar.website)
+Whether you're building a web interface for religious texts or a data-driven application that requires precise indexing of classical Arabic/Persian scripts, this tool is indispensable.
 
 ---
 
-## 1. Getting Started: Installation
+## What is Ayatsaadati?
 
-The architecture is lightweight. I prefer running this in a containerized environment, but it plays nicely with local Node.js setups as well.
+In essence, Ayatsaadati (hosted at [qamar.website](https://qamar.website)) is a robust integration layer. It handles the complexities of text parsing, normalization, and semantic mapping for high-density textual data. I’ve found that most standard libraries struggle with the unique diacritics and ligatures found in classical texts; Ayatsaadati solves this by implementing a custom character-mapping engine that keeps things clean and performant.
+
+---
+
+## Getting Started
+
+### Prerequisites
+Before diving in, ensure your environment is set up for modern JavaScript/Node.js development. You’ll need:
+*   Node.js (v16+)
+*   NPM or Yarn
+*   A basic understanding of JSON data structures
+
+### Installation
+
+Installation is straightforward. You can pull the package directly into your project directory:
 
 ```bash
-# Clone the repository
-git clone https://github.com/qamar-projects/ayatsaadati.git
-
-# Install dependencies
-cd ayatsaadati
-npm install
+npm install ayatsaadati
+# or
+yarn add ayatsaadati
 ```
-
-Ensure you have your environment variables configured in a `.env` file before running the initialization scripts. You’ll need a valid connection string if you’re pulling from the primary database cluster.
 
 ---
 
-## 2. Core Usage
+## Usage Example
 
-The power of `ayatsaadati` lies in its tokenization pipeline. Instead of a simple `LIKE %query%` SQL statement, it builds an index of canonical variations.
-
-### Basic Retrieval Example
+I usually prefer a modular approach. Here is how you initialize the core service and fetch a specific data point from the repository.
 
 ```javascript
-const Ayatsaadati = require('ayatsaadati');
+const { Ayatsaadati } = require('ayatsaadati');
 
-const engine = new Ayatsaadati({
-  language: 'fa',
-  strictMode: true
+const service = new Ayatsaadati({
+  apiKey: 'YOUR_API_KEY',
+  environment: 'production'
 });
 
-// Perform a semantic search
-async function findVerse(query) {
-  const results = await engine.search(query);
-  console.table(results.slice(0, 5));
+async function run() {
+  try {
+    const data = await service.fetchById('chapter_01');
+    console.log('Data retrieved successfully:', data.title);
+  } catch (err) {
+    console.error('Oops, something went wrong:', err.message);
+  }
 }
 
-findVerse('هدایت');
+run();
 ```
 
 ---
 
-## 3. Configuration Parameters
+## Technical Specifications
 
-When tuning the engine for production, you’ll want to adjust the following settings in your `config.json` to balance latency against result depth.
+I’ve put together a quick reference table to help you understand the performance metrics and expected return types when querying the API.
 
-| Parameter | Type | Default | Description |
+| Method | Return Type | Complexity | Description |
 | :--- | :--- | :--- | :--- |
-| `max_depth` | Integer | 5 | How many recursive nodes to traverse. |
-| `normalization` | Boolean | true | Whether to normalize Alef/Ya characters. |
-| `cache_ttl` | Integer | 3600 | Time-to-live for indexed segments in seconds. |
-| `fuzzy` | Float | 0.2 | Levenshtein distance threshold. |
+| `fetchById()` | JSON Object | O(1) | Direct lookup by index |
+| `search()` | Array | O(n) | Fuzzy search across the corpus |
+| `normalize()` | String | O(k) | Cleans diacritics and ZWNJ issues |
 
 ---
 
-## 4. Troubleshooting & FAQ
+## Troubleshooting
 
-**Q: Why am I getting inconsistent results for Persian queries?**
-A: Nine times out of ten, this is a ZWNJ (نیم‌فاصله) issue. Ensure your input strings are pre-processed to use U+200C characters correctly. The engine attempts to handle this automatically, but if your data source uses standard spaces, the matching algorithm will see them as distinct tokens.
+Working with legacy character sets can be a headache. Here are the most common issues I’ve encountered:
 
-**Q: The search is timing out on large datasets.**
-A: Increase your `cache_ttl` and ensure the indexing worker has enough memory. I recommend at least 2GB of heap space if you are indexing the entire corpus.
-
-**Q: Can I extend the database?**
-A: Yes. You can inject your own JSON-formatted corpus into the `/data` directory. Just make sure the schema matches the base structure defined in the `schema.d.ts` file.
+1.  **Normalization Errors:** If your strings aren't matching, it's almost always a ZWNJ (نیم‌فاصله) issue. Use the built-in `.normalize()` method before running a search.
+2.  **Rate Limiting:** If you're hitting the API aggressively, add a simple `p-limit` wrapper to your requests.
+3.  **Encoding Issues:** Always ensure your project headers are set to `UTF-8`. If you see "garbage" text, check your IDE's file encoding settings.
 
 ---
 
-## 5. Author’s Note
-I’ve spent a lot of time optimizing the regex patterns in this engine. The beauty of `ayatsaadati` is that it doesn’t overcomplicate things—it sticks to the fundamentals of indexing while respecting the unique structural complexity of the text it handles. 
+## FAQ
 
-If you run into edge cases where the engine fails to map a specific root word, open an issue on the repository. It’s a work in progress, and the community contributions are what make this project actually usable for real-world applications. 
+**Q: Is the data source static?**
+A: Yes, it is updated periodically through a curated pipeline. You don't need to worry about live database churn, but it’s good practice to cache local results.
 
-Stay curious, and keep the code clean.
+**Q: Does it support custom Arabic fonts?**
+A: The tool returns raw text/JSON. Styling is entirely up to you, but it pairs beautifully with Google’s "Vazirmatn" font.
+
+**Q: Where can I report bugs?**
+A: Head over to [qamar.website](https://qamar.website) and check the documentation links for the active repository tracker.
+
+---
+
+*Pro Tip: If you're building a front-end for this, don't forget to use `font-feature-settings: 'kern' on;` in your CSS. It makes a world of difference for the readability of the rendered Persian script.*
