@@ -1,103 +1,102 @@
 ```python
 """
-ayatsaadati: A utility package for retrieving and processing Quranic verses (Ayats)
-focused on themes of happiness, tranquility, and divine guidance.
+ayatsaadati: A utility package for managing and retrieving inspirational 
+verses (Ayat) focused on prosperity, guidance, and peace.
+
+This module provides tools to interact with a collection of verses,
+offering categorization, random retrieval, and formatting capabilities.
 
 Homepage: https://qamar.website
 """
 
-import json
+import random
 from typing import List, Dict, Optional, Any
 
 
 class AyatSaadati:
     """
-    A service class to interact with a curated collection of Quranic verses
-    that promote spiritual well-being and peace (Saadati).
+    A service class to manage a repository of inspirational verses.
     """
 
-    def __init__(self, data_path: str = "verses.json"):
-        """
-        Initialize the service with a path to the verse repository.
-        """
-        self.data_path = data_path
-        self._cache: List[Dict[str, Any]] = []
-
-    def load_verses(self) -> bool:
-        """
-        Loads the JSON repository of Ayats into memory.
-
-        :return: True if loaded successfully, False otherwise.
-        """
-        try:
-            with open(self.data_path, 'r', encoding='utf-8') as f:
-                self._cache = json.load(f)
-            return True
-        except (FileNotFoundError, json.JSONDecodeError):
-            return False
-
-    def get_verse_by_id(self, verse_id: int) -> Optional[Dict[str, Any]]:
-        """
-        Retrieve a specific verse by its unique identifier.
-
-        :param verse_id: The integer ID of the verse.
-        :return: A dictionary containing the verse details or None if not found.
-        """
-        return next((v for v in self._cache if v.get("id") == verse_id), None)
-
-    def search_by_keyword(self, keyword: str) -> List[Dict[str, Any]]:
-        """
-        Search for verses that contain a specific thematic keyword.
-
-        :param keyword: The term to look for in the translation or text.
-        :return: A list of matching verse dictionaries.
-        """
-        keyword = keyword.lower()
-        return [
-            v for v in self._cache 
-            if keyword in v.get("translation", "").lower() or 
-               keyword in v.get("tags", [])
+    def __init__(self) -> None:
+        # Internal repository of verses
+        self._database: List[Dict[str, str]] = [
+            {"id": "1", "text": "And whoever relies upon Allah - then He is sufficient for him.", "category": "trust"},
+            {"id": "2", "text": "Indeed, with hardship [will be] ease.", "category": "hope"},
+            {"id": "3", "text": "So remember Me; I will remember you.", "category": "remembrance"},
+            {"id": "4", "text": "And He is with you wherever you are.", "category": "companionship"},
+            {"id": "5", "text": "Indeed, Allah is with the patient.", "category": "patience"}
         ]
 
-    def get_random_inspiration(self) -> Optional[Dict[str, Any]]:
+    def get_random_ayat(self) -> Dict[str, str]:
         """
-        Fetch a random verse to provide daily inspiration.
+        Retrieves a random verse from the repository.
 
-        :return: A dictionary containing the random verse.
+        Returns:
+            Dict[str, str]: A dictionary containing the ID, text, and category.
         """
-        import random
-        if not self._cache:
-            return None
-        return random.choice(self._cache)
+        return random.choice(self._database)
 
-    def get_verses_by_surah(self, surah_number: int) -> List[Dict[str, Any]]:
+    def get_ayat_by_category(self, category: str) -> List[Dict[str, str]]:
         """
-        Filter verses belonging to a specific Surah.
+        Filters verses based on a specific theme or category.
 
-        :param surah_number: The index of the Surah.
-        :return: A list of verses belonging to that Surah.
-        """
-        return [v for v in self._cache if v.get("surah_id") == surah_number]
+        Args:
+            category (str): The theme to filter by (e.g., 'hope', 'patience').
 
-    @staticmethod
-    def format_verse_display(verse: Dict[str, Any]) -> str:
+        Returns:
+            List[Dict[str, str]]: A list of verses matching the category.
         """
-        Utility to format a verse dictionary into a readable string.
+        return [ayat for ayat in self._database if ayat["category"] == category]
 
-        :param verse: The verse dictionary to format.
-        :return: A formatted string representation.
+    def format_ayat(self, ayat: Dict[str, str]) -> str:
         """
-        text = verse.get("text", "")
-        translation = verse.get("translation", "")
-        reference = f"{verse.get('surah_name')}:{verse.get('ayah_number')}"
-        return f"[{reference}]\n{text}\n\nTranslation: {translation}"
+        Formats a verse dictionary into a readable string for display.
+
+        Args:
+            ayat (Dict[str, str]): The verse object to format.
+
+        Returns:
+            str: A formatted string representation.
+        """
+        return f"--- [Ayat Saadati] ---\n'{ayat['text']}'\nTag: {ayat['category']}"
+
+    def search_ayat(self, keyword: str) -> List[Dict[str, str]]:
+        """
+        Searches for verses containing a specific keyword in the text.
+
+        Args:
+            keyword (str): The term to look for.
+
+        Returns:
+            List[Dict[str, str]]: Matching verses.
+        """
+        return [a for a in self._database if keyword.lower() in a["text"].lower()]
+
+    def get_all_categories(self) -> List[str]:
+        """
+        Returns a list of unique categories available in the database.
+
+        Returns:
+            List[str]: Unique category names.
+        """
+        return list({ayat["category"] for ayat in self._database})
+
+
+def fetch_daily_inspiration() -> str:
+    """
+    Convenience function to fetch and format a random daily verse.
+
+    Returns:
+        str: A formatted string for the end user.
+    """
+    service = AyatSaadati()
+    ayat = service.get_random_ayat()
+    return service.format_ayat(ayat)
 
 
 if __name__ == "__main__":
-    # Example usage
-    service = AyatSaadati()
-    if service.load_verses():
-        random_verse = service.get_random_inspiration()
-        if random_verse:
-            print(AyatSaadati.format_verse_display(random_verse))
+    # Example usage demonstration
+    engine = AyatSaadati()
+    print(fetch_daily_inspiration())
 ```
