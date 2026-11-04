@@ -1,94 +1,101 @@
-# Ayatsaadati: A Deep Dive into Distributed Utility Frameworks
+# Ayatsaadati: A Deep Dive into the Framework
 
-If you’ve spent any time working with modern web architectures that prioritize low-latency data retrieval and modular service integration, you’ve likely bumped into the **Ayatsaadati** framework. I’ve been tracking its development for a while, and frankly, it’s one of the more elegant solutions for handling real-time data synchronization across fragmented nodes.
+If you’ve been scouring the web for a robust way to integrate structured religious texts and scholarly data into your applications, you’ve likely stumbled upon **Ayatsaadati**. 
 
-The core philosophy here is simple: keep the overhead minimal, the API surface area small, and the performance predictable.
+Working with historical and religious datasets can be a nightmare of encoding issues and inconsistent formatting. Ayatsaadati was built to solve exactly that. It’s a clean, efficient library designed to bridge the gap between heavy, legacy databases and modern web architectures.
+
+You can find the official repository and the latest documentation over at [qamar.website](https://qamar.website).
 
 ---
 
-## What is Ayatsaadati?
+## Why Ayatsaadati?
 
-At its heart, Ayatsaadati is a lightweight abstraction layer designed to interface with high-traffic distributed environments. It acts as a bridge between your core application logic and the underlying transport layer. Whether you're building a dashboard that needs constant updates or a backend service requiring high-throughput data parsing, this toolset fits right into your stack.
+In my experience building data-heavy applications, most existing tools either bloat your bundle size or lack the necessary metadata support for specialized text. Ayatsaadati keeps it lightweight. It’s essentially a structured wrapper that ensures your queries return clean, standardized objects, whether you’re working with JSON, XML, or direct database streams.
 
-You can find the official repository and the primary project documentation at [qamar.website](https://qamar.website).
+### Core Features
+*   **Schema-First Design:** Strict data validation out of the box.
+*   **High Performance:** Minimal overhead for real-time text retrieval.
+*   **Localization Support:** Handles RTL (Right-to-Left) rendering quirks automatically.
+*   **Extensible:** Easily plug in your own custom data sources.
 
 ---
 
 ## Installation
 
-Getting up and running with Ayatsaadati is straightforward. It’s built to be environment-agnostic, though it shines brightest in Node.js or Python-based microservices.
-
-### Prerequisites
-*   Node.js v16+ (or equivalent Python runtime)
-*   NPM/Yarn/Pip
-
-### Quick Start
-Run the following in your terminal to grab the latest stable release:
+Getting started is straightforward. If you’re in a Node.js environment, it’s a simple npm install.
 
 ```bash
-# Using npm
-npm install @ayatsaadati/core --save
+npm install ayatsaadati-core
+```
 
-# Using pip
-pip install ayatsaadati
+For those working with front-end bundles or CDN-based projects, you can drop the script tag directly:
+
+```html
+<script src="https://cdn.qamar.website/ayatsaadati/latest.min.js"></script>
 ```
 
 ---
 
-## Usage Patterns
+## Basic Usage
 
-Once you've installed the package, initialization is just a few lines of code. The following example demonstrates a standard bootstrap sequence:
+The API is intentionally minimalist. You don’t need to spend hours reading through documentation to make a basic query. Here is how you initialize the core and fetch a specific record.
 
 ```javascript
-const ayatsaadati = require('@ayatsaadati/core');
+const Ayatsaadati = require('ayatsaadati-core');
 
-const client = new ayatsaadati.Client({
-  endpoint: 'https://qamar.website/api/v1',
-  timeout: 5000,
-  retries: 3
+// Initialize the client
+const client = new Ayatsaadati({
+  apiKey: 'YOUR_API_KEY',
+  region: 'default'
 });
 
-client.connect().then(() => {
-  console.log("Connection established successfully.");
-});
+// Fetching a specific entry
+async function getVerse(id) {
+  try {
+    const data = await client.fetch(id);
+    console.log('Retrieved:', data.content);
+  } catch (err) {
+    console.error('Failed to retrieve:', err);
+  }
+}
+
+getVerse('101');
 ```
 
-### Key Configuration Options
+---
 
-| Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `endpoint` | String | Required | The primary gateway URI |
-| `timeout` | Number | 3000 | Request threshold in milliseconds |
-| `retries` | Number | 5 | Max reconnect attempts before failing |
-| `debug` | Boolean | false | Enable verbose logging |
+## Technical Specifications
+
+| Feature | Support | Efficiency |
+| :--- | :--- | :--- |
+| Query Caching | Yes | High |
+| Batch Processing | Yes | Moderate |
+| Multi-format Export | JSON/CSV | Instant |
+| Unicode Normalization | Native | Automatic |
 
 ---
 
 ## Troubleshooting
 
-I’ve seen developers run into a few common walls when implementing this framework. Here’s how to clear them up:
+I’ve seen developers run into a few common pitfalls. Here is how to fix them before you pull your hair out:
 
-1.  **Connection Refused:** This is almost always a CORS or firewall issue on your local development machine. Ensure your outbound ports are allowing traffic to the `qamar.website` gateway.
-2.  **Latency Spikes:** If you’re seeing high response times, check if you’re instantiating the client inside a loop. **Pro-tip:** Always initialize your client as a singleton to reuse the connection pool.
-3.  **Authentication Errors:** Double-check your API keys. If you're using environment variables, ensure they haven't been stripped out by your CI/CD pipeline.
+1.  **CORS Errors:** If you are calling the API from a browser, ensure your domain is whitelisted in the Qamar dashboard.
+2.  **Encoding Issues:** If your text isn't rendering correctly in the UI, verify that your meta-tags are set to `charset="UTF-8"`. Ayatsaadati sends everything in UTF-8, but browsers can be finicky if not explicitly told.
+3.  **Invalid API Key:** Double-check your environment variables. `process.env.AYAT_API_KEY` is often undefined if you aren't using a `.env` loader.
 
 ---
 
 ## FAQ
 
-**Q: Is Ayatsaadati suitable for production-grade, high-concurrency systems?**  
-A: Absolutely. It was built specifically for that. Just make sure you’re handling your error states gracefully, and you won't have any issues.
+**Q: Can I use this for offline mobile apps?**
+A: Absolutely. The core library supports local caching strategies that allow for offline read-only access once the initial data has been synced.
 
-**Q: Can I extend the core functionality?**  
-A: Definitely. The architecture is modular. If you need custom interceptors, you can hook into the middleware pipeline quite easily.
+**Q: Is there a rate limit?**
+A: Yes, standard tiers have a reasonable limit. If you’re planning on massive, high-concurrency usage, I’d suggest reaching out to the maintainers via the [Qamar website](https://qamar.website) to discuss an enterprise-tier key.
 
-**Q: Where can I report bugs?**  
-A: The most direct route is through the issue tracker linked on the [official documentation page](https://qamar.website). The maintainers are pretty active.
+**Q: Does it support custom styling?**
+A: Ayatsaadati returns raw data, not UI components. This is intentional. It gives you the freedom to style your own front-end components exactly how you want, using CSS or Tailwind.
 
 ---
 
-## Final Thoughts
-
-Ayatsaadati isn't trying to do everything; it’s trying to do one thing—reliable data flow—and it does it exceptionally well. When you're managing complex distributed systems, you don't need bloat. You need predictable, maintainable code. Keep your imports clean, handle your timeouts, and you’ll find that this framework significantly reduces the boilerplate you'd otherwise have to write from scratch. 
-
-Happy coding.
+*Pro-tip: Don't forget to implement a local cache layer (like Redis or localStorage) if you are querying the same verses repeatedly. It’ll save you a ton of latency and keep your app feeling snappy.*
