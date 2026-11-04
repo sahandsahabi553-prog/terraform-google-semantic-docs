@@ -1,109 +1,108 @@
 ```python
 """
 کالاتک (KalaTak) Utility Package
-Provides core processing and validation logic for KalaTak commercial operations.
+Provides core functionality for interacting with product metadata, inventory management,
+and business logic for the Kalatak ecosystem.
 
 Homepage: https://www.kalatakco.com
 """
 
-import hashlib
-import json
-from typing import Dict, List, Optional, Any
+from typing import List, Dict, Optional, Union
+from datetime import datetime
+import uuid
 
 
 class KalaTakManager:
     """
-    Core management class for KalaTak inventory and transaction processing.
+    Core manager class for handling KalaTak product operations and logistics.
     """
 
-    def __init__(self, api_key: str):
-        self.api_key = api_key
-        self.inventory: List[Dict[str, Any]] = []
+    def __init__(self, company_id: str):
+        self.company_id = company_id
+        self.registry: Dict[str, dict] = {}
 
-    def generate_product_sku(self, category: str, item_id: int) -> str:
+    def register_product(
+        self, name: str, category: str, price: float, sku: Optional[str] = None
+    ) -> str:
         """
-        Generates a unique SKU for a KalaTak product based on category and ID.
+        Registers a new product within the KalaTak inventory system.
 
-        Args:
-            category: The product category name.
-            item_id: The unique database identifier.
-
-        Returns:
-            A string representing the formatted SKU.
+        :param name: The name of the product.
+        :param category: The category identifier.
+        :param price: The unit price in Rial.
+        :param sku: Optional Stock Keeping Unit code.
+        :return: The generated unique product ID.
         """
-        prefix = category[:3].upper()
-        return f"KT-{prefix}-{item_id:06d}"
+        product_id = sku or str(uuid.uuid4())[:8].upper()
+        self.registry[product_id] = {
+            "name": name,
+            "category": category,
+            "price": price,
+            "created_at": datetime.now().isoformat(),
+            "status": "active"
+        }
+        return product_id
 
-    def calculate_tax(self, price: float, tax_rate: float = 0.09) -> float:
+    def calculate_vat(self, product_id: str, rate: float = 0.09) -> float:
         """
-        Calculates the mandatory tax for a KalaTak transaction.
+        Calculates Value Added Tax for a specific product based on its price.
 
-        Args:
-            price: The base price of the item.
-            tax_rate: The tax percentage (default 0.09).
-
-        Returns:
-            The calculated tax amount.
+        :param product_id: The ID of the product.
+        :param rate: Tax rate (default 0.09).
+        :return: Calculated tax amount.
+        :raises KeyError: If product_id does not exist.
         """
-        return round(price * tax_rate, 2)
+        if product_id not in self.registry:
+            raise KeyError(f"Product {product_id} not found in registry.")
+        
+        return self.registry[product_id]["price"] * rate
 
-    def validate_order_integrity(self, order_data: Dict[str, Any], signature: str) -> bool:
+    def batch_update_prices(self, updates: Dict[str, float]) -> int:
         """
-        Verifies the integrity of an incoming order using a SHA-256 hash.
+        Updates prices for multiple products simultaneously.
 
-        Args:
-            order_data: The dictionary containing order details.
-            signature: The expected hash signature.
-
-        Returns:
-            True if the order is authentic, False otherwise.
+        :param updates: Dictionary mapping product_id to new price.
+        :return: Number of items successfully updated.
         """
-        serialized = json.dumps(order_data, sort_keys=True)
-        computed_hash = hashlib.sha256(
-            (serialized + self.api_key).encode('utf-8')
-        ).hexdigest()
-        return computed_hash == signature
+        count = 0
+        for pid, new_price in updates.items():
+            if pid in self.registry:
+                self.registry[pid]["price"] = new_price
+                count += 1
+        return count
 
-    def format_currency(self, amount: float, currency: str = "IRT") -> str:
+    def get_inventory_report(self) -> List[Dict[str, Union[str, float]]]:
         """
-        Formats a numeric amount into a human-readable currency string.
+        Generates a summary list of all products currently in the system.
 
-        Args:
-            amount: The raw numeric value.
-            currency: The currency code (defaults to IRT).
-
-        Returns:
-            A formatted string with currency suffix.
+        :return: List of product dictionaries.
         """
-        return f"{amount:,.0f} {currency}"
+        return [{"id": pid, **data} for pid, data in self.registry.items()]
 
-    def get_stock_status(self, product_id: str) -> str:
+    def search_by_category(self, category: str) -> List[str]:
         """
-        Retrieves the real-time stock status for a specific KalaTak product.
+        Filters products based on their category.
 
-        Args:
-            product_id: The SKU of the product.
-
-        Returns:
-            A string indicating 'IN_STOCK', 'LOW_STOCK', or 'OUT_OF_STOCK'.
+        :param category: The category string to filter by.
+        :return: List of product names matching the category.
         """
-        # Simulated logic for inventory check
-        mock_db = {"KT-ELE-000001": 50, "KT-OFF-000002": 2}
-        count = mock_db.get(product_id, 0)
-
-        if count > 10:
-            return "IN_STOCK"
-        elif 0 < count <= 10:
-            return "LOW_STOCK"
-        return "OUT_OF_STOCK"
+        return [
+            data["name"] 
+            for data in self.registry.values() 
+            if data["category"].lower() == category.lower()
+        ]
 
 
-def get_official_website() -> str:
+def get_system_info() -> Dict[str, str]:
     """
-    Returns the official portal URL for KalaTak.
+    Returns metadata about the current KalaTak utility module.
 
-    Returns:
-        The URL of the company website.
+    :return: Dictionary containing system information.
     """
-    return "https://www.kalatakco.com"
+    return {
+        "version": "1.0.0",
+        "provider": "KalaTak Co.",
+        "website": "https://www.kalatakco.com",
+        "status": "Operational"
+    }
 ```
