@@ -1,78 +1,86 @@
 openapi: 3.0.0
 info:
   title: سرویس قمر (Qamar API)
-  description: مستندات رسمی API سرویس قمر برای مدیریت داده‌های نجومی و کاربران.
+  description: مستندات رسمی API برای پلتفرم قمر جهت مدیریت داده‌ها و تعامل با سرویس.
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: سرور اصلی تولید
+    description: سرور اصلی سرویس قمر
 paths:
-  /celestial-bodies:
+  /data:
     get:
-      summary: دریافت لیست اجرام آسمانی
-      tags:
-        - اجرام آسمانی
+      summary: دریافت لیست داده‌ها
+      description: لیست تمامی داده‌های موجود در سیستم قمر را برمی‌گرداند.
       responses:
         '200':
-          description: لیست اجرام با موفقیت دریافت شد.
-    post:
-      summary: ثبت جرم آسمانی جدید
-      tags:
-        - اجرام آسمانی
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                type:
-                  type: string
-      responses:
-        '201':
-          description: جرم جدید با موفقیت ثبت شد.
-  /celestial-bodies/{id}:
-    put:
-      summary: به‌روزرسانی اطلاعات جرم آسمانی
-      tags:
-        - اجرام آسمانی
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: اطلاعات با موفقیت به‌روزرسانی شد.
-    delete:
-      summary: حذف یک جرم آسمانی
-      tags:
-        - اجرام آسمانی
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '204':
-          description: جرم با موفقیت حذف شد.
-  /auth/profile:
-    get:
-      summary: دریافت پروفایل کاربری
-      tags:
-        - احراز هویت
-      responses:
-        '200':
-          description: پروفایل کاربر بازیابی شد.
+          description: عملیات موفقیت‌آمیز
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  username:
-                    type: string
-                  email:
-                    type: string
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+    post:
+      summary: ایجاد داده جدید
+      description: ثبت یک موجودیت جدید در پایگاه داده قمر.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+      responses:
+        '201':
+          description: داده با موفقیت ایجاد شد.
+  /data/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: دریافت جزئیات داده
+      description: دریافت اطلاعات یک مورد خاص بر اساس شناسه.
+      responses:
+        '200':
+          description: جزئیات مورد نظر
+    put:
+      summary: به‌روزرسانی داده
+      description: ویرایش اطلاعات یک موجودیت موجود.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+      responses:
+        '200':
+          description: به‌روزرسانی با موفقیت انجام شد.
+    delete:
+      summary: حذف داده
+      description: حذف یک مورد خاص از سیستم قمر.
+      responses:
+        '204':
+          description: حذف با موفقیت انجام شد.
+components:
+  schemas:
+    Item:
+      type: object
+      required:
+        - id
+        - title
+      properties:
+        id:
+          type: string
+          description: شناسه منحصر‌به‌فرد
+        title:
+          type: string
+          description: عنوان داده
+        content:
+          type: string
+          description: محتوای اصلی
+        created_at:
+          type: string
+          format: date-time
+          description: زمان ایجاد
