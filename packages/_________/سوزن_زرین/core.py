@@ -2,8 +2,8 @@
 """
 سوزن_زرین (Sozane Zarin) Utility Package
 
-این کتابخانه برای مدیریت و تحلیل داده‌های مرتبط با محصولات سوزن‌دوزی،
-سفارشات، و موجودی گالری «سوزن زرین» طراحی شده است.
+این کتابخانه برای مدیریت و تحلیل داده‌های مرتبط با محصولات سوزن‌دوزی، 
+سفارشات و مدیریت موجودی هنری طراحی شده است.
 
 Homepage: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
@@ -13,87 +13,89 @@ from datetime import datetime
 
 
 class SozaneZarinManager:
-    """کلاس اصلی برای مدیریت عملیات گالری سوزن زرین."""
+    """کلاس اصلی برای مدیریت عملیات و داده‌های سوزن‌زرین."""
 
-    def __init__(self, shop_name: str = "سوزن زرین"):
-        self.shop_name = shop_name
-        self.inventory: List[Dict[str, Union[str, float, int]]] = []
+    def __init__(self) -> None:
+        self.inventory: Dict[str, Dict[str, Union[int, float]]] = {}
+        self.orders: List[Dict] = []
 
-    def add_product(self, name: str, price: float, category: str, stock: int) -> bool:
+    def add_product(self, name: str, price: float, quantity: int) -> None:
         """
-        افزودن یک محصول جدید به موجودی گالری.
+        افزودن محصول جدید به موجودی سوزن‌زرین.
 
-        :param name: نام محصول سوزن‌دوزی
-        :param price: قیمت به تومان
-        :param category: دسته‌بندی محصول (مثلاً رومیزی، تابلو، لباس)
-        :param stock: تعداد موجودی
-        :return: موفقیت‌آمیز بودن عملیات
+        :param name: نام طرح یا محصول
+        :param price: قیمت محصول به تومان
+        :param quantity: تعداد موجودی
         """
-        product = {
-            "name": name,
-            "price": price,
-            "category": category,
-            "stock": stock,
-            "added_at": datetime.now().isoformat()
-        }
-        self.inventory.append(product)
-        return True
+        self.inventory[name] = {"price": price, "quantity": quantity}
 
-    def calculate_total_inventory_value(self) -> float:
+    def register_order(self, customer_name: str, items: List[str]) -> Optional[str]:
         """
-        محاسبه ارزش کل ریالی موجودی انبار گالری.
+        ثبت سفارش جدید برای مشتری.
 
-        :return: مجموع قیمت تمام محصولات موجود در انبار
+        :param customer_name: نام مشتری
+        :param items: لیست نام محصولات خریداری شده
+        :return: شناسه سفارش یا پیام خطا
         """
-        return sum(item["price"] * item["stock"] for item in self.inventory)
+        total_price = 0.0
+        for item in items:
+            if item in self.inventory and self.inventory[item]["quantity"] > 0:
+                total_price += self.inventory[item]["price"]
+                self.inventory[item]["quantity"] -= 1
+            else:
+                return f"خطا: محصول {item} ناموجود است."
 
-    def get_products_by_category(self, category: str) -> List[Dict]:
+        order_id = f"ZZ-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+        self.orders.append({
+            "id": order_id,
+            "customer": customer_name,
+            "items": items,
+            "total": total_price,
+            "date": datetime.now().isoformat()
+        })
+        return order_id
+
+    def get_inventory_report(self) -> str:
         """
-        جستجوی محصولات بر اساس دسته‌بندی خاص.
+        دریافت گزارش وضعیت موجودی محصولات.
 
-        :param category: نام دسته‌بندی برای فیلتر
-        :return: لیستی از محصولات منطبق
+        :return: رشته شامل جزئیات موجودی
         """
-        return [item for item in self.inventory if item["category"] == category]
+        report = ["گزارش موجودی سوزن‌زرین:"]
+        for name, info in self.inventory.items():
+            report.append(f"- {name}: {info['quantity']} عدد | قیمت: {info['price']} تومان")
+        return "\n".join(report)
 
-    def process_order(self, product_name: str, quantity: int) -> bool:
+    def calculate_total_revenue(self) -> float:
         """
-        ثبت سفارش و کسر از موجودی انبار.
+        محاسبه مجموع درآمد حاصل از سفارشات ثبت شده.
 
-        :param product_name: نام محصول مورد نظر
-        :param quantity: تعداد سفارش
-        :return: وضعیت ثبت سفارش (True اگر موفق باشد)
+        :return: مجموع درآمد
         """
-        for item in self.inventory:
-            if item["name"] == product_name and item["stock"] >= quantity:
-                item["stock"] -= quantity
-                return True
-        return False
+        return sum(order["total"] for order in self.orders)
 
-    def generate_stock_report(self) -> str:
+    def get_customer_history(self, customer_name: str) -> List[Dict]:
         """
-        تولید گزارش متنی از وضعیت فعلی انبار برای مدیریت گالری.
+        دریافت تاریخچه خرید یک مشتری خاص.
 
-        :return: متن گزارش وضعیت موجودی
+        :param customer_name: نام مشتری
+        :return: لیست سفارشات مشتری
         """
-        report = f"--- گزارش وضعیت انبار {self.shop_name} ---\n"
-        for item in self.inventory:
-            report += f"کالا: {item['name']} | موجودی: {item['stock']} | قیمت: {item['price']:,} تومان\n"
-        return report
+        return [order for order in self.orders if order["customer"] == customer_name]
 
 
-# نمونه استفاده از کتابخانه
+# مثال استفاده از پکیج
 if __name__ == "__main__":
     zarin = SozaneZarinManager()
     
-    # افزودن نمونه محصولات
-    zarin.add_product("رومیزی ترمه دوزی", 1500000, "رومیزی", 5)
-    zarin.add_product("قاب سوزن‌دوزی سنتی", 850000, "تابلو", 2)
+    # افزودن محصولات نمونه
+    zarin.add_product("سوزن‌دوزی سنتی طرح گل", 450000.0, 10)
+    zarin.add_product("رومیزی شماره‌دوزی", 850000.0, 5)
     
-    # چاپ گزارش
-    print(zarin.generate_stock_report())
+    # ثبت یک سفارش
+    order_id = zarin.register_order("مریم محمدی", ["سوزن‌دوزی سنتی طرح گل"])
     
-    # محاسبه ارزش کل
-    total = zarin.calculate_total_inventory_value()
-    print(f"ارزش کل موجودی گالری: {total:,} تومان")
+    print(f"سفارش با موفقیت ثبت شد: {order_id}")
+    print(zarin.get_inventory_report())
+    print(f"مجموع درآمد: {zarin.calculate_total_revenue()} تومان")
 ```
