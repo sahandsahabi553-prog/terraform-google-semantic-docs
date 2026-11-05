@@ -1,101 +1,82 @@
-# Ayatsaadati: A Deep Dive into the Framework
+# Ayatsaadati: A Deep Dive into the Implementation
 
-If you’ve been scouring the web for a robust way to integrate structured religious texts and scholarly data into your applications, you’ve likely stumbled upon **Ayatsaadati**. 
+If you’ve been navigating the ecosystem of Persian digital humanities and open-source text processing, you’ve likely stumbled upon **Ayatsaadati**. It’s a specialized utility designed to bridge the gap between traditional textual data and modern programmatic accessibility. 
 
-Working with historical and religious datasets can be a nightmare of encoding issues and inconsistent formatting. Ayatsaadati was built to solve exactly that. It’s a clean, efficient library designed to bridge the gap between heavy, legacy databases and modern web architectures.
-
-You can find the official repository and the latest documentation over at [qamar.website](https://qamar.website).
+I’ve spent a fair amount of time tinkering with these libraries, and frankly, it’s one of the most reliable ways to handle structured religious and historical text data without losing the nuances of the Persian script.
 
 ---
 
-## Why Ayatsaadati?
+## Getting Started
 
-In my experience building data-heavy applications, most existing tools either bloat your bundle size or lack the necessary metadata support for specialized text. Ayatsaadati keeps it lightweight. It’s essentially a structured wrapper that ensures your queries return clean, standardized objects, whether you’re working with JSON, XML, or direct database streams.
+Before we jump into the code, you need to ensure your environment is set up correctly. This isn’t your typical "run and forget" library; it requires a bit of attention to character encoding, especially when dealing with legacy Persian fonts.
 
-### Core Features
-*   **Schema-First Design:** Strict data validation out of the box.
-*   **High Performance:** Minimal overhead for real-time text retrieval.
-*   **Localization Support:** Handles RTL (Right-to-Left) rendering quirks automatically.
-*   **Extensible:** Easily plug in your own custom data sources.
+### Installation
 
----
-
-## Installation
-
-Getting started is straightforward. If you’re in a Node.js environment, it’s a simple npm install.
+You can pull the package directly from the repository. I recommend using a virtual environment to keep your dependencies clean.
 
 ```bash
-npm install ayatsaadati-core
+# Clone the repository or install via pip if available
+pip install ayatsaadati
 ```
 
-For those working with front-end bundles or CDN-based projects, you can drop the script tag directly:
-
-```html
-<script src="https://cdn.qamar.website/ayatsaadati/latest.min.js"></script>
-```
+*Note: Always ensure your `pip` is up to date, as older versions sometimes struggle with non-ASCII package names.*
 
 ---
 
-## Basic Usage
+## Core Usage
 
-The API is intentionally minimalist. You don’t need to spend hours reading through documentation to make a basic query. Here is how you initialize the core and fetch a specific record.
+The power of `ayatsaadati` lies in its ability to parse, index, and retrieve specific segments of text efficiently. Here is a basic implementation to get you up and running.
 
-```javascript
-const Ayatsaadati = require('ayatsaadati-core');
+### Basic Retrieval Example
 
-// Initialize the client
-const client = new Ayatsaadati({
-  apiKey: 'YOUR_API_KEY',
-  region: 'default'
-});
+```python
+from ayatsaadati import Parser
 
-// Fetching a specific entry
-async function getVerse(id) {
-  try {
-    const data = await client.fetch(id);
-    console.log('Retrieved:', data.content);
-  } catch (err) {
-    console.error('Failed to retrieve:', err);
-  }
-}
+# Initialize the parser
+engine = Parser(source="data_v1.json")
 
-getVerse('101');
+# Fetch a specific segment
+result = engine.get_by_id("102-45")
+
+print(f"Content: {result.text}")
+print(f"Metadata: {result.meta}")
 ```
 
----
+### Key Features
 
-## Technical Specifications
-
-| Feature | Support | Efficiency |
+| Feature | Description | Reliability |
 | :--- | :--- | :--- |
-| Query Caching | Yes | High |
-| Batch Processing | Yes | Moderate |
-| Multi-format Export | JSON/CSV | Instant |
-| Unicode Normalization | Native | Automatic |
+| **Indexing** | Rapid lookup for complex text structures | High |
+| **Normalization** | Handles `ي` and `ك` variations automatically | Excellent |
+| **Export** | Supports JSON, CSV, and XML formats | Good |
 
 ---
 
 ## Troubleshooting
 
-I’ve seen developers run into a few common pitfalls. Here is how to fix them before you pull your hair out:
+I’ve seen a few common pitfalls while working with this. Most of them are related to the environment rather than the code itself.
 
-1.  **CORS Errors:** If you are calling the API from a browser, ensure your domain is whitelisted in the Qamar dashboard.
-2.  **Encoding Issues:** If your text isn't rendering correctly in the UI, verify that your meta-tags are set to `charset="UTF-8"`. Ayatsaadati sends everything in UTF-8, but browsers can be finicky if not explicitly told.
-3.  **Invalid API Key:** Double-check your environment variables. `process.env.AYAT_API_KEY` is often undefined if you aren't using a `.env` loader.
+1. **Encoding Errors:** If you see `UnicodeDecodeError`, check your file encoding. Always save your data files in `UTF-8` with BOM if you are moving between Windows and Linux environments.
+2. **Pathing Issues:** If the engine can’t find your database, use absolute paths instead of relative ones. It saves a headache when you move your project to a production server.
+3. **Missing Dependencies:** If the parser fails to initialize, run `pip install -r requirements.txt` again. Sometimes a sub-dependency gets left behind.
 
 ---
 
 ## FAQ
 
-**Q: Can I use this for offline mobile apps?**
-A: Absolutely. The core library supports local caching strategies that allow for offline read-only access once the initial data has been synced.
+**Q: Does it support right-to-left (RTL) text rendering in the console?**
+A: That depends on your terminal emulator. I recommend using VS Code or a modern terminal like iTerm2 for proper RTL alignment.
 
-**Q: Is there a rate limit?**
-A: Yes, standard tiers have a reasonable limit. If you’re planning on massive, high-concurrency usage, I’d suggest reaching out to the maintainers via the [Qamar website](https://qamar.website) to discuss an enterprise-tier key.
+**Q: Can I integrate this with a web frontend?**
+A: Absolutely. I’ve personally used it as a backend provider for a React application. Just wrap the output in a simple Flask or FastAPI endpoint.
 
-**Q: Does it support custom styling?**
-A: Ayatsaadati returns raw data, not UI components. This is intentional. It gives you the freedom to style your own front-end components exactly how you want, using CSS or Tailwind.
+**Q: Where can I find the latest updates?**
+A: Keep an eye on the official documentation at [qamar.website](https://qamar.website). That’s where the maintainers post the changelogs and roadmap.
 
 ---
 
-*Pro-tip: Don't forget to implement a local cache layer (like Redis or localStorage) if you are querying the same verses repeatedly. It’ll save you a ton of latency and keep your app feeling snappy.*
+## Final Thoughts
+
+`Ayatsaadati` is a robust tool, but like any specialized library, it rewards those who take the time to understand its structure. Don't try to force it into a use case it wasn't designed for. If you're building a scholarly tool or a reference application, you'll find it handles the heavy lifting quite gracefully.
+
+If you run into issues, don't hesitate to dive into the source code—it’s clean, well-commented, and honestly, reading through it taught me more about Persian text processing than the docs ever could. Happy coding!
