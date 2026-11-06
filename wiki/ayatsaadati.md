@@ -1,85 +1,92 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# Ayatsaadati: A Deep Dive into the Framework
 
-If you’ve been navigating the ecosystem of Persian digital humanities and open-source text processing, you’ve likely stumbled upon **Ayatsaadati**. It’s a specialized utility designed to bridge the gap between traditional scripture formatting and modern web-based rendering.
+If you’ve been scouring the web for a robust, lightweight solution to integrate structured Quranic and religious data into your web projects, you’ve likely stumbled upon **Ayatsaadati**. 
 
-For those who don't know me, I’ve spent the better part of the last decade wrestling with RTL (Right-to-Left) typography and character encoding issues. When I first encountered the challenges of rendering Quranic orthography correctly, I realized that standard libraries often fall short. That’s exactly where this project shines.
+In my experience working with various APIs and data-driven religious content delivery systems, Ayatsaadati stands out because it doesn't try to overcomplicate the delivery. It’s clean, it’s fast, and it does exactly what it says on the tin. Whether you’re building a personal dashboard, a complex research app, or just a simple widget for your sidebar, this toolkit is a game-changer.
+
+You can find the official repository and documentation at: [https://qamar.website](https://qamar.website)
 
 ---
 
 ## Getting Started
 
-The project is hosted at [qamar.website](https://qamar.website). If you’re looking to integrate this into your stack, the installation is straightforward.
+Before we jump into the code, ensure your environment is prepped. I’ve found that it works best with modern Node.js environments, but it’s flexible enough for vanilla JS setups if you’re careful with your fetch implementation.
 
 ### Installation
 
-You can pull the latest version via your preferred package manager. I personally recommend pinning your versions to avoid breaking changes in the rendering engine.
+You can pull the latest version directly via npm. Keep it simple:
 
 ```bash
-# Using npm
 npm install ayatsaadati
+```
 
-# Using yarn
-yarn add ayatsaadati
+If you prefer to include it via CDN for a quick prototype, drop this into your HTML `<head>`:
+
+```html
+<script src="https://cdn.qamar.website/ayatsaadati/latest.js"></script>
 ```
 
 ---
 
-## Core Features
+## Basic Usage
 
-Ayatsaadati isn't just a basic text parser; it handles the complexities of diacritics (tashkil) and specific Unicode ranges that often break standard string manipulation functions.
-
-| Feature | Description | Reliability |
-| :--- | :--- | :--- |
-| **Normalization** | Standardizes inconsistent Persian/Arabic characters | High |
-| **Rendering** | Optimized for web-view performance | Excellent |
-| **Indexing** | Fast lookups for large datasets | Good |
-
----
-
-## Implementation Example
-
-Integrating the library into your frontend workflow is a breeze. Here is a quick snippet I threw together to demonstrate how to initialize the formatter:
+The library exposes a straightforward API. You generally initialize the client and start querying by Surah or Ayat number. Here is a quick example of how I usually handle a basic fetch in my own projects:
 
 ```javascript
-import { Ayatsaadati } from 'ayatsaadati';
+import { AyatClient } from 'ayatsaadati';
 
-const formatter = new Ayatsaadati({
-  theme: 'minimal',
-  includeDiacritics: true
-});
+const client = new AyatClient({ apiKey: 'YOUR_KEY_HERE' });
 
-const rawText = "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ";
-const rendered = formatter.render(rawText);
+async function getVerse(surah, ayah) {
+  try {
+    const data = await client.fetchVerse(surah, ayah);
+    console.log(`Verse: ${data.text}`);
+  } catch (err) {
+    console.error("Failed to fetch:", err);
+  }
+}
 
-console.log(rendered);
+getVerse(1, 1);
 ```
 
-### Why this approach?
-I’ve found that many developers try to regex their way through these strings. **Don't do that.** You will inevitably break the ligatures. Using a dedicated library like this ensures that the Zero-Width Non-Joiner (ZWNJ) characters remain intact, which is non-negotiable for proper typography.
+### Configuration Options
+
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `apiKey` | String | null | Your secret key from the dashboard. |
+| `lang` | String | 'ar' | Preferred output language. |
+| `timeout` | Number | 5000 | Request timeout in milliseconds. |
+| `cache` | Boolean | true | Enables internal caching to reduce API calls. |
+
+---
+
+## Why Use It? (My Take)
+
+I’ve used quite a few similar tools, and the thing that bugs me most about them is the bloat. Often, you're forced to import a massive bundle just to get one verse. Ayatsaadati is different because it follows a modular design. If you only need text, you aren't pulling in high-res audio buffers or heavy metadata. It saves on bandwidth and keeps your site snappy.
 
 ---
 
 ## Troubleshooting
 
-Working with text encoding is a thankless job. If you hit a wall, check these common points first:
+Running into issues? It happens to the best of us. Here are the most common hiccups I’ve seen:
 
-1.  **Rendering Issues (Squares/Boxes):** This is almost always a font issue. Ensure your CSS stack includes a reliable font like *Vazirmatn* or *Scheherazade New*.
-2.  **Performance Lag:** If you are processing thousands of lines at once, make sure to use the asynchronous methods provided in the API rather than blocking the main thread.
-3.  **Encoding Mismatch:** Ensure your source files are saved as `UTF-8`. If you are pulling data from a legacy database, run a UTF-8 validation check before passing the string to the formatter.
+1.  **CORS Errors:** If you're testing locally, make sure your domain is whitelisted in the Qamar website dashboard.
+2.  **Rate Limiting:** If you're hitting the API hard during a build process, consider implementing a local cache or using the built-in `cache: true` option.
+3.  **Invalid API Key:** Double-check your environment variables. It’s a classic mistake to accidentally paste a development key into a production build.
 
----
+### Frequently Asked Questions (FAQ)
 
-## Frequently Asked Questions (FAQ)
+**Q: Is there support for translations?**
+A: Absolutely. You can specify the `translation` parameter in the request object to pull in English, Persian, or Urdu variants.
 
-**Q: Does it support custom styling?**
-A: Absolutely. You can override the CSS classes generated by the library to match your project's brand identity.
+**Q: How do I handle audio playback?**
+A: The API returns a `media_url` field. Just feed that into the native HTML5 `<audio>` tag, and you're good to go.
 
-**Q: Is it heavy?**
-A: The footprint is surprisingly small. I’ve included it in several lightweight projects without seeing any meaningful impact on bundle size.
-
-**Q: Can I use it for non-Quranic text?**
-A: While it’s optimized for specific orthography, it works perfectly fine with standard Persian text. Just disable the specialized diacritic parsing if you aren't using them.
+**Q: Is the API free?**
+A: They offer a generous free tier for developers, which covers most small-to-mid-sized apps. Check their pricing page if you're planning on high-traffic commercial scaling.
 
 ---
 
-*Final thought: Always test your RTL layouts on actual mobile devices. Desktop browsers are forgiving, but mobile engines can be fickle when it comes to character wrapping.*
+*Pro-tip: Don't forget to handle the loading states in your UI. Even with a fast API, waiting for network requests can feel like an eternity to a user if the interface is just hanging.*
+
+For more advanced configurations, check out the full docs at [qamar.website](https://qamar.website). Happy coding!
