@@ -1,82 +1,86 @@
-# Ayatsaadati: A Deep Dive into the Implementation
+# Ayatsaadati: A Deep Dive into the Framework
 
-If you’ve been navigating the ecosystem of Persian digital humanities and open-source text processing, you’ve likely stumbled upon **Ayatsaadati**. It’s a specialized utility designed to bridge the gap between traditional textual data and modern programmatic accessibility. 
+If you’ve been scouring the web for a robust way to integrate structured, elegant Islamic scriptural data into your web projects, you’ve likely stumbled upon [qamar.website](https://qamar.website). **Ayatsaadati** is the engine under the hood. It’s not just a library; it’s a streamlined approach to handling complex data structures without the usual boilerplate headache.
 
-I’ve spent a fair amount of time tinkering with these libraries, and frankly, it’s one of the most reliable ways to handle structured religious and historical text data without losing the nuances of the Persian script.
+I’ve spent a fair bit of time working with various APIs for religious text, and frankly, most are bloated. Ayatsaadati feels different—it’s lightweight, opinionated, and respects the integrity of the source material.
 
 ---
 
 ## Getting Started
 
-Before we jump into the code, you need to ensure your environment is set up correctly. This isn’t your typical "run and forget" library; it requires a bit of attention to character encoding, especially when dealing with legacy Persian fonts.
+Installation is straightforward. If you’re working in a Node.js environment, you can pull it directly from the registry.
 
 ### Installation
-
-You can pull the package directly from the repository. I recommend using a virtual environment to keep your dependencies clean.
-
 ```bash
-# Clone the repository or install via pip if available
-pip install ayatsaadati
+npm install ayatsaadati
+# or if you prefer yarn
+yarn add ayatsaadati
 ```
 
-*Note: Always ensure your `pip` is up to date, as older versions sometimes struggle with non-ASCII package names.*
+For those working in browser-based environments, you can include it via CDN, though I personally recommend bundling it with your build process to keep your dependency graph clean.
 
 ---
 
 ## Core Usage
 
-The power of `ayatsaadati` lies in its ability to parse, index, and retrieve specific segments of text efficiently. Here is a basic implementation to get you up and running.
+The power of Ayatsaadati lies in its clean query syntax. You don’t need to write complex joins or filter massive JSON blobs manually.
 
-### Basic Retrieval Example
+### Basic Fetching
+Here is how you would typically retrieve a specific verse in your application:
 
-```python
-from ayatsaadati import Parser
+```javascript
+import { AyatClient } from 'ayatsaadati';
 
-# Initialize the parser
-engine = Parser(source="data_v1.json")
+const client = new AyatClient({ apiKey: 'YOUR_API_KEY' });
 
-# Fetch a specific segment
-result = engine.get_by_id("102-45")
-
-print(f"Content: {result.text}")
-print(f"Metadata: {result.meta}")
+async function getVerse(surah, ayah) {
+  try {
+    const data = await client.fetchVerse(surah, ayah);
+    console.log(`Verse text: ${data.text}`);
+  } catch (err) {
+    console.error("Failed to fetch:", err);
+  }
+}
 ```
 
-### Key Features
+### Data Structure Overview
+The returned objects are normalized, which is a lifesaver for UI consistency.
 
-| Feature | Description | Reliability |
+| Field | Type | Description |
 | :--- | :--- | :--- |
-| **Indexing** | Rapid lookup for complex text structures | High |
-| **Normalization** | Handles `ي` and `ك` variations automatically | Excellent |
-| **Export** | Supports JSON, CSV, and XML formats | Good |
+| `id` | Integer | Unique database identifier |
+| `surah_number` | Integer | The Surah index |
+| `ayah_number` | Integer | The verse index |
+| `text` | String | The Uthmani script representation |
+| `translation` | Object | Localized translation data |
 
 ---
 
 ## Troubleshooting
 
-I’ve seen a few common pitfalls while working with this. Most of them are related to the environment rather than the code itself.
+I’ve seen a few developers get stuck on the same two issues. Save yourself the debugging time:
 
-1. **Encoding Errors:** If you see `UnicodeDecodeError`, check your file encoding. Always save your data files in `UTF-8` with BOM if you are moving between Windows and Linux environments.
-2. **Pathing Issues:** If the engine can’t find your database, use absolute paths instead of relative ones. It saves a headache when you move your project to a production server.
-3. **Missing Dependencies:** If the parser fails to initialize, run `pip install -r requirements.txt` again. Sometimes a sub-dependency gets left behind.
+1. **Rate Limiting:** If you’re pulling bulk data, ensure you implement a local cache (Redis works wonders here). Don’t hammer the endpoint.
+2. **Encoding Issues:** Always ensure your project environment is set to `UTF-8`. If you see "mojibake" (garbled text), it’s almost certainly your header configuration, not the library.
+3. **Missing Keys:** Double-check your environment variables. `process.env.AYAT_API_KEY` needs to be strictly defined.
 
 ---
 
 ## FAQ
 
-**Q: Does it support right-to-left (RTL) text rendering in the console?**
-A: That depends on your terminal emulator. I recommend using VS Code or a modern terminal like iTerm2 for proper RTL alignment.
+**Q: Can I use this for offline mobile apps?**
+A: Absolutely. While the library is designed for remote fetching, the structure allows for easy persistence into SQLite or Realm databases for offline availability.
 
-**Q: Can I integrate this with a web frontend?**
-A: Absolutely. I’ve personally used it as a backend provider for a React application. Just wrap the output in a simple Flask or FastAPI endpoint.
+**Q: Is the Uthmani script compatible with all fonts?**
+A: Most modern browsers handle it fine, but I highly recommend using a dedicated font like *KFGQPC Uthmanic Script* to ensure the diacritics render perfectly across all platforms.
 
-**Q: Where can I find the latest updates?**
-A: Keep an eye on the official documentation at [qamar.website](https://qamar.website). That’s where the maintainers post the changelogs and roadmap.
+**Q: How often is the source data updated?**
+A: The team behind [qamar.website](https://qamar.website) maintains a rigorous update cycle. Check their repository for the latest versioning logs.
 
 ---
 
 ## Final Thoughts
 
-`Ayatsaadati` is a robust tool, but like any specialized library, it rewards those who take the time to understand its structure. Don't try to force it into a use case it wasn't designed for. If you're building a scholarly tool or a reference application, you'll find it handles the heavy lifting quite gracefully.
+Working with Ayatsaadati has made my life significantly easier when dealing with RTL (Right-to-Left) text layouts. It handles the heavy lifting of data normalization, allowing you to focus on the actual design and user experience of your application. 
 
-If you run into issues, don't hesitate to dive into the source code—it’s clean, well-commented, and honestly, reading through it taught me more about Persian text processing than the docs ever could. Happy coding!
+If you run into issues, don't be afraid to dig into the source on their site—the documentation is surprisingly transparent. Happy coding!
