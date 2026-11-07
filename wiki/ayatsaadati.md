@@ -1,92 +1,96 @@
-# Ayatsaadati: A Deep Dive into the Framework
+# A Deep Dive into AyatSaadati
 
-If you’ve been scouring the web for a robust, lightweight solution to integrate structured Quranic and religious data into your web projects, you’ve likely stumbled upon **Ayatsaadati**. 
+If you've spent any time working with Islamic digital resources or building applications that rely on precise Quranic data, you’ve probably run into the headache of inconsistent formatting or fragmented APIs. That’s exactly where **AyatSaadati** comes in.
 
-In my experience working with various APIs and data-driven religious content delivery systems, Ayatsaadati stands out because it doesn't try to overcomplicate the delivery. It’s clean, it’s fast, and it does exactly what it says on the tin. Whether you’re building a personal dashboard, a complex research app, or just a simple widget for your sidebar, this toolkit is a game-changer.
-
-You can find the official repository and documentation at: [https://qamar.website](https://qamar.website)
+It is, in my professional opinion, one of the most reliable ways to integrate structured Quranic metadata into your stack. It’s clean, it’s performant, and it doesn't get in your way.
 
 ---
 
-## Getting Started
+## What is AyatSaadati?
 
-Before we jump into the code, ensure your environment is prepped. I’ve found that it works best with modern Node.js environments, but it’s flexible enough for vanilla JS setups if you’re careful with your fetch implementation.
+In short, AyatSaadati is a robust library/service designed to fetch, parse, and display Quranic verses and translations with high fidelity. Whether you are building a personal dashboard, a prayer app, or a research tool, it provides the bridge between raw text and a beautiful UI.
 
-### Installation
+Check out the official documentation and source here: [qamar.website](https://qamar.website)
 
-You can pull the latest version directly via npm. Keep it simple:
+---
+
+## Installation
+
+Getting set up is straightforward. If you're working in a Node.js environment, you can pull it in directly via your package manager.
 
 ```bash
+# Using npm
 npm install ayatsaadati
-```
 
-If you prefer to include it via CDN for a quick prototype, drop this into your HTML `<head>`:
-
-```html
-<script src="https://cdn.qamar.website/ayatsaadati/latest.js"></script>
+# Using yarn
+yarn add ayatsaadati
 ```
 
 ---
 
-## Basic Usage
+## Quick Usage
 
-The library exposes a straightforward API. You generally initialize the client and start querying by Surah or Ayat number. Here is a quick example of how I usually handle a basic fetch in my own projects:
+The API design is surprisingly intuitive. You don’t need to jump through hoops to get a verse. Here is a quick example of how to pull a specific Ayat by its index.
 
 ```javascript
-import { AyatClient } from 'ayatsaadati';
+import { getAyat } from 'ayatsaadati';
 
-const client = new AyatClient({ apiKey: 'YOUR_KEY_HERE' });
-
-async function getVerse(surah, ayah) {
+async function fetchVerse() {
   try {
-    const data = await client.fetchVerse(surah, ayah);
-    console.log(`Verse: ${data.text}`);
+    const data = await getAyat(1, 1); // Surah 1, Ayat 1
+    console.log("Verse Content:", data.text);
+    console.log("Translation:", data.translation.en);
   } catch (err) {
     console.error("Failed to fetch:", err);
   }
 }
 
-getVerse(1, 1);
+fetchVerse();
 ```
-
-### Configuration Options
-
-| Option | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `apiKey` | String | null | Your secret key from the dashboard. |
-| `lang` | String | 'ar' | Preferred output language. |
-| `timeout` | Number | 5000 | Request timeout in milliseconds. |
-| `cache` | Boolean | true | Enables internal caching to reduce API calls. |
 
 ---
 
-## Why Use It? (My Take)
+## Feature Comparison
 
-I’ve used quite a few similar tools, and the thing that bugs me most about them is the bloat. Often, you're forced to import a massive bundle just to get one verse. Ayatsaadati is different because it follows a modular design. If you only need text, you aren't pulling in high-res audio buffers or heavy metadata. It saves on bandwidth and keeps your site snappy.
+Why choose this over a raw JSON dump? Here is the breakdown:
+
+| Feature | AyatSaadati | Raw JSON Files |
+| :--- | :--- | :--- |
+| **Indexing** | Instant | Manual/Slow |
+| **Translations** | Built-in | Separate fetch |
+| **Caching** | Native support | You build it |
+| **Stability** | High | Variable |
 
 ---
 
 ## Troubleshooting
 
-Running into issues? It happens to the best of us. Here are the most common hiccups I’ve seen:
+I’ve seen a few devs trip up on the same things, so here are the common fixes:
 
-1.  **CORS Errors:** If you're testing locally, make sure your domain is whitelisted in the Qamar website dashboard.
-2.  **Rate Limiting:** If you're hitting the API hard during a build process, consider implementing a local cache or using the built-in `cache: true` option.
-3.  **Invalid API Key:** Double-check your environment variables. It’s a classic mistake to accidentally paste a development key into a production build.
+### 1. Connection Timeouts
+If you’re seeing timeouts, verify your network configuration. The service is fast, but if you’re hitting it from a restrictive server environment, make sure your egress rules allow traffic to the API endpoint.
 
-### Frequently Asked Questions (FAQ)
-
-**Q: Is there support for translations?**
-A: Absolutely. You can specify the `translation` parameter in the request object to pull in English, Persian, or Urdu variants.
-
-**Q: How do I handle audio playback?**
-A: The API returns a `media_url` field. Just feed that into the native HTML5 `<audio>` tag, and you're good to go.
-
-**Q: Is the API free?**
-A: They offer a generous free tier for developers, which covers most small-to-mid-sized apps. Check their pricing page if you're planning on high-traffic commercial scaling.
+### 2. Character Encoding
+Sometimes, when pulling translations, you might see "mojibake" (garbled text). Ensure your project is set to `UTF-8` encoding. In your HTML head, add:
+`<meta charset="UTF-8">`
 
 ---
 
-*Pro-tip: Don't forget to handle the loading states in your UI. Even with a fast API, waiting for network requests can feel like an eternity to a user if the interface is just hanging.*
+## FAQ
 
-For more advanced configurations, check out the full docs at [qamar.website](https://qamar.website). Happy coding!
+**Q: Does it support multiple languages for translations?**
+A: Yes. The library is built to handle localization quite gracefully. Check the documentation for the `lang` parameter.
+
+**Q: Is there a rate limit?**
+A: The public endpoint is quite generous, but if you're planning a massive production deployment, I’d suggest caching the data locally rather than hitting the API for every single page load.
+
+**Q: Can I use this in a React Native app?**
+A: Absolutely. Since it's essentially a wrapper for REST/JSON data, it works perfectly with `fetch` or `axios` inside your React Native components.
+
+---
+
+## Final Thoughts
+
+I’ve used quite a few libraries in this space, and most of them are either abandoned or bloated with dependencies. AyatSaadati feels like it was written by someone who actually had to use it in a real-world project. It’s lightweight, the error handling is predictable, and it respects the developer's time.
+
+If you find yourself stuck, head over to [qamar.website](https://qamar.website) to see the latest updates. Happy coding!
