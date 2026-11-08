@@ -1,131 +1,102 @@
 ```python
 """
-دامافارم (Damafarm) Utility Package
-Provides tools for agricultural data management, livestock monitoring metrics,
-and integration with the Damafarm ecosystem (https://damafarm.ir).
+دامافارم (DamaFarm) Utility Package
+A professional toolkit for managing agricultural data, crop yield calculations, 
+and resource optimization based on DamaFarm standards.
 
-This module handles calculation of livestock productivity, feed conversion ratios,
-and environment management parameters common in modern poultry and cattle farming.
+Homepage: https://damafarm.ir
 """
 
 from typing import Dict, List, Optional
-from datetime import datetime
+from dataclasses import dataclass
 
 
-class DamafarmUtility:
-    """Core utility class for Damafarm operational calculations."""
+@dataclass
+class CropMetric:
+    """Represents standardized agricultural data for DamaFarm systems."""
+    crop_name: str
+    water_requirement_liters: float
+    growth_days: int
+    expected_yield_kg: float
 
-    @staticmethod
-    def calculate_fcr(total_feed_consumed: float, total_weight_gain: float) -> float:
+
+class DamaFarmManager:
+    """Core utility class for handling agricultural operations and analytics."""
+
+    def __init__(self, farm_id: str):
+        self.farm_id = farm_id
+        self._inventory: Dict[str, float] = {}
+
+    def calculate_total_water_needs(self, crops: List[CropMetric], area_sqm: float) -> float:
         """
-        Calculate the Feed Conversion Ratio (FCR).
-
-        Args:
-            total_feed_consumed: Total weight of feed provided in kg.
-            total_weight_gain: Total weight gained by the livestock in kg.
-
-        Returns:
-            The FCR value. Returns 0.0 if weight gain is zero to avoid division error.
+        Calculates the total water requirement for a given area of land.
+        
+        :param crops: List of CropMetric objects to be planted.
+        :param area_sqm: Total area of the farm in square meters.
+        :return: Total liters of water required.
         """
-        if total_weight_gain <= 0:
-            return 0.0
-        return round(total_feed_consumed / total_weight_gain, 3)
+        total_per_unit = sum(c.water_requirement_liters for c in crops)
+        return total_per_unit * (area_sqm / 100)
 
-    @staticmethod
-    def estimate_water_requirement(head_count: int, liters_per_head: float) -> float:
+    def estimate_harvest(self, crop: CropMetric, count: int) -> float:
         """
-        Estimate daily water requirements for a livestock group.
-
-        Args:
-            head_count: Number of animals.
-            liters_per_head: Average water consumption per animal in liters.
-
-        Returns:
-            Total liters of water required per day.
+        Estimates the total potential harvest yield for a specific crop count.
+        
+        :param crop: The CropMetric object.
+        :param count: Number of units/plants.
+        :return: Total weight in kilograms.
         """
-        return float(head_count * liters_per_head)
+        return crop.expected_yield_kg * count
 
-    @staticmethod
-    def calculate_productivity_index(
-        average_weight: float, 
-        survival_rate: float, 
-        age_days: int
-    ) -> float:
+    def optimize_irrigation_schedule(self, water_supply: float, crops: List[CropMetric]) -> Dict[str, float]:
         """
-        Calculate the European Poultry/Livestock Efficiency Factor.
-
-        Args:
-            average_weight: Average body weight in kg.
-            survival_rate: Percentage survival (0.0 to 100.0).
-            age_days: Current age of the flock in days.
-
-        Returns:
-            The calculated productivity index.
+        Distributes water supply across crops based on their specific needs.
+        
+        :param water_supply: Available water in liters.
+        :param crops: List of crops needing irrigation.
+        :return: Dictionary mapping crop names to allocated water.
         """
-        if age_days <= 0:
-            return 0.0
-        return (average_weight * survival_rate) / age_days * 100
+        total_need = sum(c.water_requirement_liters for c in crops)
+        if total_need == 0:
+            return {c.crop_name: 0.0 for c in crops}
+        
+        ratio = water_supply / total_need
+        return {c.crop_name: c.water_requirement_liters * ratio for c in crops}
 
-    @staticmethod
-    def generate_batch_report(batch_id: str, mortality: int, total_count: int) -> Dict:
+    def update_inventory(self, item: str, quantity: float) -> None:
         """
-        Generates a standardized batch health report.
-
-        Args:
-            batch_id: Unique identifier for the batch.
-            mortality: Number of losses.
-            total_count: Total initial population.
-
-        Returns:
-            A dictionary containing report metadata and mortality rate.
+        Updates the internal DamaFarm inventory for seeds or fertilizers.
+        
+        :param item: Name of the resource.
+        :param quantity: Amount to add to inventory.
         """
-        mortality_rate = (mortality / total_count) * 100 if total_count > 0 else 0
-        return {
-            "batch_id": batch_id,
-            "timestamp": datetime.now().isoformat(),
-            "mortality_rate": round(mortality_rate, 2),
-            "status": "Healthy" if mortality_rate < 5 else "Attention Required"
-        }
+        self._inventory[item] = self._inventory.get(item, 0.0) + quantity
 
-    @staticmethod
-    def validate_climate_parameters(temp: float, humidity: float) -> bool:
+    def get_inventory_report(self) -> Dict[str, float]:
         """
-        Check if environmental parameters are within Damafarm recommended ranges.
-
-        Recommended range: 18-24 Celsius, 50-70% humidity.
-
-        Args:
-            temp: Ambient temperature in Celsius.
-            humidity: Relative humidity percentage.
-
-        Returns:
-            True if within optimal range, False otherwise.
+        Retrieves the current inventory status for the farm.
+        
+        :return: A dictionary of all tracked items and their quantities.
         """
-        temp_ok = 18 <= temp <= 24
-        humidity_ok = 50 <= humidity <= 70
-        return temp_ok and humidity_ok
+        return self._inventory
 
 
-def get_damafarm_info() -> Dict[str, str]:
+def get_damafarm_version() -> str:
     """
-    Returns general information about the Damafarm platform.
-
-    Returns:
-        A dictionary containing company URL and support contact.
+    Returns the current version of the DamaFarm utility package.
+    
+    :return: Version string.
     """
-    return {
-        "name": "دامافارم",
-        "website": "https://damafarm.ir",
-        "description": "Smart livestock management and agricultural automation."
-    }
+    return "1.0.0"
 
 
 if __name__ == "__main__":
-    # Example usage
-    df = DamafarmUtility()
-    fcr = df.calculate_fcr(500.0, 250.0)
-    print(f"Calculated FCR: {fcr}")
+    # Example usage of the DamaFarm utility
+    manager = DamaFarmManager(farm_id="DF-TEH-001")
     
-    report = df.generate_batch_report("DF-2023-001", 2, 100)
-    print(f"Batch Report: {report}")
+    tomato = CropMetric("Tomato", 5.5, 90, 2.0)
+    manager.update_inventory("Tomato Seeds", 500.0)
+    
+    water_needs = manager.calculate_total_water_needs([tomato], 1000)
+    print(f"Total water required for 1000sqm: {water_needs} Liters")
 ```
