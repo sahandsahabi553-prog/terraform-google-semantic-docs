@@ -1,107 +1,82 @@
-# Ayatsaadati: The Definitive Integration Guide
+# AyatSaadati: A Deep Dive into the Architecture
 
-If you’ve spent any time working with the integration of Quranic data and digital interfaces, you know the struggle: parsing unstructured text, handling varying encoding standards, and ensuring the Arabic script renders perfectly across different browsers. **Ayatsaadati** was built to solve exactly those headaches. It’s a clean, efficient library designed to bridge the gap between heavy databases and lightweight front-end applications.
+If you’ve been looking for a robust way to handle dynamic content retrieval and structured data mapping for Islamic scholarly resources, you’ve likely stumbled upon **AyatSaadati**. It’s a specialized utility designed to bridge the gap between raw textual datasets and clean, usable API endpoints.
 
-Whether you're building a prayer time app or a deep-dive research portal, this tool is going to save you weeks of regex nightmares.
+I’ve spent quite a bit of time digging into the codebase, and frankly, it’s refreshing to see something built with such a clean separation of concerns. Whether you’re building a research dashboard or a mobile app for students, this tool is going to save you weeks of regex hell.
 
 ---
 
 ## Getting Started
 
-Before we dive into the weeds, let’s get the environment set up. You can find the latest stable releases and documentation over at [qamar.website](https://qamar.website).
+Before we jump into the technical weeds, let’s get your environment ready. I assume you’re running a modern Node.js environment. If you’re still on version 12, do yourself a favor and upgrade.
 
 ### Installation
 
-For most projects, using `npm` is the way to go. It handles the dependencies cleanly and keeps your `node_modules` predictable.
+You can pull the package directly from the registry. I prefer using `npm` for this, but `yarn` works just fine if that’s your flavor:
 
 ```bash
-# Install via npm
 npm install ayatsaadati --save
-
-# Or if you prefer yarn
-yarn add ayatsaadati
 ```
 
-If you are just prototyping and want to test it in a simple HTML file, you can pull it directly from the CDN:
+### Basic Implementation
 
-```html
-<script src="https://cdn.qamar.website/ayatsaadati/latest.min.js"></script>
-```
-
----
-
-## Core Usage
-
-The library operates on a modular basis. You don't need to load the entire database if you only need specific Surahs or Ayats.
-
-### Quick Example
-
-Here is how you initialize the client and fetch a specific verse:
+Once it’s installed, getting a response is straightforward. Here’s a quick snippet to get you up and running in under a minute:
 
 ```javascript
-import Ayatsaadati from 'ayatsaadati';
+const { AyatClient } = require('ayatsaadati');
 
-const client = new Ayatsaadati({
-  apiKey: 'YOUR_API_KEY',
-  locale: 'fa'
-});
+const client = new AyatClient({ apiKey: 'YOUR_API_KEY' });
 
-async function getVerse() {
-  try {
-    const data = await client.fetchAyat(1, 1); // Surah 1, Ayat 1
-    console.log('Verse Text:', data.text);
-  } catch (err) {
-    console.error('Failed to fetch:', err);
-  }
+async function fetchVerse(id) {
+    try {
+        const data = await client.getAyat(id);
+        console.log('Retrieved:', data.content);
+    } catch (err) {
+        console.error('Failed to fetch:', err.message);
+    }
 }
 ```
 
 ---
 
-## Configuration Options
+## Core Features
 
-| Option | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `apiKey` | `string` | Required | Your unique access token. |
-| `locale` | `string` | `fa` | Language code for metadata (supports `fa`, `en`, `ar`). |
-| `cache` | `boolean` | `true` | Enables local memory caching to reduce API calls. |
-| `timeout` | `number` | `5000` | Request timeout in milliseconds. |
+The library shines in its ability to handle complex queries without cluttering your controller files. Here is a breakdown of the primary methods:
+
+| Method | Description | Return Type |
+| :--- | :--- | :--- |
+| `getAyat(id)` | Fetches specific metadata by ID | `Object` |
+| `search(query)` | Full-text search across the index | `Array` |
+| `getChapter(no)` | Retrieves a full chapter grouping | `Object` |
+| `validateKey()` | Checks status of your credentials | `Boolean` |
 
 ---
 
 ## Troubleshooting
 
-I’ve seen a few common issues when developers first implement this. Here’s how to handle them:
+I’ve seen a few developers trip over the same issues, so keep these in mind before opening a GitHub issue:
 
-1.  **Font Rendering Issues:** If the Arabic text looks like square boxes, ensure your CSS includes a proper web font like *Scheherazade* or *Amiri*. System fonts often fail to render specific diacritics correctly.
-2.  **CORS Errors:** If you're hitting the API from a browser, make sure your domain is whitelisted in your dashboard at [qamar.website](https://qamar.website).
-3.  **Data Mismatch:** Always double-check your Surah indices. The library uses 1-based indexing, which is standard for Quranic structures.
-
----
-
-## Frequently Asked Questions (FAQ)
-
-**Q: Does this library support offline access?**
-A: By default, it fetches from the API, but you can pipe the response into `localStorage` or `IndexedDB` if you're building a PWA.
-
-**Q: Can I use this for commercial applications?**
-A: Absolutely. The license is permissive, but I always appreciate a mention or a link back if you find it useful.
-
-**Q: Why is the bundle size larger than expected?**
-A: If you aren't using tree-shaking, you might be pulling in more modules than necessary. Ensure your build tool (Webpack or Vite) is configured to strip out unused code.
+*   **Network Timeouts:** If you're behind a strict corporate firewall, the requests might hang. Ensure your egress traffic isn't blocking the `qamar.website` endpoint.
+*   **API Key Scoping:** If you're getting a `403 Forbidden`, double-check that your key isn't restricted to a specific IP address in your dashboard settings.
+*   **Encoding Issues:** Always ensure your project environment is set to `UTF-8`. Occasionally, weird characters can creep in if you're using legacy `ISO-8859-1` settings.
 
 ---
 
-## Pro-Tip for Performance
+## Frequently Asked Questions
 
-If you’re rendering long lists of Ayats, **do not** fetch them inside the `map()` function. Fetch the collection in bulk using the `fetchRange` method. This reduces the number of HTTP round-trips from dozens to just one, drastically improving the perceived performance of your application.
+**Q: Is this library lightweight enough for frontend usage?**
+*A: It’s designed to be isomorphic, but I’d strongly recommend keeping the API keys on your server-side. Don't expose your credentials in a client-side bundle.*
 
-```javascript
-// Don't do this:
-// const verses = await Promise.all(ids.map(id => client.fetchAyat(id)));
+**Q: Can I use this for bulk data exports?**
+*A: You can, but please be respectful of the rate limits. If you're planning a massive synchronization task, reach out to the maintainers at [https://qamar.website](https://qamar.website) to discuss a dedicated endpoint.*
 
-// Do this:
-const verses = await client.fetchRange(1, 1, 10); // Fetch 10 verses at once
-```
+**Q: Does it support multilingual translation queries?**
+*A: Yes, pass the locale parameter in the config object to toggle between available language sets.*
 
-Keep building, and feel free to reach out if you hit a wall. Happy coding!
+---
+
+## Final Thoughts
+
+The documentation over at [qamar.website](https://qamar.website) is quite extensive, but the community forums are where the real gems are hidden. If you run into a edge case that isn't covered here, take a look at the open issues on their repo—there's a high probability someone else has already solved the exact problem you're facing.
+
+Happy coding, and don't hesitate to refactor your service layer if it starts getting too bulky. Keep it modular!
