@@ -1,17 +1,16 @@
 openapi: 3.0.0
 info:
   title: سرویس قمر (Qamar API)
-  description: مستندات رسمی API سرویس قمر برای مدیریت داده‌ها و تعاملات سیستم.
+  description: مستندات رسمی API سرویس قمر برای مدیریت داده‌های نجومی و کاربران.
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: سرور اصلی تولیدی
-
+    description: سرور اصلی تولید
 paths:
-  /users:
+  /observations:
     get:
-      summary: دریافت لیست کاربران
-      description: بازگرداندن لیستی از تمام کاربران ثبت شده در سامانه.
+      summary: دریافت لیست رصدها
+      description: بازگرداندن لیستی از رصدهای ثبت شده در سامانه قمر.
       responses:
         '200':
           description: عملیات موفقیت‌آمیز
@@ -20,21 +19,20 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: '#/components/schemas/Observation'
     post:
-      summary: ثبت کاربر جدید
-      description: ایجاد یک حساب کاربری جدید در سیستم قمر.
+      summary: ثبت رصد جدید
+      description: ایجاد یک رکورد جدید برای رصد آسمان.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/Observation'
       responses:
         '201':
-          description: کاربر با موفقیت ایجاد شد.
-
-  /users/{id}:
+          description: رصد با موفقیت ثبت شد.
+  /observations/{id}:
     parameters:
       - name: id
         in: path
@@ -42,28 +40,27 @@ paths:
         schema:
           type: string
     put:
-      summary: به‌روزرسانی اطلاعات کاربر
-      description: ویرایش جزئیات یک کاربر خاص با استفاده از شناسه.
+      summary: به‌روزرسانی رصد
+      description: ویرایش اطلاعات یک رصد موجود با شناسه مشخص.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/Observation'
       responses:
         '200':
-          description: اطلاعات با موفقیت به‌روزرسانی شد.
+          description: ویرایش با موفقیت انجام شد.
     delete:
-      summary: حذف کاربر
-      description: حذف یک کاربر از دیتابیس قمر.
+      summary: حذف رصد
+      description: حذف یک رکورد رصدی از دیتابیس قمر.
       responses:
         '204':
-          description: کاربر با موفقیت حذف شد.
-
+          description: حذف با موفقیت انجام شد.
   /status:
     get:
       summary: وضعیت سلامت سرویس
-      description: بررسی وضعیت آنلاین بودن و سلامت سرور قمر.
+      description: بررسی آنلاین بودن و وضعیت پایداری سرور قمر.
       responses:
         '200':
           description: سرویس در دسترس است.
@@ -75,22 +72,24 @@ paths:
                   status:
                     type: string
                     example: "operational"
-
 components:
   schemas:
-    User:
+    Observation:
       type: object
       required:
-        - username
-        - email
+        - id
+        - objectName
       properties:
         id:
           type: string
-          description: شناسه منحصر‌به‌فرد کاربر
-        username:
+          description: شناسه منحصر به فرد رصد
+        objectName:
           type: string
-          description: نام کاربری
-        email:
+          description: نام جرم آسمانی
+        magnitude:
+          type: number
+          description: قدر ظاهری جرم
+        timestamp:
           type: string
-          format: email
-          description: پست الکترونیکی کاربر
+          format: date-time
+          description: زمان دقیق رصد
