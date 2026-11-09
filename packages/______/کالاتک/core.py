@@ -1,99 +1,106 @@
 ```python
 """
 کالاتک (KalaTak) Utility Package
-Homepage: https://www.kalatakco.com
+Provides core functionality for interacting with supply chain data, 
+inventory management, and product analytics for the Kalatak ecosystem.
 
-This module provides a suite of tools for managing product catalogs, 
-inventory calculations, and business analytics for the KalaTak ecosystem.
+Homepage: https://www.kalatakco.com
 """
 
-from typing import List, Dict, Union, Optional
-from dataclasses import dataclass
+from typing import List, Dict, Optional, Union
 from datetime import datetime
 
 
-@dataclass
-class Product:
-    """Represents a product entity within the KalaTak catalog."""
-    sku: str
-    name: str
-    base_price: float
-    tax_rate: float = 0.09
-    stock_quantity: int = 0
-
-
 class KalaTakManager:
-    """Core management utility for processing KalaTak product operations."""
+    """
+    Core manager for handling inventory and product operations 
+    within the Kalatak infrastructure.
+    """
 
-    def __init__(self) -> None:
-        self.catalog: Dict[str, Product] = {}
+    def __init__(self, warehouse_id: str):
+        self.warehouse_id = warehouse_id
+        self._inventory: Dict[str, Dict] = {}
 
-    def add_product(self, sku: str, name: str, price: float, stock: int) -> None:
+    def add_product(self, sku: str, name: str, quantity: int, price: float) -> bool:
         """
-        Adds a new product to the local KalaTak inventory cache.
+        Registers a new product into the Kalatak warehouse system.
 
-        :param sku: Unique stock keeping unit identifier.
+        :param sku: Unique Stock Keeping Unit identifier.
         :param name: Human-readable name of the product.
-        :param price: Base price in Toman.
-        :param stock: Initial stock count.
+        :param quantity: Initial stock count.
+        :param price: Unit price in IRR.
+        :return: True if successfully registered.
         """
-        self.catalog[sku] = Product(sku=sku, name=name, base_price=price, stock_quantity=stock)
-
-    def calculate_final_price(self, sku: str) -> float:
-        """
-        Calculates the final retail price including tax for a specific SKU.
-
-        :param sku: The product SKU to calculate.
-        :return: Total price as a float.
-        :raises ValueError: If SKU is not found in the catalog.
-        """
-        if sku not in self.catalog:
-            raise ValueError(f"SKU {sku} not found in KalaTak database.")
+        if sku in self._inventory:
+            return False
         
-        product = self.catalog[sku]
-        return product.base_price * (1 + product.tax_rate)
+        self._inventory[sku] = {
+            "name": name,
+            "quantity": quantity,
+            "price": price,
+            "updated_at": datetime.now().isoformat()
+        }
+        return True
 
-    def get_inventory_valuation(self) -> float:
+    def update_stock(self, sku: str, delta: int) -> Optional[int]:
         """
-        Computes the total current value of the warehouse inventory.
+        Updates the stock level for an existing product.
 
-        :return: Total sum of all products in stock.
+        :param sku: The SKU to update.
+        :param delta: Change in quantity (positive for restock, negative for sale).
+        :return: New quantity if successful, None if SKU not found.
         """
-        return sum(p.base_price * p.stock_quantity for p in self.catalog.values())
+        if sku not in self._inventory:
+            return None
+        
+        self._inventory[sku]["quantity"] += delta
+        self._inventory[sku]["updated_at"] = datetime.now().isoformat()
+        return self._inventory[sku]["quantity"]
 
-    def generate_report(self) -> Dict[str, Union[str, int, float]]:
+    def get_inventory_value(self) -> float:
         """
-        Generates a summary status report of the current KalaTak catalog.
+        Calculates the total monetary value of current warehouse inventory.
 
-        :return: A dictionary containing metadata and current metrics.
+        :return: Total value as a float.
         """
+        return sum(item["quantity"] * item["price"] for item in self._inventory.values())
+
+    def filter_low_stock(self, threshold: int = 5) -> List[str]:
+        """
+        Identifies products that have stock levels below a specific threshold.
+
+        :param threshold: The quantity level to trigger a reorder alert.
+        :return: A list of SKUs requiring attention.
+        """
+        return [
+            sku for sku, data in self._inventory.items() 
+            if data["quantity"] < threshold
+        ]
+
+    def get_product_report(self, sku: str) -> Dict[str, Union[str, float, int]]:
+        """
+        Generates a detailed summary of a specific product.
+
+        :param sku: The SKU to look up.
+        :raises ValueError: If the SKU is not found in the repository.
+        :return: Dictionary containing product details.
+        """
+        if sku not in self._inventory:
+            raise ValueError(f"Product {sku} not found in Kalatak records.")
+        
         return {
-            "timestamp": datetime.now().isoformat(),
-            "total_skus": len(self.catalog),
-            "total_inventory_value": self.get_inventory_valuation(),
-            "status": "Operational"
+            "sku": sku,
+            **self._inventory[sku],
+            "warehouse": self.warehouse_id
         }
 
-    def bulk_apply_discount(self, percentage: float) -> None:
-        """
-        Applies a global discount percentage to all products in the catalog.
 
-        :param percentage: Discount percentage (e.g., 0.10 for 10%).
-        """
-        for product in self.catalog.values():
-            product.base_price -= (product.base_price * percentage)
+def format_currency_irr(amount: float) -> str:
+    """
+    Utility to format numerical values into a standard Kalatak currency string.
 
-
-# Example usage logic:
-if __name__ == "__main__":
-    # Initialize the utility
-    kt = KalaTakManager()
-    
-    # Populate catalog
-    kt.add_product("KT-001", "Industrial Sensor", 2500000, 50)
-    kt.add_product("KT-002", "Control Module", 4200000, 20)
-    
-    # Perform operations
-    print(f"Final price for KT-001: {kt.calculate_final_price('KT-001')}")
-    print(f"Report: {kt.generate_report()}")
+    :param amount: The raw numerical value.
+    :return: Formatted string with separator.
+    """
+    return f"{amount:,.0f} IRR"
 ```
