@@ -1,11 +1,11 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی مدیریت خدمات خیاطی و سفارشات سوزن زرین
+  description: مستندات رسمی برای مدیریت خدمات خیاطی و گلدوزی سوزن زرین
   version: 1.0.0
 servers:
-  - url: https://api.sozane-zarin.com/v1
-    description: سرور اصلی تولید
+  - url: https://api.sozane-zarin.ir/v1
+    description: سرور اصلی
 paths:
   /orders:
     get:
@@ -15,28 +15,12 @@ paths:
           description: لیست سفارشات با موفقیت دریافت شد
     post:
       summary: ثبت سفارش جدید
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Order'
       responses:
         '201':
           description: سفارش با موفقیت ثبت شد
   /orders/{id}:
-    get:
-      summary: جزئیات یک سفارش
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: جزئیات سفارش
     put:
-      summary: به‌روزرسانی وضعیت سفارش
+      summary: ویرایش اطلاعات سفارش
       parameters:
         - name: id
           in: path
@@ -45,7 +29,7 @@ paths:
             type: string
       responses:
         '200':
-          description: سفارش با موفقیت ویرایش شد
+          description: سفارش با موفقیت بروزرسانی شد
     delete:
       summary: حذف سفارش
       parameters:
@@ -57,6 +41,12 @@ paths:
       responses:
         '204':
           description: سفارش با موفقیت حذف شد
+  /services:
+    get:
+      summary: دریافت لیست خدمات و تعرفه‌ها
+      responses:
+        '200':
+          description: لیست خدمات با موفقیت دریافت شد
 components:
   schemas:
     Order:
@@ -66,12 +56,8 @@ components:
           type: string
         customerName:
           type: string
-          description: نام مشتری
         serviceType:
           type: string
-          description: نوع خدمات خیاطی
-        price:
-          type: number
         status:
           type: string
           enum: [pending, in_progress, completed]
