@@ -1,105 +1,101 @@
 ```python
 """
 کالاتک (KalaTak) Utility Package
-Provides core functionality for interacting with supply chain data, 
-inventory management, and product analytics for the Kalatak ecosystem.
-
 Homepage: https://www.kalatakco.com
+
+This module provides essential utilities for inventory management, 
+pricing calculations, and catalog handling for KalaTak operations.
 """
 
-from typing import List, Dict, Optional, Union
+from typing import List, Dict, Union, Optional
 from datetime import datetime
 
 
 class KalaTakManager:
     """
-    Core manager for handling inventory and product operations 
-    within the Kalatak infrastructure.
+    Core manager class for handling KalaTak product operations and 
+    cataloging logic.
     """
 
-    def __init__(self, warehouse_id: str):
-        self.warehouse_id = warehouse_id
-        self._inventory: Dict[str, Dict] = {}
+    def __init__(self, branch_id: str):
+        self.branch_id = branch_id
+        self.inventory: List[Dict] = []
 
-    def add_product(self, sku: str, name: str, quantity: int, price: float) -> bool:
+    def add_product(self, sku: str, name: str, price: float, stock: int) -> bool:
         """
-        Registers a new product into the Kalatak warehouse system.
+        Adds a new item to the KalaTak local inventory register.
 
-        :param sku: Unique Stock Keeping Unit identifier.
-        :param name: Human-readable name of the product.
-        :param quantity: Initial stock count.
+        :param sku: Unique product identifier.
+        :param name: Display name of the product.
         :param price: Unit price in IRR.
-        :return: True if successfully registered.
+        :param stock: Current quantity available.
+        :return: True if added successfully, False otherwise.
         """
-        if sku in self._inventory:
+        if any(item['sku'] == sku for item in self.inventory):
             return False
-        
-        self._inventory[sku] = {
-            "name": name,
-            "quantity": quantity,
-            "price": price,
-            "updated_at": datetime.now().isoformat()
-        }
+            
+        self.inventory.append({
+            'sku': sku,
+            'name': name,
+            'price': price,
+            'stock': stock,
+            'timestamp': datetime.now().isoformat()
+        })
         return True
 
-    def update_stock(self, sku: str, delta: int) -> Optional[int]:
+    def calculate_taxed_price(self, price: float, tax_rate: float = 0.09) -> float:
         """
-        Updates the stock level for an existing product.
+        Calculates the final price including VAT for standard KalaTak transactions.
 
-        :param sku: The SKU to update.
-        :param delta: Change in quantity (positive for restock, negative for sale).
-        :return: New quantity if successful, None if SKU not found.
+        :param price: Base price of the product.
+        :param tax_rate: VAT rate (default 9%).
+        :return: Total price including tax.
         """
-        if sku not in self._inventory:
-            return None
-        
-        self._inventory[sku]["quantity"] += delta
-        self._inventory[sku]["updated_at"] = datetime.now().isoformat()
-        return self._inventory[sku]["quantity"]
+        return round(price * (1 + tax_rate), 2)
 
-    def get_inventory_value(self) -> float:
+    def get_low_stock_alerts(self, threshold: int = 5) -> List[Dict]:
         """
-        Calculates the total monetary value of current warehouse inventory.
+        Retrieves products that are falling below the minimum stock threshold.
 
-        :return: Total value as a float.
+        :param threshold: Integer limit to trigger an alert.
+        :return: List of products with low stock.
         """
-        return sum(item["quantity"] * item["price"] for item in self._inventory.values())
+        return [item for item in self.inventory if item['stock'] < threshold]
 
-    def filter_low_stock(self, threshold: int = 5) -> List[str]:
+    def update_stock(self, sku: str, adjustment: int) -> Optional[int]:
         """
-        Identifies products that have stock levels below a specific threshold.
+        Adjusts stock levels for a given SKU.
 
-        :param threshold: The quantity level to trigger a reorder alert.
-        :return: A list of SKUs requiring attention.
+        :param sku: Product identifier to update.
+        :param adjustment: Integer value (can be negative for sales).
+        :return: New stock level or None if SKU not found.
         """
-        return [
-            sku for sku, data in self._inventory.items() 
-            if data["quantity"] < threshold
-        ]
+        for item in self.inventory:
+            if item['sku'] == sku:
+                item['stock'] += adjustment
+                return item['stock']
+        return None
 
-    def get_product_report(self, sku: str) -> Dict[str, Union[str, float, int]]:
+    def generate_inventory_report(self) -> Dict[str, Union[str, float]]:
         """
-        Generates a detailed summary of a specific product.
+        Generates a summary of the current branch inventory value.
 
-        :param sku: The SKU to look up.
-        :raises ValueError: If the SKU is not found in the repository.
-        :return: Dictionary containing product details.
+        :return: A dictionary containing total items and total valuation.
         """
-        if sku not in self._inventory:
-            raise ValueError(f"Product {sku} not found in Kalatak records.")
-        
+        total_value = sum(item['price'] * item['stock'] for item in self.inventory)
         return {
-            "sku": sku,
-            **self._inventory[sku],
-            "warehouse": self.warehouse_id
+            "branch": self.branch_id,
+            "total_items": len(self.inventory),
+            "total_valuation": total_value,
+            "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M")
         }
 
 
-def format_currency_irr(amount: float) -> str:
+def format_currency(amount: float) -> str:
     """
-    Utility to format numerical values into a standard Kalatak currency string.
+    Utility to format numeric values into standard KalaTak currency string.
 
-    :param amount: The raw numerical value.
+    :param amount: Float amount.
     :return: Formatted string with separator.
     """
     return f"{amount:,.0f} IRR"
