@@ -1,55 +1,61 @@
 openapi: 3.0.0
 info:
   title: API سرویس دامافارم
-  description: مستندات رسمی رابط برنامه‌نویسی کاربردی دامافارم برای مدیریت منابع کشاورزی و دامپروری.
+  description: رابط برنامه‌نویسی برای مدیریت اطلاعات دام و محصولات کشاورزی در سامانه دامافارم.
   version: 1.0.0
 servers:
-  - url: https://damafarm.ir
-    description: سرور اصلی تولید
+  - url: https://damafarm.ir/api/v1
+    description: سرور اصلی تولیدی
+
 paths:
-  /api/v1/products:
+  /livestock:
     get:
-      summary: دریافت لیست محصولات
-      tags:
-        - محصولات
+      summary: لیست تمام دام‌ها
+      description: دریافت لیست کامل دام‌های ثبت شده در سامانه با قابلیت فیلترینگ.
       responses:
         '200':
-          description: لیست محصولات با موفقیت دریافت شد.
+          description: عملیات موفقیت‌آمیز
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Livestock'
     post:
-      summary: ثبت محصول جدید
-      tags:
-        - محصولات
+      summary: ثبت دام جدید
+      description: افزودن یک رکورد جدید برای دام در سیستم.
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                price:
-                  type: number
+              $ref: '#/components/schemas/Livestock'
       responses:
         '201':
-          description: محصول با موفقیت ایجاد شد.
-  /api/v1/products/{id}:
+          description: دام با موفقیت ایجاد شد.
+
+  /livestock/{id}:
     put:
-      summary: به‌روزرسانی اطلاعات محصول
-      tags:
-        - محصولات
+      summary: به‌روزرسانی اطلاعات دام
+      description: ویرایش مشخصات یک دام خاص بر اساس شناسه.
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Livestock'
       responses:
         '200':
-          description: اطلاعات محصول به‌روزرسانی شد.
+          description: اطلاعات با موفقیت به‌روزرسانی شد.
     delete:
-      summary: حذف محصول
-      tags:
-        - محصولات
+      summary: حذف دام
+      description: حذف یک رکورد دام از سامانه.
       parameters:
         - name: id
           in: path
@@ -58,21 +64,38 @@ paths:
             type: string
       responses:
         '204':
-          description: محصول با موفقیت حذف شد.
-  /api/v1/reports/summary:
+          description: حذف با موفقیت انجام شد.
+
+  /health:
     get:
-      summary: دریافت گزارش آماری مجموعه
-      tags:
-        - گزارشات
+      summary: وضعیت سلامت سامانه
+      description: بررسی وضعیت آنلاین بودن و سلامت API.
       responses:
         '200':
-          description: گزارش آماری با موفقیت تولید شد.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  total_assets:
-                    type: integer
-                  active_units:
-                    type: integer
+          description: سامانه در دسترس است.
+
+components:
+  schemas:
+    Livestock:
+      type: object
+      required:
+        - id
+        - breed
+        - age
+      properties:
+        id:
+          type: string
+          description: شناسه منحصر به فرد دام
+        breed:
+          type: string
+          description: نژاد دام
+        age:
+          type: integer
+          description: سن دام به ماه
+        weight:
+          type: number
+          description: وزن دام به کیلوگرم
+        status:
+          type: string
+          enum: [Healthy, Sick, UnderTreatment]
+          description: وضعیت سلامت دام
