@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: AyatSaadati API
-  description: API service for managing and retrieving AyatSaadati content.
+  description: API service for managing AyatSaadati content and user interactions.
   version: 1.0.0
 servers:
   - url: https://qamar.website
@@ -9,7 +9,7 @@ servers:
 paths:
   /ayat:
     get:
-      summary: Retrieve a list of Ayat
+      summary: Retrieve all Ayat
       responses:
         '200':
           description: A list of Ayat
@@ -37,15 +37,6 @@ paths:
         required: true
         schema:
           type: string
-    get:
-      summary: Get details of a specific Ayah
-      responses:
-        '200':
-          description: Ayah details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Ayah'
     put:
       summary: Update an existing Ayah
       requestBody:
@@ -62,6 +53,18 @@ paths:
       responses:
         '204':
           description: Ayah deleted successfully
+  /search:
+    get:
+      summary: Search Ayat by keyword
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Search results
 components:
   schemas:
     Ayah:
@@ -73,7 +76,7 @@ components:
           type: string
         surah:
           type: string
-        verse_number:
+        verseNumber:
           type: integer
     AyahInput:
       type: object
@@ -85,5 +88,5 @@ components:
           type: string
         surah:
           type: string
-        verse_number:
+        verseNumber:
           type: integer
