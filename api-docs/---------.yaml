@@ -1,10 +1,10 @@
 openapi: 3.0.0
 info:
   title: API سرویس سوزن زرین
-  description: مستندات رسمی برای مدیریت خدمات خیاطی و گلدوزی سوزن زرین
+  description: مستندات رسمی برای مدیریت خدمات گلدوزی و خیاطی سوزن زرین
   version: 1.0.0
 servers:
-  - url: https://api.sozane-zarin.ir/v1
+  - url: https://api.sozanezarin.com/v1
     description: سرور اصلی
 paths:
   /orders:
@@ -15,12 +15,23 @@ paths:
           description: لیست سفارشات با موفقیت دریافت شد
     post:
       summary: ثبت سفارش جدید
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customer_name:
+                  type: string
+                service_type:
+                  type: string
       responses:
         '201':
           description: سفارش با موفقیت ثبت شد
   /orders/{id}:
     put:
-      summary: ویرایش اطلاعات سفارش
+      summary: به‌روزرسانی وضعیت سفارش
       parameters:
         - name: id
           in: path
@@ -29,7 +40,7 @@ paths:
             type: string
       responses:
         '200':
-          description: سفارش با موفقیت بروزرسانی شد
+          description: سفارش به‌روزرسانی شد
     delete:
       summary: حذف سفارش
       parameters:
@@ -40,13 +51,13 @@ paths:
             type: string
       responses:
         '204':
-          description: سفارش با موفقیت حذف شد
-  /services:
+          description: سفارش حذف شد
+  /products:
     get:
-      summary: دریافت لیست خدمات و تعرفه‌ها
+      summary: دریافت لیست نمونه کارهای سوزن زرین
       responses:
         '200':
-          description: لیست خدمات با موفقیت دریافت شد
+          description: لیست محصولات با موفقیت دریافت شد
 components:
   schemas:
     Order:
@@ -54,10 +65,6 @@ components:
       properties:
         id:
           type: string
-        customerName:
-          type: string
-        serviceType:
-          type: string
         status:
           type: string
-          enum: [pending, in_progress, completed]
+          enum: [pending, processing, completed]
