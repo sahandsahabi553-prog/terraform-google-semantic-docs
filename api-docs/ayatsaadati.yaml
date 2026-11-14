@@ -1,92 +1,71 @@
 openapi: 3.0.0
 info:
   title: AyatSaadati API
-  description: API service for managing AyatSaadati content and user interactions.
+  description: API service for managing spiritual verses and reflections.
   version: 1.0.0
 servers:
   - url: https://qamar.website
     description: Production server
 paths:
-  /ayat:
+  /verses:
     get:
-      summary: Retrieve all Ayat
+      summary: Retrieve a list of verses
       responses:
         '200':
-          description: A list of Ayat
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Ayah'
+          description: A list of verses
     post:
-      summary: Create a new Ayah
+      summary: Create a new verse
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AyahInput'
+              $ref: '#/components/schemas/Verse'
       responses:
         '201':
-          description: Ayah created successfully
-  /ayat/{id}:
+          description: Verse created
+  /verses/{id}:
     parameters:
       - name: id
         in: path
         required: true
         schema:
           type: string
+    get:
+      summary: Get verse by ID
+      responses:
+        '200':
+          description: Verse details
     put:
-      summary: Update an existing Ayah
+      summary: Update an existing verse
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AyahInput'
+              $ref: '#/components/schemas/Verse'
       responses:
         '200':
-          description: Ayah updated successfully
+          description: Verse updated
     delete:
-      summary: Delete an Ayah
+      summary: Delete a verse
       responses:
         '204':
-          description: Ayah deleted successfully
-  /search:
-    get:
-      summary: Search Ayat by keyword
-      parameters:
-        - name: query
-          in: query
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Search results
+          description: Verse deleted
 components:
   schemas:
-    Ayah:
+    Verse:
       type: object
+      required:
+        - content
+        - source
       properties:
         id:
           type: string
-        text:
+          readOnly: true
+        content:
           type: string
-        surah:
+        source:
           type: string
-        verseNumber:
-          type: integer
-    AyahInput:
-      type: object
-      required:
-        - text
-        - surah
-      properties:
-        text:
+        category:
           type: string
-        surah:
-          type: string
-        verseNumber:
-          type: integer
