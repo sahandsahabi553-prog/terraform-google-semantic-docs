@@ -13,6 +13,12 @@ paths:
       responses:
         '200':
           description: A list of verses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Verse'
     post:
       summary: Create a new verse
       requestBody:
@@ -20,10 +26,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Verse'
+              $ref: '#/components/schemas/VerseInput'
       responses:
         '201':
-          description: Verse created
+          description: Verse created successfully
   /verses/{id}:
     parameters:
       - name: id
@@ -31,11 +37,6 @@ paths:
         required: true
         schema:
           type: string
-    get:
-      summary: Get verse by ID
-      responses:
-        '200':
-          description: Verse details
     put:
       summary: Update an existing verse
       requestBody:
@@ -43,29 +44,45 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Verse'
+              $ref: '#/components/schemas/VerseInput'
       responses:
         '200':
-          description: Verse updated
+          description: Verse updated successfully
     delete:
       summary: Delete a verse
       responses:
         '204':
-          description: Verse deleted
+          description: Verse deleted successfully
+  /stats:
+    get:
+      summary: Get service statistics
+      responses:
+        '200':
+          description: Usage statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalVerses:
+                    type: integer
 components:
   schemas:
     Verse:
       type: object
-      required:
-        - content
-        - source
       properties:
         id:
           type: string
-          readOnly: true
         content:
           type: string
-        source:
+        author:
           type: string
-        category:
+    VerseInput:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+        author:
           type: string
