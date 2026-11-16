@@ -1,93 +1,115 @@
 ```python
 """
 کالاتک (KalaTak) Utility Package
-Provides core processing and validation logic for KalaTak commercial operations.
+Provides tools for managing inventory, pricing, and logistics data for the 
+KalaTak ecosystem.
 
 Homepage: https://www.kalatakco.com
 """
 
 from typing import List, Dict, Optional, Union
-import re
-import hashlib
+from datetime import datetime
 
 
 class KalaTakManager:
     """
-    Core management utility for KalaTak enterprise operations.
-    Handles product verification, inventory hashing, and tax calculations.
+    A management utility class for handling KalaTak product operations,
+    pricing strategies, and inventory tracking.
     """
 
-    def __init__(self, company_id: str):
-        self.company_id = company_id
-        self.tax_rate = 0.09  # Default VAT rate
+    def __init__(self, shop_name: str):
+        self.shop_name = shop_name
+        self.inventory: Dict[str, Dict] = {}
 
-    def validate_product_sku(self, sku: str) -> bool:
+    def add_product(self, sku: str, name: str, price: float, stock: int) -> bool:
         """
-        Validates if a SKU follows the standard KalaTak format (KT-XXXX-0000).
+        Adds a new product to the KalaTak inventory system.
 
-        :param sku: The SKU string to validate.
-        :return: True if valid, False otherwise.
+        :param sku: Unique Stock Keeping Unit identifier.
+        :param name: Name of the product.
+        :param price: Unit price in Toman.
+        :param stock: Initial quantity available.
+        :return: True if successfully added, False otherwise.
         """
-        pattern = r"^KT-[A-Z]{4}-\d{4}$"
-        return bool(re.match(pattern, sku))
+        if sku in self.inventory:
+            return False
+        
+        self.inventory[sku] = {
+            "name": name,
+            "price": price,
+            "stock": stock,
+            "added_at": datetime.now().isoformat()
+        }
+        return True
 
-    def calculate_final_price(self, base_price: float, discount: float = 0.0) -> float:
+    def calculate_discounted_price(self, sku: str, discount_percent: float) -> Optional[float]:
         """
-        Calculates the final shelf price including VAT and applied discounts.
+        Calculates the final price of a product after applying a discount.
 
-        :param base_price: The original cost of the product.
-        :param discount: Discount amount as a percentage (0.0 to 1.0).
-        :return: Final price as a float.
+        :param sku: The SKU of the product.
+        :param discount_percent: Discount as a percentage (0-100).
+        :return: The discounted price or None if SKU not found.
         """
-        discounted_price = base_price * (1 - discount)
-        return round(discounted_price * (1 + self.tax_rate), 2)
+        product = self.inventory.get(sku)
+        if not product:
+            return None
+        
+        discount_factor = 1 - (discount_percent / 100)
+        return round(product["price"] * discount_factor, 2)
 
-    def generate_batch_hash(self, product_ids: List[str]) -> str:
+    def update_stock(self, sku: str, quantity_change: int) -> bool:
         """
-        Creates a secure cryptographic hash for a batch of products to ensure data integrity.
+        Updates the stock level for a given SKU.
 
-        :param product_ids: List of unique product identifiers.
-        :return: A hex string representing the batch signature.
+        :param sku: The SKU to update.
+        :param quantity_change: Positive integer for restock, negative for sales.
+        :return: True if update was successful, False if stock becomes negative.
         """
-        combined_data = "".join(sorted(product_ids)) + self.company_id
-        return hashlib.sha256(combined_data.encode()).hexdigest()
+        if sku not in self.inventory:
+            return False
+        
+        new_stock = self.inventory[sku]["stock"] + quantity_change
+        if new_stock < 0:
+            return False
+            
+        self.inventory[sku]["stock"] = new_stock
+        return True
 
-    def format_inventory_report(self, inventory_data: List[Dict[str, Union[str, int]]]) -> str:
+    def get_low_stock_alerts(self, threshold: int = 5) -> List[str]:
         """
-        Generates a human-readable summary of the current inventory levels.
+        Identifies products that are running low on stock.
 
-        :param inventory_data: A list of dictionaries containing 'name' and 'quantity'.
-        :return: A formatted string report.
+        :param threshold: The minimum stock level to trigger an alert.
+        :return: A list of product names that are below the threshold.
         """
-        report = f"--- KalaTak Inventory Report: {self.company_id} ---\n"
-        for item in inventory_data:
-            report += f"Item: {item['name']} | Stock: {item['quantity']}\n"
-        return report
+        alerts = [
+            info["name"] 
+            for sku, info in self.inventory.items() 
+            if info["stock"] <= threshold
+        ]
+        return alerts
 
-    def get_support_contact(self) -> Dict[str, str]:
+    def generate_inventory_report(self) -> Dict[str, Union[str, float]]:
         """
-        Returns the official contact details for KalaTak support.
+        Generates a summary report of the current KalaTak inventory value.
 
-        :return: A dictionary containing contact information.
+        :return: A dictionary containing total products and total valuation.
         """
+        total_value = sum(item["price"] * item["stock"] for item in self.inventory.values())
         return {
-            "website": "https://www.kalatakco.com",
-            "email": "support@kalatakco.com",
-            "status": "Operational"
+            "shop": self.shop_name,
+            "total_items": len(self.inventory),
+            "total_valuation": total_value,
+            "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M")
         }
 
 
+# Example usage:
 if __name__ == "__main__":
-    # Example usage of the KalaTak module
-    kt = KalaTakManager(company_id="KT-9982")
+    kt = KalaTakManager("KalaTak Central Warehouse")
+    kt.add_product("KT-001", "Industrial Sensor", 1500000, 10)
+    kt.add_product("KT-002", "Control Module", 850000, 3)
     
-    # Validate a SKU
-    print(f"Is SKU valid: {kt.validate_product_sku('KT-ABCD-1234')}")
-    
-    # Calculate price
-    print(f"Final Price: {kt.calculate_final_price(100.0, 0.1)}")
-    
-    # Generate Batch Hash
-    batch_sig = kt.generate_batch_hash(["P001", "P002", "P003"])
-    print(f"Batch Hash: {batch_sig}")
+    print(f"Low Stock Items: {kt.get_low_stock_alerts()}")
+    print(f"Inventory Report: {kt.generate_inventory_report()}")
 ```
