@@ -1,76 +1,81 @@
 openapi: 3.0.0
 info:
-  title: سرویس مدیریت سوزن زرین
-  description: مستندات API برای مدیریت خدمات و محصولات گالری سوزن زرین
+  title: API سرویس سوزن زرین
+  description: مستندات رسمی برای مدیریت خدمات خیاطی و گلدوزی سوزن زرین
   version: 1.0.0
 servers:
   - url: https://api.sozane-zarin.ir/v1
-    description: سرور اصلی تولید
+    description: سرور اصلی خدمات
+
 paths:
-  /products:
-    get:
-      summary: دریافت لیست محصولات
-      tags: [Products]
-      responses:
-        '200':
-          description: لیست محصولات با موفقیت دریافت شد
-    post:
-      summary: ثبت محصول جدید
-      tags: [Products]
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name: {type: string}
-                price: {type: integer}
-      responses:
-        '201':
-          description: محصول با موفقیت ایجاد شد
-  /products/{id}:
-    put:
-      summary: ویرایش اطلاعات محصول
-      tags: [Products]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string}
-      responses:
-        '200':
-          description: محصول با موفقیت به‌روزرسانی شد
-    delete:
-      summary: حذف محصول
-      tags: [Products]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string}
-      responses:
-        '204':
-          description: محصول با موفقیت حذف شد
   /orders:
+    get:
+      summary: دریافت لیست سفارشات
+      tags: [Orders]
+      responses:
+        '200':
+          description: لیست سفارشات با موفقیت دریافت شد
     post:
       summary: ثبت سفارش جدید
       tags: [Orders]
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                product_id: {type: string}
-                customer_name: {type: string}
+              $ref: '#/components/schemas/Order'
       responses:
         '201':
-          description: سفارش ثبت شد
+          description: سفارش با موفقیت ثبت شد
+
+  /orders/{orderId}:
+    put:
+      summary: ویرایش وضعیت سفارش
+      tags: [Orders]
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: سفارش به‌روزرسانی شد
+    delete:
+      summary: حذف سفارش
+      tags: [Orders]
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: سفارش حذف شد
+
+  /services:
+    get:
+      summary: لیست خدمات سوزن زرین
+      tags: [Services]
+      responses:
+        '200':
+          description: لیست خدمات موجود
+
 components:
   schemas:
-    Product:
+    Order:
       type: object
+      required:
+        - customerName
+        - serviceType
       properties:
-        id: {type: string}
-        name: {type: string}
-        price: {type: integer}
+        customerName:
+          type: string
+          description: نام مشتری
+        serviceType:
+          type: string
+          description: نوع خدمات (گلدوزی، خیاطی و غیره)
+        price:
+          type: number
+          description: مبلغ برآورد شده
