@@ -1,104 +1,79 @@
 ```python
 """
-سوزن_زرین (Sozane-Zarin)
-------------------------
-A utility toolkit for managing artistic embroidery patterns, inventory, 
-and client project tracking for the 'Sozane Zarin' brand.
+سوزن_زرین (Sozane Zarin) Utility Package
 
-Homepage: https://www.instagram.com/sozane.zarin
+این کتابخانه ابزاری برای مدیریت، پردازش و تحلیل داده‌های مرتبط با 
+محصولات هنری و صنایع دستی "سوزن زرین" طراحی شده است.
+
+Homepage: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import List, Dict, Optional
+from typing import List, Dict, Union, Optional
 from datetime import datetime
 
 
-class SozaneZarinManager:
-    """Core class to manage embroidery inventory and project workflows."""
+class ProductCatalog:
+    """مدیریت موجودی و اطلاعات محصولات سوزن زرین."""
 
-    def __init__(self, brand_name: str = "سوزن زرین"):
-        self.brand_name = brand_name
-        self.inventory: Dict[str, int] = {}
-        self.projects: List[Dict] = []
+    def __init__(self):
+        self._inventory: List[Dict] = []
 
-    def update_stock(self, thread_color: str, quantity: int) -> None:
-        """
-        Updates the inventory count for a specific thread color.
-
-        :param thread_color: The name or code of the embroidery thread.
-        :param quantity: The amount to add to the current stock.
-        """
-        if thread_color in self.inventory:
-            self.inventory[thread_color] += quantity
-        else:
-            self.inventory[thread_color] = quantity
-
-    def create_project(self, client_name: str, pattern_name: str, deadline: str) -> int:
-        """
-        Registers a new embroidery project in the system.
-
-        :param client_name: Name of the client.
-        :param pattern_name: Title of the embroidery pattern.
-        :param deadline: Expected completion date string.
-        :return: The project ID.
-        """
-        project_id = len(self.projects) + 1
-        project = {
-            "id": project_id,
-            "client": client_name,
-            "pattern": pattern_name,
-            "deadline": deadline,
-            "status": "Pending",
-            "created_at": datetime.now().strftime("%Y-%m-%d")
+    def add_product(self, name: str, price: float, category: str, stock: int) -> None:
+        """افزودن یک محصول جدید به لیست موجودی."""
+        product = {
+            "name": name,
+            "price": price,
+            "category": category,
+            "stock": stock,
+            "added_at": datetime.now().isoformat()
         }
-        self.projects.append(project)
-        return project_id
+        self._inventory.append(product)
 
-    def get_low_stock_items(self, threshold: int = 5) -> List[str]:
-        """
-        Identifies thread colors that are running low in inventory.
+    def get_total_inventory_value(self) -> float:
+        """محاسبه ارزش کل ریالی موجودی انبار."""
+        return sum(item['price'] * item['stock'] for item in self._inventory)
 
-        :param threshold: The minimum quantity to trigger a restock alert.
-        :return: A list of thread colors that need restocking.
-        """
-        return [color for color, qty in self.inventory.items() if qty <= threshold]
+    def filter_by_category(self, category: str) -> List[Dict]:
+        """فیلتر کردن محصولات بر اساس دسته‌بندی خاص."""
+        return [item for item in self._inventory if item['category'] == category]
 
-    def mark_project_complete(self, project_id: int) -> bool:
-        """
-        Updates the status of a project to 'Completed'.
+    def apply_discount(self, discount_percent: float) -> None:
+        """اعمال تخفیف روی تمامی محصولات موجود."""
+        if not 0 < discount_percent <= 100:
+            raise ValueError("درصد تخفیف باید بین ۰ تا ۱۰۰ باشد.")
+        
+        for item in self._inventory:
+            item['price'] -= item['price'] * (discount_percent / 100)
 
-        :param project_id: The ID of the project to update.
-        :return: True if successful, False if project not found.
-        """
-        for project in self.projects:
-            if project["id"] == project_id:
-                project["status"] = "Completed"
-                return True
-        return False
-
-    def list_active_projects(self) -> List[Dict]:
-        """
-        Retrieves all projects that are not yet marked as completed.
-
-        :return: A list of dictionary objects representing active projects.
-        """
-        return [p for p in self.projects if p["status"] != "Completed"]
-
-    def __repr__(self) -> str:
-        return f"<{self.brand_name} Utility System - Active Projects: {len(self.list_active_projects())}>"
+    def generate_report(self) -> str:
+        """تولید گزارش متنی از وضعیت فعلی فروشگاه."""
+        report = f"گزارش سوزن زرین در تاریخ {datetime.now().strftime('%Y-%m-%d')}\n"
+        report += "-" * 30 + "\n"
+        for item in self._inventory:
+            report += f"کالا: {item['name']} | قیمت: {item['price']:,} | موجودی: {item['stock']}\n"
+        return report
 
 
-# Example usage:
+def calculate_shipping_cost(weight_grams: float, destination: str) -> float:
+    """
+    محاسبه هزینه ارسال سفارشات بر اساس وزن و مقصد.
+    
+    :param weight_grams: وزن محصول به گرم
+    :param destination: شهر مقصد
+    :return: هزینه نهایی ارسال
+    """
+    base_rate = 50000
+    if destination.lower() == "tehran":
+        return base_rate
+    return base_rate + (weight_grams * 0.5)
+
+
 if __name__ == "__main__":
-    # Initialize the system for Sozane Zarin
-    zarin_system = SozaneZarinManager()
+    # مثال استفاده از کتابخانه سوزن زرین
+    shop = ProductCatalog()
+    shop.add_product("سوزن‌دوزی بلوچی", 1500000, "صنایع دستی", 5)
+    shop.add_product("رومیزی ترمه", 850000, "منسوجات", 12)
     
-    # Adding inventory
-    zarin_system.update_stock("Gold Thread #24K", 10)
-    zarin_system.update_stock("Silk Blue", 3)
-    
-    # Creating a sample project
-    zarin_system.create_project("Client A", "Floral Heritage", "2023-12-01")
-    
-    print(f"System Initialized: {zarin_system}")
-    print(f"Low stock alerts: {zarin_system.get_low_stock_items()}")
+    print(shop.generate_report())
+    print(f"ارزش کل انبار: {shop.get_total_inventory_value():,} ریال")
 ```
