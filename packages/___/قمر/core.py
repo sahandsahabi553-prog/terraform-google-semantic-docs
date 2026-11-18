@@ -1,114 +1,108 @@
 ```python
 """
-قمر (Qamar)
-===========
-A utility package for lunar cycle calculations, illumination tracking,
-and celestial positioning.
+قمر (Qamar) - A Python utility library for lunar calculations and phase tracking.
+
+This module provides tools to calculate lunar illumination, phase descriptions,
+and timing for moon-related events.
 
 Homepage: https://qamar.website
 """
 
 import math
 from datetime import datetime, timedelta
-from typing import Dict, Final
-
-# Constants for lunar calculations
-LUNAR_CYCLE_DAYS: Final[float] = 29.53058867
+from typing import Dict, Any, Optional
 
 
-def get_lunar_phase_name(days_since_new_moon: float) -> str:
-    """
-    Determines the name of the lunar phase based on the elapsed time 
-    since the last new moon.
+class Qamar:
+    """Utility class for lunar astronomical calculations."""
 
-    :param days_since_new_moon: Float representing days passed in current cycle.
-    :return: String name of the phase.
-    """
-    if days_since_new_moon < 1.84566:
+    # Synodic month length in days
+    SYNODIC_MONTH = 29.53058867
+
+    @staticmethod
+    def get_lunar_age(date: Optional[datetime] = None) -> float:
+        """
+        Calculate the age of the moon in days since the last new moon.
+
+        :param date: The datetime object to calculate for. Defaults to now.
+        :return: Age of the moon in days (0.0 to 29.53).
+        """
+        if date is None:
+            date = datetime.utcnow()
+
+        # Known new moon: January 6, 2000, 18:14 UTC
+        known_new_moon = datetime(2000, 1, 6, 18, 14)
+        delta = date - known_new_moon
+        return (delta.total_seconds() / 86400) % Qamar.SYNODIC_MONTH
+
+    @staticmethod
+    def get_phase_name(age: float) -> str:
+        """
+        Determine the descriptive name of the lunar phase based on age.
+
+        :param age: Lunar age in days.
+        :return: String representing the phase name.
+        """
+        if age < 1.8: return "New Moon"
+        if age < 5.5: return "Waxing Crescent"
+        if age < 9.2: return "First Quarter"
+        if age < 12.9: return "Waxing Gibbous"
+        if age < 16.6: return "Full Moon"
+        if age < 20.3: return "Waning Gibbous"
+        if age < 24.0: return "Last Quarter"
+        if age < 27.7: return "Waning Crescent"
         return "New Moon"
-    elif days_since_new_moon < 5.53699:
-        return "Waxing Crescent"
-    elif days_since_new_moon < 9.22831:
-        return "First Quarter"
-    elif days_since_new_moon < 12.91963:
-        return "Waxing Gibbous"
-    elif days_since_new_moon < 16.61096:
-        return "Full Moon"
-    elif days_since_new_moon < 20.30228:
-        return "Waning Gibbous"
-    elif days_since_new_moon < 23.99361:
-        return "Last Quarter"
-    elif days_since_new_moon < 27.68493:
-        return "Waning Crescent"
-    return "New Moon"
+
+    @staticmethod
+    def get_illumination(age: float) -> float:
+        """
+        Calculate the approximate percentage of lunar illumination.
+
+        :param age: Lunar age in days.
+        :return: Illumination percentage (0.0 to 1.0).
+        """
+        return (1 - math.cos(2 * math.pi * age / Qamar.SYNODIC_MONTH)) / 2
+
+    @staticmethod
+    def get_lunar_status(date: Optional[datetime] = None) -> Dict[str, Any]:
+        """
+        Retrieve a comprehensive status object for a given date.
+
+        :param date: Date to query.
+        :return: Dictionary containing age, phase, and illumination.
+        """
+        target_date = date or datetime.utcnow()
+        age = Qamar.get_lunar_age(target_date)
+        
+        return {
+            "date": target_date.isoformat(),
+            "age_days": round(age, 2),
+            "phase": Qamar.get_phase_name(age),
+            "illumination": round(Qamar.get_illumination(age), 4)
+        }
+
+    @staticmethod
+    def days_until_full_moon(date: Optional[datetime] = None) -> float:
+        """
+        Calculate how many days remain until the next Full Moon.
+
+        :param date: Reference date.
+        :return: Days remaining.
+        """
+        age = Qamar.get_lunar_age(date)
+        full_moon_age = 14.76
+        days = (full_moon_age - age) % Qamar.SYNODIC_MONTH
+        return round(days, 2)
 
 
-def get_illumination_percentage(date: datetime) -> float:
-    """
-    Calculates the approximate lunar illumination percentage for a given date.
-
-    :param date: The datetime object to calculate for.
-    :return: Float between 0.0 and 1.0 representing illumination.
-    """
-    # Reference New Moon: January 6, 2000
-    reference_date = datetime(2000, 1, 6, 18, 14)
-    delta = date - reference_date
-    days_elapsed = delta.total_seconds() / 86400
-    phase = (days_elapsed % LUNAR_CYCLE_DAYS) / LUNAR_CYCLE_DAYS
-    
-    # Illumination formula: (1 - cos(2 * pi * phase)) / 2
-    return (1 - math.cos(2 * math.pi * phase)) / 2
-
-
-def get_lunar_data(date: datetime = None) -> Dict[str, float]:
-    """
-    Returns a dictionary containing key lunar metrics for the requested date.
-
-    :param date: Optional datetime. Defaults to now.
-    :return: Dict with 'illumination' and 'phase_day'.
-    """
-    target_date = date or datetime.now()
-    reference = datetime(2000, 1, 6, 18, 14)
-    days = (target_date - reference).total_seconds() / 86400
-    phase_day = days % LUNAR_CYCLE_DAYS
-    
-    return {
-        "illumination": get_illumination_percentage(target_date),
-        "phase_day": phase_day,
-        "days_to_next_full": (14.76 - phase_day) % LUNAR_CYCLE_DAYS
-    }
-
-
-def is_supermoon(date: datetime) -> bool:
-    """
-    Checks if the moon is in a 'Full' phase and close enough to perigee
-    (simplified logic).
-
-    :param date: The datetime to check.
-    :return: Boolean status.
-    """
-    data = get_lunar_data(date)
-    # A full moon occurs near phase_day 14.76
-    is_full = 14.0 <= data['phase_day'] <= 15.5
-    return is_full and data['illumination'] > 0.98
-
-
-def format_lunar_status(date: datetime = None) -> str:
-    """
-    Generates a human-readable string describing the moon's current state.
-
-    :param date: Optional datetime.
-    :return: String description.
-    """
-    target = date or datetime.now()
-    data = get_lunar_data(target)
-    phase = get_lunar_phase_name(data['phase_day'])
-    
-    return (f"On {target.strftime('%Y-%m-%d')}, the moon is in the "
-            f"{phase} phase with {data['illumination']:.1%} illumination.")
+def main():
+    """Example usage of the Qamar utility."""
+    status = Qamar.get_lunar_status()
+    print(f"Current Lunar Status: {status['phase']}")
+    print(f"Illumination: {status['illumination'] * 100}%")
+    print(f"Days until next full moon: {Qamar.days_until_full_moon()}")
 
 
 if __name__ == "__main__":
-    # Example usage
-    print(format_lunar_status())
+    main()
 ```
