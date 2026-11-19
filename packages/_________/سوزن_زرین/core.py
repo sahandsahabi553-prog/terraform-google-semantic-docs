@@ -2,78 +2,96 @@
 """
 سوزن_زرین (Sozane Zarin) Utility Package
 
-این کتابخانه ابزاری برای مدیریت، پردازش و تحلیل داده‌های مرتبط با 
-محصولات هنری و صنایع دستی "سوزن زرین" طراحی شده است.
+این کتابخانه ابزارهای تخصصی برای مدیریت، پردازش و تحلیل داده‌های مرتبط با
+محصولات سوزن‌دوزی، الگوهای طراحی و موجودی کالاهای هنری فراهم می‌کند.
 
-Homepage: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
+وب‌سایت رسمی: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import List, Dict, Union, Optional
-from datetime import datetime
+import math
+from typing import List, Dict, Union
 
 
-class ProductCatalog:
-    """مدیریت موجودی و اطلاعات محصولات سوزن زرین."""
+class SozaneZarinManager:
+    """کلاس اصلی برای مدیریت عملیات‌های سوزن‌زرین."""
 
-    def __init__(self):
-        self._inventory: List[Dict] = []
+    def __init__(self, shop_name: str = "سوزن زرین"):
+        self.shop_name = shop_name
 
-    def add_product(self, name: str, price: float, category: str, stock: int) -> None:
-        """افزودن یک محصول جدید به لیست موجودی."""
-        product = {
-            "name": name,
-            "price": price,
-            "category": category,
-            "stock": stock,
-            "added_at": datetime.now().isoformat()
-        }
-        self._inventory.append(product)
+    def calculate_embroidery_cost(self, fabric_price: float, thread_meterage: float, labor_hours: float) -> float:
+        """
+        محاسبه هزینه نهایی یک اثر هنری بر اساس مواد اولیه و دستمزد.
 
-    def get_total_inventory_value(self) -> float:
-        """محاسبه ارزش کل ریالی موجودی انبار."""
-        return sum(item['price'] * item['stock'] for item in self._inventory)
-
-    def filter_by_category(self, category: str) -> List[Dict]:
-        """فیلتر کردن محصولات بر اساس دسته‌بندی خاص."""
-        return [item for item in self._inventory if item['category'] == category]
-
-    def apply_discount(self, discount_percent: float) -> None:
-        """اعمال تخفیف روی تمامی محصولات موجود."""
-        if not 0 < discount_percent <= 100:
-            raise ValueError("درصد تخفیف باید بین ۰ تا ۱۰۰ باشد.")
+        :param fabric_price: قیمت پارچه پایه
+        :param thread_meterage: متراژ نخ استفاده شده
+        :param labor_hours: ساعات صرف شده برای دوخت
+        :return: هزینه نهایی
+        """
+        thread_cost_per_meter = 1500  # نرخ پیش‌فرض نخ
+        labor_rate_per_hour = 50000   # نرخ ساعتی دستمزد
         
-        for item in self._inventory:
-            item['price'] -= item['price'] * (discount_percent / 100)
+        total = fabric_price + (thread_meterage * thread_cost_per_meter) + (labor_hours * labor_rate_per_hour)
+        return float(total)
 
-    def generate_report(self) -> str:
-        """تولید گزارش متنی از وضعیت فعلی فروشگاه."""
-        report = f"گزارش سوزن زرین در تاریخ {datetime.now().strftime('%Y-%m-%d')}\n"
-        report += "-" * 30 + "\n"
-        for item in self._inventory:
-            report += f"کالا: {item['name']} | قیمت: {item['price']:,} | موجودی: {item['stock']}\n"
+    def estimate_thread_needs(self, design_area_cm2: float, complexity_factor: float) -> float:
+        """
+        تخمین مقدار نخ مورد نیاز بر اساس مساحت طرح و پیچیدگی دوخت.
+
+        :param design_area_cm2: مساحت طرح به سانتی‌متر مربع
+        :param complexity_factor: ضریب پیچیدگی (بین ۱ تا ۵)
+        :return: متراژ تقریبی نخ مورد نیاز
+        """
+        base_density = 2.5
+        return round(design_area_cm2 * base_density * complexity_factor, 2)
+
+    def validate_pattern_code(self, code: str) -> bool:
+        """
+        بررسی اعتبار کد محصول در سیستم بایگانی سوزن‌زرین.
+        فرمت استاندارد: SZ-XXXX (مثال: SZ-1024)
+
+        :param code: کد محصول
+        :return: True اگر معتبر باشد
+        """
+        if not code.startswith("SZ-") or len(code) != 7:
+            return False
+        return code[3:].isdigit()
+
+    def generate_inventory_report(self, items: Dict[str, int]) -> str:
+        """
+        تولید گزارش موجودی انبار برای اقلام هنری.
+
+        :param items: دیکشنری شامل نام کالا و تعداد
+        :return: متن گزارش
+        """
+        report = f"--- گزارش موجودی {self.shop_name} ---\n"
+        for item, qty in items.items():
+            status = "موجود" if qty > 0 else "ناموجود"
+            report += f"{item}: {qty} عدد ({status})\n"
         return report
 
+    def calculate_shipping_weight(self, items_weight: List[float], packaging_weight: float = 0.2) -> float:
+        """
+        محاسبه وزن نهایی بسته پستی جهت ارسال سفارشات.
 
-def calculate_shipping_cost(weight_grams: float, destination: str) -> float:
-    """
-    محاسبه هزینه ارسال سفارشات بر اساس وزن و مقصد.
-    
-    :param weight_grams: وزن محصول به گرم
-    :param destination: شهر مقصد
-    :return: هزینه نهایی ارسال
-    """
-    base_rate = 50000
-    if destination.lower() == "tehran":
-        return base_rate
-    return base_rate + (weight_grams * 0.5)
+        :param items_weight: لیستی از وزن اقلام سفارش
+        :param packaging_weight: وزن بسته‌بندی (پیش‌فرض ۲۰۰ گرم)
+        :return: وزن کل به کیلوگرم
+        """
+        return sum(items_weight) + packaging_weight
 
 
+# مثال استفاده:
 if __name__ == "__main__":
-    # مثال استفاده از کتابخانه سوزن زرین
-    shop = ProductCatalog()
-    shop.add_product("سوزن‌دوزی بلوچی", 1500000, "صنایع دستی", 5)
-    shop.add_product("رومیزی ترمه", 850000, "منسوجات", 12)
+    manager = SozaneZarinManager()
     
-    print(shop.generate_report())
-    print(f"ارزش کل انبار: {shop.get_total_inventory_value():,} ریال")
+    # تست تخمین نخ
+    needed = manager.estimate_thread_needs(50.0, 3.5)
+    print(f"نخ مورد نیاز: {needed} متر")
+    
+    # تست اعتبار سنجی
+    print(f"اعتبار کد SZ-1234: {manager.validate_pattern_code('SZ-1234')}")
+    
+    # تست گزارش
+    inventory = {"سوزن شماره ۵": 10, "نخ ابریشم": 0}
+    print(manager.generate_inventory_report(inventory))
 ```
