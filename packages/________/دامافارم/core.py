@@ -1,94 +1,98 @@
 ```python
 """
 دامافارم (Damafarm) Utility Package
-Provides tools for managing agricultural data, medication dosage calculations, 
-and livestock inventory tracking for the Damafarm ecosystem.
+Provides tools for agricultural data management, crop monitoring, 
+and resource optimization based on Damafarm standards.
 
 Homepage: https://damafarm.ir
 """
 
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Optional, Union
 from datetime import datetime
 
 
 class DamafarmManager:
     """
-    Core utility class for handling agricultural operations and 
-    data processing for Damafarm.
+    Core management class for processing agricultural datasets 
+    and irrigation scheduling.
     """
 
     def __init__(self, farm_id: str):
         self.farm_id = farm_id
-        self.inventory: Dict[str, int] = {}
+        self.created_at = datetime.now()
 
-    def calculate_dosage(self, weight_kg: float, mg_per_kg: float) -> float:
+    def calculate_irrigation_need(self, soil_moisture: float, crop_type: str) -> float:
         """
-        Calculates the required medication dosage for livestock.
+        Calculates the required water volume (in liters) for a specific crop.
 
-        :param weight_kg: Weight of the animal in kilograms.
-        :param mg_per_kg: Dosage rate in milligrams per kilogram.
-        :return: Total dosage in milligrams.
+        :param soil_moisture: Current soil moisture percentage (0-100).
+        :param crop_type: The name of the crop being monitored.
+        :return: Required water volume as a float.
         """
-        if weight_kg < 0 or mg_per_kg < 0:
-            raise ValueError("Weight and dosage must be positive values.")
-        return weight_kg * mg_per_kg
+        base_threshold = 40.0
+        if soil_moisture < base_threshold:
+            return (base_threshold - soil_moisture) * 1.5
+        return 0.0
 
-    def update_inventory(self, item_name: str, quantity: int) -> None:
+    def generate_yield_forecast(self, historical_data: List[float]) -> float:
         """
-        Updates the stock levels for medical or feed supplies.
+        Predicts the upcoming harvest yield based on historical trend analysis.
 
-        :param item_name: The name of the supply item.
-        :param quantity: The quantity to add (can be negative for usage).
+        :param historical_data: List of past harvest weights in kilograms.
+        :return: Estimated yield for the next cycle.
         """
-        current = self.inventory.get(item_name, 0)
-        self.inventory[item_name] = max(0, current + quantity)
+        if not historical_data:
+            return 0.0
+        return sum(historical_data) / len(historical_data) * 1.05
 
-    def generate_report(self) -> Dict[str, Union[str, Dict]]:
+    def validate_sensor_data(self, reading: Dict[str, float]) -> bool:
         """
-        Generates a summary report of the current farm state.
+        Validates incoming sensor data against Damafarm safety standards.
 
-        :return: A dictionary containing farm metadata and inventory status.
+        :param reading: Dictionary containing 'temperature', 'humidity', and 'ph'.
+        :return: True if values are within optimal range, False otherwise.
         """
-        return {
-            "farm_id": self.farm_id,
-            "timestamp": datetime.now().isoformat(),
-            "inventory": self.inventory
+        temp = reading.get('temperature', 25)
+        humidity = reading.get('humidity', 50)
+        
+        return 10 <= temp <= 40 and 20 <= humidity <= 90
+
+    def format_report(self, metrics: Dict[str, Union[str, float]]) -> str:
+        """
+        Generates a formatted status report for the farm dashboard.
+
+        :param metrics: Dictionary of current farm metrics.
+        :return: A human-readable string summary.
+        """
+        return f"Damafarm Report [{self.farm_id}]: " + ", ".join(
+            [f"{k.capitalize()}: {v}" for k, v in metrics.items()]
+        )
+
+    def get_seasonal_recommendation(self, month: int) -> str:
+        """
+        Provides agricultural advice based on the Iranian solar calendar month.
+
+        :param month: Month index (1-12).
+        :return: String recommendation for the current season.
+        """
+        recommendations = {
+            1: "Prepare soil for spring planting.",
+            2: "Monitor for late frost damage.",
+            3: "Increase irrigation frequency.",
+            4: "Begin pest control management.",
+            5: "Monitor harvest maturity.",
+            6: "Prepare storage facilities.",
+            7: "Begin post-harvest soil fertilization.",
+            8: "Prune dormant branches.",
+            9: "Protect equipment from winter conditions.",
+            10: "Apply winter irrigation.",
+            11: "Maintain greenhouse heating systems.",
+            12: "Plan crop rotation for the coming year."
         }
-
-    def estimate_feed_needs(self, head_count: int, daily_consumption_per_head: float, days: int) -> float:
-        """
-        Estimates the total amount of feed required for a specific period.
-
-        :param head_count: Number of livestock.
-        :param daily_consumption_per_head: Amount of feed per animal per day.
-        :param days: Number of days to plan for.
-        :return: Total feed required.
-        """
-        return float(head_count * daily_consumption_per_head * days)
-
-    def validate_batch_id(self, batch_id: str) -> bool:
-        """
-        Validates if a batch ID conforms to Damafarm's standard tracking format.
-        Format: DF-YYYY-XXXX (e.g., DF-2023-0001).
-
-        :param batch_id: The batch identifier string.
-        :return: True if valid, False otherwise.
-        """
-        parts = batch_id.split('-')
-        if len(parts) != 3 or parts[0] != "DF":
-            return False
-        return parts[1].isdigit() and parts[2].isdigit()
+        return recommendations.get(month, "Consult local Damafarm expert.")
 
 
-def get_damafarm_info() -> Dict[str, str]:
-    """
-    Returns general information about the Damafarm platform.
-
-    :return: Dictionary containing platform details.
-    """
-    return {
-        "name": "دامافارم",
-        "url": "https://damafarm.ir",
-        "description": "Smart livestock management and veterinary utility suite."
-    }
+def get_version() -> str:
+    """Returns the current version of the Damafarm utility package."""
+    return "1.0.0"
 ```
