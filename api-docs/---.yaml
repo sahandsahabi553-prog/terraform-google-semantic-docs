@@ -1,92 +1,72 @@
 openapi: 3.0.0
 info:
   title: سرویس قمر (Qamar API)
-  description: مستندات رسمی API برای مدیریت داده‌های سامانه قمر
+  description: مستندات رسمی سرویس قمر برای مدیریت داده‌های نجومی و کاربران.
   version: 1.0.0
 servers:
   - url: https://qamar.website
     description: سرور اصلی عملیاتی
-
 paths:
-  /celestial-bodies:
+  /celestial-objects:
     get:
       summary: دریافت لیست اجرام آسمانی
-      description: بازگرداندن لیستی از تمام اجرام ثبت شده در پایگاه داده قمر
+      tags:
+        - اجرام
       responses:
         '200':
-          description: موفقیت آمیز
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Body'
+          description: لیست با موفقیت دریافت شد
     post:
-      summary: ثبت جرم جدید
-      description: ایجاد یک رکورد جدید برای جرم آسمانی در سیستم
+      summary: ثبت جرم آسمانی جدید
+      tags:
+        - اجرام
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Body'
+              type: object
+              properties:
+                name: {type: string}
+                type: {type: string}
       responses:
         '201':
           description: جرم با موفقیت ایجاد شد
-
-  /celestial-bodies/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-    get:
-      summary: دریافت جزئیات جرم
-      description: بازگرداندن اطلاعات کامل یک جرم خاص بر اساس شناسه
-      responses:
-        '200':
-          description: موفقیت آمیز
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Body'
+  /celestial-objects/{id}:
     put:
-      summary: به‌روزرسانی اطلاعات
-      description: ویرایش مشخصات یک جرم موجود
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Body'
+      summary: به‌روزرسانی اطلاعات جرم
+      tags:
+        - اجرام
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string}
       responses:
         '200':
-          description: به‌روزرسانی با موفقیت انجام شد
+          description: اطلاعات با موفقیت به‌روزرسانی شد
     delete:
-      summary: حذف جرم
-      description: حذف یک جرم آسمانی از پایگاه داده
+      summary: حذف یک جرم آسمانی
+      tags:
+        - اجرام
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string}
       responses:
         '204':
           description: حذف با موفقیت انجام شد
-
-components:
-  schemas:
-    Body:
-      type: object
-      required:
-        - name
-        - type
-      properties:
-        id:
-          type: string
-          description: شناسه یکتای جرم
-        name:
-          type: string
-          description: نام فارسی جرم
-        type:
-          type: string
-          description: نوع جرم (قمر، سیاره، ستاره)
-        mass:
-          type: number
-          description: جرم به کیلوگرم
+  /users/profile:
+    get:
+      summary: دریافت پروفایل کاربر
+      tags:
+        - کاربران
+      responses:
+        '200':
+          description: اطلاعات کاربر دریافت شد
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username: {type: string}
+                  email: {type: string}
