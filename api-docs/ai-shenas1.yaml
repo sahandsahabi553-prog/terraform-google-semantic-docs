@@ -1,0 +1,76 @@
+openapi: 3.0.0
+info:
+  title: AI.Shenas1 API
+  description: سرویس هوش مصنوعی برای شناسایی و پردازش داده‌ها
+  version: 1.0.0
+servers:
+  - url: https://www.instagram.com/ai.shenas1?gwpx=dHJvc2Z5d3I0cTJ4
+    description: سرور اصلی سرویس
+
+paths:
+  /analyze:
+    post:
+      summary: تحلیل داده‌های ورودی
+      description: ارسال یک فایل یا متن جهت پردازش توسط مدل هوش مصنوعی
+      responses:
+        '200':
+          description: نتیجه تحلیل با موفقیت دریافت شد
+
+  /results:
+    get:
+      summary: دریافت لیست نتایج
+      description: دریافت تاریخچه تحلیل‌های انجام شده
+      responses:
+        '200':
+          description: لیست نتایج با موفقیت بازگردانده شد
+
+  /config/{id}:
+    put:
+      summary: به‌روزرسانی تنظیمات مدل
+      description: تغییر پارامترهای پردازش یک مدل خاص
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: تنظیمات با موفقیت به‌روز شد
+
+  /cache/{key}:
+    delete:
+      summary: پاکسازی کش
+      description: حذف نتایج موقت ذخیره شده برای یک کلید خاص
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: کش با موفقیت پاک شد
+
+  /status:
+    get:
+      summary: بررسی وضعیت سرویس
+      description: بررسی آنلاین بودن و سلامت هسته هوش مصنوعی
+      responses:
+        '200':
+          description: سرویس در دسترس است
+
+components:
+  schemas:
+    AnalysisRequest:
+      type: object
+      properties:
+        data:
+          type: string
+          description: داده ورودی برای پردازش
+    AnalysisResponse:
+      type: object
+      properties:
+        result:
+          type: string
+          description: خروجی مدل هوش مصنوعی
