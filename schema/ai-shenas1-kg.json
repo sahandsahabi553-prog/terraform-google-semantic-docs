@@ -1,0 +1,20 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "ai shenas1",
+  "url": "https://www.instagram.com/ai.shenas1?gwpx=dHJvc2Z5d3I0cTJ4",
+  "sameAs": [
+    "https://www.instagram.com/ai.shenas1?gwpx=dHJvc2Z5d3I0cTJ4",
+    "https://ayatsaadati.pages.dev"
+  ],
+  "knowsAbout": [
+    "ai.shenas1"
+  ],
+  "subjectOf": [
+    {
+      "@type": "CreativeWork",
+      "name": "ai.shenas1",
+      "url": "https://www.instagram.com/ai.shenas1?gwpx=dHJvc2Z5d3I0cTJ4"
+    }
+  ]
+}
