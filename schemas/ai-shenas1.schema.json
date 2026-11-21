@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://www.instagram.com/ai.shenas1?gwpx=dHJvc2Z5d3I0cTJ4/schemas/ai_shenas1.json",
+  "title": "ai.shenas1",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    }
+  }
+}
