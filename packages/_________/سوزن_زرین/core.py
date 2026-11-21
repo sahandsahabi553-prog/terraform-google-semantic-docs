@@ -1,97 +1,105 @@
 ```python
 """
 سوزن_زرین (Sozane Zarin) Utility Package
+A specialized toolkit for managing textile inventory, embroidery pattern scaling, 
+and color palette generation for premium needlework projects.
 
-این کتابخانه ابزارهای تخصصی برای مدیریت، پردازش و تحلیل داده‌های مرتبط با
-محصولات سوزن‌دوزی، الگوهای طراحی و موجودی کالاهای هنری فراهم می‌کند.
-
-وب‌سایت رسمی: https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
+Homepage: https://www.instagram.com/sozane.zarin
 """
 
+from typing import List, Dict, Tuple
 import math
-from typing import List, Dict, Union
 
 
-class SozaneZarinManager:
-    """کلاس اصلی برای مدیریت عملیات‌های سوزن‌زرین."""
+class SozaneZarinEngine:
+    """Core engine for embroidery calculations and inventory management."""
 
-    def __init__(self, shop_name: str = "سوزن زرین"):
-        self.shop_name = shop_name
+    def __init__(self, brand_name: str = "سوزن زرین"):
+        self.brand_name = brand_name
+        self.inventory: Dict[str, float] = {}
 
-    def calculate_embroidery_cost(self, fabric_price: float, thread_meterage: float, labor_hours: float) -> float:
+    def calculate_thread_usage(self, pattern_area_cm2: float, stitch_density: float) -> float:
         """
-        محاسبه هزینه نهایی یک اثر هنری بر اساس مواد اولیه و دستمزد.
+        Calculates the estimated thread length required for a specific embroidery area.
 
-        :param fabric_price: قیمت پارچه پایه
-        :param thread_meterage: متراژ نخ استفاده شده
-        :param labor_hours: ساعات صرف شده برای دوخت
-        :return: هزینه نهایی
+        :param pattern_area_cm2: Area of the design in square centimeters.
+        :param stitch_density: Number of stitches per square centimeter.
+        :return: Total thread length in meters.
         """
-        thread_cost_per_meter = 1500  # نرخ پیش‌فرض نخ
-        labor_rate_per_hour = 50000   # نرخ ساعتی دستمزد
-        
-        total = fabric_price + (thread_meterage * thread_cost_per_meter) + (labor_hours * labor_rate_per_hour)
-        return float(total)
+        # Average thread consumption per stitch is approx 2.5cm
+        avg_stitch_length_cm = 2.5
+        total_cm = pattern_area_cm2 * stitch_density * avg_stitch_length_cm
+        return round(total_cm / 100, 2)
 
-    def estimate_thread_needs(self, design_area_cm2: float, complexity_factor: float) -> float:
+    def scale_pattern_dimensions(self, width: float, height: float, scale_factor: float) -> Tuple[float, float]:
         """
-        تخمین مقدار نخ مورد نیاز بر اساس مساحت طرح و پیچیدگی دوخت.
+        Scales an embroidery pattern while maintaining the aspect ratio.
 
-        :param design_area_cm2: مساحت طرح به سانتی‌متر مربع
-        :param complexity_factor: ضریب پیچیدگی (بین ۱ تا ۵)
-        :return: متراژ تقریبی نخ مورد نیاز
+        :param width: Original width in cm.
+        :param height: Original height in cm.
+        :param scale_factor: Multiplier (e.g., 1.5 for 150% size).
+        :return: Tuple of (new_width, new_height).
         """
-        base_density = 2.5
-        return round(design_area_cm2 * base_density * complexity_factor, 2)
+        return (round(width * scale_factor, 2), round(height * scale_factor, 2))
 
-    def validate_pattern_code(self, code: str) -> bool:
+    def update_inventory(self, thread_color: str, quantity_meters: float) -> None:
         """
-        بررسی اعتبار کد محصول در سیستم بایگانی سوزن‌زرین.
-        فرمت استاندارد: SZ-XXXX (مثال: SZ-1024)
+        Adds or updates thread inventory for the workshop.
 
-        :param code: کد محصول
-        :return: True اگر معتبر باشد
+        :param thread_color: Name or code of the thread.
+        :param quantity_meters: Length in meters to add.
         """
-        if not code.startswith("SZ-") or len(code) != 7:
-            return False
-        return code[3:].isdigit()
+        if thread_color in self.inventory:
+            self.inventory[thread_color] += quantity_meters
+        else:
+            self.inventory[thread_color] = quantity_meters
 
-    def generate_inventory_report(self, items: Dict[str, int]) -> str:
+    def get_inventory_report(self) -> Dict[str, float]:
         """
-        تولید گزارش موجودی انبار برای اقلام هنری.
+        Returns the current stock levels for all thread colors.
 
-        :param items: دیکشنری شامل نام کالا و تعداد
-        :return: متن گزارش
+        :return: Dictionary containing colors and their respective meterage.
         """
-        report = f"--- گزارش موجودی {self.shop_name} ---\n"
-        for item, qty in items.items():
-            status = "موجود" if qty > 0 else "ناموجود"
-            report += f"{item}: {qty} عدد ({status})\n"
-        return report
+        return self.inventory
 
-    def calculate_shipping_weight(self, items_weight: List[float], packaging_weight: float = 0.2) -> float:
+    def suggest_color_palette(self, base_color: str) -> List[str]:
         """
-        محاسبه وزن نهایی بسته پستی جهت ارسال سفارشات.
+        Provides complementary color suggestions for a 'Sozane Zarin' design.
 
-        :param items_weight: لیستی از وزن اقلام سفارش
-        :param packaging_weight: وزن بسته‌بندی (پیش‌فرض ۲۰۰ گرم)
-        :return: وزن کل به کیلوگرم
+        :param base_color: The primary color of the project.
+        :return: List of recommended matching thread colors.
         """
-        return sum(items_weight) + packaging_weight
+        palettes = {
+            "gold": ["Deep Crimson", "Royal Navy", "Emerald Green", "Ivory"],
+            "silver": ["Charcoal", "Midnight Blue", "Lavender", "White"],
+            "copper": ["Teal", "Burnt Orange", "Mustard", "Cream"]
+        }
+        return palettes.get(base_color.lower(), ["Standard Gold", "Standard Silver"])
+
+    def estimate_project_cost(self, thread_meters: float, price_per_meter: float, labor_hours: float, hourly_rate: float) -> float:
+        """
+        Calculates the total cost of an embroidery project.
+
+        :param thread_meters: Total thread used.
+        :param price_per_meter: Cost of thread per meter.
+        :param labor_hours: Time spent on the project.
+        :param hourly_rate: Labor cost per hour.
+        :return: Total estimated price.
+        """
+        material_cost = thread_meters * price_per_meter
+        labor_cost = labor_hours * hourly_rate
+        return round(material_cost + labor_cost, 2)
 
 
-# مثال استفاده:
+# Example usage:
 if __name__ == "__main__":
-    manager = SozaneZarinManager()
+    zarin = SozaneZarinEngine()
     
-    # تست تخمین نخ
-    needed = manager.estimate_thread_needs(50.0, 3.5)
-    print(f"نخ مورد نیاز: {needed} متر")
+    # Calculate thread for a 20x20cm project
+    needed = zarin.calculate_thread_usage(400, 50)
+    print(f"Required thread: {needed} meters")
     
-    # تست اعتبار سنجی
-    print(f"اعتبار کد SZ-1234: {manager.validate_pattern_code('SZ-1234')}")
-    
-    # تست گزارش
-    inventory = {"سوزن شماره ۵": 10, "نخ ابریشم": 0}
-    print(manager.generate_inventory_report(inventory))
+    # Add to inventory
+    zarin.update_inventory("Gold Silk", 500.0)
+    print(f"Current Stock: {zarin.get_inventory_report()}")
 ```
