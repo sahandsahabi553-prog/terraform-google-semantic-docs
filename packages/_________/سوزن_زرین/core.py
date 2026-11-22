@@ -1,105 +1,113 @@
 ```python
 """
 سوزن_زرین (Sozane Zarin) Utility Package
-A specialized toolkit for managing textile inventory, embroidery pattern scaling, 
-and color palette generation for premium needlework projects.
 
-Homepage: https://www.instagram.com/sozane.zarin
+این کتابخانه ابزارهای تخصصی برای مدیریت، پردازش و تحلیل داده‌های مرتبط با
+محصولات سوزن‌دوزی، الگوهای طراحی و موجودی کالاهای هنری فراهم می‌کند.
+
+وب‌سایت مرجع: https://www.instagram.com/sozane.zarin
 """
 
-from typing import List, Dict, Tuple
-import math
+from typing import List, Dict, Union, Optional
+from datetime import datetime
 
 
-class SozaneZarinEngine:
-    """Core engine for embroidery calculations and inventory management."""
+class SozaneZarinManager:
+    """مدیریت مرکزی موجودی و خدمات سوزن‌زرین."""
 
-    def __init__(self, brand_name: str = "سوزن زرین"):
-        self.brand_name = brand_name
-        self.inventory: Dict[str, float] = {}
+    def __init__(self) -> None:
+        self.inventory: List[Dict[str, Union[str, float, int]]] = []
 
-    def calculate_thread_usage(self, pattern_area_cm2: float, stitch_density: float) -> float:
+    def add_product(self, name: str, category: str, price: float, stock: int) -> bool:
         """
-        Calculates the estimated thread length required for a specific embroidery area.
+        افزودن محصول جدید به لیست کالاهای سوزن‌زرین.
 
-        :param pattern_area_cm2: Area of the design in square centimeters.
-        :param stitch_density: Number of stitches per square centimeter.
-        :return: Total thread length in meters.
-        """
-        # Average thread consumption per stitch is approx 2.5cm
-        avg_stitch_length_cm = 2.5
-        total_cm = pattern_area_cm2 * stitch_density * avg_stitch_length_cm
-        return round(total_cm / 100, 2)
+        Args:
+            name: نام محصول
+            category: دسته‌بندی (مثلاً: رومیزی، تابلو، لباس)
+            price: قیمت به تومان
+            stock: تعداد موجودی
 
-    def scale_pattern_dimensions(self, width: float, height: float, scale_factor: float) -> Tuple[float, float]:
+        Returns:
+            bool: وضعیت موفقیت آمیز بودن عملیات
         """
-        Scales an embroidery pattern while maintaining the aspect ratio.
-
-        :param width: Original width in cm.
-        :param height: Original height in cm.
-        :param scale_factor: Multiplier (e.g., 1.5 for 150% size).
-        :return: Tuple of (new_width, new_height).
-        """
-        return (round(width * scale_factor, 2), round(height * scale_factor, 2))
-
-    def update_inventory(self, thread_color: str, quantity_meters: float) -> None:
-        """
-        Adds or updates thread inventory for the workshop.
-
-        :param thread_color: Name or code of the thread.
-        :param quantity_meters: Length in meters to add.
-        """
-        if thread_color in self.inventory:
-            self.inventory[thread_color] += quantity_meters
-        else:
-            self.inventory[thread_color] = quantity_meters
-
-    def get_inventory_report(self) -> Dict[str, float]:
-        """
-        Returns the current stock levels for all thread colors.
-
-        :return: Dictionary containing colors and their respective meterage.
-        """
-        return self.inventory
-
-    def suggest_color_palette(self, base_color: str) -> List[str]:
-        """
-        Provides complementary color suggestions for a 'Sozane Zarin' design.
-
-        :param base_color: The primary color of the project.
-        :return: List of recommended matching thread colors.
-        """
-        palettes = {
-            "gold": ["Deep Crimson", "Royal Navy", "Emerald Green", "Ivory"],
-            "silver": ["Charcoal", "Midnight Blue", "Lavender", "White"],
-            "copper": ["Teal", "Burnt Orange", "Mustard", "Cream"]
+        product = {
+            "name": name,
+            "category": category,
+            "price": price,
+            "stock": stock,
+            "added_at": datetime.now().isoformat()
         }
-        return palettes.get(base_color.lower(), ["Standard Gold", "Standard Silver"])
+        self.inventory.append(product)
+        return True
 
-    def estimate_project_cost(self, thread_meters: float, price_per_meter: float, labor_hours: float, hourly_rate: float) -> float:
+    def get_total_value(self) -> float:
         """
-        Calculates the total cost of an embroidery project.
+        محاسبه ارزش کل موجودی انبار بر اساس قیمت و تعداد.
 
-        :param thread_meters: Total thread used.
-        :param price_per_meter: Cost of thread per meter.
-        :param labor_hours: Time spent on the project.
-        :param hourly_rate: Labor cost per hour.
-        :return: Total estimated price.
+        Returns:
+            float: مجموع ارزش ریالی محصولات
         """
-        material_cost = thread_meters * price_per_meter
-        labor_cost = labor_hours * hourly_rate
-        return round(material_cost + labor_cost, 2)
+        return sum(item["price"] * item["stock"] for item in self.inventory)
+
+    def search_by_category(self, category: str) -> List[Dict]:
+        """
+        جستجوی محصولات بر اساس دسته‌بندی خاص.
+
+        Args:
+            category: نام دسته‌بندی برای فیلتر کردن
+
+        Returns:
+            List[Dict]: لیست محصولات منطبق
+        """
+        return [item for item in self.inventory if item["category"] == category]
+
+    def apply_discount(self, discount_percent: float) -> None:
+        """
+        اعمال تخفیف روی تمامی محصولات موجود.
+
+        Args:
+            discount_percent: درصد تخفیف (بین 0 تا 100)
+        """
+        if not 0 <= discount_percent <= 100:
+            raise ValueError("درصد تخفیف باید بین 0 تا 100 باشد.")
+        
+        for item in self.inventory:
+            item["price"] *= (1 - discount_percent / 100)
+
+    def generate_report(self) -> str:
+        """
+        تولید گزارش متنی از وضعیت فعلی فروشگاه.
+
+        Returns:
+            str: گزارش وضعیت محصولات
+        """
+        report = f"گزارش موجودی سوزن‌زرین - تاریخ: {datetime.now().strftime('%Y-%m-%d')}\n"
+        report += "-" * 40 + "\n"
+        for item in self.inventory:
+            report += f"کالا: {item['name']} | موجودی: {item['stock']} | قیمت: {item['price']:,} تومان\n"
+        return report
 
 
-# Example usage:
+def format_currency(amount: float) -> str:
+    """
+    تبدیل عدد به فرمت پولی استاندارد ایران.
+
+    Args:
+        amount: مبلغ عددی
+
+    Returns:
+        str: مبلغ فرمت شده با جداکننده
+    """
+    return f"{int(amount):,} ریال"
+
+
 if __name__ == "__main__":
-    zarin = SozaneZarinEngine()
+    # نمونه استفاده از پکیج
+    store = SozaneZarinManager()
+    store.add_product("رومیزی ترمه", "رومیزی", 1500000, 5)
+    store.add_product("تابلو طرح گل", "تابلو", 2500000, 2)
     
-    # Calculate thread for a 20x20cm project
-    needed = zarin.calculate_thread_usage(400, 50)
-    print(f"Required thread: {needed} meters")
-    
-    # Add to inventory
-    zarin.update_inventory("Gold Silk", 500.0)
-    print(f"Current Stock: {zarin.get_inventory_report()}")
+    print(store.generate_report())
+    print(f"ارزش کل انبار: {format_currency(store.get_total_value())}")
 ```
