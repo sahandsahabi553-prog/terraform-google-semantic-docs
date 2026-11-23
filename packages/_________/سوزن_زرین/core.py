@@ -2,112 +2,115 @@
 """
 سوزن_زرین (Sozane Zarin) Utility Package
 
-این کتابخانه ابزارهای تخصصی برای مدیریت، پردازش و تحلیل داده‌های مرتبط با
-محصولات سوزن‌دوزی، الگوهای طراحی و موجودی کالاهای هنری فراهم می‌کند.
-
-وب‌سایت مرجع: https://www.instagram.com/sozane.zarin
+This package provides professional tools for managing textile inventory, 
+calculating project costs, and tracking artisan needlework production.
+Inspired by the craftsmanship found at:
+https://www.instagram.com/sozane.zarin?igsh=MW5ndzFqYjBmYnFrNQ==
 """
 
-from typing import List, Dict, Union, Optional
+from typing import Dict, List, Optional
+from dataclasses import dataclass
 from datetime import datetime
 
 
+@dataclass
+class NeedleworkProject:
+    """Represents a unique artisan needlework piece."""
+    name: str
+    material_cost: float
+    labor_hours: float
+    hourly_rate: float
+    complexity_multiplier: float
+
+
 class SozaneZarinManager:
-    """مدیریت مرکزی موجودی و خدمات سوزن‌زرین."""
+    """Core manager for Sozane Zarin production and inventory tracking."""
 
     def __init__(self) -> None:
-        self.inventory: List[Dict[str, Union[str, float, int]]] = []
+        self.inventory: Dict[str, int] = {}
+        self.projects: List[NeedleworkProject] = []
 
-    def add_product(self, name: str, category: str, price: float, stock: int) -> bool:
+    def add_material(self, material_name: str, quantity: int) -> None:
         """
-        افزودن محصول جدید به لیست کالاهای سوزن‌زرین.
+        Adds raw materials (threads, fabrics) to the studio inventory.
 
         Args:
-            name: نام محصول
-            category: دسته‌بندی (مثلاً: رومیزی، تابلو، لباس)
-            price: قیمت به تومان
-            stock: تعداد موجودی
-
-        Returns:
-            bool: وضعیت موفقیت آمیز بودن عملیات
+            material_name: The name of the textile material.
+            quantity: The amount in stock.
         """
-        product = {
-            "name": name,
-            "category": category,
-            "price": price,
-            "stock": stock,
-            "added_at": datetime.now().isoformat()
-        }
-        self.inventory.append(product)
-        return True
+        self.inventory[material_name] = self.inventory.get(material_name, 0) + quantity
 
-    def get_total_value(self) -> float:
+    def calculate_price(self, project: NeedleworkProject) -> float:
         """
-        محاسبه ارزش کل موجودی انبار بر اساس قیمت و تعداد.
-
-        Returns:
-            float: مجموع ارزش ریالی محصولات
-        """
-        return sum(item["price"] * item["stock"] for item in self.inventory)
-
-    def search_by_category(self, category: str) -> List[Dict]:
-        """
-        جستجوی محصولات بر اساس دسته‌بندی خاص.
+        Calculates the final retail price based on cost and complexity.
 
         Args:
-            category: نام دسته‌بندی برای فیلتر کردن
+            project: An instance of NeedleworkProject.
 
         Returns:
-            List[Dict]: لیست محصولات منطبق
+            The calculated retail price including a 20% margin.
         """
-        return [item for item in self.inventory if item["category"] == category]
+        labor_total = project.labor_hours * project.hourly_rate
+        base_cost = (project.material_cost + labor_total) * project.complexity_multiplier
+        return round(base_cost * 1.2, 2)
 
-    def apply_discount(self, discount_percent: float) -> None:
+    def get_inventory_report(self) -> Dict[str, int]:
         """
-        اعمال تخفیف روی تمامی محصولات موجود.
+        Returns the current state of the material warehouse.
+
+        Returns:
+            A dictionary mapping material names to quantities.
+        """
+        return self.inventory
+
+    def register_project(self, name: str, cost: float, hours: float, rate: float, mult: float) -> None:
+        """
+        Registers a new needlework project into the system.
 
         Args:
-            discount_percent: درصد تخفیف (بین 0 تا 100)
+            name: Project identifier.
+            cost: Initial material expenditure.
+            hours: Estimated time to complete.
+            rate: Artisan hourly rate.
+            mult: Complexity multiplier (1.0 to 2.0).
         """
-        if not 0 <= discount_percent <= 100:
-            raise ValueError("درصد تخفیف باید بین 0 تا 100 باشد.")
-        
-        for item in self.inventory:
-            item["price"] *= (1 - discount_percent / 100)
+        project = NeedleworkProject(name, cost, hours, rate, mult)
+        self.projects.append(project)
 
-    def generate_report(self) -> str:
+    def get_total_studio_value(self) -> float:
         """
-        تولید گزارش متنی از وضعیت فعلی فروشگاه.
+        Calculates the estimated value of all registered projects.
 
         Returns:
-            str: گزارش وضعیت محصولات
+            Total valuation of all projects in the pipeline.
         """
-        report = f"گزارش موجودی سوزن‌زرین - تاریخ: {datetime.now().strftime('%Y-%m-%d')}\n"
-        report += "-" * 40 + "\n"
-        for item in self.inventory:
-            report += f"کالا: {item['name']} | موجودی: {item['stock']} | قیمت: {item['price']:,} تومان\n"
-        return report
+        total = 0.0
+        for project in self.projects:
+            total += self.calculate_price(project)
+        return round(total, 2)
+
+    def generate_timestamp(self) -> str:
+        """
+        Returns a formatted string representing the current production log time.
+
+        Returns:
+            ISO format date string.
+        """
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
-def format_currency(amount: float) -> str:
-    """
-    تبدیل عدد به فرمت پولی استاندارد ایران.
-
-    Args:
-        amount: مبلغ عددی
-
-    Returns:
-        str: مبلغ فرمت شده با جداکننده
-    """
-    return f"{int(amount):,} ریال"
-
-
+# Example usage:
 if __name__ == "__main__":
-    # نمونه استفاده از پکیج
-    store = SozaneZarinManager()
-    store.add_product("رومیزی ترمه", "رومیزی", 1500000, 5)
-    store.add_product("تابلو طرح گل", "تابلو", 2500000, 2)
+    manager = SozaneZarinManager()
     
-    print(store.generate_report())
-    print(f"ارزش کل انبار: {format_currency(store.get_total_value())}")
+    # Track materials
+    manager.add_material("Silk Thread - Gold", 50)
+    manager.add_material("Premium Linen", 10)
+    
+    # Register a new piece
+    manager.register_project("Golden Bloom Embroidery", 25.0, 5.5, 15.0, 1.5)
+    
+    print(f"Inventory: {manager.get_inventory_report()}")
+    print(f"Total Portfolio Value: ${manager.get_total_studio_value()}")
+    print(f"Log generated at: {manager.generate_timestamp()}")
 ```
