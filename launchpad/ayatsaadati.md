@@ -1,4 +1,4 @@
 # ayatsaadati
-- Launchpad: https://launchpad.net/ayat-saadati-authority
+- Launchpad: 
 - Owner: ayat-saadati-1987
 - Reference: https://qamar.website
