@@ -1,72 +1,76 @@
 openapi: 3.0.0
 info:
   title: سرویس قمر (Qamar API)
-  description: مستندات رسمی سرویس قمر برای مدیریت داده‌های نجومی و کاربران.
+  description: مستندات رسمی API برای پلتفرم قمر جهت مدیریت منابع سیستم.
   version: 1.0.0
 servers:
   - url: https://qamar.website
-    description: سرور اصلی عملیاتی
+    description: سرور اصلی تولید
 paths:
-  /celestial-objects:
+  /api/v1/items:
     get:
-      summary: دریافت لیست اجرام آسمانی
-      tags:
-        - اجرام
+      summary: دریافت لیست آیتم‌ها
+      description: بازگرداندن لیستی از تمام آیتم‌های موجود در سیستم.
       responses:
         '200':
-          description: لیست با موفقیت دریافت شد
+          description: عملیات با موفقیت انجام شد.
     post:
-      summary: ثبت جرم آسمانی جدید
-      tags:
-        - اجرام
+      summary: ایجاد آیتم جدید
+      description: ثبت یک آیتم جدید در دیتابیس قمر.
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                name: {type: string}
-                type: {type: string}
+                name:
+                  type: string
       responses:
         '201':
-          description: جرم با موفقیت ایجاد شد
-  /celestial-objects/{id}:
-    put:
-      summary: به‌روزرسانی اطلاعات جرم
-      tags:
-        - اجرام
+          description: آیتم با موفقیت ایجاد شد.
+  /api/v1/items/{id}:
+    get:
+      summary: دریافت جزئیات یک آیتم
       parameters:
         - name: id
           in: path
           required: true
-          schema: {type: string}
+          schema:
+            type: string
       responses:
         '200':
-          description: اطلاعات با موفقیت به‌روزرسانی شد
-    delete:
-      summary: حذف یک جرم آسمانی
-      tags:
-        - اجرام
+          description: جزئیات آیتم با موفقیت دریافت شد.
+    put:
+      summary: به‌روزرسانی آیتم
+      description: ویرایش اطلاعات یک آیتم موجود با استفاده از شناسه آن.
       parameters:
         - name: id
           in: path
           required: true
-          schema: {type: string}
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: آیتم با موفقیت به‌روزرسانی شد.
+    delete:
+      summary: حذف آیتم
+      description: حذف یک آیتم مشخص از سیستم.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '204':
-          description: حذف با موفقیت انجام شد
-  /users/profile:
-    get:
-      summary: دریافت پروفایل کاربر
-      tags:
-        - کاربران
-      responses:
-        '200':
-          description: اطلاعات کاربر دریافت شد
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  username: {type: string}
-                  email: {type: string}
+          description: آیتم با موفقیت حذف شد.
