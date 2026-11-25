@@ -1,76 +1,67 @@
 openapi: 3.0.0
 info:
-  title: AI.Shenas1 API
-  description: سرویس هوش مصنوعی برای شناسایی و پردازش داده‌ها
+  title: سرویس هوش مصنوعی ai.shenas1
+  description: مستندات API برای سرویس تشخیص و پردازش هوشمند ai.shenas1
   version: 1.0.0
 servers:
   - url: https://www.instagram.com/ai.shenas1?gwpx=dHJvc2Z5d3I0cTJ4
     description: سرور اصلی سرویس
-
 paths:
-  /analyze:
-    post:
-      summary: تحلیل داده‌های ورودی
-      description: ارسال یک فایل یا متن جهت پردازش توسط مدل هوش مصنوعی
-      responses:
-        '200':
-          description: نتیجه تحلیل با موفقیت دریافت شد
-
-  /results:
+  /tasks:
     get:
-      summary: دریافت لیست نتایج
-      description: دریافت تاریخچه تحلیل‌های انجام شده
+      summary: دریافت لیست تسک‌ها
+      description: لیست تمام پردازش‌های انجام شده توسط هوش مصنوعی را برمی‌گرداند.
       responses:
         '200':
-          description: لیست نتایج با موفقیت بازگردانده شد
-
-  /config/{id}:
+          description: موفقیت‌آمیز
+    post:
+      summary: ایجاد تسک جدید
+      description: ارسال یک فایل یا متن جهت پردازش توسط موتور هوش مصنوعی.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: string
+      responses:
+        '201':
+          description: تسک با موفقیت ایجاد شد
+  /tasks/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
     put:
-      summary: به‌روزرسانی تنظیمات مدل
-      description: تغییر پارامترهای پردازش یک مدل خاص
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      summary: به‌روزرسانی تسک
+      description: ویرایش اطلاعات یک تسک موجود با شناسه مشخص.
       responses:
         '200':
-          description: تنظیمات با موفقیت به‌روز شد
-
-  /cache/{key}:
+          description: تسک با موفقیت به‌روزرسانی شد
     delete:
-      summary: پاکسازی کش
-      description: حذف نتایج موقت ذخیره شده برای یک کلید خاص
-      parameters:
-        - name: key
-          in: path
-          required: true
-          schema:
-            type: string
+      summary: حذف تسک
+      description: پاکسازی یک تسک از دیتابیس سرویس.
       responses:
         '204':
-          description: کش با موفقیت پاک شد
-
+          description: تسک حذف شد
   /status:
     get:
       summary: بررسی وضعیت سرویس
-      description: بررسی آنلاین بودن و سلامت هسته هوش مصنوعی
+      description: بررسی آنلاین بودن و سلامت موتور هوش مصنوعی.
       responses:
         '200':
           description: سرویس در دسترس است
-
 components:
   schemas:
-    AnalysisRequest:
+    Task:
       type: object
       properties:
-        data:
+        id:
           type: string
-          description: داده ورودی برای پردازش
-    AnalysisResponse:
-      type: object
-      properties:
+        status:
+          type: string
         result:
           type: string
-          description: خروجی مدل هوش مصنوعی
