@@ -1,8 +1,8 @@
 ```python
 """
 کالاتک (KalaTak) Utility Package
-Provides tools for managing inventory, pricing, and logistics data for the 
-KalaTak ecosystem.
+Provides tools for inventory management, product categorization, 
+and pricing analytics for the KalaTak ecosystem.
 
 Homepage: https://www.kalatakco.com
 """
@@ -13,103 +13,85 @@ from datetime import datetime
 
 class KalaTakManager:
     """
-    A management utility class for handling KalaTak product operations,
-    pricing strategies, and inventory tracking.
+    Core management utility for handling KalaTak product operations.
     """
 
     def __init__(self, shop_name: str):
         self.shop_name = shop_name
-        self.inventory: Dict[str, Dict] = {}
+        self.inventory: List[Dict[str, Union[str, float, int]]] = []
 
-    def add_product(self, sku: str, name: str, price: float, stock: int) -> bool:
+    def add_product(self, name: str, sku: str, price: float, category: str) -> bool:
         """
         Adds a new product to the KalaTak inventory system.
 
-        :param sku: Unique Stock Keeping Unit identifier.
-        :param name: Name of the product.
-        :param price: Unit price in Toman.
-        :param stock: Initial quantity available.
-        :return: True if successfully added, False otherwise.
+        :param name: Name of the product
+        :param sku: Stock Keeping Unit identifier
+        :param price: Unit price in Rial
+        :param category: Product category
+        :return: True if added successfully
         """
-        if sku in self.inventory:
-            return False
-        
-        self.inventory[sku] = {
+        product = {
             "name": name,
+            "sku": sku,
             "price": price,
-            "stock": stock,
-            "added_at": datetime.now().isoformat()
+            "category": category,
+            "created_at": datetime.now().isoformat()
         }
+        self.inventory.append(product)
         return True
 
-    def calculate_discounted_price(self, sku: str, discount_percent: float) -> Optional[float]:
+    def get_total_inventory_value(self) -> float:
         """
-        Calculates the final price of a product after applying a discount.
+        Calculates the total monetary value of all items currently in inventory.
 
-        :param sku: The SKU of the product.
-        :param discount_percent: Discount as a percentage (0-100).
-        :return: The discounted price or None if SKU not found.
+        :return: Sum of all product prices
         """
-        product = self.inventory.get(sku)
-        if not product:
-            return None
-        
-        discount_factor = 1 - (discount_percent / 100)
-        return round(product["price"] * discount_factor, 2)
+        return sum(item['price'] for item in self.inventory)
 
-    def update_stock(self, sku: str, quantity_change: int) -> bool:
+    def find_products_by_category(self, category: str) -> List[Dict]:
         """
-        Updates the stock level for a given SKU.
+        Filters the inventory to find products belonging to a specific category.
 
-        :param sku: The SKU to update.
-        :param quantity_change: Positive integer for restock, negative for sales.
-        :return: True if update was successful, False if stock becomes negative.
+        :param category: The category string to search for
+        :return: A list of product dictionaries
         """
-        if sku not in self.inventory:
-            return False
-        
-        new_stock = self.inventory[sku]["stock"] + quantity_change
-        if new_stock < 0:
-            return False
-            
-        self.inventory[sku]["stock"] = new_stock
-        return True
+        return [item for item in self.inventory if item['category'] == category]
 
-    def get_low_stock_alerts(self, threshold: int = 5) -> List[str]:
+    def apply_discount(self, sku: str, percentage: float) -> Optional[float]:
         """
-        Identifies products that are running low on stock.
+        Applies a discount to a specific product by its SKU.
 
-        :param threshold: The minimum stock level to trigger an alert.
-        :return: A list of product names that are below the threshold.
+        :param sku: The unique product identifier
+        :param percentage: Discount percentage (0-100)
+        :return: The new price if found, else None
         """
-        alerts = [
-            info["name"] 
-            for sku, info in self.inventory.items() 
-            if info["stock"] <= threshold
-        ]
-        return alerts
+        for item in self.inventory:
+            if item['sku'] == sku:
+                discounted_price = item['price'] * (1 - (percentage / 100))
+                item['price'] = discounted_price
+                return discounted_price
+        return None
 
-    def generate_inventory_report(self) -> Dict[str, Union[str, float]]:
+    def generate_report(self) -> str:
         """
-        Generates a summary report of the current KalaTak inventory value.
+        Generates a summary report of the current KalaTak inventory status.
 
-        :return: A dictionary containing total products and total valuation.
+        :return: Formatted string report
         """
-        total_value = sum(item["price"] * item["stock"] for item in self.inventory.values())
-        return {
-            "shop": self.shop_name,
-            "total_items": len(self.inventory),
-            "total_valuation": total_value,
-            "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M")
-        }
+        total_items = len(self.inventory)
+        total_value = self.get_total_inventory_value()
+        return (f"KalaTak Report for {self.shop_name}\n"
+                f"----------------------------\n"
+                f"Total Products: {total_items}\n"
+                f"Total Inventory Value: {total_value:,.2f} Rial\n"
+                f"Generated at: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
 
 
-# Example usage:
+# Example usage pattern
 if __name__ == "__main__":
     kt = KalaTakManager("KalaTak Central Warehouse")
-    kt.add_product("KT-001", "Industrial Sensor", 1500000, 10)
-    kt.add_product("KT-002", "Control Module", 850000, 3)
+    kt.add_product("Smart Monitor", "KT-101", 15000000, "Electronics")
+    kt.add_product("Ergonomic Chair", "KT-202", 8500000, "Furniture")
     
-    print(f"Low Stock Items: {kt.get_low_stock_alerts()}")
-    print(f"Inventory Report: {kt.generate_inventory_report()}")
+    print(kt.generate_report())
 ```
