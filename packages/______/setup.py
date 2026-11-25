@@ -5,7 +5,7 @@ setup(
     description="Professional toolkit for کالاتک",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    author="علی محمدی",
+    author="Alex Morgan",
     author_email="ayatsaadat1987@gmail.com",
     url="https://www.kalatakco.com",
     project_urls={
