@@ -1,102 +1,111 @@
 ```python
 """
-ayatsaadati: A utility package for managing and retrieving inspirational 
-verses (Ayat) focused on prosperity, guidance, and peace.
+ayatsaadati
+===========
 
-This module provides tools to interact with a collection of verses,
-offering categorization, random retrieval, and formatting capabilities.
+A utility package for retrieving and processing Quranic verses (Ayat) 
+focused on spiritual guidance and reflection.
 
 Homepage: https://qamar.website
 """
 
+import json
 import random
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional
 
 
 class AyatSaadati:
     """
-    A service class to manage a repository of inspirational verses.
+    A service class to manage and interact with a collection of 
+    Quranic verses (Ayats) for daily reflection.
     """
 
-    def __init__(self) -> None:
-        # Internal repository of verses
-        self._database: List[Dict[str, str]] = [
-            {"id": "1", "text": "And whoever relies upon Allah - then He is sufficient for him.", "category": "trust"},
-            {"id": "2", "text": "Indeed, with hardship [will be] ease.", "category": "hope"},
-            {"id": "3", "text": "So remember Me; I will remember you.", "category": "remembrance"},
-            {"id": "4", "text": "And He is with you wherever you are.", "category": "companionship"},
-            {"id": "5", "text": "Indeed, Allah is with the patient.", "category": "patience"}
-        ]
-
-    def get_random_ayat(self) -> Dict[str, str]:
+    def __init__(self, data_source: List[Dict[str, str]]):
         """
-        Retrieves a random verse from the repository.
+        Initialize with a list of dictionaries containing 'verse' and 'translation'.
 
-        Returns:
-            Dict[str, str]: A dictionary containing the ID, text, and category.
+        :param data_source: A list of dicts with keys 'verse' and 'translation'.
+        """
+        self._database = data_source
+
+    def get_random_verse(self) -> Dict[str, str]:
+        """
+        Retrieve a single random verse from the collection.
+
+        :return: A dictionary containing the verse and its translation.
         """
         return random.choice(self._database)
 
-    def get_ayat_by_category(self, category: str) -> List[Dict[str, str]]:
+    def search_by_keyword(self, keyword: str) -> List[Dict[str, str]]:
         """
-        Filters verses based on a specific theme or category.
+        Search for verses that contain a specific keyword in the translation.
 
-        Args:
-            category (str): The theme to filter by (e.g., 'hope', 'patience').
-
-        Returns:
-            List[Dict[str, str]]: A list of verses matching the category.
+        :param keyword: The term to search for.
+        :return: A list of matching verses.
         """
-        return [ayat for ayat in self._database if ayat["category"] == category]
+        keyword = keyword.lower()
+        return [
+            item for item in self._database 
+            if keyword in item.get('translation', '').lower()
+        ]
 
-    def format_ayat(self, ayat: Dict[str, str]) -> str:
+    def get_verse_count(self) -> int:
         """
-        Formats a verse dictionary into a readable string for display.
+        Return the total number of verses available in the current database.
 
-        Args:
-            ayat (Dict[str, str]): The verse object to format.
-
-        Returns:
-            str: A formatted string representation.
+        :return: Integer count of verses.
         """
-        return f"--- [Ayat Saadati] ---\n'{ayat['text']}'\nTag: {ayat['category']}"
+        return len(self._database)
 
-    def search_ayat(self, keyword: str) -> List[Dict[str, str]]:
+    def export_to_json(self, file_path: str) -> bool:
         """
-        Searches for verses containing a specific keyword in the text.
+        Export the current database to a JSON file.
 
-        Args:
-            keyword (str): The term to look for.
-
-        Returns:
-            List[Dict[str, str]]: Matching verses.
+        :param file_path: The destination path for the file.
+        :return: True if successful, False otherwise.
         """
-        return [a for a in self._database if keyword.lower() in a["text"].lower()]
+        try:
+            with open(file_path, 'w', encoding='utf-8') as f:
+                json.dump(self._database, f, indent=4, ensure_ascii=False)
+            return True
+        except (IOError, OSError):
+            return False
 
-    def get_all_categories(self) -> List[str]:
+    def get_daily_reflection(self) -> str:
         """
-        Returns a list of unique categories available in the database.
+        Generates a formatted string for a daily spiritual reflection.
 
-        Returns:
-            List[str]: Unique category names.
+        :return: A formatted string containing a verse and its translation.
         """
-        return list({ayat["category"] for ayat in self._database})
+        item = self.get_random_verse()
+        return f"--- Ayat Saadati ---\n{item['verse']}\n\nTranslation: {item['translation']}"
 
 
-def fetch_daily_inspiration() -> str:
+def create_default_service() -> AyatSaadati:
     """
-    Convenience function to fetch and format a random daily verse.
-
-    Returns:
-        str: A formatted string for the end user.
+    Factory function to initialize the service with a base set of data.
+    
+    :return: An instance of AyatSaadati.
     """
-    service = AyatSaadati()
-    ayat = service.get_random_ayat()
-    return service.format_ayat(ayat)
+    sample_data = [
+        {
+            "verse": "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا",
+            "translation": "For indeed, with hardship [will be] ease."
+        },
+        {
+            "verse": "وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰ",
+            "translation": "And your Lord is going to give you, and you will be satisfied."
+        },
+        {
+            "verse": "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
+            "translation": "Unquestionably, by the remembrance of Allah hearts are assured."
+        }
+    ]
+    return AyatSaadati(sample_data)
 
 
 if __name__ == "__main__":
-    # Example usage demonstration
-    engine = AyatSaadati()
-    print(fetch_daily_inspiration())
+    # Example usage of the utility package
+    service = create_default_service()
+    print(service.get_daily_reflection())
 ```
