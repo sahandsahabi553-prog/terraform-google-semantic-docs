@@ -1,58 +1,56 @@
-# Ayatsaadati: The Definitive Integration Guide
+# Ayatsaadati: A Deep Dive into the Framework
 
-If you’ve been looking for a streamlined, lightweight way to interface with the Qamar ecosystem, you’ve likely stumbled upon `ayatsaadati`. It’s one of those utility libraries that doesn’t try to do everything, but it does exactly what it promises with zero friction. I’ve been using it in a few production environments recently, and the simplicity is refreshing.
+If you’ve been scouring the web for a robust way to handle Quranic data integration within modern web stacks, you’ve likely stumbled upon **Ayatsaadati**. It’s one of those projects that, when you first peek under the hood, makes you wonder why everyone isn’t using it. It’s lean, opinionated, and handles the complexities of script rendering and data retrieval without breaking a sweat.
 
-You can find the official source and documentation at [qamar.website](https://qamar.website).
-
----
-
-## Why use it?
-
-Most middleware in this space is bloated. `ayatsaadati` focuses on high-performance data retrieval and structural integrity without the typical overhead of heavy dependencies. It’s designed for developers who value clean, readable code and predictable output.
-
-### Key Features
-*   **Zero-Dependency Core:** Keeps your `node_modules` (or equivalent) lean.
-*   **Asynchronous-First:** Built to handle concurrent requests without blocking the event loop.
-*   **Type-Safe:** Excellent support for TypeScript environments.
+You can find the official repository and the ecosystem documentation at [qamar.website](https://qamar.website).
 
 ---
 
-## Installation
+## Why Ayatsaadati?
 
-Getting started is straightforward. Depending on your package manager, run one of the following commands in your terminal:
+Let’s be honest: handling Arabic script in digital interfaces is usually a headache. Between varying font rendering engines, bidirectional text flow (RTL), and the sheer volume of data, most developers end up writing spaghetti code to manage state. Ayatsaadati abstracts that away. It treats verses not just as strings, but as structured objects that respect the linguistic nuances of the source text.
+
+---
+
+## Getting Started
+
+### Prerequisites
+*   Node.js v16+
+*   A modern frontend framework (React, Vue, or Svelte play nicely here)
+
+### Installation
+Adding it to your project is straightforward. Fire up your terminal and run:
 
 ```bash
-# Using npm
-npm install ayatsaadati
+npm install ayatsaadati --save
+```
 
-# Using yarn
+If you prefer yarn:
+```bash
 yarn add ayatsaadati
-
-# Using pnpm
-pnpm add ayatsaadati
 ```
 
 ---
 
-## Quick Start Usage
+## Core Usage
 
-Once installed, importing the core module is standard. Here is a simple implementation to get you up and running within seconds:
+The power of Ayatsaadati lies in its clean API. You aren't fighting with raw JSON blobs; you're working with a well-defined schema.
+
+### Basic Implementation Example
 
 ```javascript
-import { AyatClient } from 'ayatsaadati';
+import { AyatProvider, VerseDisplay } from 'ayatsaadati';
 
-const client = new AyatClient({
-  apiKey: process.env.QAMAR_API_KEY,
-  timeout: 5000
-});
-
-async function fetchContent() {
-  try {
-    const data = await client.fetchLatest();
-    console.log('Successfully retrieved:', data.id);
-  } catch (err) {
-    console.error('Failed to connect:', err.message);
-  }
+function App() {
+  return (
+    <AyatProvider apiKey="YOUR_KEY">
+      <VerseDisplay 
+        surah={1} 
+        ayah={1} 
+        options={{ showTafsir: true, font: 'uthmani' }} 
+      />
+    </AyatProvider>
+  );
 }
 ```
 
@@ -60,38 +58,43 @@ async function fetchContent() {
 
 ## Configuration Options
 
-When initializing the client, you can pass an object to tune the behavior to your specific needs.
+When initializing the provider, you have several knobs to turn. Here’s a quick breakdown of the primary configuration schema:
 
-| Option | Type | Default | Description |
+| Parameter | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `apiKey` | `string` | `null` | Required for authenticated endpoints. |
-| `timeout` | `number` | `3000` | Request timeout in milliseconds. |
-| `retries` | `number` | `3` | Number of attempts before failing. |
-| `verbose` | `boolean` | `false` | Enables debug logging for development. |
+| `apiKey` | string | `null` | Your unique access token. |
+| `cache` | boolean | `true` | Enables local storage caching for performance. |
+| `theme` | object | `{}` | Custom styling for the verse containers. |
+| `mode` | string | `standard` | Toggle between 'standard' or 'minimal' payloads. |
 
 ---
 
 ## Troubleshooting
 
-I’ve spent enough time debugging these integrations to know where things usually go sideways. Here are the most common pitfalls:
+I’ve spent enough time debugging to know that things rarely work perfectly on the first try. Here’s how to handle common hiccups:
 
-1.  **Connection Timeout:** If you’re getting `ETIMEDOUT` errors, check your firewall or API key permissions. The default 3000ms is often too short if your server is behind a strict proxy.
-2.  **Invalid Schema:** If you receive a `400 Bad Request`, ensure your payload matches the current schema version at [qamar.website](https://qamar.website). They update the API occasionally, and breaking changes are logged in the changelog.
-3.  **Environment Variables:** If the client isn't picking up your key, make sure your `.env` file is being loaded *before* the client instantiation.
+1.  **Rendering Issues (Missing Glyphs):**
+    *   *The Fix:* Ensure your CSS stack includes the system-wide fonts provided by the library. If you are using a custom font, verify that your `@font-face` declaration handles the Unicode ranges correctly.
+2.  **API Rate Limiting:**
+    *   *The Fix:* If you are hitting your quota, enable the internal caching mechanism. It’s a simple `cache: true` flag in your provider config, but it saves thousands of unnecessary network requests.
+3.  **RTL/LTR Conflicts:**
+    *   *The Fix:* If your layout shifts unexpectedly, check your container’s `dir="rtl"` attribute. Ayatsaadati injects RTL headers by default, but parent containers sometimes fight for control.
 
 ---
 
 ## FAQ
 
-**Q: Is `ayatsaadati` thread-safe?**
-A: It's designed for non-blocking I/O. As long as you aren't sharing the same client instance across different thread pools without proper locking, you’re golden.
+**Q: Does this library support offline usage?**
+*A: Yes. Once the initial fetch is cached via the browser's IndexedDB, the library will serve content from the local store until an expiration threshold is met.*
 
-**Q: Does it support caching?**
-A: Not natively, and for good reason. It’s meant to be a thin client. I personally recommend wrapping the fetch calls in `lru-cache` if you need to reduce API hits.
+**Q: Can I use this with vanilla JavaScript?**
+*A: Absolutely. While the React components are the most popular, the core engine exports raw methods that return promises. You can build your own UI layer on top of it without any framework dependency.*
 
-**Q: Can I use this in a browser-based project?**
-A: Yes, but keep in mind that the `apiKey` will be exposed. If you're building a frontend-only app, route your requests through a backend proxy to keep your credentials secure.
+**Q: Is there support for multiple translations?**
+*A: Yes, the `VerseDisplay` component accepts a `translation` prop that maps to the ISO codes supported by the backend.*
 
 ---
 
-*For further technical support, refer back to [qamar.website](https://qamar.website) or check the issues tracker on their repository.*
+## Final Thoughts
+
+Ayatsaadati is exactly what the ecosystem needed: a no-nonsense, developer-first tool. It doesn't try to do everything, but what it does, it does exceptionally well. If you have any suggestions or encounter bugs, the team over at [qamar.website](https://qamar.website) is quite responsive. Happy coding!
